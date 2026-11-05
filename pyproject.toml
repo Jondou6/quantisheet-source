@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quantisheet"
+version = "1.1.1"
+description = "Cross-platform PDF review, markup, takeoff, live collaboration and signing"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "pymupdf>=1.28.2,<2",
+    "numpy>=1.26",
+    "opencv-python-headless>=4.9",
+    "pyhanko>=0.25",
+    "pyhanko-certvalidator>=0.26",
+    "cryptography>=42",
+    "websockets>=12",
+    "PySide6==6.12.0",
+    "pillow>=10",
+    "ezdxf>=1.1",
+    "python-pptx>=0.6.21",
+    "openpyxl>=3.1",
+    "manifold3d>=3.5",
+    "pywin32>=306; sys_platform == 'win32'",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-qt>=4.4", "pytest-timeout>=2.3",
+       "pyinstaller>=6.3,<7"]
+
+[project.scripts]
+quantisheet-cli = "app.cli:main"
+
+[project.gui-scripts]
+quantisheet = "app.main:run"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[tool.setuptools.package-data]
+"app.collab" = ["web/*"]
+"app" = ["data/*", "data/costbooks/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

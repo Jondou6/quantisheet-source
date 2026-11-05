@@ -1,0 +1,8 @@
+QuantiSheet 1.0.7
+- Estimate > Bid Form Workbook: pick the spec book or the owner's bid form and QuantiSheet makes an Excel workbook of its items, quantities and alternates. Type the unit prices in the yellow cells; line totals, the subtotal, add and deduct alternates and the base bid are Excel formulas. Transfer to PDF fills the bid form and adds a bid schedule page whose fields add and subtract on their own.
+- Check an Addendum (in the Bid Form Workbook): if an addendum reissues the bid form, you see what changed (new items, removed items, quantity changes, alternates) and get a new workbook with the prices kept for items that didn't change. Every addendum summary now says when the addendum includes a bid form.
+- Spec Book Risk Scanner: each scan saves '<project> - Bid Form & Insurance Review.pdf' beside the spec book with the bid form, insurance requirements and builder's risk pages pulled out behind a cover page.
+- Estimate > Builder's Risk Quote Request: project name, address, summary of work and estimated amount on one page, with the spec's builder's risk pages attached. Edit anything, then Email to Insurance sends it from QuantiSheet; the agent's address is remembered.
+- Count From a Picture: paste or pick a picture of a symbol and every match on the sheet (or all sheets) is found for review.
+- Bid quotes that are scans or photos are read with text recognition; the Bid Form Autopilot fills unit prices from the estimate; the dashboard shows estimating hours from the Time Log.
+- Package Tracker: with a carrier's developer keys (Carrier Keys…), Check Status shows each package's latest scan and delivery date in the list.

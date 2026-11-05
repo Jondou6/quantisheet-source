@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Punch</title>
+<style>
+body{font-family:system-ui,sans-serif;margin:0;padding:12px;max-width:560px}
+input,button,select{font-size:1.1em;padding:10px;margin:4px 0;width:100%;box-sizing:border-box}
+.muted{color:#666;font-size:.9em}
+</style></head>
+<body data-page="punch">
+<h1>Punch in / out</h1>
+<p class="muted">Works with no signal: punches wait on this phone and send
+when you are back online. Your location is checked against the job site.
+A photo is kept only if you signed the photo consent form.</p>
+<select id="job"></select><select id="code"></select>
+<input id="photo" type="file" accept="image/*" capture="user">
+<button id="in">Punch IN</button><button id="out">Punch OUT</button>
+<p id="queue" class="muted"></p>
+<p><a href="/">My pay, PTO and info</a></p>
+<script src="/app.js"></script>
+</body></html>

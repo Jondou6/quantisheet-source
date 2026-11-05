@@ -1,0 +1,230 @@
+{
+ "interface_version": 1,
+ "source": {
+  "app": "QuantiSheet 0.13.1",
+  "file": "",
+  "folder": "",
+  "taken_at": "2026-10-22T10:00"
+ },
+ "project": {
+  "name": "Example Clinic",
+  "number": "2611",
+  "address": "",
+  "owner": "",
+  "contractor": "",
+  "architect": "",
+  "contract_no": "",
+  "contract_date": "",
+  "state": "OR"
+ },
+ "cost_codes": [
+  {
+   "code": "01-5000",
+   "description": "Temporary facilities",
+   "category": "O"
+  },
+  {
+   "code": "03-3000",
+   "description": "Cast-in-place concrete",
+   "category": "L"
+  },
+  {
+   "code": "06-1000",
+   "description": "Rough carpentry",
+   "category": "S"
+  },
+  {
+   "code": "09-2000",
+   "description": "Gypsum board",
+   "category": "S"
+  },
+  {
+   "code": "26-0500",
+   "description": "Electrical",
+   "category": "S"
+  }
+ ],
+ "budget": [
+  {
+   "code": "01-5000",
+   "description": "Temporary facilities",
+   "category": "O",
+   "original": "12500.50",
+   "revised": "12500.50"
+  },
+  {
+   "code": "03-3000",
+   "description": "Cast-in-place concrete",
+   "category": "L",
+   "original": "48000.00",
+   "revised": "48000.00"
+  },
+  {
+   "code": "06-1000",
+   "description": "Rough carpentry",
+   "category": "S",
+   "original": "135000.00",
+   "revised": "143500.00"
+  },
+  {
+   "code": "09-2000",
+   "description": "Gypsum board",
+   "category": "S",
+   "original": "62000.00",
+   "revised": "65100.75"
+  },
+  {
+   "code": "26-0500",
+   "description": "Electrical",
+   "category": "S",
+   "original": "88000.00",
+   "revised": "88000.00"
+  }
+ ],
+ "estimate": [],
+ "activities": [],
+ "contract": {
+  "retainage_work": "10.0000",
+  "retainage_stored": "10.0000",
+  "sov": []
+ },
+ "changes": [
+  {
+   "id": "CE-003",
+   "pco": "",
+   "cor": "",
+   "co": "",
+   "title": "Extra outlets",
+   "stage": "pco",
+   "amount": "2070.00",
+   "approved_amount": "0.00",
+   "days": "0",
+   "executed": ""
+  },
+  {
+   "id": "501b99a58c4c1567",
+   "pco": "",
+   "cor": "",
+   "co": "CE-001",
+   "title": "Added header beams",
+   "stage": "co",
+   "amount": "9350.00",
+   "approved_amount": "9350.00",
+   "days": "0",
+   "executed": "2026-08-15"
+  },
+  {
+   "id": "d924b52e5a2fb002",
+   "pco": "",
+   "cor": "",
+   "co": "CE-002",
+   "title": "Owner upgrade",
+   "stage": "co",
+   "amount": "3565.86",
+   "approved_amount": "3565.86",
+   "days": "0",
+   "executed": "2026-09-02"
+  }
+ ],
+ "payapps": [],
+ "commitments": [
+  {
+   "number": "SC-001",
+   "vendor": "Example Framing",
+   "type": "Subcontract",
+   "lines": [
+    {
+     "cost_code": "06-1000",
+     "description": "Framing",
+     "amount": "120000.00"
+    },
+    {
+     "cost_code": "06-1000",
+     "description": "CE-001 Added header beams",
+     "amount": "8500.00"
+    }
+   ],
+   "retainage": "10.0000",
+   "insurance_expires": "2026-09-30",
+   "license_expires": "",
+   "w9": ""
+  },
+  {
+   "number": "SC-002",
+   "vendor": "Example Ready-Mix",
+   "type": "Purchase Order",
+   "lines": [
+    {
+     "cost_code": "03-3000",
+     "description": "Ready-mix",
+     "amount": "30000.00"
+    },
+    {
+     "cost_code": "03-3000",
+     "description": "Pump",
+     "amount": "2750.25"
+    }
+   ],
+   "retainage": "0.0000",
+   "insurance_expires": "",
+   "license_expires": "",
+   "w9": ""
+  }
+ ],
+ "direct_costs": [
+  {
+   "id": "DC-0001",
+   "date": "2026-10-05",
+   "vendor": "Test vendor",
+   "cost_code": "03-3000",
+   "category": "M",
+   "amount": "1850.00",
+   "invoice": "",
+   "status": "Approved",
+   "paid_on": "",
+   "commitment": "",
+   "description": ""
+  },
+  {
+   "id": "DC-0002",
+   "date": "2026-09-25",
+   "vendor": "Test vendor",
+   "cost_code": "06-1000",
+   "category": "S",
+   "amount": "96000.00",
+   "invoice": "",
+   "status": "Approved",
+   "paid_on": "",
+   "commitment": "SC-001",
+   "description": ""
+  },
+  {
+   "id": "DC-0003",
+   "date": "2026-10-12",
+   "vendor": "Test vendor",
+   "cost_code": "01-5000",
+   "category": "O",
+   "amount": "412.37",
+   "invoice": "",
+   "status": "Approved",
+   "paid_on": "",
+   "commitment": "",
+   "description": ""
+  },
+  {
+   "id": "DC-0004",
+   "date": "2026-10-14",
+   "vendor": "Test vendor",
+   "cost_code": "26-0500",
+   "category": "M",
+   "amount": "2200.10",
+   "invoice": "",
+   "status": "Approved",
+   "paid_on": "",
+   "commitment": "",
+   "description": ""
+  }
+ ],
+ "timecards": [],
+ "directory": []
+}

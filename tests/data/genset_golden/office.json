@@ -1,0 +1,886 @@
+{
+  "schema": "pdfstudio.genset_plan/1",
+  "units": "ft",
+  "disclaimer": "FOR REVIEW \u2014 NOT FOR SEALING",
+  "project": {
+    "name": "Untitled Project",
+    "address": null,
+    "firm": "[FIRM NAME]",
+    "date": null,
+    "building_type": "small_commercial",
+    "work": "new",
+    "occupancy": "B",
+    "gross_sf_target": 2400.0
+  },
+  "source": {
+    "brief": "2,400 sf office, occupancy B, new",
+    "sketch": null,
+    "ai_used": false,
+    "ai_model": null,
+    "kernel": "modulor",
+    "modulor_version": null
+  },
+  "footprint": {
+    "width": 70.0,
+    "depth": 34.0,
+    "from": "brief"
+  },
+  "level": {
+    "name": "L1",
+    "floor_elev": 0.0,
+    "plate_height": 12.0,
+    "slab": 0.33
+  },
+  "roof": {
+    "type": "flat",
+    "pitch": 0.25,
+    "ridge_dir": null,
+    "overhang": 0,
+    "parapet": 3.0
+  },
+  "walls": [
+    {
+      "id": "W1",
+      "a": [
+        0.0,
+        0.0
+      ],
+      "b": [
+        70.0,
+        0.0
+      ],
+      "thickness": 0.5,
+      "kind": "exterior",
+      "face": "S"
+    },
+    {
+      "id": "W2",
+      "a": [
+        70.0,
+        0.0
+      ],
+      "b": [
+        70.0,
+        34.0
+      ],
+      "thickness": 0.5,
+      "kind": "exterior",
+      "face": "E"
+    },
+    {
+      "id": "W3",
+      "a": [
+        70.0,
+        34.0
+      ],
+      "b": [
+        0.0,
+        34.0
+      ],
+      "thickness": 0.5,
+      "kind": "exterior",
+      "face": "N"
+    },
+    {
+      "id": "W4",
+      "a": [
+        0.0,
+        34.0
+      ],
+      "b": [
+        0.0,
+        0.0
+      ],
+      "thickness": 0.5,
+      "kind": "exterior",
+      "face": "W"
+    },
+    {
+      "id": "W5",
+      "a": [
+        0.25,
+        23.0
+      ],
+      "b": [
+        25.0,
+        23.0
+      ],
+      "thickness": 0.375,
+      "kind": "interior",
+      "face": null
+    },
+    {
+      "id": "W6",
+      "a": [
+        25.0,
+        23.0
+      ],
+      "b": [
+        43.0,
+        23.0
+      ],
+      "thickness": 0.375,
+      "kind": "interior",
+      "face": null
+    },
+    {
+      "id": "W7",
+      "a": [
+        43.0,
+        14.0
+      ],
+      "b": [
+        43.0,
+        20.0
+      ],
+      "thickness": 0.375,
+      "kind": "interior",
+      "face": null
+    },
+    {
+      "id": "W8",
+      "a": [
+        43.0,
+        0.25
+      ],
+      "b": [
+        43.0,
+        14.0
+      ],
+      "thickness": 0.375,
+      "kind": "interior",
+      "face": null
+    },
+    {
+      "id": "W9",
+      "a": [
+        43.0,
+        20.0
+      ],
+      "b": [
+        43.0,
+        23.0
+      ],
+      "thickness": 0.375,
+      "kind": "interior",
+      "face": null
+    },
+    {
+      "id": "W10",
+      "a": [
+        25.0,
+        23.0
+      ],
+      "b": [
+        25.0,
+        33.75
+      ],
+      "thickness": 0.375,
+      "kind": "interior",
+      "face": null
+    },
+    {
+      "id": "W11",
+      "a": [
+        43.0,
+        23.0
+      ],
+      "b": [
+        43.0,
+        33.75
+      ],
+      "thickness": 0.375,
+      "kind": "interior",
+      "face": null
+    },
+    {
+      "id": "W12",
+      "a": [
+        43.0,
+        14.0
+      ],
+      "b": [
+        50.0,
+        14.0
+      ],
+      "thickness": 0.375,
+      "kind": "interior",
+      "face": null
+    },
+    {
+      "id": "W13",
+      "a": [
+        50.0,
+        14.0
+      ],
+      "b": [
+        57.0,
+        14.0
+      ],
+      "thickness": 0.375,
+      "kind": "interior",
+      "face": null
+    },
+    {
+      "id": "W14",
+      "a": [
+        57.0,
+        14.0
+      ],
+      "b": [
+        69.75,
+        14.0
+      ],
+      "thickness": 0.375,
+      "kind": "interior",
+      "face": null
+    },
+    {
+      "id": "W15",
+      "a": [
+        43.0,
+        20.0
+      ],
+      "b": [
+        49.0,
+        20.0
+      ],
+      "thickness": 0.375,
+      "kind": "interior",
+      "face": null
+    },
+    {
+      "id": "W16",
+      "a": [
+        49.0,
+        20.0
+      ],
+      "b": [
+        57.0,
+        20.0
+      ],
+      "thickness": 0.375,
+      "kind": "interior",
+      "face": null
+    },
+    {
+      "id": "W17",
+      "a": [
+        57.0,
+        20.0
+      ],
+      "b": [
+        69.75,
+        20.0
+      ],
+      "thickness": 0.375,
+      "kind": "interior",
+      "face": null
+    },
+    {
+      "id": "W18",
+      "a": [
+        50.0,
+        0.25
+      ],
+      "b": [
+        50.0,
+        14.0
+      ],
+      "thickness": 0.375,
+      "kind": "interior",
+      "face": null
+    },
+    {
+      "id": "W19",
+      "a": [
+        57.0,
+        0.25
+      ],
+      "b": [
+        57.0,
+        14.0
+      ],
+      "thickness": 0.375,
+      "kind": "interior",
+      "face": null
+    },
+    {
+      "id": "W20",
+      "a": [
+        49.0,
+        20.0
+      ],
+      "b": [
+        49.0,
+        33.75
+      ],
+      "thickness": 0.375,
+      "kind": "interior",
+      "face": null
+    },
+    {
+      "id": "W21",
+      "a": [
+        57.0,
+        20.0
+      ],
+      "b": [
+        57.0,
+        33.75
+      ],
+      "thickness": 0.375,
+      "kind": "interior",
+      "face": null
+    }
+  ],
+  "rooms": [
+    {
+      "id": "R101",
+      "number": "101",
+      "name": "OPEN OFFICE",
+      "type": "open_office",
+      "rect": [
+        0.25,
+        0.25,
+        43.0,
+        23.0
+      ],
+      "area": 972.56,
+      "target_sf": 975.2,
+      "finishes": {
+        "floor": "CPT-T",
+        "base": "RB",
+        "walls": "GWB-PT",
+        "ceiling": "ACT"
+      },
+      "ceiling_ht": 10.0
+    },
+    {
+      "id": "R102",
+      "number": "102",
+      "name": "CONFERENCE",
+      "type": "conference",
+      "rect": [
+        0.25,
+        23.0,
+        25.0,
+        33.75
+      ],
+      "area": 266.06,
+      "target_sf": 256.6,
+      "finishes": {
+        "floor": "CPT-T",
+        "base": "RB",
+        "walls": "GWB-PT",
+        "ceiling": "ACT"
+      },
+      "ceiling_ht": 10.0
+    },
+    {
+      "id": "R103",
+      "number": "103",
+      "name": "BREAK ROOM",
+      "type": "break",
+      "rect": [
+        25.0,
+        23.0,
+        43.0,
+        33.75
+      ],
+      "area": 193.5,
+      "target_sf": 179.6,
+      "finishes": {
+        "floor": "LVT",
+        "base": "RB",
+        "walls": "GWB-PT",
+        "ceiling": "ACT"
+      },
+      "ceiling_ht": 10.0
+    },
+    {
+      "id": "R104",
+      "number": "104",
+      "name": "HALL",
+      "type": "hall",
+      "rect": [
+        43.0,
+        14.0,
+        69.75,
+        20.0
+      ],
+      "area": 160.5,
+      "target_sf": 160.5,
+      "finishes": {
+        "floor": "LVP",
+        "base": "WD",
+        "walls": "GWB-PT",
+        "ceiling": "GWB-PT"
+      },
+      "ceiling_ht": 10.0
+    },
+    {
+      "id": "R105",
+      "number": "105",
+      "name": "RESTROOM 1",
+      "type": "restroom",
+      "rect": [
+        43.0,
+        0.25,
+        50.0,
+        14.0
+      ],
+      "area": 96.25,
+      "target_sf": 102.7,
+      "finishes": {
+        "floor": "CT",
+        "base": "CT",
+        "walls": "GWB-MR",
+        "ceiling": "GWB-PT"
+      },
+      "ceiling_ht": 10.0
+    },
+    {
+      "id": "R106",
+      "number": "106",
+      "name": "STORAGE",
+      "type": "storage",
+      "rect": [
+        50.0,
+        0.25,
+        57.0,
+        14.0
+      ],
+      "area": 96.25,
+      "target_sf": 102.7,
+      "finishes": {
+        "floor": "SC",
+        "base": "RB",
+        "walls": "GWB-PT",
+        "ceiling": "EXP"
+      },
+      "ceiling_ht": 10.0
+    },
+    {
+      "id": "R107",
+      "number": "107",
+      "name": "OFFICE 1",
+      "type": "office",
+      "rect": [
+        57.0,
+        0.25,
+        69.75,
+        14.0
+      ],
+      "area": 175.31,
+      "target_sf": 179.6,
+      "finishes": {
+        "floor": "CPT-T",
+        "base": "RB",
+        "walls": "GWB-PT",
+        "ceiling": "ACT"
+      },
+      "ceiling_ht": 10.0
+    },
+    {
+      "id": "R108",
+      "number": "108",
+      "name": "MECH",
+      "type": "mech",
+      "rect": [
+        43.0,
+        20.0,
+        49.0,
+        33.75
+      ],
+      "area": 82.5,
+      "target_sf": 77.0,
+      "finishes": {
+        "floor": "SC",
+        "base": "RB",
+        "walls": "GWB",
+        "ceiling": "EXP"
+      },
+      "ceiling_ht": 10.0
+    },
+    {
+      "id": "R109",
+      "number": "109",
+      "name": "RESTROOM 2",
+      "type": "restroom",
+      "rect": [
+        49.0,
+        20.0,
+        57.0,
+        33.75
+      ],
+      "area": 110.0,
+      "target_sf": 102.7,
+      "finishes": {
+        "floor": "CT",
+        "base": "CT",
+        "walls": "GWB-MR",
+        "ceiling": "GWB-PT"
+      },
+      "ceiling_ht": 10.0
+    },
+    {
+      "id": "R110",
+      "number": "110",
+      "name": "OFFICE 2",
+      "type": "office",
+      "rect": [
+        57.0,
+        20.0,
+        69.75,
+        33.75
+      ],
+      "area": 175.31,
+      "target_sf": 179.6,
+      "finishes": {
+        "floor": "CPT-T",
+        "base": "RB",
+        "walls": "GWB-PT",
+        "ceiling": "ACT"
+      },
+      "ceiling_ht": 10.0
+    }
+  ],
+  "openings": [
+    {
+      "id": "D1",
+      "kind": "door",
+      "mark": "101",
+      "type": "A",
+      "wall": "W1",
+      "along": 21.625,
+      "width": 3.0,
+      "height": 6.667,
+      "swing": "in-left",
+      "from_room": "EXT",
+      "to_room": "R101"
+    },
+    {
+      "id": "D2",
+      "kind": "door",
+      "mark": "102",
+      "type": "B",
+      "wall": "W5",
+      "along": 3.25,
+      "width": 3.0,
+      "height": 6.667,
+      "swing": "in",
+      "from_room": "R101",
+      "to_room": "R102"
+    },
+    {
+      "id": "D3",
+      "kind": "door",
+      "mark": "103",
+      "type": "B",
+      "wall": "W6",
+      "along": 3.25,
+      "width": 3.0,
+      "height": 6.667,
+      "swing": "in",
+      "from_room": "R101",
+      "to_room": "R103"
+    },
+    {
+      "id": "D4",
+      "kind": "door",
+      "mark": "104",
+      "type": "B",
+      "wall": "W7",
+      "along": 3.25,
+      "width": 3.0,
+      "height": 6.667,
+      "swing": "in",
+      "from_room": "R101",
+      "to_room": "R104"
+    },
+    {
+      "id": "D5",
+      "kind": "door",
+      "mark": "105",
+      "type": "B",
+      "wall": "W12",
+      "along": 3.25,
+      "width": 3.0,
+      "height": 6.667,
+      "swing": "in",
+      "from_room": "R104",
+      "to_room": "R105"
+    },
+    {
+      "id": "D6",
+      "kind": "door",
+      "mark": "106",
+      "type": "B",
+      "wall": "W13",
+      "along": 3.25,
+      "width": 3.0,
+      "height": 6.667,
+      "swing": "in",
+      "from_room": "R104",
+      "to_room": "R106"
+    },
+    {
+      "id": "D7",
+      "kind": "door",
+      "mark": "107",
+      "type": "B",
+      "wall": "W14",
+      "along": 3.25,
+      "width": 3.0,
+      "height": 6.667,
+      "swing": "in",
+      "from_room": "R104",
+      "to_room": "R107"
+    },
+    {
+      "id": "D8",
+      "kind": "door",
+      "mark": "108",
+      "type": "B",
+      "wall": "W15",
+      "along": 3.25,
+      "width": 3.0,
+      "height": 6.667,
+      "swing": "in",
+      "from_room": "R104",
+      "to_room": "R108"
+    },
+    {
+      "id": "D9",
+      "kind": "door",
+      "mark": "109",
+      "type": "B",
+      "wall": "W16",
+      "along": 3.25,
+      "width": 3.0,
+      "height": 6.667,
+      "swing": "in",
+      "from_room": "R104",
+      "to_room": "R109"
+    },
+    {
+      "id": "D10",
+      "kind": "door",
+      "mark": "110",
+      "type": "B",
+      "wall": "W17",
+      "along": 3.25,
+      "width": 3.0,
+      "height": 6.667,
+      "swing": "in",
+      "from_room": "R104",
+      "to_room": "R110"
+    },
+    {
+      "id": "N1",
+      "kind": "window",
+      "mark": "A",
+      "type": "A",
+      "wall": "W1",
+      "along": 7.375,
+      "width": 3.0,
+      "height": 4.0,
+      "sill": 3.0,
+      "room": "R101"
+    },
+    {
+      "id": "N2",
+      "kind": "window",
+      "mark": "A",
+      "type": "A",
+      "wall": "W1",
+      "along": 35.875,
+      "width": 3.0,
+      "height": 4.0,
+      "sill": 3.0,
+      "room": "R101"
+    },
+    {
+      "id": "N3",
+      "kind": "window",
+      "mark": "A",
+      "type": "A",
+      "wall": "W4",
+      "along": 22.375,
+      "width": 3.0,
+      "height": 4.0,
+      "sill": 3.0,
+      "room": "R101"
+    },
+    {
+      "id": "N4",
+      "kind": "window",
+      "mark": "A",
+      "type": "A",
+      "wall": "W1",
+      "along": 2.25,
+      "width": 3.0,
+      "height": 4.0,
+      "sill": 3.0,
+      "room": "R101"
+    },
+    {
+      "id": "N5",
+      "kind": "window",
+      "mark": "A",
+      "type": "A",
+      "wall": "W1",
+      "along": 11.25,
+      "width": 3.0,
+      "height": 4.0,
+      "sill": 3.0,
+      "room": "R101"
+    },
+    {
+      "id": "N6",
+      "kind": "window",
+      "mark": "A",
+      "type": "A",
+      "wall": "W1",
+      "along": 15.25,
+      "width": 3.0,
+      "height": 4.0,
+      "sill": 3.0,
+      "room": "R101"
+    },
+    {
+      "id": "N7",
+      "kind": "window",
+      "mark": "A",
+      "type": "A",
+      "wall": "W1",
+      "along": 25.25,
+      "width": 3.0,
+      "height": 4.0,
+      "sill": 3.0,
+      "room": "R101"
+    },
+    {
+      "id": "N8",
+      "kind": "window",
+      "mark": "A",
+      "type": "A",
+      "wall": "W3",
+      "along": 51.188,
+      "width": 3.0,
+      "height": 4.0,
+      "sill": 3.0,
+      "room": "R102"
+    },
+    {
+      "id": "N9",
+      "kind": "window",
+      "mark": "A",
+      "type": "A",
+      "wall": "W3",
+      "along": 63.562,
+      "width": 3.0,
+      "height": 4.0,
+      "sill": 3.0,
+      "room": "R102"
+    },
+    {
+      "id": "N10",
+      "kind": "window",
+      "mark": "A",
+      "type": "A",
+      "wall": "W2",
+      "along": 7.125,
+      "width": 3.0,
+      "height": 4.0,
+      "sill": 3.0,
+      "room": "R107"
+    },
+    {
+      "id": "N11",
+      "kind": "window",
+      "mark": "A",
+      "type": "A",
+      "wall": "W1",
+      "along": 63.375,
+      "width": 3.0,
+      "height": 4.0,
+      "sill": 3.0,
+      "room": "R107"
+    },
+    {
+      "id": "N12",
+      "kind": "window",
+      "mark": "A",
+      "type": "A",
+      "wall": "W2",
+      "along": 26.875,
+      "width": 3.0,
+      "height": 4.0,
+      "sill": 3.0,
+      "room": "R110"
+    },
+    {
+      "id": "N13",
+      "kind": "window",
+      "mark": "A",
+      "type": "A",
+      "wall": "W3",
+      "along": 6.625,
+      "width": 3.0,
+      "height": 4.0,
+      "sill": 3.0,
+      "room": "R110"
+    }
+  ],
+  "door_types": {
+    "A": "Exterior, insulated",
+    "B": "Interior, solid core, 3'-0\" (ADA 32 in. clear)"
+  },
+  "window_types": {
+    "A": "3'-0\" x 4'-0\" single hung",
+    "B": "2'-0\" x 3'-0\" (bath, obscure)"
+  },
+  "notes": {
+    "general": [],
+    "project": [],
+    "from_ai": false
+  },
+  "warnings": [
+    "Lot size not in the brief - drawn just big enough for the building and setbacks; get the survey.",
+    "Setbacks assumed (front 20', side 10', rear 20') - verify with zoning."
+  ],
+  "site": {
+    "lot_w": 95.0,
+    "lot_d": 75.0,
+    "lot_from": "assumed",
+    "lot_x0": -12.5,
+    "lot_y0": -20.25,
+    "setbacks": {
+      "front": 20.0,
+      "side": 10.0,
+      "rear": 20.0
+    },
+    "setbacks_from": "assumed",
+    "assumed": [
+      "front",
+      "rear",
+      "side"
+    ],
+    "provided": {
+      "front": 20.0,
+      "rear": 20.5,
+      "side": 12.25
+    },
+    "envelope": [
+      75.0,
+      35.0
+    ],
+    "on_lot": true,
+    "binding": [],
+    "coverage": 0.3414,
+    "street": "south"
+  },
+  "dropped": []
+}

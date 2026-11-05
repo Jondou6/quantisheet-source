@@ -1,0 +1,14 @@
+{
+  "house_1story": {"brief": "3 bed 2 bath ranch, about 1600 sf, new"},
+  "house_2story": {"brief": "two story 2400 sf house, 4 bed 3 bath, new"},
+  "house_garage": {"brief": "3 bed 2 bath house 1800 sf with a 2-car garage, new"},
+  "house_porch": {"brief": "3 bed 2 bath house 1600 sf with a covered front porch and a rear deck, new"},
+  "house_narrow_lot": {"brief": "3 bed 2 bath house 1600 sf, lot 40 x 120, side setback 5 ft"},
+  "house_2story_narrow": {"brief": "3 bed 2 bath two story house 2400 sf, lot 40 x 120, side setback 5 ft"},
+  "office": {"brief": "2,400 sf office, occupancy B, new"},
+  "office_8000": {"brief": "8000 sf office, new"},
+  "retail": {"brief": "4000 sf retail store, new"},
+  "retail_existing": {"brief": "3,000 sf retail store, remodel existing"},
+  "fields_house_small": {"fields": {"building_type": "single_family", "gross_sf": 400, "beds": 6, "baths": 4}},
+  "fields_retail_8000": {"fields": {"building_type": "small_commercial", "occupancy": "M", "gross_sf": 8000}}
+}

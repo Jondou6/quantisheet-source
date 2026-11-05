@@ -1,0 +1,46 @@
+{
+  "kind": "service_agreements",
+  "version": 1,
+  "next": 4,
+  "agreements": [
+    {
+      "id": "sa-sample-1",
+      "number": "SA-0001",
+      "customer": "Example Resident",
+      "site": "Example Hall",
+      "property_id": "",
+      "price": "120.00",
+      "visits_per_year": 2,
+      "start": "2026-01-01",
+      "renewal": "2027-01-01",
+      "notes": "Sample agreement.",
+      "status": "active"
+    },
+    {
+      "id": "sa-sample-2",
+      "number": "SA-0002",
+      "customer": "Example Tenant",
+      "site": "Example Warehouse",
+      "property_id": "",
+      "price": "80.00",
+      "visits_per_year": 4,
+      "start": "2026-03-01",
+      "renewal": "2027-03-01",
+      "notes": "Sample agreement.",
+      "status": "active"
+    },
+    {
+      "id": "sa-sample-3",
+      "number": "SA-0003",
+      "customer": "Example Owner",
+      "site": "Example School",
+      "property_id": "",
+      "price": "90.00",
+      "visits_per_year": 1,
+      "start": "2025-11-01",
+      "renewal": "2026-11-01",
+      "notes": "Sample agreement.",
+      "status": "active"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+QuantiSheet 1.0.4
+- Tool sets for the team: Tool Chest > Tool Sets > Save Sets as a File; others double-click the .qstools file and get the same tools, statuses and columns. A tool can carry a unit cost (adds Unit Cost and Total Cost columns), column values, rise/drop, wall height or volume depth. New Takeoff (Metric) set (existing users: Tool Sets > Restore Default Tools).
+- Live legend: this page or every page, only chosen tool sets (unused items show 0), keeps itself up to date, optional markup counts.
+- Wall Area tool (Shift+W): length x height less openings ("3x7 x2, 6x4").
+- Right-click a measurement: Rise / Drop, Wall Height and Openings, Convert To (length / area / volume / wall area), Show Volume In (cu ft / cu yd), Copy Several Times (previewed). Right-click a count: Add More to it.
+- Scale presets ask which pages (this one, all, same size, or a list) and warn on half-size / 11x17 prints or an odd-sized sheet.
+- Takeoff > Show Side Lengths and Takeoff > Captions (name and quantity / quantity only / name only).
+- Markups List: Group by any column with totals; export to CSV, Excel or XML; choices can carry a hidden number (Carpet = 4.50) for formulas.
+- Count Library entries keep their own color.
+- Proposals: Qualifications can list what the takeoff assumed, plus a rough schedule from labor hours.
+- Takeoff > Takeoff Standard: the office's takeoff steps as a checklist on each drawing.

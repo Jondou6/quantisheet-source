@@ -1,0 +1,420 @@
+{
+ "note": "Rates researched Oct 17, 2026 for South Carolina (see 'SC heavy civil rate sources' report). Labor base = BLS May 2025 SC medians (Davis-Bacon WD SC20260043 rates are lower legal minimums). Equipment = FEMA 2025 operated rates with an assumed own/op split and fuel at today's price. Workers' comp, GL and rentals are ESTIMATES - replace with your policy, Blue Book and quotes.",
+ "settings": {
+  "fuel": 5.12,
+  "fuel_source": "EIA Lower Atlantic on-highway diesel $5.645 (Oct 12, 2026) less federal 24.4 and SC 28 cents road tax = off-road diesel"
+ },
+ "equipment": [
+  {
+   "code": "EXC-20",
+   "desc": "Excavator, 20-ton (e.g. 320 class)",
+   "class": "Excavator",
+   "own_hr": 68.47,
+   "op_hr": 29.34,
+   "fuel_gph": 2.78,
+   "use": "own",
+   "source": "FEMA Schedule of Equipment Rates 2025 (operated rate, fuel included, no operator): code 8282 Cat 320 GC $107.93/hr; fuel burn: Cat Performance Handbook (2022) medium-load fuel burn; own/op split is an ESTIMATING ASSUMPTION: FEMA rate less fuel at $3.64/gal, then 70% ownership / 30% operating (repairs, tires, FOG); fuel is added at today's price"
+  },
+  {
+   "code": "EXC-35",
+   "desc": "Excavator, 35-ton",
+   "class": "Excavator",
+   "own_hr": 92.83,
+   "op_hr": 39.78,
+   "fuel_gph": 5.05,
+   "use": "own",
+   "source": "FEMA Schedule of Equipment Rates 2025 (operated rate, fuel included, no operator): code 8283 Cat 330 $150.99/hr; fuel burn: Cat Performance Handbook (2022) medium-load fuel burn (Cat 336); own/op split is an ESTIMATING ASSUMPTION: FEMA rate less fuel at $3.64/gal, then 70% ownership / 30% operating (repairs, tires, FOG); fuel is added at today's price"
+  },
+  {
+   "code": "BKH",
+   "desc": "Backhoe loader",
+   "class": "Backhoe",
+   "own_hr": 73.3,
+   "op_hr": 31.41,
+   "fuel_gph": 1.46,
+   "use": "own",
+   "source": "FEMA Schedule of Equipment Rates 2025 (operated rate, fuel included, no operator): code 8572 Cat 420 $110.03/hr; fuel burn: Cat Performance Handbook (2022) medium-load fuel burn; own/op split is an ESTIMATING ASSUMPTION: FEMA rate less fuel at $3.64/gal, then 70% ownership / 30% operating (repairs, tires, FOG); fuel is added at today's price"
+  },
+  {
+   "code": "LDR-35",
+   "desc": "Wheel loader, 3.5 CY",
+   "class": "Loader",
+   "own_hr": 90.17,
+   "op_hr": 38.64,
+   "fuel_gph": 3.02,
+   "use": "own",
+   "source": "FEMA Schedule of Equipment Rates 2025 (operated rate, fuel included, no operator): code 8396 Cat 950 $139.8/hr; fuel burn: Cat Performance Handbook (2022) medium-load fuel burn (950M); own/op split is an ESTIMATING ASSUMPTION: FEMA rate less fuel at $3.64/gal, then 70% ownership / 30% operating (repairs, tires, FOG); fuel is added at today's price"
+  },
+  {
+   "code": "SKS",
+   "desc": "Skid steer / track loader",
+   "class": "Loader",
+   "own_hr": 24.99,
+   "op_hr": 10.71,
+   "fuel_gph": 2.62,
+   "use": "own",
+   "source": "FEMA Schedule of Equipment Rates 2025 (operated rate, fuel included, no operator): code 8541 Bobcat S76 $45.23/hr; fuel burn: Cat Performance Handbook (2022) medium-load fuel burn (259/279/289D3); own/op split is an ESTIMATING ASSUMPTION: FEMA rate less fuel at $3.64/gal, then 70% ownership / 30% operating (repairs, tires, FOG); fuel is added at today's price"
+  },
+  {
+   "code": "DOZ-D6",
+   "desc": "Dozer, D6 class",
+   "class": "Dozer",
+   "own_hr": 82.32,
+   "op_hr": 35.28,
+   "fuel_gph": 4.82,
+   "use": "own",
+   "source": "FEMA Schedule of Equipment Rates 2025 (operated rate, fuel included, no operator): code 8253 Cat D6 $135.15/hr; fuel burn: Cat Performance Handbook (2022) medium-load fuel burn; own/op split is an ESTIMATING ASSUMPTION: FEMA rate less fuel at $3.64/gal, then 70% ownership / 30% operating (repairs, tires, FOG); fuel is added at today's price"
+  },
+  {
+   "code": "GRD",
+   "desc": "Motor grader",
+   "class": "Grader",
+   "own_hr": 102.95,
+   "op_hr": 44.12,
+   "fuel_gph": 3.29,
+   "use": "own",
+   "source": "FEMA Schedule of Equipment Rates 2025 (operated rate, fuel included, no operator): code 8332 Cat 140 $159.04/hr; fuel burn: Cat Performance Handbook (2022) medium-load fuel burn; own/op split is an ESTIMATING ASSUMPTION: FEMA rate less fuel at $3.64/gal, then 70% ownership / 30% operating (repairs, tires, FOG); fuel is added at today's price"
+  },
+  {
+   "code": "RLR-SD",
+   "desc": "Roller, smooth drum 84 in",
+   "class": "Roller",
+   "own_hr": 79.89,
+   "op_hr": 34.24,
+   "fuel_gph": 2.91,
+   "use": "own",
+   "source": "FEMA Schedule of Equipment Rates 2025 (operated rate, fuel included, no operator): code 8224 smooth drum (closest FEMA row) $124.72/hr; fuel burn: Cat Performance Handbook (2022) medium-load fuel burn (CS56B); own/op split is an ESTIMATING ASSUMPTION: FEMA rate less fuel at $3.64/gal, then 70% ownership / 30% operating (repairs, tires, FOG); fuel is added at today's price"
+  },
+  {
+   "code": "RLR-PF",
+   "desc": "Roller, padfoot",
+   "class": "Roller",
+   "own_hr": 78.56,
+   "op_hr": 33.67,
+   "fuel_gph": 3.43,
+   "use": "own",
+   "source": "FEMA Schedule of Equipment Rates 2025 (operated rate, fuel included, no operator): code no FEMA padfoot row - smooth drum 8224 used $124.72/hr; fuel burn: Cat Performance Handbook (2022) medium-load fuel burn (CP56B); own/op split is an ESTIMATING ASSUMPTION: FEMA rate less fuel at $3.64/gal, then 70% ownership / 30% operating (repairs, tires, FOG); fuel is added at today's price"
+  },
+  {
+   "code": "PLT",
+   "desc": "Plate / jumping jack compactor",
+   "class": "Compactor",
+   "own_hr": 3.11,
+   "op_hr": 1.33,
+   "fuel_gph": 0.3,
+   "use": "own",
+   "source": "FEMA Schedule of Equipment Rates 2025 (operated rate, fuel included, no operator): code 8220 hand-held compactor $5.54/hr; fuel burn: sample; own/op split is an ESTIMATING ASSUMPTION: FEMA rate less fuel at $3.64/gal, then 70% ownership / 30% operating (repairs, tires, FOG); fuel is added at today's price"
+  },
+  {
+   "code": "TRK-TRI",
+   "desc": "Tri-axle dump truck",
+   "class": "Truck",
+   "own_hr": 90.85,
+   "op_hr": 38.94,
+   "fuel_gph": 5.0,
+   "use": "own",
+   "source": "FEMA Schedule of Equipment Rates 2025 (operated rate, fuel included, no operator): code 8724 dump truck 18 CY (no tri-axle row) $147.99/hr; fuel burn: sample; own/op split is an ESTIMATING ASSUMPTION: FEMA rate less fuel at $3.64/gal, then 70% ownership / 30% operating (repairs, tires, FOG); fuel is added at today's price"
+  },
+  {
+   "code": "TRK-WTR",
+   "desc": "Water truck 4,000 gal",
+   "class": "Truck",
+   "own_hr": 36.39,
+   "op_hr": 15.6,
+   "fuel_gph": 4.0,
+   "use": "own",
+   "source": "FEMA Schedule of Equipment Rates 2025 (operated rate, fuel included, no operator): code 8614 Freightliner M2 water truck - CHECK: looks low $66.55/hr; fuel burn: sample; own/op split is an ESTIMATING ASSUMPTION: FEMA rate less fuel at $3.64/gal, then 70% ownership / 30% operating (repairs, tires, FOG); fuel is added at today's price"
+  },
+  {
+   "code": "PKP",
+   "desc": "Crew pickup",
+   "class": "Truck",
+   "own_hr": 17.49,
+   "op_hr": 7.49,
+   "fuel_gph": 1.5,
+   "use": "own",
+   "source": "FEMA Schedule of Equipment Rates 2025 (operated rate, fuel included, no operator): code 8807 3/4-ton 4x4 pickup $30.44/hr; fuel burn: sample; own/op split is an ESTIMATING ASSUMPTION: FEMA rate less fuel at $3.64/gal, then 70% ownership / 30% operating (repairs, tires, FOG); fuel is added at today's price"
+  },
+  {
+   "code": "BOX-8x20",
+   "desc": "Trench box 8x20 (rented)",
+   "class": "Shoring",
+   "use": "rent",
+   "rent_month": 1500,
+   "hours_month": 176,
+   "op_hr": 0,
+   "fuel_gph": 0,
+   "source": "Sunbelt Rentals government price sheet (posted Nov 2024, FL): 8x20 steel trench box $1,402.20 per 4 weeks; $1,500 is an escalated ESTIMATE - get a quote"
+  },
+  {
+   "code": "PMP-4",
+   "desc": "4 in trash pump (rented)",
+   "class": "Pump",
+   "use": "rent",
+   "rent_month": 1200,
+   "hours_month": 176,
+   "op_hr": 2,
+   "fuel_gph": 0.8,
+   "source": "Sunbelt Rentals government price sheet (Nov 2024): 4 in electric trash pump $1,092.50 per 4 weeks; a diesel 4 in pump costs more - $1,200 is an ESTIMATE, get a quote"
+  }
+ ],
+ "labor": [
+  {
+   "code": "FMN",
+   "desc": "Foreman",
+   "base": 36.23,
+   "fringe": 0,
+   "ot_pct": 10,
+   "wc_rate": 6.8,
+   "fica": 7.65,
+   "unemp": 0.4,
+   "gl_pct": 1.5,
+   "other_pct": 0,
+   "source": "BLS May 2025 South Carolina median wage (O*NET OnLine, SOC 47-1011); Davis-Bacon minimum on this job: SC20260043 Mod 1 (Heavy, Horry County, 05/18/2026): no foreman class on the WD (conformance needed) - the market wage here is above it, so no extra fringe is owed; workers' comp ESTIMATE class 6217 excavation: broker range $3.70-9.93 per $100 (midpoint) - use your policy's rate; unemployment = SC SUTA 1.06% on $14,000 + FUTA 0.6% on $7,000, about 0.4% of pay; GL 1.5% of payroll is an ESTIMATE"
+  },
+  {
+   "code": "OPR",
+   "desc": "Equipment operator",
+   "base": 23.53,
+   "fringe": 0,
+   "ot_pct": 10,
+   "wc_rate": 6.8,
+   "fica": 7.65,
+   "unemp": 0.4,
+   "gl_pct": 1.5,
+   "other_pct": 0,
+   "source": "BLS May 2025 South Carolina median wage (O*NET OnLine, SOC 47-2073); Davis-Bacon minimum on this job: SC20260043 Mod 1 (Heavy, Horry County, 05/18/2026): Operator Backhoe/Excavator $15.56 + $2.19; Grader $20.11 + $1.39; Loader $10.50 + $1.98; no dozer/roller class - the market wage here is above it, so no extra fringe is owed; workers' comp ESTIMATE class 6217 excavation: broker range $3.70-9.93 per $100 (midpoint) - use your policy's rate; unemployment = SC SUTA 1.06% on $14,000 + FUTA 0.6% on $7,000, about 0.4% of pay; GL 1.5% of payroll is an ESTIMATE"
+  },
+  {
+   "code": "PIPE",
+   "desc": "Pipelayer",
+   "base": 21.72,
+   "fringe": 0,
+   "ot_pct": 10,
+   "wc_rate": 6.8,
+   "fica": 7.65,
+   "unemp": 0.4,
+   "gl_pct": 1.5,
+   "other_pct": 0,
+   "source": "BLS May 2025 South Carolina median wage (O*NET OnLine, SOC 47-2151); Davis-Bacon minimum on this job: SC20260043 Mod 1 (Heavy, Horry County, 05/18/2026): Laborer Pipelayer $12.55 + $1.82 - the market wage here is above it, so no extra fringe is owed; workers' comp ESTIMATE class 6217 excavation: broker range $3.70-9.93 per $100 (midpoint) - use your policy's rate; unemployment = SC SUTA 1.06% on $14,000 + FUTA 0.6% on $7,000, about 0.4% of pay; GL 1.5% of payroll is an ESTIMATE"
+  },
+  {
+   "code": "LAB",
+   "desc": "Laborer",
+   "base": 20.65,
+   "fringe": 0,
+   "ot_pct": 10,
+   "wc_rate": 6.8,
+   "fica": 7.65,
+   "unemp": 0.4,
+   "gl_pct": 1.5,
+   "other_pct": 0,
+   "source": "BLS May 2025 South Carolina median wage (O*NET OnLine, SOC 47-2061); Davis-Bacon minimum on this job: SC20260043 Mod 1 (Heavy, Horry County, 05/18/2026): Laborer Common $11.56 + $2.53 - the market wage here is above it, so no extra fringe is owed; workers' comp ESTIMATE class 6217 excavation: broker range $3.70-9.93 per $100 (midpoint) - use your policy's rate; unemployment = SC SUTA 1.06% on $14,000 + FUTA 0.6% on $7,000, about 0.4% of pay; GL 1.5% of payroll is an ESTIMATE"
+  },
+  {
+   "code": "DRV",
+   "desc": "Truck driver",
+   "base": 24.58,
+   "fringe": 0,
+   "ot_pct": 10,
+   "wc_rate": 11.05,
+   "fica": 7.65,
+   "unemp": 0.4,
+   "gl_pct": 1.5,
+   "other_pct": 0,
+   "source": "BLS May 2025 South Carolina median wage (O*NET OnLine, SOC 53-3032); Davis-Bacon minimum on this job: SC20260043 Mod 1 (Heavy, Horry County, 05/18/2026): Truck Driver $13.85 + $2.49 - the market wage here is above it, so no extra fringe is owed; workers' comp ESTIMATE class 7219 trucking: broker range $6.00-16.10 per $100 (midpoint) - use your policy's rate; unemployment = SC SUTA 1.06% on $14,000 + FUTA 0.6% on $7,000, about 0.4% of pay; GL 1.5% of payroll is an ESTIMATE"
+  },
+  {
+   "code": "GRC",
+   "desc": "Grade checker",
+   "base": 22.57,
+   "fringe": 0,
+   "ot_pct": 10,
+   "wc_rate": 6.8,
+   "fica": 7.65,
+   "unemp": 0.4,
+   "gl_pct": 1.5,
+   "other_pct": 0,
+   "source": "BLS May 2025 South Carolina median wage (O*NET OnLine, SOC 47-2071); Davis-Bacon minimum on this job: SC20260043 Mod 1 (Heavy, Horry County, 05/18/2026): no grade checker class on the WD - the market wage here is above it, so no extra fringe is owed; workers' comp ESTIMATE class 6217 excavation: broker range $3.70-9.93 per $100 (midpoint) - use your policy's rate; unemployment = SC SUTA 1.06% on $14,000 + FUTA 0.6% on $7,000, about 0.4% of pay; GL 1.5% of payroll is an ESTIMATE"
+  }
+ ],
+ "crews": [
+  {
+   "code": "PIPE",
+   "desc": "Pipe crew (trenched)",
+   "labor": [
+    [
+     "FMN",
+     1
+    ],
+    [
+     "OPR",
+     2
+    ],
+    [
+     "PIPE",
+     2
+    ],
+    [
+     "LAB",
+     2
+    ]
+   ],
+   "equipment": [
+    [
+     "EXC-20",
+     1
+    ],
+    [
+     "LDR-35",
+     1
+    ],
+    [
+     "BOX-8x20",
+     1
+    ],
+    [
+     "PLT",
+     1
+    ],
+    [
+     "PKP",
+     1
+    ]
+   ]
+  },
+  {
+   "code": "MH",
+   "desc": "Manhole / structure crew",
+   "labor": [
+    [
+     "FMN",
+     1
+    ],
+    [
+     "OPR",
+     1
+    ],
+    [
+     "LAB",
+     2
+    ]
+   ],
+   "equipment": [
+    [
+     "EXC-20",
+     1
+    ],
+    [
+     "PLT",
+     1
+    ],
+    [
+     "PKP",
+     1
+    ]
+   ]
+  },
+  {
+   "code": "CUT",
+   "desc": "Mass excavation",
+   "labor": [
+    [
+     "OPR",
+     2
+    ],
+    [
+     "LAB",
+     1
+    ]
+   ],
+   "equipment": [
+    [
+     "EXC-35",
+     1
+    ],
+    [
+     "DOZ-D6",
+     1
+    ]
+   ]
+  },
+  {
+   "code": "FILL",
+   "desc": "Fill and compact",
+   "labor": [
+    [
+     "OPR",
+     3
+    ],
+    [
+     "LAB",
+     1
+    ]
+   ],
+   "equipment": [
+    [
+     "DOZ-D6",
+     1
+    ],
+    [
+     "RLR-PF",
+     1
+    ],
+    [
+     "TRK-WTR",
+     1
+    ]
+   ]
+  },
+  {
+   "code": "GRADE",
+   "desc": "Fine grading",
+   "labor": [
+    [
+     "OPR",
+     2
+    ],
+    [
+     "GRC",
+     1
+    ]
+   ],
+   "equipment": [
+    [
+     "GRD",
+     1
+    ],
+    [
+     "RLR-SD",
+     1
+    ]
+   ]
+  },
+  {
+   "code": "TRUCK",
+   "desc": "One dump truck",
+   "labor": [
+    [
+     "DRV",
+     1
+    ]
+   ],
+   "equipment": [
+    [
+     "TRK-TRI",
+     1
+    ]
+   ]
+  }
+ ],
+ "sources": [
+  "https://careersourcebfv.com/wp-content/uploads/2024/11/Attachment-B-Price-Sheet-Sunbelt-Rentals-Inc.pdf",
+  "https://dew.sc.gov/employers/tax-rate-information",
+  "https://sam.gov/wage-determination/SC20260043/1",
+  "https://www.eia.gov/petroleum/gasdiesel/",
+  "https://www.fema.gov/assistance/public/tools-resources/schedule-equipment-rates",
+  "https://www.onetonline.org/link/localwages/47-2073.00?st=SC",
+  "https://www.workerscompensationshop.com/insurance-states/south-carolina/rates"
+ ]
+}

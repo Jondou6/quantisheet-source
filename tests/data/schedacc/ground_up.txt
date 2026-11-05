@@ -1,0 +1,60 @@
+SECTION 01 11 00 - SUMMARY OF WORK
+Project: Cedar Annex Office, a ground-up commercial building.
+Phase 1 is the shell. Phase 2 is the interior fit-out.
+Window washing is by others.
+
+SECTION 01 32 00 - CONSTRUCTION PROGRESS DOCUMENTATION
+The Work shall be substantially complete within three hundred sixty (360) calendar days after Notice to Proceed.
+The Work shall be finally complete within 390 calendar days after Notice to Proceed.
+
+SECTION 01 33 00 - SUBMITTAL PROCEDURES
+The architect will review submittals within 14 calendar days.
+
+SECTION 01 45 00 - QUALITY CONTROL
+Special inspection of structural steel is required before the enclosure starts.
+The above-ceiling rough-in shall be inspected before cover.
+
+SECTION 01 57 00 - TEMPORARY CONTROLS
+The contractor shall maintain the SWPPP until paving is complete.
+
+SECTION 01 77 00 - CLOSEOUT PROCEDURES
+Closeout includes operation and maintenance manuals, as-built drawings, warranties and training.
+
+SECTION 01 91 00 - COMMISSIONING
+Commissioning includes test and balance and functional performance tests.
+
+SECTION 03 30 00 - CAST-IN-PLACE CONCRETE
+Concrete shall achieve a 28-day cure before structural steel erection.
+
+SECTION 05 12 00 - STRUCTURAL STEEL FRAMING
+Structural steel lead time is 12 weeks.
+
+SECTION 07 41 00 - ROOF PANELS
+Roofing lead time is 8 weeks.
+
+SECTION 08 44 00 - CURTAIN WALL
+Curtain wall lead time is 16 weeks.
+
+SECTION 09 29 00 - GYPSUM BOARD
+Gypsum board and finishes are in this contract.
+
+SECTION 21 13 00 - FIRE SUPPRESSION SPRINKLERS
+Wet-pipe sprinklers serve the office floors.
+
+SECTION 22 11 00 - FACILITY WATER DISTRIBUTION
+Domestic water piping is in this contract.
+
+SECTION 23 73 00 - AIR HANDLING UNITS
+The air handler lead time is 14 weeks.
+
+SECTION 26 13 00 - MEDIUM VOLTAGE SWITCHGEAR
+Switchgear lead time is 16 weeks.
+
+SECTION 26 32 13 - ENGINE GENERATORS
+The generator lead time is 18 weeks.
+
+SECTION 31 20 00 - EARTH MOVING
+Site grading and excavation are in this contract.
+
+SECTION 32 12 00 - FLEXIBLE PAVING
+Asphalt paving is in this contract.

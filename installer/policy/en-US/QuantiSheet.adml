@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<policyDefinitionResources xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" revision="1.0" schemaVersion="1.0" xmlns="http://schemas.microsoft.com/GroupPolicy/2006/07/PolicyDefinitions">
+  <displayName>QuantiSheet</displayName>
+  <description>QuantiSheet settings managed by the IT department.</description>
+  <resources>
+    <stringTable>
+      <string id="QuantiSheet">QuantiSheet</string>
+      <string id="SUPPORTED_QuantiSheet">QuantiSheet 1.0.0 and later</string>
+      <string id="Cat_Licensing">Licensing and sign-in</string>
+      <string id="Cat_Shared">Shared data and servers</string>
+      <string id="Cat_Internet">Internet and AI features</string>
+      <string id="LicenseKey">Beta license key for every user of this PC</string>
+      <string id="LicenseKey_Help">Enter the beta license key issued to your company. Every user of the computer is licensed with it and isn't asked for a key. A valid key a user entered themselves still wins.</string>
+      <string id="AcceptAgreement">No longer used (no agreement since 1.0.0)</string>
+      <string id="AcceptAgreement_Help">No longer used: QuantiSheet 1.0.0 and later have no agreement page. Kept so an existing setting does no harm.</string>
+      <string id="SkipEmailSignIn">Don't ask users for their work email (the PC is company-managed)</string>
+      <string id="SkipEmailSignIn_Help">Enable on company-managed computers so users aren't asked for their work email the first time they start QuantiSheet.</string>
+      <string id="PriceDatabasePath">Shared price database (a UNC path such as \\server\share\prices.db)</string>
+      <string id="PriceDatabasePath_Help">Location of the shared price database, normally a UNC path such as \\server\share\QuantiSheet\prices.db. Users can't move or disconnect it while this is set. Every user needs read and write access to the folder.</string>
+      <string id="RelayURL">Collaboration relay address, e.g. ws://quantisheet-relay:8765</string>
+      <string id="RelayURL_Help">Address of the company's QuantiSheet collaboration relay, for example ws://quantisheet-relay:8765. Install the relay with QuantiSheet Server Setup (task: collaboration relay).</string>
+      <string id="RelayToken">The relay's access token (on the relay server: C:\ProgramData\QuantiSheet\relay\relay-token.txt)</string>
+      <string id="RelayToken_Help">The relay's access token. On the relay server it is in C:\ProgramData\QuantiSheet\relay\relay-token.txt (made when Server Setup installs the relay). Users can read this value, which they need to connect.</string>
+      <string id="DisableAI">Turn off the local AI features</string>
+      <string id="DisableAI_Help">Turns off the local AI features (AI Takeoff, AI review, brief reading, RFI finder).</string>
+      <string id="AIHost">Ollama address (default http://localhost:11434)</string>
+      <string id="AIHost_Help">Address of the Ollama server the local AI features use. Default: http://localhost:11434 (each PC runs its own). Use a shared server, for example http://ai-server:11434, to avoid installing the model on every PC.</string>
+      <string id="OfflineMode">No internet use at all (every item below)</string>
+      <string id="OfflineMode_Help">Enable to stop QuantiSheet from using the internet at all: aerial photos, address lookup, site layers, weather, labor-rate downloads, DocuSign and Dropbox are turned off. Drawings, takeoff and estimating work as normal.</string>
+      <string id="DisableAerial">No aerial photos, address lookup or site layers (USGS, Census, FEMA, USFWS)</string>
+      <string id="DisableAerial_Help">Turns off aerial photos, address lookup and site layers (flood, wetlands, contours). These contact USGS, the US Census geocoder, FEMA and USFWS.</string>
+      <string id="DisableWeather">No weather for daily logs (Open-Meteo)</string>
+      <string id="DisableWeather_Help">Turns off weather for daily logs (Open-Meteo).</string>
+      <string id="DisableRateLookup">No labor-rate downloads (BLS)</string>
+      <string id="DisableRateLookup_Help">Turns off labor-rate downloads from the US Bureau of Labor Statistics.</string>
+      <string id="DisableDocuSign">No DocuSign signature requests</string>
+      <string id="DisableDocuSign_Help">Turns off DocuSign signature requests. QuantiSheet's own signing still works.</string>
+      <string id="DisableDropbox">No Dropbox open and save (dropbox.com)</string>
+      <string id="DisableDropbox_Help">Turns off File &gt; Open from Dropbox and Save to Dropbox. These contact www.dropbox.com, api.dropboxapi.com and content.dropboxapi.com, only when a user runs them.</string>
+      <string id="DisableUpdateCheck">No daily update check: the team copy's check for a newer version, and the Microsoft Store copy's reminder when the Store has an update waiting</string>
+      <string id="DisableUpdateCheck_Help">Turns off the once-a-day update check. The team copy downloads one small signed file from the team update host (see IT_DEPLOYMENT.md), sends no user data, and installs an update only when the user clicks Update now. The Microsoft Store copy asks the Microsoft Store on this PC whether an update is waiting and shows a reminder; the Store does the download and install. Help &gt; Check for Updates Now still works when the user picks it.</string>
+      <string id="DisablePackageStatus">No live package status from the carriers</string>
+      <string id="DisablePackageStatus_Help">Turns off Package Tracker &gt; Check Status, which sends only a tracking number to the carrier it belongs to (UPS, FedEx, USPS or DHL) when the user clicks it and has that carrier's keys. Track (opening the carrier's page) still works. OfflineMode turns this off too.</string>
+      <string id="DropboxAppKey">The Dropbox App key for every user (from the company's Dropbox app; no App secret is needed)</string>
+      <string id="DropboxAppKey_Help">The App key of the company's Dropbox app (dropbox.com/developers/apps, Scoped access, Full Dropbox, permissions files.metadata.read, files.content.read and files.content.write, redirect URI http://127.0.0.1:53917/). Users then only sign in. The App secret is not needed and must not be entered anywhere.</string>
+      <string id="LogDirectory">Write log files here instead of each user's profile</string>
+      <string id="LogDirectory_Help">Write log files here instead of each user's profile. Environment variables are allowed. Each user gets a sub-folder named after their Windows user name, so Remote Desktop users don't share a file.</string>
+    </stringTable>
+    <presentationTable>
+      <presentation id="LicenseKey">
+        <textBox refId="LicenseKey"><label>LicenseKey:</label></textBox>
+      </presentation>
+      <presentation id="PriceDatabasePath">
+        <textBox refId="PriceDatabasePath"><label>PriceDatabasePath:</label></textBox>
+      </presentation>
+      <presentation id="RelayURL">
+        <textBox refId="RelayURL"><label>RelayURL:</label></textBox>
+      </presentation>
+      <presentation id="RelayToken">
+        <textBox refId="RelayToken"><label>RelayToken:</label></textBox>
+      </presentation>
+      <presentation id="AIHost">
+        <textBox refId="AIHost"><label>AIHost:</label></textBox>
+      </presentation>
+      <presentation id="DropboxAppKey">
+        <textBox refId="DropboxAppKey"><label>DropboxAppKey:</label></textBox>
+      </presentation>
+      <presentation id="LogDirectory">
+        <textBox refId="LogDirectory"><label>LogDirectory:</label></textBox>
+      </presentation>
+    </presentationTable>
+  </resources>
+</policyDefinitionResources>

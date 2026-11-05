@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QuantiSheet Group Policy template. Copy QuantiSheet.admx to
+     C:\Windows\PolicyDefinitions (or the Central Store) and
+     en-US\QuantiSheet.adml to its en-US sub-folder. -->
+<policyDefinitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" revision="1.0" schemaVersion="1.0" xmlns="http://schemas.microsoft.com/GroupPolicy/2006/07/PolicyDefinitions">
+  <policyNamespaces>
+    <target prefix="quantisheet" namespace="QuantiSheet.Policies.QuantiSheet" />
+    <using prefix="windows" namespace="Microsoft.Policies.Windows" />
+  </policyNamespaces>
+  <resources minRequiredRevision="1.0" />
+  <supportedOn>
+    <definitions>
+      <definition name="SUPPORTED_QuantiSheet" displayName="$(string.SUPPORTED_QuantiSheet)" />
+    </definitions>
+  </supportedOn>
+  <categories>
+    <category name="QuantiSheet" displayName="$(string.QuantiSheet)" />
+    <category name="Licensing" displayName="$(string.Cat_Licensing)"><parentCategory ref="QuantiSheet" /></category>
+    <category name="Shared" displayName="$(string.Cat_Shared)"><parentCategory ref="QuantiSheet" /></category>
+    <category name="Internet" displayName="$(string.Cat_Internet)"><parentCategory ref="QuantiSheet" /></category>
+  </categories>
+  <policies>
+    <policy name="LicenseKey" class="Both" displayName="$(string.LicenseKey)" explainText="$(string.LicenseKey_Help)" presentation="$(presentation.LicenseKey)" key="Software\Policies\QuantiSheet">
+      <parentCategory ref="Licensing" />
+      <supportedOn ref="SUPPORTED_QuantiSheet" />
+      <elements>
+        <text id="LicenseKey" valueName="LicenseKey" required="true" />
+      </elements>
+    </policy>
+    <policy name="AcceptAgreement" class="Both" displayName="$(string.AcceptAgreement)" explainText="$(string.AcceptAgreement_Help)" key="Software\Policies\QuantiSheet" valueName="AcceptAgreement">
+      <parentCategory ref="Licensing" />
+      <supportedOn ref="SUPPORTED_QuantiSheet" />
+      <enabledValue><decimal value="1" /></enabledValue>
+      <disabledValue><decimal value="0" /></disabledValue>
+    </policy>
+    <policy name="SkipEmailSignIn" class="Both" displayName="$(string.SkipEmailSignIn)" explainText="$(string.SkipEmailSignIn_Help)" key="Software\Policies\QuantiSheet" valueName="SkipEmailSignIn">
+      <parentCategory ref="Licensing" />
+      <supportedOn ref="SUPPORTED_QuantiSheet" />
+      <enabledValue><decimal value="1" /></enabledValue>
+      <disabledValue><decimal value="0" /></disabledValue>
+    </policy>
+    <policy name="PriceDatabasePath" class="Both" displayName="$(string.PriceDatabasePath)" explainText="$(string.PriceDatabasePath_Help)" presentation="$(presentation.PriceDatabasePath)" key="Software\Policies\QuantiSheet">
+      <parentCategory ref="Shared" />
+      <supportedOn ref="SUPPORTED_QuantiSheet" />
+      <elements>
+        <text id="PriceDatabasePath" valueName="PriceDatabasePath" required="true" />
+      </elements>
+    </policy>
+    <policy name="RelayURL" class="Both" displayName="$(string.RelayURL)" explainText="$(string.RelayURL_Help)" presentation="$(presentation.RelayURL)" key="Software\Policies\QuantiSheet">
+      <parentCategory ref="Shared" />
+      <supportedOn ref="SUPPORTED_QuantiSheet" />
+      <elements>
+        <text id="RelayURL" valueName="RelayURL" required="true" />
+      </elements>
+    </policy>
+    <policy name="RelayToken" class="Both" displayName="$(string.RelayToken)" explainText="$(string.RelayToken_Help)" presentation="$(presentation.RelayToken)" key="Software\Policies\QuantiSheet">
+      <parentCategory ref="Shared" />
+      <supportedOn ref="SUPPORTED_QuantiSheet" />
+      <elements>
+        <text id="RelayToken" valueName="RelayToken" required="true" />
+      </elements>
+    </policy>
+    <policy name="AIHost" class="Both" displayName="$(string.AIHost)" explainText="$(string.AIHost_Help)" presentation="$(presentation.AIHost)" key="Software\Policies\QuantiSheet">
+      <parentCategory ref="Shared" />
+      <supportedOn ref="SUPPORTED_QuantiSheet" />
+      <elements>
+        <text id="AIHost" valueName="AIHost" required="true" />
+      </elements>
+    </policy>
+    <policy name="LogDirectory" class="Both" displayName="$(string.LogDirectory)" explainText="$(string.LogDirectory_Help)" presentation="$(presentation.LogDirectory)" key="Software\Policies\QuantiSheet">
+      <parentCategory ref="Shared" />
+      <supportedOn ref="SUPPORTED_QuantiSheet" />
+      <elements>
+        <text id="LogDirectory" valueName="LogDirectory" required="true" />
+      </elements>
+    </policy>
+    <policy name="OfflineMode" class="Both" displayName="$(string.OfflineMode)" explainText="$(string.OfflineMode_Help)" key="Software\Policies\QuantiSheet" valueName="OfflineMode">
+      <parentCategory ref="Internet" />
+      <supportedOn ref="SUPPORTED_QuantiSheet" />
+      <enabledValue><decimal value="1" /></enabledValue>
+      <disabledValue><decimal value="0" /></disabledValue>
+    </policy>
+    <policy name="DisableAerial" class="Both" displayName="$(string.DisableAerial)" explainText="$(string.DisableAerial_Help)" key="Software\Policies\QuantiSheet" valueName="DisableAerial">
+      <parentCategory ref="Internet" />
+      <supportedOn ref="SUPPORTED_QuantiSheet" />
+      <enabledValue><decimal value="1" /></enabledValue>
+      <disabledValue><decimal value="0" /></disabledValue>
+    </policy>
+    <policy name="DisableWeather" class="Both" displayName="$(string.DisableWeather)" explainText="$(string.DisableWeather_Help)" key="Software\Policies\QuantiSheet" valueName="DisableWeather">
+      <parentCategory ref="Internet" />
+      <supportedOn ref="SUPPORTED_QuantiSheet" />
+      <enabledValue><decimal value="1" /></enabledValue>
+      <disabledValue><decimal value="0" /></disabledValue>
+    </policy>
+    <policy name="DisableRateLookup" class="Both" displayName="$(string.DisableRateLookup)" explainText="$(string.DisableRateLookup_Help)" key="Software\Policies\QuantiSheet" valueName="DisableRateLookup">
+      <parentCategory ref="Internet" />
+      <supportedOn ref="SUPPORTED_QuantiSheet" />
+      <enabledValue><decimal value="1" /></enabledValue>
+      <disabledValue><decimal value="0" /></disabledValue>
+    </policy>
+    <policy name="DisableDocuSign" class="Both" displayName="$(string.DisableDocuSign)" explainText="$(string.DisableDocuSign_Help)" key="Software\Policies\QuantiSheet" valueName="DisableDocuSign">
+      <parentCategory ref="Internet" />
+      <supportedOn ref="SUPPORTED_QuantiSheet" />
+      <enabledValue><decimal value="1" /></enabledValue>
+      <disabledValue><decimal value="0" /></disabledValue>
+    </policy>
+    <policy name="DisableDropbox" class="Both" displayName="$(string.DisableDropbox)" explainText="$(string.DisableDropbox_Help)" key="Software\Policies\QuantiSheet" valueName="DisableDropbox">
+      <parentCategory ref="Internet" />
+      <supportedOn ref="SUPPORTED_QuantiSheet" />
+      <enabledValue><decimal value="1" /></enabledValue>
+      <disabledValue><decimal value="0" /></disabledValue>
+    </policy>
+    <policy name="DisablePackageStatus" class="Both" displayName="$(string.DisablePackageStatus)" explainText="$(string.DisablePackageStatus_Help)" key="Software\Policies\QuantiSheet" valueName="DisablePackageStatus">
+      <parentCategory ref="Internet" />
+      <supportedOn ref="SUPPORTED_QuantiSheet" />
+      <enabledValue><decimal value="1" /></enabledValue>
+      <disabledValue><decimal value="0" /></disabledValue>
+    </policy>
+    <policy name="DropboxAppKey" class="Both" displayName="$(string.DropboxAppKey)" explainText="$(string.DropboxAppKey_Help)" presentation="$(presentation.DropboxAppKey)" key="Software\Policies\QuantiSheet">
+      <parentCategory ref="Internet" />
+      <supportedOn ref="SUPPORTED_QuantiSheet" />
+      <elements>
+        <text id="DropboxAppKey" valueName="DropboxAppKey" required="true" />
+      </elements>
+    </policy>
+    <policy name="DisableAI" class="Both" displayName="$(string.DisableAI)" explainText="$(string.DisableAI_Help)" key="Software\Policies\QuantiSheet" valueName="DisableAI">
+      <parentCategory ref="Internet" />
+      <supportedOn ref="SUPPORTED_QuantiSheet" />
+      <enabledValue><decimal value="1" /></enabledValue>
+      <disabledValue><decimal value="0" /></disabledValue>
+    </policy>
+    <policy name="DisableUpdateCheck" class="Both" displayName="$(string.DisableUpdateCheck)" explainText="$(string.DisableUpdateCheck_Help)" key="Software\Policies\QuantiSheet" valueName="DisableUpdateCheck">
+      <parentCategory ref="Internet" />
+      <supportedOn ref="SUPPORTED_QuantiSheet" />
+      <enabledValue><decimal value="1" /></enabledValue>
+      <disabledValue><decimal value="0" /></disabledValue>
+    </policy>
+  </policies>
+</policyDefinitions>

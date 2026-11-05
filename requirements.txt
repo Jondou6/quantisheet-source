@@ -1,0 +1,22 @@
+pymupdf>=1.28.2,<2  # 2.0 loses takeoff items on save; lift after that is fixed
+numpy>=1.26
+opencv-python-headless>=4.9
+pyhanko>=0.25
+pyhanko-certvalidator>=0.26
+cryptography>=42
+websockets>=12
+PySide6==6.12.0
+pillow>=10
+ezdxf>=1.1
+python-pptx>=0.6.21
+openpyxl>=3.1
+pywin32>=306; sys_platform == "win32"
+manifold3d>=3.5
+shapely>=2.0,<3  # roof, wall-area and site takeoff (envelope.py, sitework.py)
+# Generate Set kernel: Modulor 1.0.0rc3 (MIT, commit 40f6c2a). It isn't on
+# PyPI; install the reviewed source zip kept in vendor/ (SHA-256
+# c234db9221c6037eda35699e3aa52ad1fbaaf862a7a159d630ad68c27effb0c5) with:
+#     python tools/install_modulor.py
+# AI  → install ollama (https://ollama.com) then: ollama pull llama3.2
+# OCR → install tesseract (system package)
+# Tests/builds also need: pytest, pyinstaller>=6.3,<7

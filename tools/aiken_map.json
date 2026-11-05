@@ -1,0 +1,1660 @@
+{
+ "version": 6,
+ "about": [
+  "Explicit map from QuantiSheet AI Takeoff result lines to the human takeoff groups (Group_ID) in the reviewer's Aiken_Human_vs_AI_Comparison.xlsx, sheet Mapping. Read by tools/aiken_eval.py; the scorer itself does no fuzzy matching.",
+  "An AI line key is '<engine>:<name>' where engine is rooms, pipes, civil, devices, ducts, steel (counts EA, beam LF, weight LB), footings (CY) or schedules (schedule keys counted on the plans: 'schedules:P-1 WALL HUNG LAVATORY', 'schedules:Doors', 'schedules:Hardware set 1.0', 'schedules:Light C 2X4 TROFFER', 'schedules:Plant Ab ...'), finishes (per finish code from the rooms and the finish schedule: 'finishes:Floor EPX' SF, 'finishes:Base RB' LF, 'finishes:Ceiling ACT / GB' SF, 'finishes:Wall finish PT-1 / PT-2' SF) or walls (one floor plan per level: 'walls:Wall Type 2A' LF per wall type, 'walls:Exterior Walls' LF of the outer face loop, '... wall area' SF where a height is known) and name is the measurement group exactly as AI Takeoff names it, e.g. 'pipes:1/2\" CW' or 'civil:6\" PVC sanitary, depth unknown'.",
+  "Rules are tried in order: every 'key' (exact) rule first, then every 'regex' rule (Python re.search, so anchor with ^ and $). The first rule that matches wins; one AI line maps to at most one group, a group may collect many lines (summed).",
+  "'group' may also be 'R<row>' for one human row the reviewer left unmapped (e.g. R123); such a row then scores as its own group.",
+  "Lines matched by 'info' are listed in ai_lines.csv but not counted as AI lines the human doesn't carry.",
+  "'groups' holds per-group unit conversions: when the AI unit differs from the human unit, human qty x factor gives the human qty in that unit (the reviewer's conversions, 'compared on base QUANTITY pre-waste').",
+  "Quantities only. No prices, no cost data.",
+  "v4 (Oct 26): 0.13.8 roof, site, earthwork, flex duct and pipe-drop lines mapped. Roof area is compared on plan SF (the human standing-seam line matches plan area); fill maps to the human Fill row (R743).",
+  "v4: wall assemblies (round 5) mapped where the human row is clearly the same wall type's material.",
+  "v5: the workbook's Division 01 lines (general:..., 1 LS each) map to the human general rows R12-R18.",
+  "v5: two-ceiling rooms split by the RCP grid map like their codes; the gypsum board ceiling SF joins the human all-ceilings group (it carries the GB ceiling rows)."
+ ],
+ "groups": {
+  "H05-HSS4": {
+   "alt": {
+    "EA": 0.0079902
+   },
+   "note": "human LBS / (12.21 lb/ft x 10'-3\" column height) = column count"
+  },
+  "H05-HSS6": {
+   "alt": {
+    "LF": 0.0525762
+   },
+   "note": "human LBS / 19.02 lb/ft (HSS6x6x1/4)"
+  },
+  "H05-W8": {
+   "alt": {
+    "LF": 0.047619
+   },
+   "note": "human LBS / 21 lb/ft"
+  },
+  "H32-WALK": {
+   "alt": {
+    "SF": 81.0
+   },
+   "note": "human CY x 27 / (4\"/12) = SF"
+  },
+  "R284": {
+   "alt": {
+    "SF": 1.0
+   },
+   "note": "the human's '3\" Batt Insulation' row is wall area (198.22 LF x 10'-8\" = 2,117) though marked LF"
+  }
+ },
+ "rules": [
+  {
+   "key": "roof:Sub-fascia (roof edge)",
+   "group": "R147"
+  },
+  {
+   "key": "roof:Downspouts (length)",
+   "group": "H07-DS"
+  },
+  {
+   "regex": "^slab:Slab on grade - \\d+\" (graded aggregate base|gab|#57 stone|crushed stone|aggregate base)",
+   "group": "R50"
+  },
+  {
+   "key": "site:Wheel stops (one per parking space)",
+   "group": "H32-BUMPER"
+  },
+  {
+   "key": "site:Accessible parking space emblem",
+   "group": "H32-ADA"
+  },
+  {
+   "regex": "^schedules:Panel [A-Z]{1,3}-?\\d{1,3}[A-Z]?$",
+   "group": "H26-PANEL"
+  },
+  {
+   "key": "civil:Silt fence",
+   "group": "H31-SILT"
+  },
+  {
+   "key": "civil:Silt fence posts @ 6' OC",
+   "group": "R792"
+  },
+  {
+   "key": "civil:Silt fence trench 6\" x 6\" (and backfill)",
+   "group": "R748"
+  },
+  {
+   "key": "finishes:Gypsum board ceiling",
+   "group": "H09-CEIL-ALL"
+  },
+  {
+   "regex": "^finishes:Ceiling ACT-?1 \\(rooms with ",
+   "group": "H09-CEIL-ALL"
+  },
+  {
+   "regex": "^finishes:Ceiling PT-?4 \\(rooms with ",
+   "group": "R344"
+  },
+  {
+   "key": "envelope:Window head flashing",
+   "group": "R177"
+  },
+  {
+   "key": "envelope:Sill flashing under the brick cap",
+   "group": "R176"
+  },
+  {
+   "key": "envelope:Brick weeps @ 24\" OC",
+   "group": "R94"
+  },
+  {
+   "key": "envelope:Steel angle at the brick (size per the wall detail)",
+   "group": "R92"
+  },
+  {
+   "regex": "^envelope:Brick ties",
+   "group": "R93"
+  },
+  {
+   "key": "general:Scaffolding and lifts",
+   "group": "R18"
+  },
+  {
+   "key": "general:Temporary facilities and controls",
+   "group": "R17"
+  },
+  {
+   "key": "general:Bonds",
+   "group": "R16"
+  },
+  {
+   "key": "general:Mobilization",
+   "group": "R15"
+  },
+  {
+   "key": "general:Final cleaning",
+   "group": "R14"
+  },
+  {
+   "key": "general:Submittals and shop drawings",
+   "group": "R13"
+  },
+  {
+   "key": "general:Supervision and coordination",
+   "group": "R12"
+  },
+  {
+   "key": "finishes:Ceiling ACT-1 / PT-4",
+   "group": "H09-CEIL-ALL"
+  },
+  {
+   "key": "pipes:1/2\" CW",
+   "group": "H22-CW-1/2"
+  },
+  {
+   "key": "pipes:3/4\" CW",
+   "group": "H22-CW-3/4"
+  },
+  {
+   "key": "pipes:1\" CW",
+   "group": "H22-CW-1"
+  },
+  {
+   "key": "pipes:1-1/4\" CW",
+   "group": "H22-CW-1-1/4"
+  },
+  {
+   "key": "pipes:1-1/2\" CW",
+   "group": "H22-CW-1-1/2"
+  },
+  {
+   "key": "pipes:2\" CW",
+   "group": "H22-CW-2"
+  },
+  {
+   "key": "pipes:1/2\" HW",
+   "group": "H22-HW-1/2"
+  },
+  {
+   "key": "pipes:3/4\" HW",
+   "group": "H22-HW-3/4"
+  },
+  {
+   "key": "pipes:1\" HW",
+   "group": "H22-HW-1"
+  },
+  {
+   "key": "pipes:1-1/2\" V",
+   "group": "H22-V-1-1/2"
+  },
+  {
+   "key": "pipes:2\" V",
+   "group": "H22-V-2"
+  },
+  {
+   "key": "pipes:3\" V",
+   "group": "H22-V-3"
+  },
+  {
+   "key": "pipes:3\" VTR",
+   "group": "H22-V-3"
+  },
+  {
+   "key": "pipes:2\" W",
+   "group": "H22-W-2"
+  },
+  {
+   "key": "pipes:3\" W",
+   "group": "H22-W-3"
+  },
+  {
+   "key": "pipes:4\" W",
+   "group": "H22-W-4"
+  },
+  {
+   "regex": "^civil:6\" (PVC )?sanitary(, .*)?$",
+   "group": "H33-SS6"
+  },
+  {
+   "regex": "^civil:8\" (PVC )?sanitary(, .*)?$",
+   "group": "H33-SS8"
+  },
+  {
+   "regex": "^civil:18\" (RCP )?storm(, .*)?$",
+   "group": "H33-RCP18"
+  },
+  {
+   "regex": "^civil:8\" (PVC )?storm(, .*)?$",
+   "group": "H33-RD8"
+  },
+  {
+   "regex": "^civil:2\" ((PVC|HDPE|PE|CTS|COPPER) )?water(, .*)?$",
+   "group": "H33-WS2"
+  },
+  {
+   "regex": "^civil:Sanitary manhole",
+   "group": "H33-MH"
+  },
+  {
+   "regex": "(?i)^civil:(sewer )?cleanout",
+   "group": "H33-CO"
+  },
+  {
+   "regex": "(?i)^civil:(fire )?hydrant",
+   "group": "H33-FH"
+  },
+  {
+   "regex": "(?i)^civil:(structure|storm manhole)",
+   "group": "H33-SDSTR"
+  },
+  {
+   "regex": "(?i)^devices:duplex (convenience )?(receptacle|outlet)( - ground fault interrupter type)?$",
+   "group": "H26-REC-DUP"
+  },
+  {
+   "regex": "(?i)^devices:.*weatherproof.*(gfi|gfci|ground fault)",
+   "group": "H26-REC-WP"
+  },
+  {
+   "regex": "(?i)^devices:2' ?x ?4' (light )?fixture$",
+   "group": "H26-LT-C"
+  },
+  {
+   "regex": "(?i)^devices:2' ?x ?4' (light )?fixture w/ emergency battery( pack)?$",
+   "group": "H26-LT-CE"
+  },
+  {
+   "regex": "(?i)^devices:2' ?x ?2' (light )?fixture$",
+   "group": "H26-LT-E"
+  },
+  {
+   "regex": "(?i)^devices:2' ?x ?2' (light )?fixture w/ emergency battery( pack)?$",
+   "group": "H26-LT-EE"
+  },
+  {
+   "regex": "(?i)^devices:down ?light fixture$",
+   "group": "H26-LT-G"
+  },
+  {
+   "regex": "(?i)^devices:down ?light fixture w/ emergency battery( pack)?$",
+   "group": "H26-LT-GE"
+  },
+  {
+   "regex": "(?i)^devices:(ceiling ?/ ?wall mounted )?exit sign",
+   "group": "H26-LT-X"
+  },
+  {
+   "regex": "(?i)^devices:wall sconce w/ emergency",
+   "group": "H26-LT-FE"
+  },
+  {
+   "regex": "(?i)^devices:((ceiling mounted )?(dual technology )?occupancy sensor|wall mounted (dual technology )?sensor)",
+   "group": "H26-OS"
+  },
+  {
+   "regex": "(?i)^devices:(wall mounted )?data outlet",
+   "group": "H27-DATA"
+  },
+  {
+   "regex": "(?i)^devices:(single pole |spst )?(toggle )?switch$",
+   "group": "H26-SW"
+  },
+  {
+   "regex": "(?i)^devices:fire alarm (manual )?pull station",
+   "group": "H28-PULL"
+  },
+  {
+   "regex": "(?i)^devices:fire alarm wall mounted audio ?/ ?visual device",
+   "group": "H28-AV"
+  },
+  {
+   "regex": "(?i)^devices:fire alarm wall mounted visual device",
+   "group": "H28-V"
+  },
+  {
+   "regex": "(?i)^devices:fire alarm ceiling mounted smoke detector",
+   "group": "H28-SMK"
+  },
+  {
+   "regex": "(?i)^devices:(facp )?fire alarm control panel",
+   "group": "H28-FACP"
+  },
+  {
+   "key": "ducts:4\" round",
+   "group": "H23-D4"
+  },
+  {
+   "key": "ducts:6\" round",
+   "group": "H23-D6"
+  },
+  {
+   "key": "ducts:8\" round",
+   "group": "H23-D8"
+  },
+  {
+   "key": "ducts:10\" round",
+   "group": "H23-D10"
+  },
+  {
+   "key": "ducts:12\" round",
+   "group": "H23-D12"
+  },
+  {
+   "key": "ducts:14\" round",
+   "group": "H23-D14"
+  },
+  {
+   "key": "ducts:16\" round",
+   "group": "H23-D16"
+  },
+  {
+   "key": "ducts:20\" round",
+   "group": "H23-D20"
+  },
+  {
+   "key": "ducts:10x10",
+   "group": "H23-D10x10"
+  },
+  {
+   "key": "ducts:14x14",
+   "group": "H23-D14x14"
+  },
+  {
+   "regex": "^ducts:(20x14|14x20)$",
+   "group": "H23-D20x14"
+  },
+  {
+   "regex": "^ducts:(20x22|22x20)$",
+   "group": "H23-D20x22"
+  },
+  {
+   "regex": "(?i)^steel:HSS4X4X1/4$",
+   "group": "H05-HSS4"
+  },
+  {
+   "regex": "(?i)^steel:HSS6X6X1/4$",
+   "group": "H05-HSS6"
+  },
+  {
+   "regex": "(?i)^steel:W8X21$",
+   "group": "H05-W8"
+  },
+  {
+   "key": "schedules:Doors",
+   "group": "H08-DOORS"
+  },
+  {
+   "regex": "^schedules:Window ",
+   "group": "H08-WINDOWS"
+  },
+  {
+   "regex": "(?i)^schedules:Hardware set (HW-?)?0?1(\\.0)?$",
+   "group": "H08-HW-1.0"
+  },
+  {
+   "regex": "(?i)^schedules:Hardware set (HW-?)?0?2(\\.0)?$",
+   "group": "H08-HW-2.0"
+  },
+  {
+   "regex": "(?i)^schedules:Hardware set (HW-?)?0?3(\\.0)?$",
+   "group": "H08-HW-3.0"
+  },
+  {
+   "regex": "(?i)^schedules:Hardware set (HW-?)?0?4(\\.0)?$",
+   "group": "H08-HW-4.0"
+  },
+  {
+   "regex": "(?i)^schedules:Hardware set (HW-?)?0?5(\\.0)?$",
+   "group": "H08-HW-5.0"
+  },
+  {
+   "regex": "(?i)^schedules:Hardware set (HW-?)?0?6(\\.0)?$",
+   "group": "H08-HW-6.0"
+  },
+  {
+   "regex": "(?i)^schedules:Hardware set (HW-?)?0?7(\\.0)?$",
+   "group": "H08-HW-7.0"
+  },
+  {
+   "regex": "(?i)^schedules:Hardware set (HW-?)?0?8(\\.0)?$",
+   "group": "H08-HW-8.0"
+  },
+  {
+   "regex": "(?i)^schedules:Hardware set (HW-?)?0?9(\\.0)?$",
+   "group": "H08-HW-9.0"
+  },
+  {
+   "regex": "(?i)^schedules:Hardware set (HW-?)?0?10(\\.0)?$",
+   "group": "H08-HW-10.0"
+  },
+  {
+   "regex": "(?i)^schedules:Hardware set (HW-?)?0?11(\\.0)?$",
+   "group": "H08-HW-11.0"
+  },
+  {
+   "regex": "^schedules:Accessory ",
+   "group": "H10-TOILACC"
+  },
+  {
+   "regex": "^schedules:CB-?2( |$)",
+   "group": "H11-CB2"
+  },
+  {
+   "regex": "^schedules:CB-?5( |$)",
+   "group": "H11-CB5"
+  },
+  {
+   "regex": "^schedules:CB-?6( |$)",
+   "group": "H11-CB6"
+  },
+  {
+   "regex": "^schedules:CB-?9( |$)",
+   "group": "H11-CB9"
+  },
+  {
+   "regex": "^schedules:OT( |$)",
+   "group": "H11-OT"
+  },
+  {
+   "regex": "^schedules:WMA( |$)",
+   "group": "H11-WMA"
+  },
+  {
+   "regex": "^schedules:WPT-?1( |$)",
+   "group": "H11-WPT1"
+  },
+  {
+   "regex": "^schedules:WPT-?2( |$)",
+   "group": "H11-WPT2"
+  },
+  {
+   "regex": "^schedules:MBA( |$)",
+   "group": "H11-MBA"
+  },
+  {
+   "regex": "^schedules:AUTO( |$)",
+   "group": "H11-AUTO"
+  },
+  {
+   "regex": "^schedules:PT( |$)",
+   "group": "H11-PT"
+  },
+  {
+   "regex": "^schedules:USB( |$)",
+   "group": "H11-USB"
+  },
+  {
+   "regex": "^schedules:UST( |$)",
+   "group": "H11-UST"
+  },
+  {
+   "regex": "^schedules:WT( |$)",
+   "group": "H11-WT"
+  },
+  {
+   "regex": "^schedules:ET( |$)",
+   "group": "H11-ET"
+  },
+  {
+   "regex": "^schedules:KEN( |$)",
+   "group": "H11-KEN"
+  },
+  {
+   "regex": "^schedules:P-?1( |$)",
+   "group": "H22-P-1"
+  },
+  {
+   "regex": "^schedules:P-?2( |$)",
+   "group": "H22-P-2"
+  },
+  {
+   "regex": "^schedules:P-?3( |$)",
+   "group": "H22-P-3"
+  },
+  {
+   "regex": "^schedules:P-?4( |$)",
+   "group": "H22-P-4"
+  },
+  {
+   "regex": "^schedules:P-?5( |$)",
+   "group": "H22-P-5"
+  },
+  {
+   "regex": "^schedules:P-?6( |$)",
+   "group": "H22-P-6"
+  },
+  {
+   "regex": "^schedules:P-?7( |$)",
+   "group": "H22-P-7"
+  },
+  {
+   "regex": "^schedules:P-?8( |$)",
+   "group": "H22-P-8"
+  },
+  {
+   "regex": "^schedules:IB-?1( |$)",
+   "group": "H22-IB-1"
+  },
+  {
+   "regex": "^schedules:WB-?1( |$)",
+   "group": "H22-WB-1"
+  },
+  {
+   "regex": "^schedules:EWH-?1( |$)",
+   "group": "H22-EWH"
+  },
+  {
+   "regex": "^schedules:PMP-?1( |$)",
+   "group": "H22-PMP"
+  },
+  {
+   "regex": "^schedules:FD(-?\\d+)?( |$)",
+   "group": "H22-FD"
+  },
+  {
+   "regex": "^schedules:EG-?1( |$)",
+   "group": "H23-EG-1"
+  },
+  {
+   "regex": "^schedules:EG-?2( |$)",
+   "group": "H23-EG-2"
+  },
+  {
+   "regex": "^schedules:EG-?3( |$)",
+   "group": "H23-EG-3"
+  },
+  {
+   "regex": "^schedules:EG-?4( |$)",
+   "group": "H23-EG-4"
+  },
+  {
+   "regex": "^schedules:EG-?5( |$)",
+   "group": "H23-EG-5"
+  },
+  {
+   "regex": "^schedules:RG-?1( |$)",
+   "group": "H23-RG-1"
+  },
+  {
+   "regex": "^schedules:RG-?2( |$)",
+   "group": "H23-RG-2"
+  },
+  {
+   "regex": "^schedules:RG-?3( |$)",
+   "group": "H23-RG-3"
+  },
+  {
+   "regex": "^schedules:RG-?4( |$)",
+   "group": "H23-RG-4"
+  },
+  {
+   "regex": "^schedules:SD-?1( |$)",
+   "group": "H23-SD-1"
+  },
+  {
+   "regex": "^schedules:SD-?2( |$)",
+   "group": "H23-SD-2"
+  },
+  {
+   "regex": "^schedules:SD-?3( |$)",
+   "group": "H23-SD-3"
+  },
+  {
+   "regex": "^schedules:SD-?4( |$)",
+   "group": "H23-SD-4"
+  },
+  {
+   "regex": "^schedules:SD-?5( |$)",
+   "group": "H23-SD-5"
+  },
+  {
+   "regex": "^schedules:AHU-?1( |$)",
+   "group": "H23-AHU-1"
+  },
+  {
+   "regex": "^schedules:DOAS-?1( |$)",
+   "group": "H23-DOAS-1"
+  },
+  {
+   "regex": "^schedules:DOHP-?1( |$)",
+   "group": "H23-DOHP-1"
+  },
+  {
+   "regex": "^schedules:OHP-?1( |$)",
+   "group": "H23-OHP-1"
+  },
+  {
+   "regex": "^schedules:BC-?1( |$)",
+   "group": "H23-BC-1"
+  },
+  {
+   "regex": "^schedules:IL-?1( |$)",
+   "group": "H23-IL-1"
+  },
+  {
+   "regex": "^schedules:IL-?2( |$)",
+   "group": "H23-IL-2"
+  },
+  {
+   "regex": "^schedules:EL-?1( |$)",
+   "group": "H23-EL-1"
+  },
+  {
+   "regex": "^schedules:Light A( |$)",
+   "group": "H26-LT-A"
+  },
+  {
+   "regex": "^schedules:Light B( |$)",
+   "group": "H26-LT-B"
+  },
+  {
+   "regex": "^schedules:Light BE( |$)",
+   "group": "H26-LT-BE"
+  },
+  {
+   "regex": "^schedules:Light C( |$)",
+   "group": "H26-LT-C"
+  },
+  {
+   "regex": "^schedules:Light CE( |$)",
+   "group": "H26-LT-CE"
+  },
+  {
+   "regex": "^schedules:Light DE( |$)",
+   "group": "H26-LT-DE"
+  },
+  {
+   "regex": "^schedules:Light E( |$)",
+   "group": "H26-LT-E"
+  },
+  {
+   "regex": "^schedules:Light EE( |$)",
+   "group": "H26-LT-EE"
+  },
+  {
+   "regex": "^schedules:Light FE( |$)",
+   "group": "H26-LT-FE"
+  },
+  {
+   "regex": "^schedules:Light G( |$)",
+   "group": "H26-LT-G"
+  },
+  {
+   "regex": "^schedules:Light GE( |$)",
+   "group": "H26-LT-GE"
+  },
+  {
+   "regex": "^schedules:Light H1( |$)",
+   "group": "H26-LT-H1"
+  },
+  {
+   "regex": "^schedules:Light H2( |$)",
+   "group": "H26-LT-H2"
+  },
+  {
+   "regex": "^schedules:Light X( |$)",
+   "group": "H26-LT-X"
+  },
+  {
+   "regex": "^schedules:Panel ",
+   "group": "H26-PANEL"
+  },
+  {
+   "regex": "^schedules:Plant Ab( |$)",
+   "group": "H32-PL-Ab"
+  },
+  {
+   "regex": "^schedules:Plant AxgAB( |$)",
+   "group": "H32-PL-AxgAB"
+  },
+  {
+   "regex": "^schedules:Plant Cv( |$)",
+   "group": "H32-PL-Cv"
+  },
+  {
+   "regex": "^schedules:Plant Q[Il]( |$)",
+   "group": "H32-PL-Ql"
+  },
+  {
+   "regex": "^schedules:Plant Td( |$)",
+   "group": "H32-PL-Td"
+  },
+  {
+   "regex": "^schedules:Plant DxVJ( |$)",
+   "group": "H32-PL-DxVJ"
+  },
+  {
+   "regex": "^schedules:Plant IvHG( |$)",
+   "group": "H32-PL-IvHG"
+  },
+  {
+   "regex": "^schedules:Plant NdHD( |$)",
+   "group": "H32-PL-NdHD"
+  },
+  {
+   "regex": "^schedules:Plant RxA[lI]( |$)",
+   "group": "H32-PL-RxAI"
+  },
+  {
+   "regex": "^schedules:Plant Tg( |$)",
+   "group": "H32-PL-Tg"
+  },
+  {
+   "regex": "^schedules:Plant At( |$)",
+   "group": "H32-PL-At"
+  },
+  {
+   "regex": "^schedules:Plant Ep( |$)",
+   "group": "H32-PL-Ep"
+  },
+  {
+   "regex": "^schedules:Plant Iv( |$)",
+   "group": "H32-PL-Iv"
+  },
+  {
+   "regex": "^schedules:Plant Ls( |$)",
+   "group": "H32-PL-Ls"
+  },
+  {
+   "regex": "^schedules:Plant Mf( |$)",
+   "group": "H32-PL-Mf"
+  },
+  {
+   "regex": "^schedules:Plant Rf( |$)",
+   "group": "H32-PL-Rf"
+  },
+  {
+   "regex": "^schedules:Plant LmMW( |$)",
+   "group": "H32-PL-LmMW"
+  },
+  {
+   "regex": "(?i)^footings:F-?4$",
+   "group": "H03-F4-CY"
+  },
+  {
+   "key": "walls:Exterior Walls",
+   "group": "H09-EXTWALL-LF"
+  },
+  {
+   "key": "walls:Exterior Walls wall area",
+   "group": "H04-CMU8-SF"
+  },
+  {
+   "key": "walls:Wall Type 1A wall area",
+   "group": "H09-GB-EXT"
+  },
+  {
+   "regex": "^walls:Wall Type 2[AB]$",
+   "group": "H09-INTWALL"
+  },
+  {
+   "regex": "^finishes:Floor EPX(-?\\d+)?$",
+   "group": "H09-EPX-FLOOR"
+  },
+  {
+   "regex": "^finishes:Floor PC(-?\\d+)?$",
+   "group": "H03-POLISH"
+  },
+  {
+   "regex": "^finishes:Base EPX(-?\\d+)?$",
+   "group": "H09-EPX-BASE"
+  },
+  {
+   "regex": "^finishes:Base RB(-?\\d+)?$",
+   "group": "H09-RB"
+  },
+  {
+   "regex": "^finishes:Ceiling (ACT|GB)(-?\\d+)?( ?/ ?(ACT|GB)(-?\\d+)?)*$",
+   "group": "H09-CEIL-ALL"
+  },
+  {
+   "regex": "^finishes:Wall finish EPP-?1$",
+   "group": "H09-EPP1-WALL"
+  },
+  {
+   "regex": "^finishes:Wall finish (PT-?[12]|CWT(-?1)?)( ?/ ?(PT-?[12]|CWT(-?1)?))*$",
+   "group": "H09-PAINT-WALL"
+  },
+  {
+   "regex": "^finishes:Wall finish WP-?1$",
+   "group": "H09-WALLPANEL"
+  },
+  {
+   "key": "roof:Roof area (plan)",
+   "group": "H07-ROOF"
+  },
+  {
+   "key": "roof:Ridge (plan length)",
+   "group": "H07-RIDGE"
+  },
+  {
+   "key": "roof:Roof eave (gutter line)",
+   "group": "H07-GUTTER"
+  },
+  {
+   "key": "roof:Roof edge (eave + rake)",
+   "group": "H07-FASCIA"
+  },
+  {
+   "key": "walls:Gross floor area",
+   "group": "H01-GSF"
+  },
+  {
+   "key": "earthwork:Earthwork cut",
+   "group": "H31-CUT"
+  },
+  {
+   "key": "earthwork:Earthwork fill",
+   "group": "R743"
+  },
+  {
+   "key": "site:Asphalt paving",
+   "group": "H32-ASPH"
+  },
+  {
+   "key": "site:Concrete sidewalk",
+   "group": "H32-WALK"
+  },
+  {
+   "key": "ducts:8\" round flex",
+   "group": "R568"
+  },
+  {
+   "key": "ducts:10\" round flex",
+   "group": "R569"
+  },
+  {
+   "regex": "^pipe drops:1/2\" CW drops$",
+   "group": "H22-CW-1/2"
+  },
+  {
+   "regex": "^pipe drops:3/4\" CW drops$",
+   "group": "H22-CW-3/4"
+  },
+  {
+   "regex": "^pipe drops:1\" CW drops$",
+   "group": "H22-CW-1"
+  },
+  {
+   "regex": "^pipe drops:1-1/4\" CW drops$",
+   "group": "H22-CW-1-1/4"
+  },
+  {
+   "regex": "^pipe drops:1-1/2\" CW drops$",
+   "group": "H22-CW-1-1/2"
+  },
+  {
+   "regex": "^pipe drops:1/2\" HW drops$",
+   "group": "H22-HW-1/2"
+  },
+  {
+   "regex": "^pipe drops:3/4\" HW drops$",
+   "group": "H22-HW-3/4"
+  },
+  {
+   "regex": "^pipe drops:1\" HW drops$",
+   "group": "H22-HW-1"
+  },
+  {
+   "regex": "^schedules:Plant SEED( |$)",
+   "group": "H32-SEED"
+  },
+  {
+   "regex": "^schedules:Plant RGSM( |$)",
+   "group": "H32-RAIN"
+  },
+  {
+   "regex": "^site:Asphalt paving - tack coat",
+   "group": "R817"
+  },
+  {
+   "regex": "^site:Asphalt paving - binder course",
+   "group": "R818"
+  },
+  {
+   "regex": "^site:Asphalt paving - prime coat",
+   "group": "R819"
+  },
+  {
+   "regex": "^site:Asphalt paving - aggregate base",
+   "group": "R820"
+  },
+  {
+   "regex": "^site:Asphalt paving - compacted subgrade",
+   "group": "R821"
+  },
+  {
+   "regex": "^site:Asphalt paving - geotextile",
+   "group": "R822"
+  },
+  {
+   "regex": "^assembly:Wall Type 2A - 3-5/8\" metal studs",
+   "group": "R282"
+  },
+  {
+   "regex": "^assembly:Wall Type 2A - 3-5/8\" top & bottom track",
+   "group": "R283"
+  },
+  {
+   "regex": "^assembly:Wall Type 2A - 5/8\" type X gypsum board$",
+   "group": "R285"
+  },
+  {
+   "regex": "^assembly:Wall Type 2A - gypsum board 4.x8. sheets",
+   "group": "R286"
+  },
+  {
+   "regex": "^assembly:Wall Type 2A - joint tape",
+   "group": "R287"
+  },
+  {
+   "regex": "^assembly:Wall Type 2A - joint compound",
+   "group": "R288"
+  },
+  {
+   "regex": "^assembly:Wall Type 2A - 1-1/4\" drywall screws",
+   "group": "R289"
+  },
+  {
+   "regex": "^assembly:Wall Type 3[AB] - 8\" CMU wall$",
+   "group": "H04-CMU8-SF"
+  },
+  {
+   "regex": "^assembly:Wall Type 3[AB] - 8\" CMU block$",
+   "group": "H04-CMU8-EA"
+  },
+  {
+   "regex": "^assembly:Wall Type 1[AB] - 2\" rigid insulation$",
+   "group": "H07-RIGID"
+  },
+  {
+   "regex": "^assembly:Wall Type 1[AB] - vapor barrier$",
+   "group": "R159"
+  },
+  {
+   "regex": "^roof:Roof - rigid insulation",
+   "group": "R163"
+  },
+  {
+   "regex": "^roof:Roof - (underlayment|vapor barrier)",
+   "group": "R160"
+  },
+  {
+   "regex": "^schedules:1/2\"-?HB( |$)",
+   "group": "R486"
+  },
+  {
+   "regex": "^schedules:3/4\"-?WH( |$)",
+   "group": "R487"
+  },
+  {
+   "regex": "^finishes:Ceiling EPP-?1$",
+   "group": "R343"
+  },
+  {
+   "regex": "^finishes:Ceiling PT-?4$",
+   "group": "R344"
+  },
+  {
+   "regex": "(?i)^civil:6\" x 6\" tapping sleeve$",
+   "group": "R904"
+  },
+  {
+   "regex": "(?i)^civil:6\" tapping valve$",
+   "group": "R905"
+  },
+  {
+   "regex": "(?i)^civil:6\" x 2\" saddle tap$",
+   "group": "R908"
+  },
+  {
+   "regex": "(?i)^civil:2\" gate valve$",
+   "group": "R909"
+  },
+  {
+   "regex": "(?i)^civil:2\" valve box$",
+   "group": "R910"
+  },
+  {
+   "regex": "(?i)^civil:2\" water meter$",
+   "group": "R911"
+  },
+  {
+   "regex": "(?i)^civil:2\" meter box$",
+   "group": "R912"
+  },
+  {
+   "regex": "(?i)^civil:6\" x 1\" saddle tap$",
+   "group": "R916"
+  },
+  {
+   "regex": "(?i)^civil:1\" gate valve$",
+   "group": "R917"
+  },
+  {
+   "regex": "(?i)^civil:1\" valve box$",
+   "group": "R918"
+  },
+  {
+   "regex": "(?i)^civil:1\" water meter$",
+   "group": "R919"
+  },
+  {
+   "regex": "(?i)^civil:1\" meter box$",
+   "group": "R920"
+  },
+  {
+   "regex": "(?i)^civil:\\d\" RPZ backflow preventer$",
+   "group": "H33-BFP"
+  },
+  {
+   "regex": "^assembly:Wall Type 1[AB] - glass mat gypsum sheathing$",
+   "group": "R144"
+  },
+  {
+   "regex": "^assembly:Wall Type 1[AB] - cement board siding$",
+   "group": "H07-SIDING"
+  },
+  {
+   "regex": "(?i)^roof:Metal roof deck ",
+   "group": "H05-DECK"
+  },
+  {
+   "regex": "^slab:Slab on grade \\d+\" - concrete$",
+   "group": "H03-SOG-CY"
+  },
+  {
+   "regex": "^slab:Slab on grade - WWF",
+   "group": "H03-WWF"
+  },
+  {
+   "regex": "^slab:Slab on grade - vapor barrier$",
+   "group": "H03-VAPOR"
+  },
+  {
+   "regex": "^spec:Pipe insulation - ",
+   "group": "H22-PIPEINS"
+  },
+  {
+   "regex": "^spec:Duct insulation - ",
+   "group": "H23-DUCTINS"
+  },
+  {
+   "key": "ducts:6\" round flex",
+   "group": "R567"
+  },
+  {
+   "regex": "^trench:Trench excavation - \\d+\" PVC sanitary",
+   "group": "R775"
+  },
+  {
+   "regex": "^trench:Trench bedding - \\d+\" PVC sanitary",
+   "group": "R776"
+  },
+  {
+   "regex": "^trench:Trench backfill - \\d+\" PVC sanitary",
+   "group": "R777"
+  },
+  {
+   "regex": "^trench:Trench excavation - \\d+\" water",
+   "group": "R771"
+  },
+  {
+   "regex": "^trench:Trench bedding - \\d+\" water",
+   "group": "R772"
+  },
+  {
+   "regex": "^trench:Trench backfill - \\d+\" water",
+   "group": "R773"
+  },
+  {
+   "regex": "^trench:Trench excavation - 8\" PVC storm",
+   "group": "R763"
+  },
+  {
+   "regex": "^trench:Trench bedding - 8\" PVC storm",
+   "group": "R764"
+  },
+  {
+   "regex": "^trench:Trench backfill - 8\" PVC storm",
+   "group": "R765"
+  },
+  {
+   "regex": "(?i)^footings:F-?4 rebar",
+   "group": "H03-F4-REBAR"
+  },
+  {
+   "regex": "^footings:Wall footing \\d",
+   "group": "H03-WFTG-CY"
+  },
+  {
+   "regex": "^footings:Wall footing rebar",
+   "group": "H03-WFTG-REBAR"
+  },
+  {
+   "regex": "^spec:Window shade at ",
+   "group": "H12-SHADES"
+  },
+  {
+   "regex": "(?i)^devices:quadruplex (convenience )?(receptacle|outlet)$",
+   "group": "R704"
+  },
+  {
+   "regex": "(?i)^devices:special outlet$",
+   "group": "H26-REC-SPEC"
+  },
+  {
+   "regex": "(?i)^devices:remote annunciator panel",
+   "group": "R724"
+  },
+  {
+   "regex": "(?i)^devices:FULL PORT BALL VALVE",
+   "group": "H22-BALLV"
+  },
+  {
+   "regex": "(?i)^devices:WATER HAMMER ARREST",
+   "group": "H22-WHA"
+  },
+  {
+   "regex": "^envelope:Exterior wall - 8\" CMU back-up",
+   "group": "H04-CMU8-SF"
+  },
+  {
+   "regex": "^envelope:Exterior wall - 8\" CMU block",
+   "group": "H04-CMU8-EA"
+  },
+  {
+   "key": "fittings:1-1/2\" 45 elbow - vent",
+   "group": "R490"
+  },
+  {
+   "key": "fittings:1-1/2\" 90 elbow - vent",
+   "group": "R491"
+  },
+  {
+   "key": "fittings:1-1/2\" tee - vent",
+   "group": "R492"
+  },
+  {
+   "key": "fittings:2\" 45 elbow - vent",
+   "group": "R493"
+  },
+  {
+   "key": "fittings:2\" 90 elbow - vent",
+   "group": "R494"
+  },
+  {
+   "key": "fittings:2\" tee - vent",
+   "group": "R495"
+  },
+  {
+   "key": "fittings:2\" x 1-1/2\" tee - vent",
+   "group": "R496"
+  },
+  {
+   "key": "fittings:2\" 45 elbow - waste",
+   "group": "R497"
+  },
+  {
+   "key": "fittings:2\" 90 elbow - waste",
+   "group": "R498"
+  },
+  {
+   "key": "fittings:2\" Y-tee - waste",
+   "group": "R499"
+  },
+  {
+   "key": "fittings:3\" 45 elbow - waste",
+   "group": "R500"
+  },
+  {
+   "key": "fittings:3\" 90 elbow - waste",
+   "group": "R501"
+  },
+  {
+   "key": "fittings:3\" Y-tee - waste",
+   "group": "R502"
+  },
+  {
+   "key": "fittings:4\" 45 elbow - waste",
+   "group": "R503"
+  },
+  {
+   "key": "fittings:4\" 90 elbow - waste",
+   "group": "R504"
+  },
+  {
+   "key": "fittings:4\" Y-tee - waste",
+   "group": "H22-FIT-4Y"
+  },
+  {
+   "key": "fittings:1/2\" 90 elbow - water",
+   "group": "R506"
+  },
+  {
+   "key": "fittings:3/4\" 90 elbow - water",
+   "group": "R507"
+  },
+  {
+   "key": "fittings:1\" 90 elbow - water",
+   "group": "R508"
+  },
+  {
+   "key": "fittings:1-1/4\" 90 elbow - water",
+   "group": "R509"
+  },
+  {
+   "key": "fittings:1-1/4\" tee - water",
+   "group": "R510"
+  },
+  {
+   "key": "fittings:2\" 90 elbow - water",
+   "group": "R511"
+  },
+  {
+   "key": "fittings:1/2\" tee - water",
+   "group": "R512"
+  },
+  {
+   "key": "fittings:3/4\" tee - water",
+   "group": "R513"
+  },
+  {
+   "key": "fittings:1\" tee - water",
+   "group": "R514"
+  },
+  {
+   "key": "fittings:3/4\" x 1/2\" tee - water",
+   "group": "R516"
+  },
+  {
+   "key": "fittings:2\" x 1/2\" tee - water",
+   "group": "R520"
+  },
+  {
+   "key": "fittings:2\" x 1\" tee - water",
+   "group": "R521"
+  },
+  {
+   "key": "envelope:Exterior wall - through-wall flashing",
+   "group": "H04-FLASH"
+  },
+  {
+   "key": "envelope:Exterior wall - brick veneer wainscot",
+   "group": "H04-BRICK"
+  },
+  {
+   "key": "envelope:Exterior wall - brick wainscot cap (precast sill / rowlock)",
+   "group": "H04-ROWLOCK"
+  },
+  {
+   "key": "fittings:6\" round 90 elbow - duct",
+   "group": "R623"
+  },
+  {
+   "key": "fittings:8\" round 90 elbow - duct",
+   "group": "R624"
+  },
+  {
+   "key": "fittings:10\" round 90 elbow - duct",
+   "group": "R625"
+  },
+  {
+   "key": "fittings:12\" round 90 elbow - duct",
+   "group": "R626"
+  },
+  {
+   "key": "fittings:14\" round 90 elbow - duct",
+   "group": "R627"
+  },
+  {
+   "key": "fittings:20\" round 90 elbow - duct",
+   "group": "R629"
+  },
+  {
+   "key": "fittings:6\" round 45 elbow - duct",
+   "group": "R622"
+  },
+  {
+   "key": "fittings:20\" round 45 elbow - duct",
+   "group": "R628"
+  },
+  {
+   "key": "fittings:10\" round to 12\" round transition - duct",
+   "group": "R630"
+  },
+  {
+   "key": "fittings:10\" round to 16\" round transition - duct",
+   "group": "R631"
+  },
+  {
+   "key": "fittings:14\" round to 16\" round transition - duct",
+   "group": "R632"
+  },
+  {
+   "key": "fittings:14\" round to 20\" round transition - duct",
+   "group": "R633"
+  },
+  {
+   "key": "fittings:16\" round to 20\" round transition - duct",
+   "group": "R634"
+  },
+  {
+   "key": "fittings:10\" round to 14\" round transition - duct",
+   "group": "R635"
+  },
+  {
+   "key": "fittings:6\" round to flex connection - duct",
+   "group": "R636"
+  },
+  {
+   "key": "fittings:8\" round to flex connection - duct",
+   "group": "R637"
+  },
+  {
+   "key": "fittings:10\" round to flex connection - duct",
+   "group": "R638"
+  },
+  {
+   "key": "fittings:6\" round take-off from 10\" round - duct",
+   "group": "R639"
+  },
+  {
+   "key": "fittings:6\" round take-off from 12\" round - duct",
+   "group": "R640"
+  },
+  {
+   "key": "fittings:6\" round take-off from 14\" round - duct",
+   "group": "R641"
+  },
+  {
+   "key": "fittings:6\" round take-off from 16\" round - duct",
+   "group": "R642"
+  },
+  {
+   "key": "fittings:8\" round take-off from 10\" round - duct",
+   "group": "R643"
+  },
+  {
+   "key": "fittings:8\" round take-off from 12\" round - duct",
+   "group": "R644"
+  },
+  {
+   "key": "fittings:8\" round take-off from 14\" round - duct",
+   "group": "R645"
+  },
+  {
+   "key": "fittings:8\" round take-off from 16\" round - duct",
+   "group": "R646"
+  },
+  {
+   "key": "fittings:8\" round take-off from 20\" round - duct",
+   "group": "R647"
+  },
+  {
+   "key": "fittings:10\" round take-off from 12\" round - duct",
+   "group": "R648"
+  },
+  {
+   "key": "fittings:10\" round take-off from 14\" round - duct",
+   "group": "R649"
+  },
+  {
+   "key": "fittings:12\" round take-off from 14\" round - duct",
+   "group": "R650"
+  },
+  {
+   "key": "fittings:12\" round take-off from 16\" round - duct",
+   "group": "R651"
+  },
+  {
+   "key": "fittings:16\" round take-off from 20\" round - duct",
+   "group": "R652"
+  },
+  {
+   "key": "fittings:10\" round take-off from 14x14 - duct",
+   "group": "R653"
+  },
+  {
+   "key": "fittings:8\" round take-off from 10x10 - duct",
+   "group": "R654"
+  },
+  {
+   "key": "fittings:20\" round take-off from 10x10 - duct",
+   "group": "R655"
+  },
+  {
+   "key": "fittings:10\" round take-off from 20x14 - duct",
+   "group": "R656"
+  },
+  {
+   "key": "fittings:20\" round take-off from 20x22 - duct",
+   "group": "R657"
+  },
+  {
+   "key": "fittings:20x14 to 20\" round transition - duct",
+   "group": "R658"
+  },
+  {
+   "key": "schedules:Door finish ST-1: 2'-8\" x 7'-0\" type F",
+   "group": "R346"
+  },
+  {
+   "key": "schedules:Door finish ST-1: 3'-0\" x 7'-0\" type N",
+   "group": "R347"
+  },
+  {
+   "key": "schedules:Door finish ST-1: 3'-0\" x 7'-0\" type HG",
+   "group": "R348"
+  },
+  {
+   "key": "schedules:Door finish ST-1: 3'-0\" x 7'-0\" type F",
+   "group": "R349"
+  },
+  {
+   "key": "schedules:Door finish ST-1: 3'-0\" x 7'-0\" type D",
+   "group": "R350"
+  },
+  {
+   "key": "schedules:Door finish ST-1: 6'-0\" x 7'-0\" type DF",
+   "group": "R351"
+  },
+  {
+   "key": "schedules:Door finish PT-3: 3'-0\" x 7'-0\" type FG",
+   "group": "R352"
+  },
+  {
+   "key": "schedules:Door finish PT-3: 3'-0\" x 7'-0\" type HG",
+   "group": "H09-DOOR-PT3-HG"
+  },
+  {
+   "key": "schedules:Door finish PT-3: 3'-0\" x 7'-0\" type F",
+   "group": "R355"
+  },
+  {
+   "key": "schedules:Door finish PT-3: 3'-0\" x 7'-0\" type L",
+   "group": "R356"
+  },
+  {
+   "key": "schedules:Door finish PT-3: 6'-0\" x 7'-0\" type DHG",
+   "group": "R357"
+  },
+  {
+   "key": "schedules:Door finish PT-3: 6'-4\" x 7'-0\" type DHG",
+   "group": "R358"
+  },
+  {
+   "key": "schedules:Door frame finish PT-3",
+   "group": "R359"
+  },
+  {
+   "key": "schedules:Door trim finish PT-3 (both faces)",
+   "group": "R360"
+  },
+  {
+   "key": "envelope:Exterior wall inside face - 7/8\" metal furring channels",
+   "group": "H09-EXTFACE-FURR"
+  },
+  {
+   "key": "envelope:Exterior wall inside face - 5/8\" type X gypsum board",
+   "group": "H09-GB-EXT"
+  },
+  {
+   "key": "envelope:Exterior wall inside face - gypsum board 4'x8' sheets",
+   "group": "H09-EXTFACE-SHEETS"
+  },
+  {
+   "key": "envelope:Exterior wall inside face - joint tape (500' rolls)",
+   "group": "H09-EXTFACE-TAPE"
+  },
+  {
+   "key": "envelope:Exterior wall inside face - joint compound",
+   "group": "H09-EXTFACE-MUD"
+  },
+  {
+   "key": "envelope:Exterior wall inside face - 1-1/4\" drywall screws",
+   "group": "H09-EXTFACE-SCREWS"
+  },
+  {
+   "key": "envelope:Exterior wall inside face - sealant (top and bottom of the board)",
+   "group": "H09-EXTFACE-SEAL"
+  },
+  {
+   "key": "assembly:Wall Type 2A - sealant (top and bottom of the board)",
+   "group": "R290"
+  },
+  {
+   "key": "assembly:Wall Type 2A - batt insulation",
+   "group": "R284"
+  },
+  {
+   "key": "schedules:Sealant & backer rod at door frames",
+   "group": "H07-SEALANT"
+  },
+  {
+   "key": "finishes:Gypsum board ceiling - 4'x8' sheets",
+   "group": "H09-GBC-SHEETS"
+  },
+  {
+   "key": "finishes:Gypsum board ceiling - joint tape (500' rolls)",
+   "group": "H09-GBC-TAPE"
+  },
+  {
+   "key": "finishes:Gypsum board ceiling - joint compound",
+   "group": "H09-GBC-MUD"
+  },
+  {
+   "key": "finishes:Gypsum board ceiling - 1-1/4\" drywall screws",
+   "group": "H09-GBC-SCREWS"
+  }
+ ],
+ "info": [
+  {
+   "regex": "^rooms:",
+   "why": "room floor area - the human carries finishes, not room areas (see the rooms check)"
+  },
+  {
+   "regex": "^walls:Wall Type 1[AB]$",
+   "why": "exterior wall types (8\" CMU back-up, furring) - the exterior wall length is scored once, from the outer face loop (walls:Exterior Walls -> H09-EXTWALL-LF)"
+  },
+  {
+   "regex": "^walls:Wall Type (1B|2[AB]) wall area$",
+   "why": "wall area of a type the human carries by its layers (studs, board, insulation rows not mapped by the reviewer)"
+  },
+  {
+   "regex": "^finishes:.*\\(code unknown\\)$",
+   "why": "finish with no code in the finish schedule (review only)"
+  },
+  {
+   "regex": "^schedules:Hardware set \\(blank\\)$",
+   "why": "doors with no hardware set in the schedule (review only)"
+  }
+ ],
+ "checks": {
+  "rooms_sf_from_tags": 3562,
+  "rooms_note": "sum of the room-tag areas on the floor plan, per the reviewer (AI 0.13.4 had 10,762 SF from 4 sheets)",
+  "duplicate_sheet_numbers": [
+   "A-803",
+   "A-903",
+   "E-101"
+  ],
+  "spec_sections": 78
+ },
+ "regroup": {
+  "H22-BALLV": [
+   "524",
+   "525"
+  ],
+  "H22-WHA": [
+   "548",
+   "549"
+  ],
+  "H22-FIT-4Y": [
+   "489",
+   "505"
+  ],
+  "H09-DOOR-PT3-HG": [
+   "353",
+   "354"
+  ],
+  "H09-EXTFACE-FURR": [
+   "253",
+   "261",
+   "274",
+   "292"
+  ],
+  "H09-EXTFACE-SHEETS": [
+   "255",
+   "263",
+   "268",
+   "276",
+   "294",
+   "299"
+  ],
+  "H09-EXTFACE-TAPE": [
+   "256",
+   "264",
+   "269",
+   "277",
+   "295",
+   "300"
+  ],
+  "H09-EXTFACE-MUD": [
+   "257",
+   "265",
+   "270",
+   "278",
+   "296",
+   "301"
+  ],
+  "H09-EXTFACE-SCREWS": [
+   "258",
+   "266",
+   "271",
+   "279",
+   "297",
+   "302"
+  ],
+  "H09-EXTFACE-SEAL": [
+   "259",
+   "272",
+   "280",
+   "303"
+  ],
+  "H09-GBC-SHEETS": [
+   "314",
+   "319"
+  ],
+  "H09-GBC-TAPE": [
+   "315",
+   "320"
+  ],
+  "H09-GBC-MUD": [
+   "316",
+   "321"
+  ],
+  "H09-GBC-SCREWS": [
+   "317",
+   "322"
+  ]
+ }
+}

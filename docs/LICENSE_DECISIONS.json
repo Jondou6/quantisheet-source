@@ -1,0 +1,12 @@
+{
+ "_about": "Packages whose license needs a decision before QuantiSheet ships with them (tools/build_installer.py license_gate). 'for' says which distribution the decision covers; a build for anything wider must not rely on it.",
+ "accepted": {
+  "pymupdf": {
+   "flag": "AGPL",
+   "for": "in-house testers only",
+   "note": "Under the AGPL every person who gets a build (testers included) must be able to get the exact corresponding source. Each build's source zip (tools/zip_source) is to be offered with the installer; where it is hosted is Jon's call. Widening 'for' beyond in-house testers needs Jon's go.",
+   "recorded": "2026-11-04",
+   "decision": "AGPL (free license) - Jon, Nov 4 2026, 5:24 PM ET. Not buying a commercial license."
+  }
+ }
+}

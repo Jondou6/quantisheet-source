@@ -1,0 +1,7 @@
+{"interface_version": 1,
+ "source": {"file": "Smith Residence.pdf", "taken_at": "2026-10-20T11:40"},
+ "items": [
+  {"name": "Interior Wall", "qty": "1234.5000", "unit": "sf", "page_label": "A-101", "color": "#ff0000"},
+  {"name": "Base Trim", "qty": "212.2500", "unit": "ft", "page_label": "A-101", "color": "#00aa00"},
+  {"name": "Doors", "qty": "3.0000", "unit": "ea", "page_label": "A-102", "color": ""}
+ ]}

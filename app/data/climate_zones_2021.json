@@ -1,0 +1,13017 @@
+{
+"edition": "2021 IECC",
+"source": "PNNL-33270, Guide to Determining Climate Zones by County: Building America and IECC 2021 Updates (US Department of Energy, September 2022)",
+"states": {
+"AK": {
+"Aleutians East": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Aleutians West": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Anchorage": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Bethel": {
+"ba": "Very Cold",
+"was": "8",
+"zone": "7"
+},
+"Bristol Bay": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Denali": {
+"ba": "Very Cold",
+"was": "7",
+"zone": "8"
+},
+"Dillingham": {
+"ba": "Very Cold",
+"was": "8",
+"zone": "7"
+},
+"Fairbanks North Star": {
+"ba": "Subarctic",
+"zone": "8"
+},
+"Haines": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Juneau": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Kenai Peninsula": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Ketchikan Gateway": {
+"ba": "Cold",
+"was": "7",
+"zone": "5C"
+},
+"Kodiak Island": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Lake and Peninsula": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Matanuska-Susitna": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Nome": {
+"ba": "Subarctic",
+"zone": "8"
+},
+"North Slope": {
+"ba": "Subarctic",
+"zone": "8"
+},
+"Northwest Arctic": {
+"ba": "Subarctic",
+"zone": "8"
+},
+"Prince of Wales-Outer Ketchikan": {
+"ba": "Cold",
+"was": "7",
+"zone": "5C"
+},
+"Sitka": {
+"ba": "Cold",
+"was": "7",
+"zone": "5C"
+},
+"Skagway-Hoonah-Angoon": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Southeast Fairbanks": {
+"ba": "Subarctic",
+"zone": "8"
+},
+"Valdez-Cordova": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Wade Hampton": {
+"ba": "Subarctic",
+"zone": "8"
+},
+"Wrangell-Petersburg": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Yakutat": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Yukon-Koyukuk": {
+"ba": "Subarctic",
+"zone": "8"
+}
+},
+"AL": {
+"Autauga": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Baldwin": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Barbour": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Bibb": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Blount": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Bullock": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Butler": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Calhoun": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Chambers": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Cherokee": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Chilton": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Choctaw": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Clarke": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Clay": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Cleburne": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Coffee": {
+"ba": "Hot-Humid",
+"was": "3A",
+"zone": "2A"
+},
+"Colbert": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Conecuh": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Coosa": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Covington": {
+"ba": "Hot-Humid",
+"was": "3A",
+"zone": "2A"
+},
+"Crenshaw": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Cullman": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Dale": {
+"ba": "Hot-Humid",
+"was": "3A",
+"zone": "2A"
+},
+"Dallas": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"DeKalb": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Elmore": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Escambia": {
+"ba": "Hot-Humid",
+"was": "3A",
+"zone": "2A"
+},
+"Etowah": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Fayette": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Franklin": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Geneva": {
+"ba": "Hot-Humid",
+"was": "3A",
+"zone": "2A"
+},
+"Greene": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Hale": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Henry": {
+"ba": "Hot-Humid",
+"was": "3A",
+"zone": "2A"
+},
+"Houston": {
+"ba": "Hot-Humid",
+"was": "3A",
+"zone": "2A"
+},
+"Jackson": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Jefferson": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Lamar": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Lauderdale": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Lawrence": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Lee": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Limestone": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Lowndes": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Macon": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Madison": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Marengo": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Marion": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Marshall": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Mobile": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Monroe": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Montgomery": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Morgan": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Perry": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Pickens": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Pike": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Randolph": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Russell": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Shelby": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"St. Clair": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Sumter": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Talladega": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Tallapoosa": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Tuscaloosa": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Walker": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Washington": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Wilcox": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Winston": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+}
+},
+"AR": {
+"Arkansas": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Ashley": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Baxter": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Benton": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Boone": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Bradley": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Calhoun": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Carroll": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Chicot": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Clark": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Clay": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Cleburne": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Cleveland": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Columbia": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Conway": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Craighead": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Crawford": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Crittenden": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Cross": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Dallas": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Desha": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Drew": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Faulkner": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Franklin": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Fulton": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Garland": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Grant": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Greene": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Hempstead": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Hot Spring": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Howard": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Independence": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Izard": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Jackson": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Jefferson": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Johnson": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Lafayette": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Lincoln": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Little River": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Logan": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Lonoke": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Madison": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Marion": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Miller": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Mississippi": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Monroe": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Montgomery": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Nevada": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Newton": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Ouachita": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Perry": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Phillips": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Pike": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Poinsett": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Polk": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Pope": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Prairie": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Pulaski": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Randolph": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Saline": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Scott": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Searcy": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Sebastian": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Sevier": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Sharp": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"St. Francis": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Stone": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Union": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Van Buren": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Washington": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"White": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Woodruff": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Yell": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+}
+},
+"AZ": {
+"Apache": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Cochise": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Coconino": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Gila": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Graham": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Greenlee": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"La Paz": {
+"ba": "Hot-Dry",
+"zone": "2B"
+},
+"Maricopa": {
+"ba": "Hot-Dry",
+"zone": "2B"
+},
+"Mohave": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Navajo": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Pima": {
+"ba": "Hot-Dry",
+"zone": "2B"
+},
+"Pinal": {
+"ba": "Hot-Dry",
+"zone": "2B"
+},
+"Santa Cruz": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Yavapai": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Yuma": {
+"ba": "Hot-Dry",
+"zone": "2B"
+}
+},
+"CA": {
+"Alameda": {
+"ba": "Marine",
+"zone": "3C"
+},
+"Alpine": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Amador": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Butte": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Calaveras": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Colusa": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Contra Costa": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Del Norte": {
+"ba": "Marine",
+"zone": "4C"
+},
+"El Dorado": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Fresno": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Glenn": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Humboldt": {
+"ba": "Marine",
+"zone": "4C"
+},
+"Imperial": {
+"ba": "Hot-Dry",
+"zone": "2B"
+},
+"Inyo": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Kern": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Kings": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Lake": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Lassen": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Los Angeles": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Madera": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Marin": {
+"ba": "Marine",
+"zone": "3C"
+},
+"Mariposa": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Mendocino": {
+"ba": "Marine",
+"zone": "3C"
+},
+"Merced": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Modoc": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Mono": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Monterey": {
+"ba": "Marine",
+"zone": "3C"
+},
+"Napa": {
+"ba": "Marine",
+"zone": "3C"
+},
+"Nevada": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Orange": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Placer": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Plumas": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Riverside": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Sacramento": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"San Benito": {
+"ba": "Marine",
+"zone": "3C"
+},
+"San Bernardino": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"San Diego": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"San Francisco": {
+"ba": "Marine",
+"zone": "3C"
+},
+"San Joaquin": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"San Luis Obispo": {
+"ba": "Marine",
+"zone": "3C"
+},
+"San Mateo": {
+"ba": "Marine",
+"zone": "3C"
+},
+"Santa Barbara": {
+"ba": "Marine",
+"zone": "3C"
+},
+"Santa Clara": {
+"ba": "Marine",
+"zone": "3C"
+},
+"Santa Cruz": {
+"ba": "Marine",
+"zone": "3C"
+},
+"Shasta": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Sierra": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Siskiyou": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Solano": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Sonoma": {
+"ba": "Marine",
+"zone": "3C"
+},
+"Stanislaus": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Sutter": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Tehama": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Trinity": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Tulare": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Tuolumne": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Ventura": {
+"ba": "Marine",
+"zone": "3C"
+},
+"Yolo": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Yuba": {
+"ba": "Hot-Dry",
+"zone": "3B"
+}
+},
+"CO": {
+"Adams": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Alamosa": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Arapahoe": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Archuleta": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Baca": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Bent": {
+"ba": "Mixed-Dry",
+"was": "5B",
+"zone": "4B"
+},
+"Boulder": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Broomfield": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Chaffee": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Cheyenne": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Clear Creek": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Conejos": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Costilla": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Crowley": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Custer": {
+"ba": "Cold",
+"was": "6B",
+"zone": "5B"
+},
+"Delta": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Denver": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Dolores": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Douglas": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Eagle": {
+"ba": "Cold",
+"zone": "6B"
+},
+"El Paso": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Elbert": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Fremont": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Garfield": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Gilpin": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Grand": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Gunnison": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Hinsdale": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Huerfano": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Jackson": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Jefferson": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Kiowa": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Kit Carson": {
+"ba": "Cold",
+"zone": "5B"
+},
+"La Plata": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Lake": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Larimer": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Las Animas": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Lincoln": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Logan": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Mesa": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Mineral": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Moffat": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Montezuma": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Montrose": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Morgan": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Otero": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Ouray": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Park": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Phillips": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Pitkin": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Prowers": {
+"ba": "Mixed-Dry",
+"was": "5B",
+"zone": "4B"
+},
+"Pueblo": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Rio Blanco": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Rio Grande": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Routt": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Saguache": {
+"ba": "Cold",
+"zone": "6B"
+},
+"San Juan": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"San Miguel": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Sedgwick": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Summit": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Teller": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Washington": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Weld": {
+"ba": "Cold",
+"zone": "5B"
+}
+},
+"CT": {
+"Fairfield": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Hartford": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Litchfield": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Middlesex": {
+"ba": "Cold",
+"zone": "5A"
+},
+"New Haven": {
+"ba": "Cold",
+"zone": "5A"
+},
+"New London": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Tolland": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Windham": {
+"ba": "Cold",
+"zone": "5A"
+}
+},
+"DC": {
+"District of Columbia": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+}
+},
+"DE": {
+"Kent": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"New Castle": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+}
+},
+"FL": {
+"Alachua": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Baker": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Bay": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Bradford": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Brevard": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Broward": {
+"ba": "Hot-Humid",
+"zone": "1A"
+},
+"Calhoun": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Charlotte": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Citrus": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Clay": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Collier": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Columbia": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"DeSoto": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Dixie": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Duval": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Escambia": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Flagler": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Franklin": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Gadsden": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Gilchrist": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Glades": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Gulf": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Hamilton": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Hardee": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"HenB": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Hernando": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Highlands": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Hillsborough": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Holmes": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Indian River": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Jackson": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Jefferson": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Lafayette": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Lake": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Lee": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Leon": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Levy": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Liberty": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Madison": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Manatee": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Marion": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Martin": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Miami-Dade": {
+"ba": "Hot-Humid",
+"zone": "1A"
+},
+"Monroe": {
+"ba": "Hot-Humid",
+"zone": "1A"
+},
+"Nassau": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Okaloosa": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Okeechobee": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Orange": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Osceola": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Palm Beach": {
+"ba": "Hot-Humid",
+"was": "2A",
+"zone": "1A"
+},
+"Pasco": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Pinellas": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Polk": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Putnam": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Santa Rosa": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Sarasota": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Seminole": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"St. Johns": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"St. Lucie": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Sumter": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Suwannee": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Taylor": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Union": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Volusia": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Wakulla": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Walton": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Washington": {
+"ba": "Hot-Humid",
+"zone": "2A"
+}
+},
+"GA": {
+"Appling": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Atkinson": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Bacon": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Baker": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Baldwin": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Banks": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Barrow": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Bartow": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Ben Hill": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Berrien": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Bibb": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Bleckley": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Brantley": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Brooks": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Bryan": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Bulloch": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Burke": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Butts": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Calhoun": {
+"ba": "Hot-Humid",
+"was": "3A",
+"zone": "2A"
+},
+"Camden": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Candler": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Carroll": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Catoosa": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Charlton": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Chatham": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Chattahoochee": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Chattooga": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Cherokee": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Clarke": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Clay": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Clayton": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Clinch": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Cobb": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Coffee": {
+"ba": "Hot-Humid",
+"was": "3A",
+"zone": "2A"
+},
+"Colquitt": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Columbia": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Cook": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Coweta": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Crawford": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Crisp": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Dade": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Dawson": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"DeKalb": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Decatur": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Dodge": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Dooly": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Dougherty": {
+"ba": "Hot-Humid",
+"was": "3A",
+"zone": "2A"
+},
+"Douglas": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Early": {
+"ba": "Hot-Humid",
+"was": "3A",
+"zone": "2A"
+},
+"Echols": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Effingham": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Elbert": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Emanuel": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Evans": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Fannin": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Fayette": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Floyd": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Forsyth": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Franklin": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Fulton": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Gilmer": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Glascock": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Glynn": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Gordon": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Grady": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Greene": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Gwinnett": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Habersham": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Hall": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Hancock": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Haralson": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Harris": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Hart": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Heard": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Henry": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Houston": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Irwin": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Jackson": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Jasper": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Jeff Davis": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Jefferson": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Jenkins": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Johnson": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Jones": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Lamar": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Lanier": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Laurens": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Lee": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Liberty": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Lincoln": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Long": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Lowndes": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Lumpkin": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Macon": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Madison": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Marion": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"McDuffie": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"McIntosh": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Meriwether": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Miller": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Mitchell": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Monroe": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Montgomery": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Morgan": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Murray": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Muscogee": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Newton": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Oconee": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Oglethorpe": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Paulding": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Peach": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Pickens": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Pierce": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Pike": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Polk": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Pulaski": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Putnam": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Quitman": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Rabun": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Randolph": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Richmond": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Rockdale": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Schley": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Screven": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Seminole": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Spalding": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Stephens": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Stewart": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Sumter": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Talbot": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Taliaferro": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Tattnall": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Taylor": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Telfair": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Terrell": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Thomas": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Tift": {
+"ba": "Hot-Humid",
+"was": "3A",
+"zone": "2A"
+},
+"Toombs": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Towns": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Treutlen": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Troup": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Turner": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Twiggs": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Union": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Upson": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Walker": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Walton": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Ware": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Warren": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Washington": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Wayne": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Webster": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Wheeler": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"White": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Whitfield": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Wilcox": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Wilkes": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Wilkinson": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Worth": {
+"ba": "Hot-Humid",
+"was": "3A",
+"zone": "2A"
+}
+},
+"HI": {
+"Hawaii": {
+"ba": "Hot-Humid",
+"zone": "1A"
+},
+"Honolulu": {
+"ba": "Hot-Humid",
+"zone": "1A"
+},
+"Kalawao": {
+"ba": "Hot-Humid",
+"zone": "1A"
+},
+"Kauai": {
+"ba": "Hot-Humid",
+"zone": "1A"
+},
+"Maui": {
+"ba": "Hot-Humid",
+"zone": "1A"
+}
+},
+"IA": {
+"Adair": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Adams": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Allamakee": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Appanoose": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Audubon": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Benton": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Black Hawk": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Boone": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Bremer": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Buchanan": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Buena Vista": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Butler": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Calhoun": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Carroll": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Cass": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Cedar": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Cerro Gordo": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Cherokee": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Chickasaw": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Clarke": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Clay": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Clayton": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Clinton": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Crawford": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Dallas": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Davis": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Decatur": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Delaware": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Des Moines": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Dickinson": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Dubuque": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Emmet": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Fayette": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Floyd": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Franklin": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Fremont": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Greene": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Grundy": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Guthrie": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Hamilton": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Hancock": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Hardin": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Harrison": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Henry": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Howard": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Humboldt": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Ida": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Iowa": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Jackson": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Jasper": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Jefferson": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Johnson": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Jones": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Keokuk": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Kossuth": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Lee": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Linn": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Louisa": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Lucas": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Lyon": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Madison": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Mahaska": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Marion": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Marshall": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Mills": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Mitchell": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Monona": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Monroe": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Montgomery": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Muscatine": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Ringgold": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Sac": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Scott": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Shelby": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Sioux": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Story": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Tama": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Taylor": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Union": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Van Buren": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Wapello": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Warren": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Washington": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Wayne": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Webster": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Winnebago": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Winneshiek": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Woodbury": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Worth": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Wright": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+}
+},
+"ID": {
+"Adams": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Bannock": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Bear Lake": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Benewah": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Bingham": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Blaine": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Boise": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Bonner": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Bonneville": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Boundary": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Butte": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Camas": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Canyon": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Caribou": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Cassia": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Clark": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Clearwater": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Custer": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Elmore": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Franklin": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Fremont": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Gem": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Gooding": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Idaho": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Jefferson": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Jerome": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Kootenai": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Latah": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Lemhi": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Lewis": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Lincoln": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Madison": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Minidoka": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Nez Perce": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Oneida": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Owyhee": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Payette": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Power": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Shoshone": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Teton": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Twin Falls": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Valley": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Washington": {
+"ba": "Cold",
+"zone": "5B"
+}
+},
+"IL": {
+"Adams": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Alexander": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Bond": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Boone": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Brown": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Bureau": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Calhoun": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Carroll": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Cass": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Champaign": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Christian": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Clark": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Clay": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Clinton": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Coles": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Cook": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Crawford": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Cumberland": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"De Witt": {
+"ba": "Cold",
+"zone": "5A"
+},
+"DeKalb": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Douglas": {
+"ba": "Cold",
+"zone": "5A"
+},
+"DuPage": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Edgar": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Edwards": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Effingham": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Fayette": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Ford": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Franklin": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Fulton": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Gallatin": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Greene": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Grundy": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Hamilton": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Hancock": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Hardin": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Henderson": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Henry": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Iroquois": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Jackson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Jasper": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Jefferson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Jersey": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Jo Daviess": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Johnson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Kane": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Kankakee": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Kendall": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Knox": {
+"ba": "Cold",
+"zone": "5A"
+},
+"La Salle": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Lake": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Lawrence": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Lee": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Livingston": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Logan": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Macon": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Macoupin": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Madison": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Marion": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Marshall": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Mason": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Massac": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"McDonough": {
+"ba": "Cold",
+"zone": "5A"
+},
+"McHenry": {
+"ba": "Cold",
+"zone": "5A"
+},
+"McLean": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Menard": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Mercer": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Monroe": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Morgan": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Moultrie": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Ogle": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Peoria": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Perry": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Piatt": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Pike": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Pope": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Pulaski": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Putnam": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Randolph": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Richland": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Rock Island": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Saline": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Sangamon": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Schuyler": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Scott": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Shelby": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"St. Clair": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Stark": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Stephenson": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Tazewell": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Union": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Vermilion": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Wabash": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Warren": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Washington": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Wayne": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"White": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Whiteside": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Will": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Williamson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Winnebago": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Woodford": {
+"ba": "Cold",
+"zone": "5A"
+}
+},
+"IN": {
+"Adams": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Allen": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Bartholomew": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Benton": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Blackford": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Boone": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Brown": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Carroll": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Cass": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Clark": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Clay": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Clinton": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Crawford": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Daviess": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"De Kalb": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Dearborn": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Decatur": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Delaware": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Dubois": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Elkhart": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Fayette": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Floyd": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Fountain": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Franklin": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Fulton": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Gibson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Grant": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Greene": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Hamilton": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Hancock": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Harrison": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Hendricks": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Henry": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Howard": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Huntington": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Jackson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Jasper": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Jay": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Jefferson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Jennings": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Johnson": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Knox": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Kosciusko": {
+"ba": "Cold",
+"zone": "5A"
+},
+"La Porte": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Lagrange": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Lake": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Lawrence": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Madison": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Marion": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Marshall": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Martin": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Miami": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Monroe": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Montgomery": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Morgan": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Newton": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Noble": {
+"ba": "Cold",
+"zone": "5A"
+},
+"O'Brien": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Ohio": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Orange": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Osceola": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Owen": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Page": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Palo Alto": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Parke": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Perry": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Pike": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Plymouth": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Pocahontas": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Polk": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Porter": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Posey": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Pottawattamie": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Poweshiek": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Pulaski": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Putnam": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Randolph": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Ripley": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Rush": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Scott": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Shelby": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Spencer": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"St. Joseph": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Starke": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Steuben": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Sullivan": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Switzerland": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Tippecanoe": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Tipton": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Union": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Vanderburgh": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Vermillion": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Vigo": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Wabash": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Warren": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Warrick": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Washington": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Wayne": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Wells": {
+"ba": "Cold",
+"zone": "5A"
+},
+"White": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Whitley": {
+"ba": "Cold",
+"zone": "5A"
+}
+},
+"KS": {
+"Allen": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Anderson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Atchison": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Barber": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Barton": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Bourbon": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Brown": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Butler": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Chase": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Chautauqua": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Cherokee": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Cheyenne": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Clark": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Clay": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Cloud": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Coffey": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Comanche": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Cowley": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Crawford": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Decatur": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Dickinson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Doniphan": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Douglas": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Edwards": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Elk": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Ellis": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Ellsworth": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Finney": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Ford": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Franklin": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Geary": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Gove": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Graham": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Grant": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Gray": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Greeley": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Greenwood": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Hamilton": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Harper": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Harvey": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Haskell": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Hodgeman": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Jackson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Jefferson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Jewell": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Johnson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Kearny": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Kingman": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Kiowa": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Labette": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Lane": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Leavenworth": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Lincoln": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Linn": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Logan": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Lyon": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Marion": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Marshall": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"McPherson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Meade": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Miami": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Mitchell": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Montgomery": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Morris": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Morton": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Nemaha": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Neosho": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Ness": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Norton": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Osage": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Osborne": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Ottawa": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Pawnee": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Phillips": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Pottawatomie": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Pratt": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Rawlins": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Reno": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Republic": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Rice": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Riley": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Rooks": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Rush": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Russell": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Saline": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Scott": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Sedgwick": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Seward": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Shawnee": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Sheridan": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Sherman": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Smith": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Stafford": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Stanton": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Stevens": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Sumner": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Thomas": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Trego": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Wabaunsee": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Wallace": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Washington": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Wichita": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Wilson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Woodson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Wyandotte": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+}
+},
+"KY": {
+"Adair": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Allen": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Anderson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Ballard": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Barren": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Bath": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Bell": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Boone": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Bourbon": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Boyd": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Boyle": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Bracken": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Breathitt": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Breckinridge": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Bullitt": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Butler": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Caldwell": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Calloway": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Campbell": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Carlisle": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Carroll": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Carter": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Casey": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Christian": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Clark": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Clay": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Clinton": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Crittenden": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Cumberland": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Daviess": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Edmonson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Elliott": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Estill": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Fayette": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Fleming": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Floyd": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Franklin": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Fulton": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Gallatin": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Garrard": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Grant": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Graves": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Grayson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Green": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Greenup": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Hancock": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Hardin": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Harlan": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Harrison": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Hart": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Henderson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Henry": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Hickman": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Hopkins": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Jackson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Jefferson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Jessamine": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Johnson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Kenton": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Knott": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Knox": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Larue": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Laurel": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Lawrence": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Lee": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Leslie": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Letcher": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Lewis": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Lincoln": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Livingston": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Logan": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Lyon": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Madison": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Magoffin": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Marion": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Marshall": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Martin": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Mason": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"McCracken": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"McCreary": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"McLean": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Meade": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Menifee": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Mercer": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Metcalfe": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Monroe": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Montgomery": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Morgan": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Muhlenberg": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Nelson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Nicholas": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Ohio": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Oldham": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Owen": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Owsley": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Pendleton": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Perry": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Pike": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Powell": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Pulaski": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Robertson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Rockcastle": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Rowan": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Russell": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Scott": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Shelby": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Simpson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Spencer": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Taylor": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Todd": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Trigg": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Trimble": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Union": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Warren": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Washington": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Wayne": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Webster": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Whitley": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Wolfe": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Woodford": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+}
+},
+"LA": {
+"Acadia": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Allen": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Ascension": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Assumption": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Avoyelles": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Beauregard": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Bienville": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Bossier": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Caddo": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Calcasieu": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Caldwell": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Cameron": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Catahoula": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Claiborne": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Concordia": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"De Soto": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"East Baton Rouge": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"East Carroll": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"East Feliciana": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Evangeline": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Franklin": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Grant": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Iberia": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Iberville": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Jackson": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Jefferson": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Jefferson Davis": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"La Salle": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Lafayette": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Lafourche": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Lincoln": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Livingston": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Madison": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Morehouse": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Natchitoches": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Orleans": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Ouachita": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Plaquemines": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Pointe Coupee": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Rapides": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Red River": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Richland": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Sabine": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"St. Bernard": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"St. Charles": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"St. Helena": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"St. James": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"St. John the Baptist": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"St. Landry": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"St. Martin": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"St. Mary": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"St. Tammany": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Tangipahoa": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Tensas": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Terrebonne": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Union": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Vermilion": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Vernon": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Washington": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Webster": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"West Baton Rouge": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"West Carroll": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"West Feliciana": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Winn": {
+"ba": "Hot-Humid",
+"zone": "3A"
+}
+},
+"MA": {
+"Barnstable": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Berkshire": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Bristol": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Dukes": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Essex": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Franklin": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Hampden": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Hampshire": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Middlesex": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Nantucket": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Norfolk": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Plymouth": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Suffolk": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Worcester": {
+"ba": "Cold",
+"zone": "5A"
+}
+},
+"MD": {
+"Allegany": {
+"ba": "Cold",
+"was": "4A",
+"zone": "5A"
+},
+"Anne Arundel": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Baltimore": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Baltimore (city)": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Calvert": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Caroline": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Carroll": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Cecil": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Charles": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Dorchester": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Frederick": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Garrett": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Harford": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Howard": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Kent": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Montgomery": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Prince George's": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Queen Anne's": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Somerset": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"St. Mary's": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Talbot": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Washington": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Wicomico": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Worcester": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+}
+},
+"ME": {
+"Androscoggin": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Aroostook": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Cumberland": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Franklin": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Hancock": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Kennebec": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Knox": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Lincoln": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Oxford": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Penobscot": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Piscataquis": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Sagadahoc": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Somerset": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Waldo": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Washington": {
+"ba": "Cold",
+"zone": "6A"
+},
+"York": {
+"ba": "Cold",
+"zone": "6A"
+}
+},
+"MI": {
+"Alcona": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Alger": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Allegan": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Alpena": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Antrim": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Arenac": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Baraga": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Barry": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Bay": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Benzie": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Berrien": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Branch": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Calhoun": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Cass": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Charlevoix": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Cheboygan": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Chippewa": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Clare": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Clinton": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Crawford": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Delta": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Dickinson": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Eaton": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Emmet": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Genesee": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Gladwin": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Gogebic": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Grand Traverse": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Gratiot": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Hillsdale": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Houghton": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Huron": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Ingham": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Ionia": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Iosco": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Iron": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Isabella": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Jackson": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Kalamazoo": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Kalkaska": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Kent": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Keweenaw": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Lake": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Lapeer": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Leelanau": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Lenawee": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Livingston": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Luce": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Mackinac": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Macomb": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Manistee": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Marquette": {
+"ba": "Very Cold",
+"was": "6A",
+"zone": "7"
+},
+"Mason": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Mecosta": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Menominee": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Midland": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Missaukee": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Monroe": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Montcalm": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Montmorency": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Muskegon": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Newaygo": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Oakland": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Oceana": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Ogemaw": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Ontonagon": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Osceola": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Oscoda": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Otsego": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Ottawa": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Presque Isle": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Roscommon": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Saginaw": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Sanilac": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Schoolcraft": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Shiawassee": {
+"ba": "Cold",
+"zone": "5A"
+},
+"St. Clair": {
+"ba": "Cold",
+"zone": "5A"
+},
+"St. Joseph": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Tuscola": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Van Buren": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Washtenaw": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Wayne": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Wexford": {
+"ba": "Cold",
+"zone": "6A"
+}
+},
+"MN": {
+"Aitkin": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Anoka": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Becker": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Beltrami": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Benton": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Big Stone": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Blue Earth": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Brown": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Carlton": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Carver": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Cass": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Chippewa": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Chisago": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Clay": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Clearwater": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Cook": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Cottonwood": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Crow Wing": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Dakota": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Dodge": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Douglas": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Faribault": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Fillmore": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Freeborn": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Goodhue": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Grant": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Hennepin": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Houston": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Hubbard": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Isanti": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Itasca": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Jackson": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Kanabec": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Kandiyohi": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Kittson": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Koochiching": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Lac qui Parle": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Lake": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Lake of the Woods": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Le Sueur": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Lincoln": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Lyon": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Mahnomen": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Marshall": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Martin": {
+"ba": "Cold",
+"zone": "6A"
+},
+"McLeod": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Meeker": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Mille Lacs": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Morrison": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Mower": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Murray": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Nicollet": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Nobles": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Norman": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Olmsted": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Otter Tail": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Pennington": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Pine": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Pipestone": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Polk": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Pope": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Ramsey": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Red Lake": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Redwood": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Renville": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Rice": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Rock": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Roseau": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Scott": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Sherburne": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Sibley": {
+"ba": "Cold",
+"zone": "6A"
+},
+"St. Louis": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Stearns": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Steele": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Stevens": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Swift": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Todd": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Traverse": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Wabasha": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Wadena": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Waseca": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Washington": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Watonwan": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Wilkin": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Winona": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Wright": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Yellow Medicine": {
+"ba": "Cold",
+"zone": "6A"
+}
+},
+"MO": {
+"Adair": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Andrew": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Atchison": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Audrain": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Barry": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Barton": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Bates": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Benton": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Bollinger": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Boone": {
+"ba": "Mixed-Humid",
+"zone": "4"
+},
+"Buchanan": {
+"ba": "Mixed-Humid",
+"was": "5",
+"zone": "4"
+},
+"Butler": {
+"ba": "Mixed-Humid",
+"zone": "4"
+},
+"Caldwell": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Callaway": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Camden": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Cape Girardeau": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Carroll": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Carter": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Cass": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Cedar": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Chariton": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Christian": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Clark": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Clay": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Clinton": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Cole": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Cooper": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Crawford": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Dade": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Dallas": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Daviess": {
+"ba": "Cold",
+"zone": "5A"
+},
+"DeKalb": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Dent": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Douglas": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Dunklin": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Franklin": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Gasconade": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Gentry": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Greene": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Grundy": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Harrison": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Henry": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Hickory": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Holt": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Howard": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Howell": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Iron": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Jackson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Jasper": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Jefferson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Johnson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Knox": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Laclede": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Lafayette": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Lawrence": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Lewis": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Lincoln": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Linn": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Livingston": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Macon": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Madison": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Maries": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Marion": {
+"ba": "Cold",
+"zone": "5A"
+},
+"McDonald": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Mercer": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Miller": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Mississippi": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Moniteau": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Monroe": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Montgomery": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Morgan": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"New Madrid": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Newton": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Nodaway": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Oregon": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Osage": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Ozark": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Pemiscot": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Perry": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Pettis": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Phelps": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Pike": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Platte": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Polk": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Pulaski": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Putnam": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Ralls": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Randolph": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Ray": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Reynolds": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Ripley": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Saline": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Schuyler": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Scotland": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Scott": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Shannon": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Shelby": {
+"ba": "Cold",
+"zone": "5A"
+},
+"St. Charles": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"St. Clair": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"St. Francois": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"St. Louis": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"St. Louis (city)": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Ste. Genevieve": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Stoddard": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Stone": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Sullivan": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Taney": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Texas": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Vernon": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Warren": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Washington": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Wayne": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Webster": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Worth": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Wright": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+}
+},
+"MS": {
+"Adams": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Alcorn": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Amite": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Attala": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Benton": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Bolivar": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Calhoun": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Carroll": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Chickasaw": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Choctaw": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Claiborne": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Clarke": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Clay": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Coahoma": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Copiah": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Covington": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"DeSoto": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Forrest": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Franklin": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"George": {
+"ba": "Hot-Humid",
+"was": "3A",
+"zone": "2A"
+},
+"Greene": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Grenada": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Hancock": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Harrison": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Hinds": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Holmes": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Humphreys": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Issaquena": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Itawamba": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Jackson": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Jasper": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Jefferson": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Jefferson Davis": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Jones": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Kemper": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Lafayette": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Lamar": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Lauderdale": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Lawrence": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Leake": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Lee": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Leflore": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Lincoln": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Lowndes": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Madison": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Marion": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Marshall": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Monroe": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Montgomery": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Neshoba": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Noxubee": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Oktibbeha": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Panola": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Pearl River": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Perry": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Pike": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Pontotoc": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Prentiss": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Quitman": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Rankin": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Scott": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Sharkey": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Simpson": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Smith": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Stone": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Sunflower": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Tallahatchie": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Tate": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Tippah": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Tishomingo": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Tunica": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Union": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Walthall": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Warren": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Washington": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Wayne": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Webster": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Wilkinson": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Winston": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Yalobusha": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Yazoo": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+}
+},
+"MT": {
+"Beaverhead": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Big Horn": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Blaine": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Broadwater": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Carbon": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Carter": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Cascade": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Chouteau": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Custer": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Daniels": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Dawson": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Deer Lodge": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Fallon": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Fergus": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Flathead": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Gallatin": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Garfield": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Glacier": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Golden Valley": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Granite": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Hill": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Jefferson": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Judith Basin": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Lake": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Lewis and Clark": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Liberty": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Lincoln": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Madison": {
+"ba": "Cold",
+"zone": "6B"
+},
+"McCone": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Meagher": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Mineral": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Missoula": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Musselshell": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Park": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Petroleum": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Phillips": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Pondera": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Powder River": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Powell": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Prairie": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Ravalli": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Richland": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Roosevelt": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Rosebud": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Sanders": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Sheridan": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Silver Bow": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Stillwater": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Sweet Grass": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Teton": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Toole": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Treasure": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Valley": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Wheatland": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Wibaux": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Yellowstone": {
+"ba": "Cold",
+"zone": "6B"
+}
+},
+"NC": {
+"A": {
+"ba": "Very Cold",
+"zone": "5A"
+},
+"Alamance": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Alexander": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Alleghany": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Anson": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Ashe": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Beaufort": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Bertie": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Bladen": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Brunswick": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Buncombe": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Burke": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Cabarrus": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Caldwell": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Camden": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Carteret": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Caswell": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Catawba": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Chatham": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Cherokee": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Chowan": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Clay": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Cleveland": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Columbus": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Craven": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Cumberland": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Currituck": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Dare": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Davidson": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Davie": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Duplin": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Durham": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Edgecombe": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Forsyth": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Franklin": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Gaston": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Gates": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Graham": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Granville": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Greene": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Guilford": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Halifax": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Harnett": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Haywood": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Henderson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Hertford": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Hoke": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Hyde": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Iredell": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Jackson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Johnston": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Jones": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Lee": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Lenoir": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Lincoln": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Macon": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Madison": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Martin": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"McDowell": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Mecklenburg": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Mitchell": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Montgomery": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Moore": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Nash": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"New Hanover": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Northampton": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Onslow": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Orange": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Pamlico": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Pasquotank": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Pender": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Perquimans": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Person": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Pitt": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Polk": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Randolph": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Richmond": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Robeson": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Rockingham": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Rowan": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Rutherford": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Sampson": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Scotland": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Stanly": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Stokes": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Surry": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Swain": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Transylvania": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Tyrrell": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Union": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Vance": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Wake": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Warren": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Washington": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Watauga": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Wayne": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Wilkes": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Wilson": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Yadkin": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Yancey": {
+"ba": "Cold",
+"zone": "5A"
+}
+},
+"ND": {
+"Adams": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Barnes": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Benson": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Billings": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Bottineau": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Bowman": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Burke": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Burleigh": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Cass": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Cavalier": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Dickey": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Divide": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Dunn": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Eddy": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Emmons": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Foster": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Golden Valley": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Grand Forks": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Grant": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Griggs": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Hettinger": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Kidder": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"LaMoure": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Logan": {
+"ba": "Cold",
+"zone": "6A"
+},
+"McHenry": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"McIntosh": {
+"ba": "Cold",
+"zone": "6A"
+},
+"McKenzie": {
+"ba": "Cold",
+"zone": "6A"
+},
+"McLean": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Mercer": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Morton": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Mountrail": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Nelson": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Oliver": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Pembina": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Pierce": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Ramsey": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Ransom": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Renville": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Richland": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Rolette": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Sargent": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Sheridan": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Sioux": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Slope": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Stark": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Steele": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Stutsman": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Towner": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Traill": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Walsh": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Ward": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Wells": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Williams": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+}
+},
+"NE": {
+"Adams": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Antelope": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Arthur": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Banner": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Blaine": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Boone": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Box Butte": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Boyd": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Brown": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Buffalo": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Burt": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Butler": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Cass": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Cedar": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Chase": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Cherry": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Cheyenne": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Clay": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Colfax": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Cuming": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Custer": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Dakota": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Dawes": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Dawson": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Deuel": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Dixon": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Dodge": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Douglas": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Dundy": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Fillmore": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Franklin": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Frontier": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Furnas": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Gage": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Garden": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Garfield": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Gosper": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Grant": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Greeley": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Hall": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Hamilton": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Harlan": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Hayes": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Hitchcock": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Holt": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Hooker": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Howard": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Jefferson": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Johnson": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Kearney": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Keith": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Keya Paha": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Kimball": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Knox": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Lancaster": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Lincoln": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Logan": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Loup": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Madison": {
+"ba": "Cold",
+"zone": "5A"
+},
+"McPherson": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Merrick": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Morrill": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Nance": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Nemaha": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Nuckolls": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Otoe": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Pawnee": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Perkins": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Phelps": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Pierce": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Platte": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Polk": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Red Willow": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Richardson": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Rock": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Saline": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Sarpy": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Saunders": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Scotts Bluff": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Seward": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Sheridan": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Sherman": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Sioux": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Stanton": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Thayer": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Thomas": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Thurston": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Valley": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Washington": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Wayne": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Webster": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Wheeler": {
+"ba": "Cold",
+"zone": "5A"
+},
+"York": {
+"ba": "Cold",
+"zone": "5A"
+}
+},
+"NH": {
+"Belknap": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Carroll": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Cheshire": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Coos": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Grafton": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Hillsborough": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Merrimack": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Rockingham": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Strafford": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Sullivan": {
+"ba": "Cold",
+"zone": "6A"
+}
+},
+"NJ": {
+"Atlantic": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Bergen": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Burlington": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Camden": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Cape May": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Cumberland": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Essex": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Gloucester": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Hudson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Hunterdon": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Mercer": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Middlesex": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Monmouth": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Morris": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Ocean": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Passaic": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Salem": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Somerset": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Sussex": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Union": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Warren": {
+"ba": "Cold",
+"zone": "5A"
+}
+},
+"NM": {
+"Bernalillo": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Catron": {
+"ba": "Mixed-Dry",
+"was": "5B",
+"zone": "4B"
+},
+"Chaves": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Cibola": {
+"ba": "Cold",
+"zone": "4B"
+},
+"Colfax": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Curry": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"DeBaca": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Dona Ana": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Eddy": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Grant": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Guadalupe": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Harding": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Hidalgo": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Lea": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Lincoln": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Los Alamos": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Luna": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"McKinley": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Mora": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Otero": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Quay": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Rio Arriba": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Roosevelt": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"San Juan": {
+"ba": "Cold",
+"zone": "5B"
+},
+"San Miguel": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Sandoval": {
+"ba": "Cold",
+"zone": "5"
+},
+"Santa Fe": {
+"ba": "Cold",
+"zone": "5"
+},
+"Sierra": {
+"ba": "Hot-Dry",
+"was": "4",
+"zone": "3"
+},
+"Socorro": {
+"ba": "Mixed-Dry",
+"zone": "4"
+},
+"Taos": {
+"ba": "Cold",
+"zone": "5"
+},
+"Torrance": {
+"ba": "Cold",
+"zone": "5"
+},
+"Union": {
+"ba": "Mixed-Dry",
+"zone": "4"
+},
+"Valencia": {
+"ba": "Mixed-Dry",
+"zone": "4"
+}
+},
+"NV": {
+"Carson City (city)": {
+"ba": "Mixed-Dry",
+"was": "5B",
+"zone": "4B"
+},
+"Churchill": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Clark": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Douglas": {
+"ba": "Mixed-Dry",
+"was": "5B",
+"zone": "4B"
+},
+"Elko": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Esmeralda": {
+"ba": "Mixed-Dry",
+"was": "5B",
+"zone": "4B"
+},
+"Eureka": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Humboldt": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Lander": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Lincoln": {
+"ba": "Mixed-Dry",
+"was": "5B",
+"zone": "4B"
+},
+"Lyon": {
+"ba": "Mixed-Dry",
+"was": "5B",
+"zone": "4B"
+},
+"Mineral": {
+"ba": "Mixed-Dry",
+"was": "5B",
+"zone": "4B"
+},
+"Nye": {
+"ba": "Mixed-Dry",
+"was": "5B",
+"zone": "4B"
+},
+"Pershing": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Storey": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Washoe": {
+"ba": "Cold",
+"zone": "5B"
+},
+"White Pine": {
+"ba": "Cold",
+"zone": "5B"
+}
+},
+"NY": {
+"Albany": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Allegany": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Bronx": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Broome": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Cattaraugus": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Cayuga": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Chautauqua": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Chemung": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Chenango": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Clinton": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Columbia": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Cortland": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Delaware": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Dutchess": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Erie": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Essex": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Franklin": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Fulton": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Genesee": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Greene": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Hamilton": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Herkimer": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Jefferson": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Kings": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Lewis": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Livingston": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Madison": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Monroe": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Montgomery": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Nassau": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"New York": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Niagara": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Oneida": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Onondaga": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Ontario": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Orange": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Orleans": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Oswego": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Otsego": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Putnam": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Queens": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Rensselaer": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Richmond": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Rockland": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Saratoga": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Schenectady": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Schoharie": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Schuyler": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Seneca": {
+"ba": "Cold",
+"zone": "5A"
+},
+"St. Lawrence": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Steuben": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Suffolk": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Sullivan": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Tioga": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Tompkins": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Ulster": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Warren": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Washington": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Wayne": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Westchester": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Wyoming": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+}
+},
+"OH": {
+"Adams": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Allen": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Ashland": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Ashtabula": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Athens": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Auglaize": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Belmont": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Brown": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Butler": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Carroll": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Champaign": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Clark": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Clermont": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Clinton": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Columbiana": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Coshocton": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Crawford": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Cuyahoga": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Darke": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Defiance": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Delaware": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Erie": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Fairfield": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Fayette": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Franklin": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Fulton": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Gallia": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Geauga": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Greene": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Guernsey": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Hamilton": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Hancock": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Hardin": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Harrison": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Henry": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Highland": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Hocking": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Holmes": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Huron": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Jackson": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Jefferson": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Knox": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Lake": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Lawrence": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Licking": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Logan": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Lorain": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Lucas": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Madison": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Mahoning": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Marion": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Medina": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Meigs": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Mercer": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Miami": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Monroe": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Montgomery": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Morgan": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Morrow": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Muskingum": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Noble": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Ottawa": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Paulding": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Perry": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Pickaway": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Pike": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Portage": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Preble": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Putnam": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Richland": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Ross": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Sandusky": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Scioto": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Seneca": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Shelby": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Stark": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Summit": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Trumbull": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Tuscarawas": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Union": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Van Wert": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Vinton": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Warren": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Washington": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Wayne": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Williams": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Wood": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Wyandot": {
+"ba": "Cold",
+"zone": "5A"
+}
+},
+"OK": {
+"Adair": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Alfalfa": {
+"ba": "Mixed-Humid",
+"was": "3A",
+"zone": "4A"
+},
+"Atoka": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Beaver": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Beckham": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Blaine": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Bryan": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Caddo": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Canadian": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Carter": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Cherokee": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Choctaw": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Cimarron": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Cleveland": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Coal": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Comanche": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Cotton": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Craig": {
+"ba": "Mixed-Humid",
+"was": "3A",
+"zone": "4A"
+},
+"Creek": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Custer": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Delaware": {
+"ba": "Mixed-Humid",
+"was": "3A",
+"zone": "4A"
+},
+"Dewey": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Ellis": {
+"ba": "Mixed-Humid",
+"was": "3A",
+"zone": "4A"
+},
+"Garfield": {
+"ba": "Mixed-Humid",
+"was": "3A",
+"zone": "4A"
+},
+"Garvin": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Grady": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Grant": {
+"ba": "Mixed-Humid",
+"was": "3A",
+"zone": "4A"
+},
+"Greer": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Harmon": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Harper": {
+"ba": "Mixed-Humid",
+"was": "3A",
+"zone": "4A"
+},
+"Haskell": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Hughes": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Jackson": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Jefferson": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Johnston": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Kay": {
+"ba": "Mixed-Humid",
+"was": "3A",
+"zone": "4A"
+},
+"Kingfisher": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Kiowa": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Latimer": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Le Flore": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Lincoln": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Logan": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Love": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Major": {
+"ba": "Mixed-Humid",
+"was": "3A",
+"zone": "4A"
+},
+"Marshall": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Mayes": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"McClain": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"McCurtain": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"McIntosh": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Murray": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Muskogee": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Noble": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Nowata": {
+"ba": "Mixed-Humid",
+"was": "3A",
+"zone": "4A"
+},
+"Okfuskee": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Oklahoma": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Okmulgee": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Osage": {
+"ba": "Mixed-Humid",
+"was": "3A",
+"zone": "4A"
+},
+"Ottawa": {
+"ba": "Mixed-Humid",
+"was": "3A",
+"zone": "4A"
+},
+"Pawnee": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Payne": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Pittsburg": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Pontotoc": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Pottawatomie": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Pushmataha": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Roger Mills": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Rogers": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Seminole": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Sequoyah": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Stephens": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Texas": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Tillman": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Tulsa": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Wagoner": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Washington": {
+"ba": "Mixed-Humid",
+"was": "3A",
+"zone": "4A"
+},
+"Washita": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Woods": {
+"ba": "Mixed-Humid",
+"was": "3A",
+"zone": "4A"
+},
+"Woodward": {
+"ba": "Mixed-Humid",
+"was": "3A",
+"zone": "4A"
+}
+},
+"OR": {
+"Baker": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Benton": {
+"ba": "Marine",
+"zone": "4C"
+},
+"Clackamas": {
+"ba": "Marine",
+"zone": "4C"
+},
+"Clatsop": {
+"ba": "Marine",
+"zone": "4C"
+},
+"Columbia": {
+"ba": "Marine",
+"zone": "4C"
+},
+"Coos": {
+"ba": "Marine",
+"zone": "4C"
+},
+"Crook": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Curry": {
+"ba": "Marine",
+"zone": "4C"
+},
+"Deschutes": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Douglas": {
+"ba": "Marine",
+"zone": "4C"
+},
+"Gilliam": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Grant": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Harney": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Hood River": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Jackson": {
+"ba": "Marine",
+"zone": "4C"
+},
+"Jefferson": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Josephine": {
+"ba": "Marine",
+"zone": "4C"
+},
+"Klamath": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Lake": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Lane": {
+"ba": "Marine",
+"zone": "4C"
+},
+"Lincoln": {
+"ba": "Marine",
+"zone": "4C"
+},
+"Linn": {
+"ba": "Marine",
+"zone": "4C"
+},
+"Malheur": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Marion": {
+"ba": "Marine",
+"zone": "4C"
+},
+"Morrow": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Multnomah": {
+"ba": "Marine",
+"zone": "4C"
+},
+"Polk": {
+"ba": "Marine",
+"zone": "4C"
+},
+"Sherman": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Tillamook": {
+"ba": "Marine",
+"zone": "4C"
+},
+"Umatilla": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Union": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Wallowa": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Wasco": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Washington": {
+"ba": "Marine",
+"zone": "4C"
+},
+"Wheeler": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Yamhill": {
+"ba": "Marine",
+"zone": "4C"
+}
+},
+"PA": {
+"Adams": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Allegheny": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Armstrong": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Beaver": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Bedford": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Berks": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Blair": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Bradford": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Bucks": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Butler": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Cambria": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Cameron": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Carbon": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Centre": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Chester": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Clarion": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Clearfield": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Clinton": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Columbia": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Crawford": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Cumberland": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Dauphin": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Delaware": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Elk": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Erie": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Fayette": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Forest": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Franklin": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Fulton": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Greene": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Huntingdon": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Indiana": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Jefferson": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Juniata": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Lackawanna": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Lancaster": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Lawrence": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Lebanon": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Lehigh": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Luzerne": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Lycoming": {
+"ba": "Cold",
+"zone": "5A"
+},
+"McKean": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Mercer": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Mifflin": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Monroe": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Montgomery": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Montour": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Northampton": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Northumberland": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Perry": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Philadelphia": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Pike": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Potter": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Schuylkill": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Snyder": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Somerset": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Sullivan": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Susquehanna": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Tioga": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Union": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Venango": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Warren": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Washington": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Wayne": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Westmoreland": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Wyoming": {
+"ba": "Cold",
+"zone": "5A"
+},
+"York": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+}
+},
+"RI": {
+"Bristol": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Kent": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Newport": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Providence": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Washington": {
+"ba": "Cold",
+"zone": "5A"
+}
+},
+"SC": {
+"Abbeville": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Aiken": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Allendale": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Anderson": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Bamberg": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Barnwell": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Beaufort": {
+"ba": "Hot-Humid",
+"was": "3A",
+"zone": "2A"
+},
+"Berkeley": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Calhoun": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Charleston": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Cherokee": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Chester": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Chesterfield": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Clarendon": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Colleton": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Darlington": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Dillon": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Dorchester": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Edgefield": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Fairfield": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Florence": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Georgetown": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Greenville": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Greenwood": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Hampton": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Horry": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Jasper": {
+"ba": "Hot-Humid",
+"was": "3A",
+"zone": "2A"
+},
+"Kershaw": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Lancaster": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Laurens": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Lee": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Lexington": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Marion": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Marlboro": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"McCormick": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Newberry": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Oconee": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Orangeburg": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Pickens": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Richland": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Saluda": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Spartanburg": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Sumter": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Union": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Williamsburg": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"York": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+}
+},
+"SD": {
+"Aurora": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Beadle": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Bennett": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Bon Homme": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Brookings": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Brown": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Brule": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Buffalo": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Butte": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Campbell": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Charles Mix": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Clark": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Clay": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Codington": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Corson": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Custer": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Davison": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Day": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Deuel": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Dewey": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Douglas": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Edmunds": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Fall River": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Faulk": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Grant": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Gregory": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Haakon": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Hamlin": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Hand": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Hanson": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Harding": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Hughes": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Hutchinson": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Hyde": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Jackson": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Jerauld": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Jones": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Kingsbury": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Lake": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Lawrence": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Lincoln": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Lyman": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Marshall": {
+"ba": "Cold",
+"zone": "6A"
+},
+"McCook": {
+"ba": "Cold",
+"zone": "6A"
+},
+"McPherson": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Meade": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Mellette": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Miner": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Minnehaha": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Moody": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Pennington": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Perkins": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Potter": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Roberts": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Sanborn": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Shannon": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Spink": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Stanley": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Sully": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Todd": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Tripp": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Turner": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Union": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Walworth": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Yankton": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Ziebach": {
+"ba": "Cold",
+"zone": "6A"
+}
+},
+"TN": {
+"Anderson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Bedford": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Benton": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Bledsoe": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Blount": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Bradley": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Campbell": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Cannon": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Carroll": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Carter": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Cheatham": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Chester": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Claiborne": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Clay": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Cocke": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Coffee": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Crockett": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Cumberland": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Davidson": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"DeKalb": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Decatur": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Dickson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Dyer": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Fayette": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Fentress": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Franklin": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Gibson": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Giles": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Grainger": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Greene": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Grundy": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Hamblen": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Hamilton": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Hancock": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Hardeman": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Hardin": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Hawkins": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Haywood": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Henderson": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Henry": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Hickman": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Houston": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Humphreys": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Jackson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Jefferson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Johnson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Knox": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Lake": {
+"ba": "Mixed-Humid",
+"was": "3A",
+"zone": "4A"
+},
+"Lauderdale": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Lawrence": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Lewis": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Lincoln": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Loudon": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Macon": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Madison": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Marion": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Marshall": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Maury": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"McMinn": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"McNairy": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Meigs": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Monroe": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Montgomery": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Moore": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Morgan": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Obion": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Overton": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Perry": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Pickett": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Polk": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Putnam": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Rhea": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Roane": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Robertson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Rutherford": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Scott": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Sequatchie": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Sevier": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Shelby": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Smith": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Stewart": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Sullivan": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Sumner": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Tipton": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Trousdale": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Unicoi": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Union": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Van Buren": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Warren": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Washington": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Wayne": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Weakley": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"White": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Williamson": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Wilson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+}
+},
+"TX": {
+"Anderson": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Andrews": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Angelina": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Aransas": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Archer": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Armstrong": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Atascosa": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Austin": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Bailey": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Bandera": {
+"ba": "Hot-Humid",
+"zone": "2B"
+},
+"Bastrop": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Baylor": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Bee": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Bell": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Bexar": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Blanco": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Borden": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Bosque": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Bowie": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Brazoria": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Brazos": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Brewster": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Briscoe": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Brooks": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Brown": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Burleson": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Burnet": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Caldwell": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Calhoun": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Callahan": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Cameron": {
+"ba": "Hot-Humid",
+"was": "2A",
+"zone": "1A"
+},
+"Camp": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Carson": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Cass": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Castro": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Chambers": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Cherokee": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Childress": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Clay": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Cochran": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Coke": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Coleman": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Collin": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Collingsworth": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Colorado": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Comal": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Comanche": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Concho": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Cooke": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Coryell": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Cottle": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Crane": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Crockett": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Crosby": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Culberson": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Dallam": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Dallas": {
+"ba": "Hot-Humid",
+"was": "3A",
+"zone": "2A"
+},
+"Dawson": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"DeWitt": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Deaf Smith": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Delta": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Denton": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Dickens": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Dimmit": {
+"ba": "Hot-Humid",
+"zone": "2B"
+},
+"Donley": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Duval": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Eastland": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Ector": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Edwards": {
+"ba": "Hot-Humid",
+"zone": "2B"
+},
+"El Paso": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Ellis": {
+"ba": "Hot-Humid",
+"was": "3A",
+"zone": "2A"
+},
+"Erath": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Falls": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Fannin": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Fayette": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Fisher": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Floyd": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Foard": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Fort Bend": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Franklin": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Freestone": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Frio": {
+"ba": "Hot-Humid",
+"zone": "2B"
+},
+"Gaines": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Galveston": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Garza": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Gillespie": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Glasscock": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Goliad": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Gonzales": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Gray": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Grayson": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Gregg": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Grimes": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Guadalupe": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Hale": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Hall": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Hamilton": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Hansford": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Hardeman": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Hardin": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Harris": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Harrison": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Hartley": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Haskell": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Hays": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Hemphill": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Henderson": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Hidalgo": {
+"ba": "Hot-Humid",
+"was": "2A",
+"zone": "1A"
+},
+"Hill": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Hockley": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Hood": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Hopkins": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Houston": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Howard": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Hudspeth": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Hunt": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Hutchinson": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Irion": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Jack": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Jackson": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Jasper": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Jeff Davis": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Jefferson": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Jim Hogg": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Jim Wells": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Johnson": {
+"ba": "Hot-Humid",
+"was": "3A",
+"zone": "2A"
+},
+"Jones": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Karnes": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Kaufman": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Kendall": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Kenedy": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Kent": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Kerr": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Kimble": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"King": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Kinney": {
+"ba": "Hot-Humid",
+"zone": "2B"
+},
+"Kleberg": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Knox": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"La Salle": {
+"ba": "Hot-Humid",
+"zone": "2B"
+},
+"Lamar": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Lamb": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Lampasas": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Lavaca": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Lee": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Leon": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Liberty": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Limestone": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Lipscomb": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Live Oak": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Llano": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Loving": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Lubbock": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Lynn": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Madison": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Marion": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Martin": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Mason": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Matagorda": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Maverick": {
+"ba": "Hot-Humid",
+"zone": "2B"
+},
+"McCulloch": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"McLennan": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"McMullen": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Medina": {
+"ba": "Hot-Humid",
+"zone": "2B"
+},
+"Menard": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Midland": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Milam": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Mills": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Mitchell": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Montague": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Montgomery": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Moore": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Morris": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Motley": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Nacogdoches": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Navarro": {
+"ba": "Hot-Humid",
+"was": "3A",
+"zone": "2A"
+},
+"Newton": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Nolan": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Nueces": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Ochiltree": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Oldham": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Orange": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Palo Pinto": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Panola": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Parker": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Parmer": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Pecos": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Polk": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Potter": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Presidio": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Rains": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Randall": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Reagan": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Real": {
+"ba": "Hot-Humid",
+"zone": "2B"
+},
+"Red River": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Reeves": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Refugio": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Roberts": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Robertson": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Rockwall": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Runnels": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Rusk": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Sabine": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"San Augustine": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"San Jacinto": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"San Patricio": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"San Saba": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Schleicher": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Scurry": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Shackelford": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Shelby": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Sherman": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Smith": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Somervell": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Starr": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Stephens": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Sterling": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Stonewall": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Sutton": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Swisher": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Tarrant": {
+"ba": "Hot-Humid",
+"was": "3A",
+"zone": "2A"
+},
+"Taylor": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Terrell": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Terry": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Throckmorton": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Titus": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Tom Green": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Travis": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Trinity": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Tyler": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Upshur": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Upton": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Uvalde": {
+"ba": "Hot-Humid",
+"zone": "2B"
+},
+"Val Verde": {
+"ba": "Hot-Humid",
+"zone": "2B"
+},
+"Van Zandt": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Victoria": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Walker": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Waller": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Ward": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Washington": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Webb": {
+"ba": "Hot-Humid",
+"zone": "2B"
+},
+"Wharton": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Wheeler": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Wichita": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Wilbarger": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Willacy": {
+"ba": "Hot-Humid",
+"was": "2A",
+"zone": "1A"
+},
+"Williamson": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Wilson": {
+"ba": "Hot-Humid",
+"zone": "2A"
+},
+"Winkler": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Wise": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Wood": {
+"ba": "Hot-Humid",
+"zone": "3A"
+},
+"Yoakum": {
+"ba": "Mixed-Dry",
+"zone": "4B"
+},
+"Young": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Zapata": {
+"ba": "Hot-Humid",
+"zone": "2B"
+},
+"Zavala": {
+"ba": "Hot-Humid",
+"zone": "2B"
+}
+},
+"UT": {
+"Beaver": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Box Elder": {
+"ba": "Cold",
+"was": "6B",
+"zone": "5B"
+},
+"Cache": {
+"ba": "Cold",
+"was": "6B",
+"zone": "5B"
+},
+"Carbon": {
+"ba": "Cold",
+"was": "6B",
+"zone": "5B"
+},
+"Daggett": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Davis": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Duchesne": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Emery": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Garfield": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Grand": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Iron": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Juab": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Kane": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Millard": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Morgan": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Piute": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Rich": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Salt Lake": {
+"ba": "Cold",
+"zone": "5B"
+},
+"San Juan": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Sanpete": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Sevier": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Summit": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Tooele": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Uintah": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Utah": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Wasatch": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Washington": {
+"ba": "Hot-Dry",
+"zone": "3B"
+},
+"Wayne": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Weber": {
+"ba": "Cold",
+"zone": "5B"
+}
+},
+"VA": {
+"Accomack": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Albemarle": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Alexandria (city)": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Alleghany": {
+"ba": "Cold",
+"was": "4A",
+"zone": "5A"
+},
+"Amelia": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Amherst": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Appomattox": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Arlington": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Augusta": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Bath": {
+"ba": "Cold",
+"was": "4A",
+"zone": "5A"
+},
+"Bedford": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Bedford (city)": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Bland": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Botetourt": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Bristol (city)": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Brunswick": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Buchanan": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Buckingham": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Buena Vista (city)": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Campbell": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Caroline": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Carroll": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Charles City": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Charlotte": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Charlottesville (city)": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Chesapeake (city)": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Chesterfield": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Clarke": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Clifton Forge (city)": {
+"ba": "Cold",
+"was": "4A",
+"zone": "5A"
+},
+"Colonial Heights (city)": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Covington (city)": {
+"ba": "Cold",
+"was": "4A",
+"zone": "5A"
+},
+"Craig": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Culpeper": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Cumberland": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Danville (city)": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Dickenson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Dinwiddie": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Emporia (city)": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Essex": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Fairfax": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Falls Church (city)": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Fauquier": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Floyd": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Fluvanna": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Franklin": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Franklin (city)": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Frederick": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Fredericksburg (city)": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Galax (city)": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Giles": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Gloucester": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Goochland": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Grayson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Greene": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Greensville": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Halifax": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Hampton (city)": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Hanover": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Harrisonburg (city)": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Henrico": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Henry": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Highland": {
+"ba": "Cold",
+"was": "4A",
+"zone": "5A"
+},
+"Hopewell (city)": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Isle of Wight": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"James City": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"King George": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"King William": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"King and Queen": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Lancaster": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Lee": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Lexington (city)": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Loudoun": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Louisa": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Lunenburg": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Lynchburg (city)": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Madison": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Manassas (city)": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Manassas Park (city)": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Martinsville (city)": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Mathews": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Mecklenburg": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Middlesex": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Montgomery": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Nelson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"New Kent": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Newport News (city)": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Norfolk (city)": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Northampton": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Northumberland": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Norton (city)": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Nottoway": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Orange": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Page": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Patrick": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Petersburg (city)": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Pittsylvania": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Poquoson (city)": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Portsmouth (city)": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Powhatan": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Prince Edward": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Prince George": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Prince William": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Pulaski": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Radford (city)": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Rappahannock": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Richmond": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Richmond (city)": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Roanoke": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Roanoke (city)": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Rockbridge": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Rockingham": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Russell": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Salem (city)": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Scott": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Shenandoah": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Smyth": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"South Boston": {
+"ba": "Mixed-Humid",
+"zone": "3A"
+},
+"Southampton": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Spotsylvania": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Stafford": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Staunton (city)": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Suffolk (city)": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Surry": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Sussex": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Tazewell": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Virginia Beach (city)": {
+"ba": "Mixed-Humid",
+"was": "4A",
+"zone": "3A"
+},
+"Warren": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Washington": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Waynesboro (city)": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Westmoreland": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Williamsburg (city)": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Winchester (city)": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Wise": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Wythe": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"York": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+}
+},
+"VT": {
+"Addison": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Bennington": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Caledonia": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Chittenden": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Essex": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Franklin": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Grand Isle": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Lamoille": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Orange": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Orleans": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Rutland": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Washington": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Windham": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Windsor": {
+"ba": "Cold",
+"zone": "6A"
+}
+},
+"WA": {
+"Adams": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Asotin": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Benton": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Chelan": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Clallam": {
+"ba": "Marine",
+"was": "4C",
+"zone": "5C"
+},
+"Clark": {
+"ba": "Marine",
+"zone": "4C"
+},
+"Columbia": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Cowlitz": {
+"ba": "Marine",
+"zone": "4C"
+},
+"Douglas": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Ferry": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Franklin": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Garfield": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Grant": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Grays Harbor": {
+"ba": "Marine",
+"zone": "4C"
+},
+"Island": {
+"ba": "Marine",
+"was": "4C",
+"zone": "5C"
+},
+"Jefferson": {
+"ba": "Marine",
+"zone": "4C"
+},
+"King": {
+"ba": "Marine",
+"zone": "4C"
+},
+"Kitsap": {
+"ba": "Marine",
+"was": "4C",
+"zone": "5C"
+},
+"Kittitas": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Klickitat": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Lewis": {
+"ba": "Marine",
+"zone": "4C"
+},
+"Lincoln": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Mason": {
+"ba": "Marine",
+"zone": "4C"
+},
+"Okanogan": {
+"ba": "Cold",
+"was": "6B",
+"zone": "5B"
+},
+"Pacific": {
+"ba": "Marine",
+"zone": "4C"
+},
+"Pend Oreille": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Pierce": {
+"ba": "Marine",
+"zone": "4C"
+},
+"San Juan": {
+"ba": "Cold",
+"was": "4C",
+"zone": "5C"
+},
+"Skagit": {
+"ba": "Marine",
+"zone": "4C"
+},
+"Skamania": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Snohomish": {
+"ba": "Marine",
+"zone": "4C"
+},
+"Spokane": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Stevens": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Thurston": {
+"ba": "Marine",
+"zone": "4C"
+},
+"Wahkiakum": {
+"ba": "Marine",
+"zone": "4C"
+},
+"Walla Walla": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Whatcom": {
+"ba": "Marine",
+"zone": "4C"
+},
+"Whitman": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Yakima": {
+"ba": "Cold",
+"zone": "5B"
+}
+},
+"WI": {
+"Adams": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Ashland": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Barron": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Bayfield": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Brown": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Buffalo": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Burnett": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Calumet": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Chippewa": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Clark": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Columbia": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Crawford": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Dane": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Dodge": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Door": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Douglas": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Dunn": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Eau Claire": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Florence": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Fond du Lac": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Forest": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Grant": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Green": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Green Lake": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Iowa": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Iron": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Jackson": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Jefferson": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Juneau": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Kenosha": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Kewaunee": {
+"ba": "Cold",
+"zone": "6A"
+},
+"La Crosse": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Lafayette": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Langlade": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Lincoln": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Manitowoc": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Marathon": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Marinette": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Marquette": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Menominee": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Milwaukee": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Monroe": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Oconto": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Oneida": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Outagamie": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Ozaukee": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Pepin": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Pierce": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Polk": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Portage": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Price": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Racine": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Richland": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Rock": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Rusk": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Sauk": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Sawyer": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Shawano": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Sheboygan": {
+"ba": "Cold",
+"zone": "6A"
+},
+"St. Croix": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Taylor": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Trempealeau": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Vernon": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Vilas": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Walworth": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Washburn": {
+"ba": "Cold",
+"was": "7",
+"zone": "6A"
+},
+"Washington": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Waukesha": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Waupaca": {
+"ba": "Cold",
+"zone": "6A"
+},
+"Waushara": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Winnebago": {
+"ba": "Cold",
+"was": "6A",
+"zone": "5A"
+},
+"Wood": {
+"ba": "Cold",
+"zone": "6A"
+}
+},
+"WV": {
+"Barbour": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Berkeley": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Boone": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Braxton": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Brooke": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Cabell": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Calhoun": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Clay": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Doddridge": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Fayette": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Gilmer": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Grant": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Greenbrier": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Hampshire": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Hancock": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Hardy": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Harrison": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Jackson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Jefferson": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Kanawha": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Lewis": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Lincoln": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Logan": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Marion": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Marshall": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Mason": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"McDowell": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Mercer": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Mineral": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Mingo": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Monongalia": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Monroe": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Morgan": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Nicholas": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Ohio": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Pendleton": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Pleasants": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Pocahontas": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Preston": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Putnam": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Raleigh": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Randolph": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Ritchie": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Roane": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Summers": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Taylor": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Tucker": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Tyler": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Upshur": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Wayne": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Webster": {
+"ba": "Mixed-Humid",
+"was": "5A",
+"zone": "4A"
+},
+"Wetzel": {
+"ba": "Cold",
+"zone": "5A"
+},
+"Wirt": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Wood": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+},
+"Wyoming": {
+"ba": "Mixed-Humid",
+"zone": "4A"
+}
+},
+"WY": {
+"Albany": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Big Horn": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Campbell": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Carbon": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Converse": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Crook": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Fremont": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Goshen": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Hot Springs": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Johnson": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Laramie": {
+"ba": "Cold",
+"was": "6B",
+"zone": "5B"
+},
+"Lincoln": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Natrona": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Niobrara": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Park": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Platte": {
+"ba": "Cold",
+"zone": "5B"
+},
+"Sheridan": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Sublette": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Sweetwater": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Teton": {
+"ba": "Very Cold",
+"zone": "7"
+},
+"Uinta": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Washakie": {
+"ba": "Cold",
+"zone": "6B"
+},
+"Weston": {
+"ba": "Cold",
+"zone": "6B"
+}
+}
+}
+}

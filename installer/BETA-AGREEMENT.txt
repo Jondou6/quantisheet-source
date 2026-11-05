@@ -1,0 +1,47 @@
+﻿QuantiSheet Beta Test Agreement
+
+Version beta-1.0 · October 15, 2026
+
+You have been invited to test a pre-release version of QuantiSheet (the "Beta") owned by QuantiSheet ("we"). By installing or using the Beta you agree to this agreement, for yourself and for the company you test it for.
+
+1. Personal, limited license
+
+Your license key is issued to you by name. We grant you a free, personal, non-exclusive, non-transferable license to use the Beta only to test it and tell us what you find, until the end date of your key. The Beta and every copy of it remain our property.
+
+2. What you may not do
+
+- Sell, rent, lease, license, lend or otherwise commercialize the Beta or access to it.
+
+- Give, share, upload or post the installer, the program, or your key to anyone else. Each tester gets their own key.
+
+- Remove or change the license, copyright or "not for resale" notices, or try to get around the license key or its end date.
+
+- Copy, rebrand or make products based on the Beta, its design or its features, or decompile or reverse-engineer it, except where an open-source license or the law expressly allows it.
+
+3. Confidential
+
+The Beta, its features and anything we tell you about it are confidential until we release them publicly. Don't publish reviews, screenshots or videos of the Beta without our written OK.
+
+4. Feedback
+
+Please report problems and ideas to the person who sent you your key. You give us the right to use your feedback to improve QuantiSheet, with no payment owed to you.
+
+5. Your files
+
+Your drawings and data stay yours and stay on your computer. Beta software can have bugs: keep copies of important files, and check every quantity, estimate and document before you rely on it.
+
+6. No warranty; limited liability
+
+THE BETA IS PROVIDED "AS IS", FREE OF CHARGE AND WITHOUT WARRANTY OF ANY KIND. TO THE FULLEST EXTENT THE LAW ALLOWS, WE ARE NOT LIABLE FOR ANY DAMAGES ARISING FROM YOUR USE OF THE BETA, INCLUDING LOST DATA, LOST BIDS OR LOST PROFITS.
+
+7. Ending
+
+This agreement ends on your key's end date, or earlier if you break it or we end the beta program. Then stop using the Beta and uninstall it. Sections 2 to 6 continue after it ends.
+
+8. Open-source parts
+
+The Beta includes open-source components under their own licenses (Help > Third-Party Licenses). Nothing here limits the rights those licenses give you in those components.
+
+9. General
+
+This agreement is governed by the laws of the state where the publisher has its principal place of business. If part of it can't be enforced, the rest still applies. The QuantiSheet Terms of Service also apply where they don't conflict with this agreement.

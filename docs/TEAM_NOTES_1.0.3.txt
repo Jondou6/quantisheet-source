@@ -1,0 +1,3 @@
+QuantiSheet 1.0.3
+- AI Takeoff rooms: the floor beside a shower bench, a door swing or a grab bar is now counted. Those lines used to be treated like a doorway, so rooms such as showers measured short (HMB Women's Shower 109: 114.7 -> 119.7 SF, now within tolerance). The floor under a built-in bench itself still isn't counted - check those rooms.
+- Everything from 1.0.2 is unchanged (review tools, Count Library, Count by Label wildcards, AI Takeoff zones and names, update reminders).

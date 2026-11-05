@@ -1,0 +1,34 @@
+# fly launch --copy-config --no-deploy ; fly volumes create quantisheet_data --size 10 ; fly secrets set RELAY_TOKEN=... ; fly deploy
+app = "quantisheet-relay"
+primary_region = "iad"
+
+[build]
+
+[env]
+  PORT = "8765"
+  DATA_DIR = "/data"
+  # Fly's proxy does HTTPS (force_https below); clients use wss://
+  TLS_PROXY = "1"
+  # Fly's edge proxy reaches the app over the private 6PN network
+  # (fdaa::/16) and adds the client's address to X-Forwarded-For (and
+  # Fly-Client-IP). Trusting it gives the wrong-password lockout the real
+  # client address. VERIFY this range against Fly's current docs before
+  # deploying: wrong, and every client looks like the proxy (one bad
+  # password locks everyone out) or a client could fake its address.
+  TRUSTED_PROXIES = "fdaa::/16"
+
+# signature requests, project files and punch items live here
+[mounts]
+  source = "quantisheet_data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 8765
+  force_https = true
+  auto_stop_machines = "off"
+  min_machines_running = 1
+
+[[http_service.checks]]
+  path = "/healthz"
+  interval = "30s"
+  timeout = "5s"

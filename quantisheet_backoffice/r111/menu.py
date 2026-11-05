@@ -1,0 +1,103 @@
+"""Menu entries for the developer wiring release 1.1.1.
+
+Each row is the label a person sees, where it belongs, and the
+module.function (or page class) to call. Nothing here is attached to a
+menu; the host screens are left for that wiring.
+"""
+from __future__ import annotations
+
+import importlib
+
+ENTRIES = (
+    {"label": "Import job cost report…",
+     "where": "Job Cost page",
+     "call": "quantisheet_backoffice.r111.sagejc.import_pdf"},
+    {"label": "Publish job cost report",
+     "where": "Job Cost page, after a report is imported",
+     "call": "quantisheet_backoffice.r111.sagejc.publish"},
+    {"label": "Choose invoice folder…",
+     "where": "Payables page",
+     "call": "quantisheet_backoffice.r111.apdrop.set_folder"},
+    {"label": "Scan invoice folder",
+     "where": "Payables page (also safe on a timer)",
+     "call": "quantisheet_backoffice.r111.apdrop.scan"},
+    {"label": "Stamp approved invoice",
+     "where": "Payables page, after approve",
+     "call": "quantisheet_backoffice.r111.apstamp.stamp_invoice"},
+    {"label": "Waiting on me",
+     "where": "Home, and its own page",
+     "call": "quantisheet_backoffice.r111.ui.WaitingPage"},
+    {"label": "Approve",
+     "where": "Waiting on me — one click",
+     "call": "quantisheet_backoffice.r111.waiting.approve"},
+    {"label": "Reject",
+     "where": "Waiting on me — one click once a reason is typed",
+     "call": "quantisheet_backoffice.r111.waiting.reject"},
+    {"label": "Remember vendor layout",
+     "where": "Payables, after an invoice is coded",
+     "call": "quantisheet_backoffice.r111.vendmem.learn_invoice"},
+    {"label": "Safety meetings",
+     "where": "Field page",
+     "call": "quantisheet_backoffice.r111.ui.SafetyPage"},
+    {"label": "Sign-in sheet",
+     "where": "Safety meetings",
+     "call": "quantisheet_backoffice.r111.safety.signin_pdf"},
+    {"label": "Incident report",
+     "where": "Field page",
+     "call": "quantisheet_backoffice.r111.ui.IncidentPage"},
+    {"label": "Recordable case log",
+     "where": "Field > Incidents",
+     "call": "quantisheet_backoffice.r111.incident.export_log"},
+    {"label": "Daily pre-task plan",
+     "where": "Field page",
+     "call": "quantisheet_backoffice.r111.ui.JhaPage"},
+    {"label": "Copy yesterday's plan",
+     "where": "Daily pre-task plan",
+     "call": "quantisheet_backoffice.r111.jha.copy_yesterday"},
+    {"label": "Equipment and vehicles",
+     "where": "Field page",
+     "call": "quantisheet_backoffice.r111.ui.EquipmentPage"},
+    {"label": "Crew board",
+     "where": "Field page",
+     "call": "quantisheet_backoffice.r111.ui.CrewBoardPage"},
+    {"label": "Copy Yesterday's Crews",
+     "where": "Crew board — visible button, not hidden in a menu",
+     "call": "quantisheet_backoffice.r111.crewboard.copy_yesterday"},
+    {"label": "Print crew board",
+     "where": "Crew board",
+     "call": "quantisheet_backoffice.r111.crewboard.print_pdf"},
+    {"label": "Fill daily logs and time cards",
+     "where": "Crew board",
+     "call": "quantisheet_backoffice.r111.crewboard.prefill"},
+    {"label": "Warranty and service calls",
+     "where": "Field page, closed jobs",
+     "call": "quantisheet_backoffice.r111.ui.WarrantyPage"},
+    {"label": "Checklist templates",
+     "where": "Field or Settings — the editor is on the page",
+     "call": "quantisheet_backoffice.r111.ui.QaTemplatePage"},
+    {"label": "Save checklist",
+     "where": "Checklist templates editor",
+     "call": "quantisheet_backoffice.r111.qatemplates.save"},
+    {"label": "Allow this duplicate",
+     "where": "Payables, on a file blocked as a duplicate",
+     "call": "quantisheet_backoffice.r111.apdrop.accept_duplicate"},
+    {"label": "Allow self-approval",
+     "where": "Payroll Key & Approvals page, Admin only, off until "
+              "turned on",
+     "call": "quantisheet_backoffice.r111.duties.set_self_approval"},
+    {"label": "Rotate payroll key",
+     "where": "Payroll Key & Approvals page",
+     "call": "quantisheet_backoffice.r111.paykeys.rotate"},
+    {"label": "Back up payroll key",
+     "where": "Payroll Key & Approvals page",
+     "call": "quantisheet_backoffice.r111.paykeys.backup"},
+    {"label": "Restore payroll key",
+     "where": "Payroll Key & Approvals page",
+     "call": "quantisheet_backoffice.r111.paykeys.restore"},
+)
+
+
+def resolve(call: str):
+    module_name, _, attr = call.rpartition(".")
+    mod = importlib.import_module(module_name)
+    return getattr(mod, attr)

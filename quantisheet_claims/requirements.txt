@@ -1,0 +1,5 @@
+# ClaimIT (separate program). Same pins as QuantiSheet.
+PySide6==6.12.0
+openpyxl>=3.1
+pymupdf>=1.24
+# tests: pytest>=8

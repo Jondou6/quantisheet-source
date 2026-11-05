@@ -1,0 +1,43 @@
+A-101 
+warning: The `fitz` API is deprecated and will be removed in future. Use `import pymupdf` instead.
+BREAK ROOM 110                 tag     185  traced    183.8    -0.6%
+EXAM 104                       tag     121  traced    109.0    -9.9%
+FERAL CAT INTAKE (TNR) 102     tag     153  traced    153.0    +0.0%
+LOBBY 101                      tag     259  traced    258.6    -0.1%
+MECH/ELEC 109                  tag     116  traced    113.7    -2.0%
+O.R. 114                       tag     354  traced    355.2    +0.3%
+PREP 115                       tag   1,069  traced  1,071.4    +0.2%
+PREP STORAGE 115.1             tag      11  traced     10.2    -7.6%
+PUBLIC CAT INTAKE 107          tag     192  traced    191.9    -0.0%
+PUBLIC DOG INTAKE 108          tag     278  traced    277.0    -0.4%
+PUBLIC TOILET 106              tag      75  traced     68.5    -8.6%
+RECEPTION & OFFICE 103         tag     212  traced    208.1    -1.8%
+STAFF TOILET 105               tag      68  traced     45.9   -32.4%
+STORAGE 112                    tag      29  traced     41.2   +42.1%
+VESTIBULE 101.1                tag      67  traced     66.7    -0.5%
+JAN 113                        tag       8  NOT FOUND
+CORRIDOR 111                   tag     365  NOT FOUND
+
+15/17 rooms found in 1.0s; 10 within 5%, 13 within 10%
+ 
+A-102 
+warning: The `fitz` API is deprecated and will be removed in future. Use `import pymupdf` instead.
+BREAK ROOM 110                 tag     185  traced    186.2    +0.7%
+EXAM 104                       tag     121  traced    112.6    -7.0%
+FERAL CAT INTAKE (TNR) 102     tag     153  traced    150.9    -1.4%
+LOBBY 101                      tag     259  traced    260.2    +0.4%
+MECH/ELEC 109                  tag     116  traced    113.8    -1.9%
+PREP STORAGE 115.1             tag      11  traced     10.3    -6.4%
+PUBLIC CAT INTAKE 107          tag     192  traced    186.5    -2.9%
+PUBLIC DOG INTAKE 108          tag     278  traced    278.5    +0.2%
+PUBLIC TOILET 106              tag      75  traced     68.8    -8.2%
+RECEPTION & OFFICE 103         tag     212  traced    205.5    -3.1%
+STAFF TOILET 105               tag      68  traced     60.6   -10.9%
+STORAGE 112                    tag      29  traced     39.5   +36.3%
+VESTIBULE 101.1                tag      67  traced     67.4    +0.6%
+O.R. 114                       tag     354  NOT FOUND
+PREP 115                       tag   1,069  NOT FOUND
+CORRIDOR 111                   tag     365  NOT FOUND
+JAN 113                        tag       8  NOT FOUND
+
+13/17 rooms found in 1.4s; 8 within 5%, 11 within 10%

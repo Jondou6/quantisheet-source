@@ -1,0 +1,26 @@
+SECTION 01 11 00 - SUMMARY OF WORK
+Project: North Clinic rooftop equipment replacement, an MEP retrofit.
+The existing building envelope stays. This is a replacement of existing rooftop units.
+
+SECTION 01 32 00 - CONSTRUCTION PROGRESS DOCUMENTATION
+The Work shall be substantially complete within two hundred (200) calendar days after Notice to Proceed.
+The Work shall be finally complete within 230 calendar days after Notice to Proceed.
+
+SECTION 01 33 00 - SUBMITTAL PROCEDURES
+Submittals will be reviewed within 14 calendar days.
+
+SECTION 01 45 00 - QUALITY CONTROL
+A pressure test of the new piping is required before startup.
+
+SECTION 01 77 00 - CLOSEOUT PROCEDURES
+Closeout includes operation and maintenance manuals, warranties and training.
+
+SECTION 01 91 00 - COMMISSIONING
+Commissioning includes test and balance after startup.
+
+SECTION 23 74 00 - PACKAGED OUTDOOR HVAC EQUIPMENT
+Replace the existing rooftop units. The rooftop unit lead time is 14 weeks.
+A crane is required for the set.
+
+SECTION 26 05 00 - COMMON WORK RESULTS FOR ELECTRICAL
+Disconnect and reconnect the rooftop equipment. Switchgear lead time is 12 weeks.

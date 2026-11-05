@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Invitation to bid</title>
+<style>
+:root{--bg:#f4f5f7;--card:#fff;--text:#16181d;--muted:#5f6470;--line:#e2e4e9;--accent:#2563eb;--soft:#e3ecff;--ok:#12865a;--bad:#d92d20;--warn:#b54708}
+@media (prefers-color-scheme:dark){:root{--bg:#1b1c1f;--card:#232428;--text:#e8e9ec;--muted:#9a9da6;--line:#3a3c43;--accent:#4c8dff;--soft:#25344f;--ok:#3fb27f;--bad:#f05252;--warn:#e3a008}}
+*{box-sizing:border-box}body{margin:0;font:16px/1.5 -apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text)}
+main{max-width:760px;margin:0 auto;padding:24px 16px 60px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-bottom:14px}
+h1{font-size:24px;margin:2px 0 4px}.muted{color:var(--muted)}.big{font-size:18px;font-weight:600}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:14px}
+.facts div span{display:block;font-size:13px;color:var(--muted)}
+.doc{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.doc:first-of-type{border-top:0}.doc a{color:var(--accent);font-weight:600;text-decoration:none}
+.choices{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0 4px}
+.choice{flex:1;min-width:150px;border:2px solid var(--line);background:var(--card);color:var(--text);border-radius:12px;padding:14px;font:600 16px inherit;cursor:pointer}
+.choice.on{border-color:var(--accent);background:var(--soft)}
+label{display:block;font-size:14px;color:var(--muted);margin:14px 0 4px}
+input,textarea{width:100%;font:inherit;color:var(--text);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+button.send{margin-top:18px;width:100%;border:0;border-radius:12px;padding:14px;font:600 17px inherit;background:var(--accent);color:#fff;cursor:pointer}
+.status{display:inline-block;border:1px solid currentColor;border-radius:12px;padding:2px 10px;font-size:13px;font-weight:600}
+.ok{color:var(--ok)}.bad{color:var(--bad)}.warn{color:var(--warn)}
+pre{white-space:pre-wrap;font:inherit;margin:0}
+table.form{width:100%;border-collapse:collapse;margin-top:8px;font-size:15px}
+table.form th{font-size:13px;color:var(--muted);text-align:left;font-weight:600;padding:6px 6px;border-bottom:1px solid var(--line)}
+table.form td{padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+table.form td.num{text-align:right;white-space:nowrap}
+table.form input,table.form select{padding:7px 9px;min-width:90px}
+table.form .note{font-size:13px;color:var(--muted)}
+.total{display:flex;justify-content:space-between;font-size:18px;font-weight:700;margin-top:12px}
+.ack{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line)}
+.ack:first-of-type{border-top:0}.ack input{width:auto;margin-top:5px}
+.due{font-weight:700}
+@media (max-width:600px){table.form .hide-s{display:none}}
+</style>
+</head>
+<body><main id="main"><div class="card">Loading…</div></main>
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const token = new URLSearchParams(location.search).get("t") || "";
+let ws, nextId = 1, waiting = {}, info = null, intent = null, values = {}, acks = new Set();
+const money = n => "$" + Number(n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+const num = v => { const n = parseFloat(String(v ?? "").replace(/[$,]/g,"")); return isNaN(n) ? null : n; };
+function lineTotal(ln, v){ const p = num(v);
+  if (ln.type === "Lump sum") return p || 0;
+  if (ln.type === "Unit price") return (p || 0) * (num(ln.qty) || 0);
+  if (ln.type === "Allowance") { const q = num(ln.qty); return q !== null ? q : (p || 0); }
+  return 0; }
+function countdown(i){ if (!i.due || i.closed) return "";
+  const d = new Date(i.due + "T12:00"), days = Math.round((d - new Date(new Date().toDateString()+" 12:00")) / 864e5);
+  const t = days > 1 ? `Bids due in ${days} days` : days === 1 ? "Bids due tomorrow" : days === 0 ? "Bids due today" : "The bid date has passed";
+  return `<p class="due ${days <= 1 ? "bad" : ""}" style="margin:12px 0 0">${t}</p>`; }
+function keep(){ document.querySelectorAll(".fv").forEach(el => values[el.dataset.i] = el.value); }
+function formHtml(i){
+  return `<div class="big" style="margin-top:18px">Bid form</div>
+  <table class="form"><tr><th>#</th><th>Description</th><th class="hide-s">Qty</th><th>Your price</th><th class="num">Amount</th></tr>
+  ${i.form.map((ln, k) => { const v = values[k] ?? "";
+    let input;
+    if (ln.type === "Yes / No") input = `<select class="fv" data-i="${k}"><option value=""></option>${["Yes","No"].map(o => `<option ${v===o?"selected":""}>${o}</option>`).join("")}</select>`;
+    else if (ln.type === "Text") input = `<input class="fv" data-i="${k}" value="${esc(v)}">`;
+    else if (ln.type === "Allowance") input = `<span class="muted">${ln.qty != null ? money(ln.qty) + " (allowance)" : ""}</span>`;
+    else input = `<input class="fv" data-i="${k}" inputmode="decimal" placeholder="${ln.type === "Unit price" ? "$ / " + esc(ln.unit || "unit") : ln.type === "Alternate" ? "+/- $" : "$"}" value="${esc(v)}">`;
+    return `<tr><td>${esc(ln.item)}</td><td>${esc(ln.description)}${ln.type === "Alternate" ? ' <span class="muted">(alternate - not in base)</span>' : ""}${ln.note ? `<div class="note">${esc(ln.note)}</div>` : ""}</td>
+     <td class="hide-s">${ln.type === "Unit price" ? `${esc(ln.qty ?? "")} ${esc(ln.unit||"")}` : ""}</td><td>${input}</td><td class="num" id="lt${k}"></td></tr>`; }).join("")}
+  </table><div class="total"><span>Base bid</span><span id="base">$0.00</span></div>`; }
+function updateTotal(){ if (!info || !info.form.length) return; let base = 0;
+  info.form.forEach((ln, k) => { const t = lineTotal(ln, values[k]); const cell = $("#lt" + k);
+    if (cell) cell.textContent = ["Lump sum","Unit price","Allowance"].includes(ln.type) ? money(t) : (ln.type === "Alternate" && num(values[k]) !== null ? money(num(values[k])) : "");
+    if (["Lump sum","Unit price","Allowance"].includes(ln.type)) base += t; });
+  const b = $("#base"); if (b) b.textContent = money(base); }
+function wsUrl(){ const p = new URLSearchParams(location.search); if (p.get("ws")) return p.get("ws");
+  if (location.port === "8766") return `ws://${location.hostname}:8765`;
+  return `${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/`; }
+function call(op, args){
+  return new Promise((ok, bad) => {
+    const go = () => { const id = nextId++; waiting[id] = {ok, bad}; ws.send(JSON.stringify({id, op, args})); };
+    if (ws && ws.readyState === 1) return go();
+    ws = new WebSocket(wsUrl());
+    ws.onopen = () => ws.send(JSON.stringify({type:"api", client_id:"bidder"}));
+    ws.onmessage = ev => { const m = JSON.parse(ev.data);
+      if (m.type === "api_ready") return go();
+      if (m.type === "api_reply" && waiting[m.id]) { const w = waiting[m.id]; delete waiting[m.id]; m.ok ? w.ok(m.result) : w.bad(new Error(m.error)); } };
+    ws.onerror = () => bad(new Error("Can't reach the server - try again shortly."));
+  });
+}
+function fmtDate(d){ if(!d) return "—"; return new Date(d+"T12:00").toLocaleDateString(undefined,{weekday:"short",month:"long",day:"numeric",year:"numeric"}); }
+function size(n){ return n > 1048576 ? (n/1048576).toFixed(1)+" MB" : Math.max(1,Math.round(n/1024))+" KB"; }
+function render(msg){
+  const i = info;
+  const cls = {"Will Bid":"ok","Bid Received":"ok","Won't Bid":"bad","Might Bid":"warn"}[i.status] || "";
+  $("#main").innerHTML = `
+  <div class="card"><div class="muted">${esc(i.project)} · ${esc(i.number)}</div>
+   <h1>Invitation to bid: ${esc(i.title)}</h1>
+   <div class="muted">For ${esc(i.company)} ${i.status ? `· <span class="status ${cls}">${esc(i.status)}</span>` : ""}</div>
+   ${i.sealed ? `<p class="muted" style="margin:8px 0 0">&#128274; <b>Sealed bid.</b> Your number stays sealed until the bid opening after ${esc(fmtDate(i.due))} ${esc(i.due_time||"")}. You can change it until then.${i.past_due ? " <b>The deadline has passed.</b>" : ""}</p>` : ""}
+   <div class="facts"><div><span>Bids due</span><b>${esc(fmtDate(i.due))} ${esc(i.due_time||"")}</b></div>
+    ${i.trades ? `<div><span>Trade</span><b>${esc(i.trades)}</b></div>` : ""}
+    ${i.prebid ? `<div><span>Pre-bid meeting</span><b>${esc(i.prebid)}</b></div>` : ""}
+    ${i.site_visit ? `<div><span>Site visit</span><b>${esc(i.site_visit)}</b></div>` : ""}
+    ${i.rfi_due ? `<div><span>Questions due by</span><b>${esc(fmtDate(i.rfi_due))}</b></div>` : ""}
+    ${i.specs ? `<div><span>Spec sections</span><b>${esc(i.specs)}</b></div>` : ""}
+    ${i.sheets ? `<div><span>Drawing sheets</span><b>${esc(i.sheets)}</b></div>` : ""}
+    ${i.contact ? `<div><span>Questions to</span><b>${esc(i.contact)}</b></div>` : ""}</div>
+   ${countdown(i)}</div>
+  ${i.scope ? `<div class="card"><div class="big">Scope of work</div><pre>${esc(i.scope)}</pre></div>` : ""}
+  <div class="card"><div class="big">Bid documents</div>
+   ${i.documents.length ? i.documents.map(d => `<div class="doc"><a href="/hub/bid/${encodeURIComponent(token)}/${d.sha256}" download="${esc(d.name)}">${esc(d.name)}</a><span class="muted">${size(d.size)}</span></div>`).join("") : '<p class="muted">No documents posted yet.</p>'}</div>
+  ${i.addenda.length ? `<div class="card"><div class="big">Addenda</div><p class="muted" style="margin:4px 0 6px">Tick each addendum to confirm it's included in your bid.</p>
+   ${i.addenda.map(a => `<label class="ack"><input type="checkbox" class="ackbox" value="${esc(a.number)}" ${acks.has(a.number)?"checked":""} ${i.closed?"disabled":""}><span><b>Addendum ${esc(a.number)}</b> ${a.date?`<span class="muted">(${esc(fmtDate(a.date))})</span>`:""}<br>${esc(a.description)}</span></label>`).join("")}</div>` : ""}
+  <div class="card">${i.closed ? '<div class="big">Bidding has closed. Thank you.</div>' : `
+   <div class="big">Will you bid?</div>
+   <div class="choices">${["Will Bid","Might Bid","Won't Bid"].map(c => `<button class="choice ${c===intent?"on":""}" data-c="${c}">${c}</button>`).join("")}</div>
+   ${i.form.length ? formHtml(i) : `<label>Bid amount (optional now - you can send it later)</label><input id="amt" inputmode="decimal" placeholder="$0.00" value="${esc(i.amount ?? "")}">`}
+   <label>Inclusions</label><textarea id="incl" rows="2" placeholder="What your price includes">${esc(i.inclusions||"")}</textarea>
+   <label>Exclusions / clarifications</label><textarea id="excl" rows="2" placeholder="What your price does not include">${esc(i.exclusions||"")}</textarea>
+   <label>Bid form or proposal (PDF)</label><input id="file" type="file" accept=".pdf,image/*">
+   <label>Note</label><textarea id="note" rows="3" placeholder="Exclusions, questions, alternates…">${esc(i.note || "")}</textarea>
+   <button class="send" id="send">Send response</button>`}
+   ${msg ? `<p class="${msg.ok ? "ok" : "bad"}" style="margin-top:12px">${esc(msg.text)}</p>` : ""}</div>`;
+  document.querySelectorAll(".choice").forEach(b => b.onclick = () => { keep(); intent = b.dataset.c; render(); });
+  document.querySelectorAll(".fv").forEach(el => el.oninput = el.onchange = () => { keep(); updateTotal(); });
+  document.querySelectorAll(".ackbox").forEach(el => el.onchange = () => { el.checked ? acks.add(el.value) : acks.delete(el.value); });
+  updateTotal();
+  const send = $("#send"); if (!send) return;
+  send.onclick = async () => {
+    keep();
+    const f = $("#file").files[0];
+    const amt = $("#amt") ? $("#amt").value : "";
+    const filled = Object.values(values).some(v => String(v).trim() !== "");
+    if (!intent && !f && !amt && !filled) return render({ok:false, text:"Choose will bid, might bid or won't bid."});
+    const bidding = f || amt || filled;
+    if (bidding && info.addenda.length && info.addenda.some(a => !acks.has(a.number)))
+      return render({ok:false, text:"Tick every addendum to confirm it's in your bid."});
+    send.disabled = true; send.textContent = "Sending…";
+    let file = null;
+    if (f) file = await new Promise(ok => { const r = new FileReader(); r.onload = () => ok(r.result.split(",")[1]); r.readAsDataURL(f); });
+    try {
+      const r = await call("bid.respond", {token, intent: bidding && intent !== "Won't Bid" ? "Bid Received" : (intent || "Will Bid"),
+        amount: amt, note: $("#note").value, file, file_name: f ? f.name : "",
+        form: info.form.length ? values : undefined, acks: [...acks],
+        inclusions: $("#incl").value, exclusions: $("#excl").value});
+      info.status = r.status; info.amount = amt || info.amount; info.note = $("#note").value;
+      info.inclusions = $("#incl").value; info.exclusions = $("#excl").value; info.values = values;
+      render({ok:true, text:"Thanks - your response was sent."});
+    } catch (e) { render({ok:false, text:e.message}); }
+  };
+}
+(async () => {
+  try { info = await call("bid.open", {token}); intent = ["Will Bid","Might Bid","Won't Bid"].includes(info.status) ? info.status : null;
+        info.form = info.form || []; info.addenda = info.addenda || [];
+        values = Object.assign({}, info.values || {}); acks = new Set(info.acks || []); render(); }
+  catch (e) { $("#main").innerHTML = `<div class="card"><h1>Invitation to bid</h1><p class="bad">${esc(e.message)}</p></div>`; }
+})();
+</script>
+</body>
+</html>

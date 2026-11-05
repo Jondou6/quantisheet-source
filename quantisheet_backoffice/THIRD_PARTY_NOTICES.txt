@@ -1,0 +1,61 @@
+QuantiSheet Back Office - third-party libraries
+
+QuantiSheet Back Office is original work written from the QuantiSheet Back
+Office briefs. It contains no code from other accounting programs. It uses
+these libraries, which are installed with it (the same ones QuantiSheet
+itself ships). Each line: distribution : licence.
+
+- PySide6 : LGPL-3.0-only (Qt for Python; also offered under GPL-2.0/GPL-3.0)
+- shiboken6 : LGPL-3.0-only (part of Qt for Python)
+- PyMuPDF : AGPL-3.0 or Artifex commercial licence (dual licensed)
+- cryptography : Apache-2.0 OR BSD-3-Clause
+- cffi : MIT-0 (used by cryptography)
+- openpyxl : MIT
+- et_xmlfile : MIT (used by openpyxl)
+- Pillow : MIT-CMU (HPND)
+
+Design: the Time Off page and its calendar (ui/timeoff_page.py,
+ui/calendar_view.py, timeoff.py) follow the look and behaviour of the
+"Kargul Calender Design Prototype" (https://github.com/kargulstudio/
+calender-app-design), MIT License, Copyright (c) 2026 Kargul Studio. No
+code from it is included; the Qt screens are written for Back Office. The
+licence text:
+
+    MIT License
+    
+    Copyright (c) 2026 Kargul Studio
+    
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+    
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+    
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+Optional, not installed with Back Office and only used when already on
+the PC: Microsoft Outlook (through pywin32, if present) to show an email
+for review; the Tesseract OCR program (Apache-2.0) to read scanned bills.
+Without them Back Office writes an .eml file / asks for the fields by hand.
+
+Optional self-service server (server\, P2-07/08), only if you choose to
+run it as its own service; not part of the desktop program. It uses the
+Python standard library; its container image (server\deploy\Dockerfile)
+adds:
+  * waitress, licence ZPL-2.1 (WSGI server, installed only inside that image)
+  * Caddy, licence Apache-2.0 (optional reverse proxy for HTTPS)
+The server's web pages are plain HTML/JavaScript written for Back Office
+and load nothing from other sites.
+
+QuickBooks is a trademark of Intuit Inc. QuantiSheet is not affiliated with or endorsed by Intuit.
+Sage 300 Construction and Real Estate is a trademark of The Sage Group plc.

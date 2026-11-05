@@ -1,0 +1,90 @@
+{
+ "activities": [
+  {
+   "_coll": "activity",
+   "_ext": "msp:1",
+   "_n": 1,
+   "_no": "A0001",
+   "_rev": 0,
+   "actual_finish": "",
+   "actual_start": "",
+   "area": "",
+   "duration": 9,
+   "name": "Pour",
+   "percent": "",
+   "preds": [],
+   "start": "2026-11-02",
+   "status": "Not Started"
+  },
+  {
+   "_coll": "activity",
+   "_ext": "msp:2",
+   "_n": 2,
+   "_no": "A0002",
+   "_rev": 0,
+   "actual_finish": "",
+   "actual_start": "",
+   "area": "",
+   "duration": 2.5,
+   "name": "Cure",
+   "notes": "n",
+   "percent": "",
+   "preds": [
+    {
+     "id": "A0001",
+     "lag": 1,
+     "type": "FS"
+    }
+   ],
+   "start": "",
+   "status": "Not Started"
+  },
+  {
+   "_coll": "activity",
+   "_ext": "p6:1",
+   "_n": 3,
+   "_no": "A0003",
+   "_rev": 0,
+   "actual_finish": "",
+   "actual_start": "",
+   "area": "",
+   "duration": 9,
+   "name": "Pour",
+   "percent": "",
+   "preds": [],
+   "start": "2026-11-02",
+   "status": "Not Started"
+  },
+  {
+   "_coll": "activity",
+   "_ext": "p6:2",
+   "_n": 4,
+   "_no": "A0004",
+   "_rev": 0,
+   "actual_finish": "",
+   "actual_start": "",
+   "area": "",
+   "duration": 2.5,
+   "name": "Cure",
+   "notes": "n",
+   "percent": "",
+   "preds": [
+    {
+     "id": "A0003",
+     "lag": 1,
+     "type": "FS"
+    }
+   ],
+   "start": "",
+   "status": "Not Started"
+  }
+ ],
+ "next": {
+  "activity": 5
+ },
+ "pending": 4,
+ "settings": {
+  "data_date": "2026-10-01",
+  "holidays": null
+ }
+}

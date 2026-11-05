@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Review and sign</title>
+<style>
+:root{--bg:#eef0f3;--card:#fff;--text:#16181d;--muted:#5f6470;--line:#dfe2e7;--accent:#2563eb;--soft:#e3ecff;--ok:#12865a;--bad:#d92d20}
+*{box-sizing:border-box}body{margin:0;font:16px/1.45 -apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text)}
+header{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--line);padding:10px 16px;display:flex;gap:12px;align-items:center}
+header .t{flex:1;min-width:0}header b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}header small{color:var(--muted)}
+button{font:600 15px inherit;border-radius:10px;padding:10px 16px;cursor:pointer}
+.primary{background:var(--accent);color:#fff;border:0}.primary:disabled{opacity:.45;cursor:default}
+.ghost{background:var(--card);color:var(--text);border:1px solid var(--line)}
+main{max-width:980px;margin:0 auto;padding:16px}
+.note{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px}
+.page{position:relative;margin:0 auto 18px;box-shadow:0 2px 10px rgba(0,0,0,.12);background:#fff}
+.page img{display:block;width:100%;height:auto}
+.f{position:absolute;border:2px dashed var(--accent);background:rgba(37,99,235,.10);border-radius:4px;display:flex;align-items:center;justify-content:center;
+font-size:12px;font-weight:600;color:var(--accent);cursor:pointer;overflow:hidden}
+.f.done{border-style:solid;background:rgba(18,134,90,.06);border-color:var(--ok)}
+.f img{max-width:100%;max-height:100%}.f input{width:100%;height:100%;border:0;background:transparent;font:13px inherit;padding:0 4px}
+.f.req::after{content:"*";position:absolute;top:0;right:3px;color:var(--bad)}
+.consent{display:flex;gap:10px;align-items:flex-start;margin-top:10px;font-size:14px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:20;padding:12px}
+.box{background:var(--card);border-radius:14px;padding:16px;width:min(560px,100%)}
+canvas{width:100%;height:180px;border:1px solid var(--line);border-radius:10px;touch-action:none;background:#fff}
+.tabs{display:flex;gap:8px;margin:6px 0 10px}.tabs button{flex:1}.tabs .on{background:var(--soft);border-color:var(--accent)}
+.row{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+.done-card{text-align:center;padding:40px 16px}
+.bad{color:var(--bad)}.ok{color:var(--ok)}.muted{color:var(--muted)}
+#typed{width:100%;font:28px "Segoe Script","Brush Script MT","Lucida Handwriting",cursive;padding:10px;border:1px solid var(--line);border-radius:10px}
+</style>
+</head>
+<body>
+<header><div class="t"><b id="title">Loading…</b><small id="sub"></small></div>
+<button class="ghost" id="decline" style="display:none">Decline</button>
+<button class="primary" id="finish" style="display:none" disabled>Finish</button></header>
+<main id="main"></main>
+<div class="modal" id="modal"><div class="box">
+ <b id="mtitle">Your signature</b>
+ <div class="tabs"><button class="ghost on" id="tdraw">Draw</button><button class="ghost" id="ttype">Type</button></div>
+ <div id="pdraw"><canvas id="pad"></canvas></div>
+ <div id="ptype" style="display:none"><input id="typed" placeholder="Type your name"></div>
+ <div class="row"><button class="ghost" id="clear">Clear</button><button class="ghost" id="cancel">Cancel</button><button class="primary" id="use">Use this</button></div>
+</div></div>
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const token = new URLSearchParams(location.search).get("t") || "";
+let ws, nextId = 1, waiting = {}, info, values = {}, current = null, saved = {};
+function wsUrl(){ const p = new URLSearchParams(location.search); if (p.get("ws")) return p.get("ws");
+  if (location.port === "8766") return `ws://${location.hostname}:8765`;
+  return `${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/`; }
+function call(op, args){
+  return new Promise((ok, bad) => {
+    const go = () => { const id = nextId++; waiting[id] = {ok, bad}; ws.send(JSON.stringify({id, op, args})); };
+    if (ws && ws.readyState === 1) return go();
+    ws = new WebSocket(wsUrl());
+    ws.onopen = () => ws.send(JSON.stringify({type:"api", client_id:"signer"}));
+    ws.onmessage = ev => { const m = JSON.parse(ev.data);
+      if (m.type === "api_ready") return go();
+      if (m.type === "api_reply" && waiting[m.id]) { const w = waiting[m.id]; delete waiting[m.id]; m.ok ? w.ok(m.result) : w.bad(new Error(m.error)); } };
+    ws.onerror = () => bad(new Error("Can't reach the signing server - check your connection and try again."));
+  });
+}
+const today = new Date().toISOString().slice(0,10);
+function render(){
+  $("#title").textContent = info.title;
+  $("#sub").textContent = `From ${info.sender.name || "the sender"} · for ${info.signer}`;
+  if (!info.can_sign) {
+    $("#main").innerHTML = `<div class="note done-card"><h2>${esc(info.status === "signed" ? "Thank you" : "Not available")}</h2><p class="muted">${esc(info.why)}</p></div>`;
+    return;
+  }
+  $("#finish").style.display = $("#decline").style.display = "inline-block";
+  const others = info.others.length ? `<div class="muted" style="font-size:14px;margin-top:6px">Also signing: ${info.others.map(o => esc(o.name)).join(", ")}</div>` : "";
+  let html = `<div class="note"><b>${esc(info.sender.name || "Someone")} asked you to sign this document.</b>
+    ${info.message ? `<p style="margin:8px 0 0;white-space:pre-wrap">${esc(info.message)}</p>` : ""}${others}
+    <p class="muted" style="font-size:14px;margin:8px 0 0">Click each highlighted box to fill it in, then press <b>Finish</b>. Boxes marked * are required.</p>
+    <label class="consent"><input type="checkbox" id="consent"><span>I agree to use electronic records and signatures, and that my electronic signature is as valid as my handwritten signature.</span></label></div>`;
+  info.pages.forEach((p, n) => {
+    html += `<div class="page" data-n="${n}" style="max-width:${Math.round(p.w*1.6)}px"><img src="/hub/env/${encodeURIComponent(envId())}/p${n}.png?t=${encodeURIComponent(token)}" alt="Page ${n+1}">`;
+    for (const f of info.fields.filter(f => f.page === n)) {
+      const [x0,y0,x1,y1] = f.rect;
+      const st = `left:${x0/p.w*100}%;top:${y0/p.h*100}%;width:${(x1-x0)/p.w*100}%;height:${(y1-y0)/p.h*100}%`;
+      html += `<div class="f ${f.required ? "req" : ""}" data-id="${f.id}" data-kind="${f.kind}" style="${st}"></div>`;
+    }
+    html += `</div>`;
+  });
+  $("#main").innerHTML = html;
+  document.querySelectorAll(".f").forEach(drawField);
+  document.querySelectorAll(".f").forEach(el => el.onclick = () => fieldClick(el));
+  $("#consent").onchange = check;
+  check();
+}
+function envId(){ return info.env_id || ""; }
+function drawField(el){
+  const id = el.dataset.id, k = el.dataset.kind, v = values[id];
+  el.classList.toggle("done", v !== undefined && v !== "" && v !== false || k === "date" || k === "name");
+  if (k === "date") el.textContent = today;
+  else if (k === "name") el.textContent = info.signer;
+  else if (k === "signature" || k === "initials") el.innerHTML = v ? `<img src="data:image/png;base64,${v}">` : (k === "signature" ? "Sign" : "Initial");
+  else if (k === "checkbox") el.textContent = v ? "✔" : "";
+  else if (k === "text" && !el.querySelector("input")) {
+    el.innerHTML = `<input placeholder="${esc(info.fields.find(f => f.id === id).label || "Type here")}">`;
+    const i = el.querySelector("input"); i.value = v || ""; i.oninput = () => { values[id] = i.value; el.classList.toggle("done", !!i.value); check(); };
+  }
+}
+function fieldClick(el){
+  const k = el.dataset.kind, id = el.dataset.id;
+  if (k === "checkbox") { values[id] = !values[id]; drawField(el); check(); return; }
+  if (k === "signature" || k === "initials") {
+    if (saved[k]) { values[id] = saved[k]; drawField(el); check(); return; }
+    current = {el, id, k}; openPad(k);
+  }
+}
+function check(){
+  const missing = info.fields.filter(f => f.required && ["signature","initials","text"].includes(f.kind) && !values[f.id]);
+  $("#finish").disabled = !!missing.length || !$("#consent").checked;
+  $("#finish").textContent = missing.length ? `Finish (${missing.length} to go)` : "Finish";
+}
+// ---------------------------------------------------------------- signature pad
+const pad = $("#pad"); let ctx, drawing = false, dirty = false, mode = "draw";
+function openPad(k){
+  $("#mtitle").textContent = k === "signature" ? "Your signature" : "Your initials";
+  $("#modal").style.display = "flex";
+  const r = pad.getBoundingClientRect(); pad.width = r.width * 2; pad.height = r.height * 2;
+  ctx = pad.getContext("2d"); ctx.scale(2,2); ctx.lineWidth = 2.4; ctx.lineCap = ctx.lineJoin = "round"; ctx.strokeStyle = "#0b1f5c";
+  dirty = false; $("#typed").value = k === "initials" ? info.signer.split(/\s+/).map(w => w[0]).join("") : info.signer;
+}
+function pos(e){ const r = pad.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
+pad.onpointerdown = e => { drawing = true; dirty = true; pad.setPointerCapture(e.pointerId); const [x,y] = pos(e); ctx.beginPath(); ctx.moveTo(x,y); };
+pad.onpointermove = e => { if (!drawing) return; const [x,y] = pos(e); ctx.lineTo(x,y); ctx.stroke(); };
+pad.onpointerup = () => drawing = false;
+$("#clear").onclick = () => { ctx.clearRect(0,0,pad.width,pad.height); dirty = false; $("#typed").value = ""; };
+$("#cancel").onclick = () => $("#modal").style.display = "none";
+$("#tdraw").onclick = () => { mode = "draw"; $("#pdraw").style.display = "block"; $("#ptype").style.display = "none"; $("#tdraw").classList.add("on"); $("#ttype").classList.remove("on"); };
+$("#ttype").onclick = () => { mode = "type"; $("#pdraw").style.display = "none"; $("#ptype").style.display = "block"; $("#ttype").classList.add("on"); $("#tdraw").classList.remove("on"); };
+function trimmed(c){
+  const d = c.getContext("2d").getImageData(0,0,c.width,c.height).data; let x0=c.width,y0=c.height,x1=0,y1=0;
+  for (let y=0;y<c.height;y++) for (let x=0;x<c.width;x++) if (d[(y*c.width+x)*4+3] > 10) { if(x<x0)x0=x; if(x>x1)x1=x; if(y<y0)y0=y; if(y>y1)y1=y; }
+  if (x1 <= x0) return null; const o = document.createElement("canvas"); o.width = x1-x0+8; o.height = y1-y0+8;
+  o.getContext("2d").drawImage(c, x0-4, y0-4, o.width, o.height, 0, 0, o.width, o.height); return o.toDataURL("image/png").split(",")[1];
+}
+$("#use").onclick = () => {
+  let b64;
+  if (mode === "type") {
+    const t = $("#typed").value.trim(); if (!t) return;
+    const c = document.createElement("canvas"); c.width = 900; c.height = 200; const x = c.getContext("2d");
+    x.font = '96px "Segoe Script","Brush Script MT","Lucida Handwriting",cursive'; x.fillStyle = "#0b1f5c"; x.textBaseline = "middle"; x.fillText(t, 10, 100);
+    b64 = trimmed(c);
+  } else { if (!dirty) return; b64 = trimmed(pad); }
+  if (!b64) return;
+  saved[current.k] = b64; values[current.id] = b64; drawField(current.el);
+  for (const el of document.querySelectorAll(`.f[data-kind=${current.k}]`)) if (!values[el.dataset.id]) { values[el.dataset.id] = b64; drawField(el); }
+  $("#modal").style.display = "none"; check();
+};
+$("#finish").onclick = async () => {
+  $("#finish").disabled = true; $("#finish").textContent = "Sending…";
+  try { await call("sign.submit", {token, values, consent: true}); info.can_sign = false; info.status = "signed";
+    info.why = "You've signed. The sender gets a copy with everyone's signatures when all have signed."; render();
+    $("#finish").style.display = $("#decline").style.display = "none"; }
+  catch (e) { alertBox(e.message); check(); }
+};
+$("#decline").onclick = async () => {
+  const why = prompt("Why are you declining? (the sender will see this)"); if (why === null) return;
+  try { await call("sign.decline", {token, reason: why}); info.can_sign = false; info.status = "declined"; info.why = "You declined to sign. The sender has been told."; render();
+    $("#finish").style.display = $("#decline").style.display = "none"; } catch (e) { alertBox(e.message); }
+};
+function alertBox(t){ const n = document.querySelector(".note"); if (n) n.insertAdjacentHTML("afterbegin", `<p class="bad">${esc(t)}</p>`); }
+(async () => {
+  try { info = await call("sign.open", {token}); info.env_id = info.env_id || ""; render(); }
+  catch (e) { $("#title").textContent = "Review and sign"; $("#main").innerHTML = `<div class="note done-card"><p class="bad">${esc(e.message)}</p></div>`; }
+})();
+</script>
+</body>
+</html>

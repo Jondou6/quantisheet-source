@@ -1,0 +1,12 @@
+SECTION 01 11 00 - SUMMARY OF WORK
+Plumbing service call at the Harbor Annex mechanical room.
+Isolate the domestic water, repair the failed pump, and return the system to the customer.
+
+SECTION 01 32 00 - CONSTRUCTION PROGRESS DOCUMENTATION
+The Work shall be substantially complete within ninety (90) calendar days after Notice to Proceed.
+The Work shall be finally complete within 120 calendar days after Notice to Proceed.
+
+SECTION 22 11 16 - DOMESTIC WATER PIPING
+Replace the circulating pump and the adjacent piping.
+The water heater lead time is 3 weeks.
+Pressure test the repaired piping before startup.

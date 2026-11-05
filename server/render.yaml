@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: quantisheet-relay
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /healthz
+    disk:
+      name: quantisheet-data
+      mountPath: /data
+      sizeGB: 10
+    envVars:
+      - key: DATA_DIR
+        value: /data
+      # Render terminates HTTPS in front of the container (wss:// for clients)
+      - key: TLS_PROXY
+        value: "1"
+      # Render's proxy reaches the service from its internal 10.0.0.0/8
+      # network and adds the client's address to X-Forwarded-For; trusting
+      # it gives the wrong-password lockout the real client address.
+      # VERIFY this range against Render's current docs before deploying:
+      # wrong, and every client looks like the proxy (one bad password
+      # locks everyone out) or a client could fake its address.
+      - key: TRUSTED_PROXIES
+        value: "10.0.0.0/8"
+      - key: RELAY_TOKEN
+        generateValue: true

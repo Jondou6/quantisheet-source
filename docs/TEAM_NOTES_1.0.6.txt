@@ -1,0 +1,12 @@
+QuantiSheet 1.0.6
+- Copy text from a drawing: Home > Select Text (I), drag across the words, Ctrl+C. Box a schedule and press Ctrl+Shift+C to paste it into Excel with its columns. Double-click a word, or select a text box and press Ctrl+C.
+- Help > Report an Issue: say what happened, check the screenshot, and an email to support opens with it attached (and facts about the drawing - never its content). After the program stops responding, the next start offers to report it.
+- Tools > Package Tracker: FedEx, UPS, USPS and DHL numbers in one list (paste a shipping email and they're picked out), expected dates, late packages in red, a filter by job; Track opens the carrier's page.
+- Tools > Time Log: active time per job and sheet, takeoff vs review, with CSV export.
+- Estimate Error Check now also catches old prices, expired quotes, unpriced addenda, placeholders and double counts. Project > Addenda > Mark Priced (unpriced addenda block the bid form). Estimate > Placeholders & Allowances, Escalation to Buy Date.
+- Estimate > Leveling Board (sub quotes in green / yellow / red against your scope, gaps plugged from your own takeoff) and trade scope sheets.
+- Estimate > Bid Form Autopilot fills the owner's bid form; Billing > Change Order From Revision prices a revised sheet with clouded backup; bid results and hit rate by size and markup in the Estimating Dashboard.
+- File > Open Bid Download (.zip) as a Job; Review > Spec Book Risk Scanner; RFI finder checks the sheet index and spec drawing references; submittals list their drawing sheets.
+- Right-click in File Explorer: Combine PDFs (folder), Reduce size, Convert to PDF.
+- AI Takeoff rooms count the floor under a built-in shower bench.
+- Hold the mouse wheel button and drag to pan. Server installs: Check for Updates offers your own copy that updates itself.

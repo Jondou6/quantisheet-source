@@ -1,0 +1,5 @@
+# TLS in front of the relay: replace the host name with yours.
+# Caddy gets the certificate itself.  Then use wss://relay.example.com/
+relay.example.com {
+    reverse_proxy 127.0.0.1:8765
+}

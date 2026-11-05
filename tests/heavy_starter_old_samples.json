@@ -1,0 +1,416 @@
+{
+ "note": "Labor base wages are BLS May 2025 South Carolina medians and fuel is the EIA Lower Atlantic price (off-road), Oct 2026. Fringes, workers' comp, insurance and ALL EQUIPMENT RATES are SAMPLES - replace them with your own (Civil > Equipment Rates / Labor Burden / Crews).",
+ "settings": {
+  "fuel": 5.12,
+  "fuel_source": "EIA Lower Atlantic on-highway diesel $5.645 (Oct 12, 2026) less federal 24.4 and SC 28 cents road tax = off-road diesel"
+ },
+ "equipment": [
+  {
+   "code": "EXC-20",
+   "desc": "Excavator, 20-ton (e.g. 320 class)",
+   "class": "Excavator",
+   "own_hr": 48,
+   "op_hr": 28,
+   "fuel_gph": 4.5,
+   "use": "own",
+   "source": "sample - replace with your cost records or a rate book"
+  },
+  {
+   "code": "EXC-35",
+   "desc": "Excavator, 35-ton",
+   "class": "Excavator",
+   "own_hr": 78,
+   "op_hr": 42,
+   "fuel_gph": 7.5,
+   "use": "own",
+   "source": "sample - replace with your cost records or a rate book"
+  },
+  {
+   "code": "BKH",
+   "desc": "Backhoe loader",
+   "class": "Backhoe",
+   "own_hr": 22,
+   "op_hr": 14,
+   "fuel_gph": 2.2,
+   "use": "own",
+   "source": "sample - replace with your cost records or a rate book"
+  },
+  {
+   "code": "LDR-35",
+   "desc": "Wheel loader, 3.5 CY",
+   "class": "Loader",
+   "own_hr": 45,
+   "op_hr": 26,
+   "fuel_gph": 4.0,
+   "use": "own",
+   "source": "sample - replace with your cost records or a rate book"
+  },
+  {
+   "code": "SKS",
+   "desc": "Skid steer / track loader",
+   "class": "Loader",
+   "own_hr": 18,
+   "op_hr": 12,
+   "fuel_gph": 1.8,
+   "use": "own",
+   "source": "sample - replace with your cost records or a rate book"
+  },
+  {
+   "code": "DOZ-D6",
+   "desc": "Dozer, D6 class",
+   "class": "Dozer",
+   "own_hr": 55,
+   "op_hr": 32,
+   "fuel_gph": 5.5,
+   "use": "own",
+   "source": "sample - replace with your cost records or a rate book"
+  },
+  {
+   "code": "GRD",
+   "desc": "Motor grader",
+   "class": "Grader",
+   "own_hr": 60,
+   "op_hr": 35,
+   "fuel_gph": 5.0,
+   "use": "own",
+   "source": "sample - replace with your cost records or a rate book"
+  },
+  {
+   "code": "RLR-SD",
+   "desc": "Roller, smooth drum 84 in",
+   "class": "Roller",
+   "own_hr": 24,
+   "op_hr": 14,
+   "fuel_gph": 2.5,
+   "use": "own",
+   "source": "sample - replace with your cost records or a rate book"
+  },
+  {
+   "code": "RLR-PF",
+   "desc": "Roller, padfoot",
+   "class": "Roller",
+   "own_hr": 26,
+   "op_hr": 15,
+   "fuel_gph": 2.6,
+   "use": "own",
+   "source": "sample - replace with your cost records or a rate book"
+  },
+  {
+   "code": "PLT",
+   "desc": "Plate / jumping jack compactor",
+   "class": "Compactor",
+   "own_hr": 4,
+   "op_hr": 3,
+   "fuel_gph": 0.3,
+   "use": "own",
+   "source": "sample - replace with your cost records or a rate book"
+  },
+  {
+   "code": "TRK-TRI",
+   "desc": "Tri-axle dump truck",
+   "class": "Truck",
+   "own_hr": 30,
+   "op_hr": 32,
+   "fuel_gph": 5.0,
+   "use": "own",
+   "source": "sample - replace with your cost records or a rate book"
+  },
+  {
+   "code": "TRK-WTR",
+   "desc": "Water truck 4,000 gal",
+   "class": "Truck",
+   "own_hr": 28,
+   "op_hr": 24,
+   "fuel_gph": 4.0,
+   "use": "own",
+   "source": "sample - replace with your cost records or a rate book"
+  },
+  {
+   "code": "PKP",
+   "desc": "Crew pickup",
+   "class": "Truck",
+   "own_hr": 9,
+   "op_hr": 6,
+   "fuel_gph": 1.5,
+   "use": "own",
+   "source": "sample - replace with your cost records or a rate book"
+  },
+  {
+   "code": "BOX-8x20",
+   "desc": "Trench box 8x20 (rented)",
+   "class": "Shoring",
+   "use": "rent",
+   "rent_month": 2200,
+   "hours_month": 176,
+   "op_hr": 0,
+   "fuel_gph": 0,
+   "source": "sample - replace with your cost records or a rate book"
+  },
+  {
+   "code": "PMP-4",
+   "desc": "4 in trash pump (rented)",
+   "class": "Pump",
+   "use": "rent",
+   "rent_month": 1400,
+   "hours_month": 176,
+   "op_hr": 2,
+   "fuel_gph": 0.8,
+   "source": "sample - replace with your cost records or a rate book"
+  }
+ ],
+ "labor": [
+  {
+   "code": "FMN",
+   "desc": "Foreman",
+   "base": 36.23,
+   "fringe": 0,
+   "ot_pct": 10,
+   "wc_rate": 1.5,
+   "fica": 7.65,
+   "unemp": 0.3,
+   "gl_pct": 1.5,
+   "other_pct": 0,
+   "source": "BLS May 2025 South Carolina median wage (O*NET OnLine, SOC 47-1011); comp: SC class 5606 supervisors, typical 2025 range - use your carrier's rate"
+  },
+  {
+   "code": "OPR",
+   "desc": "Equipment operator",
+   "base": 23.53,
+   "fringe": 0,
+   "ot_pct": 10,
+   "wc_rate": 6.0,
+   "fica": 7.65,
+   "unemp": 0.3,
+   "gl_pct": 1.5,
+   "other_pct": 0,
+   "source": "BLS May 2025 South Carolina median wage (O*NET OnLine, SOC 47-2073); comp: SC class 6217 excavation, typical 2025 range - use your carrier's rate"
+  },
+  {
+   "code": "PIPE",
+   "desc": "Pipelayer",
+   "base": 21.72,
+   "fringe": 0,
+   "ot_pct": 10,
+   "wc_rate": 6.0,
+   "fica": 7.65,
+   "unemp": 0.3,
+   "gl_pct": 1.5,
+   "other_pct": 0,
+   "source": "BLS May 2025 South Carolina median wage (O*NET OnLine, SOC 47-2151); comp: SC class 6217 excavation, typical 2025 range - use your carrier's rate"
+  },
+  {
+   "code": "LAB",
+   "desc": "Laborer",
+   "base": 20.65,
+   "fringe": 0,
+   "ot_pct": 10,
+   "wc_rate": 6.0,
+   "fica": 7.65,
+   "unemp": 0.3,
+   "gl_pct": 1.5,
+   "other_pct": 0,
+   "source": "BLS May 2025 South Carolina median wage (O*NET OnLine, SOC 47-2061); comp: SC class 6217 excavation, typical 2025 range - use your carrier's rate"
+  },
+  {
+   "code": "DRV",
+   "desc": "Truck driver",
+   "base": 24.58,
+   "fringe": 0,
+   "ot_pct": 10,
+   "wc_rate": 8.0,
+   "fica": 7.65,
+   "unemp": 0.3,
+   "gl_pct": 1.5,
+   "other_pct": 0,
+   "source": "BLS May 2025 South Carolina median wage (O*NET OnLine, SOC 53-3032); comp: SC class 7219 trucking, typical 2025 range - use your carrier's rate"
+  },
+  {
+   "code": "GRC",
+   "desc": "Grade checker",
+   "base": 22.57,
+   "fringe": 0,
+   "ot_pct": 10,
+   "wc_rate": 6.0,
+   "fica": 7.65,
+   "unemp": 0.3,
+   "gl_pct": 1.5,
+   "other_pct": 0,
+   "source": "BLS May 2025 South Carolina median wage (O*NET OnLine, SOC 47-2071); comp: SC class 6217 excavation, typical 2025 range - use your carrier's rate"
+  }
+ ],
+ "crews": [
+  {
+   "code": "PIPE",
+   "desc": "Pipe crew (trenched)",
+   "labor": [
+    [
+     "FMN",
+     1
+    ],
+    [
+     "OPR",
+     2
+    ],
+    [
+     "PIPE",
+     2
+    ],
+    [
+     "LAB",
+     2
+    ]
+   ],
+   "equipment": [
+    [
+     "EXC-20",
+     1
+    ],
+    [
+     "LDR-35",
+     1
+    ],
+    [
+     "BOX-8x20",
+     1
+    ],
+    [
+     "PLT",
+     1
+    ],
+    [
+     "PKP",
+     1
+    ]
+   ]
+  },
+  {
+   "code": "MH",
+   "desc": "Manhole / structure crew",
+   "labor": [
+    [
+     "FMN",
+     1
+    ],
+    [
+     "OPR",
+     1
+    ],
+    [
+     "LAB",
+     2
+    ]
+   ],
+   "equipment": [
+    [
+     "EXC-20",
+     1
+    ],
+    [
+     "PLT",
+     1
+    ],
+    [
+     "PKP",
+     1
+    ]
+   ]
+  },
+  {
+   "code": "CUT",
+   "desc": "Mass excavation",
+   "labor": [
+    [
+     "OPR",
+     2
+    ],
+    [
+     "LAB",
+     1
+    ]
+   ],
+   "equipment": [
+    [
+     "EXC-35",
+     1
+    ],
+    [
+     "DOZ-D6",
+     1
+    ]
+   ]
+  },
+  {
+   "code": "FILL",
+   "desc": "Fill and compact",
+   "labor": [
+    [
+     "OPR",
+     3
+    ],
+    [
+     "LAB",
+     1
+    ]
+   ],
+   "equipment": [
+    [
+     "DOZ-D6",
+     1
+    ],
+    [
+     "RLR-PF",
+     1
+    ],
+    [
+     "TRK-WTR",
+     1
+    ]
+   ]
+  },
+  {
+   "code": "GRADE",
+   "desc": "Fine grading",
+   "labor": [
+    [
+     "OPR",
+     2
+    ],
+    [
+     "GRC",
+     1
+    ]
+   ],
+   "equipment": [
+    [
+     "GRD",
+     1
+    ],
+    [
+     "RLR-SD",
+     1
+    ]
+   ]
+  },
+  {
+   "code": "TRUCK",
+   "desc": "One dump truck",
+   "labor": [
+    [
+     "DRV",
+     1
+    ]
+   ],
+   "equipment": [
+    [
+     "TRK-TRI",
+     1
+    ]
+   ]
+  }
+ ],
+ "sources": [
+  "https://www.onetonline.org/link/localwages/47-2073.00?st=SC",
+  "https://www.eia.gov/petroleum/gasdiesel/",
+  "https://www.workerscompensationshop.com/insurance-states/south-carolina/rates"
+ ]
+}

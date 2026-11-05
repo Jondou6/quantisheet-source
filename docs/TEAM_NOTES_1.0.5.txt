@@ -1,0 +1,5 @@
+QuantiSheet 1.0.5
+- Drawing sets with a lot of markups open quickly. A 99-sheet set with 31,580 markups that froze on open now opens in about 2 seconds. For sets that big the Markups List starts with the current page (untick "This page" to list every markup), and the status bar's unpriced count runs when you click it.
+- File > Print Preview: each page on its paper before it prints (step through, pick all / this page / a list, change paper and orientation), then Print.
+- Printing shows "Printing page 13 of 60" as it goes, with Cancel.
+- Everything from 1.0.4 is unchanged (tool sets, live legends, Wall Area, rise/drop, convert, copy several times, scale preset pages, Takeoff Standard...).

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Back Office self-service</title>
+<style>
+body{font-family:system-ui,sans-serif;margin:0;padding:12px;max-width:560px}
+h1{font-size:1.3em}section{border:1px solid #ccc;border-radius:8px;padding:10px;margin:10px 0}
+input,button,select{font-size:1em;padding:8px;margin:4px 0;width:100%;box-sizing:border-box}
+.hide{display:none}.muted{color:#666;font-size:.9em}
+</style></head>
+<body>
+<h1>My pay, PTO and info</h1>
+<section id="signin">
+  <label>Employee number <input id="no" autocomplete="username"></label>
+  <label>Password <input id="pw" type="password" autocomplete="current-password"></label>
+  <button id="go">Sign in</button><p id="msg" class="muted"></p>
+</section>
+<div id="main" class="hide">
+  <section id="change" class="hide"><b>Choose a new password</b>
+    <input id="newpw" type="password" placeholder="at least 10 characters">
+    <button id="setpw">Save password</button></section>
+  <section><b>My pay stubs</b><div id="stubs"></div><pre id="stub"></pre></section>
+  <section><b>My PTO</b><div id="pto"></div>
+    <input id="pf" type="date"><input id="pt" type="date">
+    <input id="ph" value="8" inputmode="decimal">
+    <button id="preq">Request PTO</button></section>
+  <section><b>My info</b><div id="me"></div>
+    <select id="mf"><option>address</option><option>phone</option><option>email</option></select>
+    <input id="mv" placeholder="new value"><button id="msave">Send to HR</button>
+    <p class="muted">Changes wait for HR to approve.</p></section>
+  <p><a href="/punch">Punch in / out</a></p>
+</div>
+<script src="/app.js"></script>
+</body></html>

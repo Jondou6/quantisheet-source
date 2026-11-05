@@ -1,0 +1,6882 @@
+{
+ "fields_house_small": {
+  "audit": [
+   [
+    "PASS",
+    "Floor fully covered by rooms",
+    ""
+   ],
+   [
+    "PASS",
+    "No rooms overlap",
+    ""
+   ],
+   [
+    "PASS",
+    "Rooms inside the building",
+    ""
+   ],
+   [
+    "WARN",
+    "Habitable rooms at least 7 ft across",
+    "DINING"
+   ],
+   [
+    "PASS",
+    "An entry door from outside",
+    ""
+   ],
+   [
+    "PASS",
+    "Every room has a door",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors don't swing into each other",
+    ""
+   ],
+   [
+    "WARN",
+    "Room sizes within 40% of the program",
+    "BATH 4"
+   ],
+   [
+    "PASS",
+    "Every room reached from an outside door",
+    ""
+   ],
+   [
+    "PASS",
+    "No walking through bedrooms, baths or service rooms",
+    ""
+   ],
+   [
+    "PASS",
+    "Every habitable room has a window",
+    ""
+   ],
+   [
+    "PASS",
+    "Window glass at least 8% of floor area",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors and windows fit their walls, none overlap",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors at least 2'-0\" wide",
+    ""
+   ],
+   [
+    "PASS",
+    "Dimension string closes on the overall size",
+    ""
+   ],
+   [
+    "PASS",
+    "Gross area within 10% of the brief",
+    ""
+   ],
+   [
+    "PASS",
+    "Room schedule totals the plan",
+    "395 SF net"
+   ],
+   [
+    "PASS",
+    "Has a bedroom and a bath",
+    ""
+   ],
+   [
+    "PASS",
+    "Building inside the setbacks",
+    "setbacks assumed: front, rear, side"
+   ],
+   [
+    "PASS",
+    "FOR REVIEW - NOT FOR SEALING on the set",
+    ""
+   ]
+  ],
+  "doors": [
+   [
+    "101",
+    "A",
+    "3'-0\" x 6'-8\"",
+    "Exterior, insulated",
+    "EXTERIOR -> 101 LIVING",
+    "W1"
+   ],
+   [
+    "102",
+    "A",
+    "3'-0\" x 6'-8\"",
+    "Exterior, insulated",
+    "EXTERIOR -> 102 KITCHEN",
+    "W3"
+   ],
+   [
+    "103",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "101 LIVING -> 102 KITCHEN",
+    "W5"
+   ],
+   [
+    "104",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "101 LIVING -> 103 DINING",
+    "W6"
+   ],
+   [
+    "105",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "101 LIVING -> 104 HALL",
+    "W7"
+   ],
+   [
+    "106",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "104 HALL -> 105 BATH 4",
+    "W11"
+   ],
+   [
+    "107",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "104 HALL -> 106 PRIMARY BEDROOM",
+    "W12"
+   ]
+  ],
+  "notes": [
+   "One-story single-family residence on a slab on grade.",
+   "Wood-frame exterior walls with gable roof; roof framing by others.",
+   "Bedrooms each have an operable window; verify egress requirements.",
+   "Kitchen and bath layouts are diagrammatic; fixture layouts by the design professional.",
+   "Mechanical room size and equipment are to be confirmed."
+  ],
+  "quantities": [
+   [
+    "Site & foundation",
+    "Slab on grade (house)",
+    437.0,
+    "SF",
+    "outside face of the walls"
+   ],
+   [
+    "Site & foundation",
+    "Slab concrete, 4\" thick",
+    5.3,
+    "CY",
+    "slab area x thickness, no waste"
+   ],
+   [
+    "Site & foundation",
+    "Perimeter footing / thickened edge",
+    86.0,
+    "LF",
+    "house perimeter, outside face"
+   ],
+   [
+    "Framing & walls",
+    "Exterior walls",
+    84.0,
+    "LF",
+    "centreline, 9 ft plate"
+   ],
+   [
+    "Framing & walls",
+    "Exterior wall area, net",
+    662.0,
+    "SF",
+    "gross less doors and windows (siding, sheathing, insulation)"
+   ],
+   [
+    "Framing & walls",
+    "Interior partitions",
+    60.0,
+    "LF",
+    "centreline, 9 ft"
+   ],
+   [
+    "Framing & walls",
+    "Gypsum board, walls",
+    1573.0,
+    "SF",
+    "partitions both sides + inside of exterior walls"
+   ],
+   [
+    "Openings",
+    "Door A: Exterior, insulated",
+    2,
+    "EA",
+    "3'-0\" x 6'-8\""
+   ],
+   [
+    "Openings",
+    "Door B: Interior, hollow core",
+    5,
+    "EA",
+    "2'-8\" x 6'-8\""
+   ],
+   [
+    "Openings",
+    "Window A: 3'-0\" x 4'-0\" single hung",
+    4,
+    "EA",
+    "3'-0\" x 4'-0\""
+   ],
+   [
+    "Openings",
+    "Window B: 2'-0\" x 3'-0\" (bath, obscure)",
+    1,
+    "EA",
+    "2'-0\" x 3'-0\""
+   ],
+   [
+    "Finishes",
+    "Floor finish CPT",
+    91.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish CT",
+    59.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish LVP",
+    245.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Base CT",
+    34.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Base WD",
+    170.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Ceiling GWB-PT",
+    395.0,
+    "SF",
+    "room areas"
+   ],
+   [
+    "Roof",
+    "Roof, 6:12 gable",
+    643.0,
+    "SF",
+    "plan area incl. 1.5 ft overhang x slope factor 1.118"
+   ],
+   [
+    "Roof",
+    "Roofing squares",
+    6.4,
+    "SQ",
+    "no waste"
+   ],
+   [
+    "Roof",
+    "Ridge",
+    30.0,
+    "LF",
+    ""
+   ],
+   [
+    "Roof",
+    "Eaves / gutters",
+    59.0,
+    "LF",
+    ""
+   ],
+   [
+    "Roof",
+    "Rakes",
+    44.0,
+    "LF",
+    ""
+   ],
+   [
+    "Site & foundation",
+    "Front walk, 4 ft",
+    100.0,
+    "SF",
+    "front door (or porch) to the lot line"
+   ]
+  ],
+  "rooms": [
+   [
+    "101",
+    "LIVING",
+    "99",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "102",
+    "KITCHEN",
+    "60",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "103",
+    "DINING",
+    "39",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "104",
+    "HALL",
+    "48",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "105",
+    "BATH 4",
+    "59",
+    "CT",
+    "CT",
+    "GWB-MR",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "106",
+    "PRIMARY BEDROOM",
+    "91",
+    "CPT",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ]
+  ],
+  "sheets": [
+   [
+    "G-001",
+    "Cover"
+   ],
+   [
+    "G-002",
+    "General Notes"
+   ],
+   [
+    "AS-101",
+    "Site Plan"
+   ],
+   [
+    "A-101",
+    "Floor Plan"
+   ],
+   [
+    "A-102",
+    "Roof Plan"
+   ],
+   [
+    "A-201",
+    "Exterior Elevations"
+   ],
+   [
+    "A-301",
+    "Building Section"
+   ],
+   [
+    "A-601",
+    "Room Schedule"
+   ],
+   [
+    "A-602",
+    "Door & Window Schedules"
+   ],
+   [
+    "A-701",
+    "Quantity Summary"
+   ]
+  ],
+  "windows": [
+   [
+    "A",
+    "3'-0\" x 4'-0\" single hung",
+    "3'-0\" x 4'-0\"",
+    "4",
+    "3'-0\"",
+    "7'-0\""
+   ],
+   [
+    "B",
+    "2'-0\" x 3'-0\" (bath, obscure)",
+    "2'-0\" x 3'-0\"",
+    "1",
+    "4'-0\"",
+    "7'-0\""
+   ]
+  ]
+ },
+ "fields_retail_8000": {
+  "ada": [
+   [
+    "PASS",
+    "Door clear width",
+    "Every door 32 in. clear minimum",
+    "404.2.3"
+   ],
+   [
+    "PASS",
+    "Door maneuvering depth",
+    "60 in. pull side and 48 in. push side available",
+    "404.2.4.1"
+   ],
+   [
+    "PASS",
+    "Latch-side clearance",
+    "18 in. of wall beside each interior door",
+    "404.2.4.1"
+   ],
+   [
+    "PASS",
+    "Restroom turning space",
+    "60 in. turning circle fits in each restroom",
+    "603.2.1 / 304.3.1"
+   ],
+   [
+    "WARN",
+    "Water closet clearance",
+    "Lay out 60 x 56 in. clear at the toilet, its centerline 16-18 in. from the side wall; grab bars per 604.5",
+    "604.2 / 604.3.1"
+   ],
+   [
+    "PASS",
+    "Accessible route width",
+    "Halls and routes 36 in. clear minimum",
+    "403.5.1"
+   ],
+   [
+    "PASS",
+    "Route to every room",
+    "Every room is reached through doors from the entrance",
+    "206.2.4"
+   ],
+   [
+    "PASS",
+    "Accessible entrance",
+    "1 entrance door(s), 36 in. leaf; keep the landing level and the threshold 1/2 in. max",
+    "206.4 / 404.2.5"
+   ]
+  ],
+  "audit": [
+   [
+    "PASS",
+    "Floor fully covered by rooms",
+    ""
+   ],
+   [
+    "PASS",
+    "No rooms overlap",
+    ""
+   ],
+   [
+    "PASS",
+    "Rooms inside the building",
+    ""
+   ],
+   [
+    "PASS",
+    "Habitable rooms at least 7 ft across",
+    ""
+   ],
+   [
+    "PASS",
+    "An entry door from outside",
+    ""
+   ],
+   [
+    "PASS",
+    "Every room has a door",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors don't swing into each other",
+    ""
+   ],
+   [
+    "PASS",
+    "Room sizes within 40% of the program",
+    ""
+   ],
+   [
+    "PASS",
+    "Every room reached from an outside door",
+    ""
+   ],
+   [
+    "PASS",
+    "No walking through bedrooms, baths or service rooms",
+    ""
+   ],
+   [
+    "PASS",
+    "Every habitable room has a window",
+    ""
+   ],
+   [
+    "PASS",
+    "Window glass at least 8% of floor area",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors and windows fit their walls, none overlap",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors at least 2'-0\" wide",
+    ""
+   ],
+   [
+    "PASS",
+    "Dimension string closes on the overall size",
+    ""
+   ],
+   [
+    "PASS",
+    "Gross area within 10% of the brief",
+    ""
+   ],
+   [
+    "PASS",
+    "Room schedule totals the plan",
+    "7,827 SF net"
+   ],
+   [
+    "PASS",
+    "Has a restroom",
+    ""
+   ],
+   [
+    "PASS",
+    "Building inside the setbacks",
+    "setbacks assumed: front, rear, side"
+   ],
+   [
+    "PASS",
+    "FOR REVIEW - NOT FOR SEALING on the set",
+    ""
+   ]
+  ],
+  "doors": [
+   [
+    "101",
+    "A",
+    "3'-0\" x 6'-8\"",
+    "Exterior, insulated",
+    "EXTERIOR -> 101 SALES",
+    "W1"
+   ],
+   [
+    "102",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "101 SALES -> 102 HALL",
+    "W5"
+   ],
+   [
+    "103",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "102 HALL -> 103 STOCK",
+    "W8"
+   ],
+   [
+    "104",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "102 HALL -> 104 MECH",
+    "W9"
+   ],
+   [
+    "105",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "102 HALL -> 105 RESTROOM 1",
+    "W10"
+   ],
+   [
+    "106",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "102 HALL -> 106 RESTROOM 2",
+    "W11"
+   ],
+   [
+    "107",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "102 HALL -> 107 OFFICE",
+    "W12"
+   ]
+  ],
+  "notes": [
+   "One-story commercial building on a slab on grade.",
+   "Flat roof with parapet; roof drainage by others.",
+   "Restrooms are diagrammatic; fixture counts and accessible layouts by the design professional.",
+   "Tenant finishes are as scheduled unless noted otherwise.",
+   "Storefront and exterior door hardware to be confirmed."
+  ],
+  "quantities": [
+   [
+    "Site & foundation",
+    "Slab on grade (house)",
+    8013.0,
+    "SF",
+    "outside face of the walls"
+   ],
+   [
+    "Site & foundation",
+    "Slab concrete, 4\" thick",
+    97.9,
+    "CY",
+    "slab area x thickness, no waste"
+   ],
+   [
+    "Site & foundation",
+    "Perimeter footing / thickened edge",
+    374.0,
+    "LF",
+    "house perimeter, outside face"
+   ],
+   [
+    "Framing & walls",
+    "Exterior walls",
+    372.0,
+    "LF",
+    "centreline, 12 ft plate"
+   ],
+   [
+    "Framing & walls",
+    "Exterior wall area, net",
+    4012.0,
+    "SF",
+    "gross less doors and windows (siding, sheathing, insulation)"
+   ],
+   [
+    "Framing & walls",
+    "Interior partitions",
+    244.0,
+    "LF",
+    "centreline, 12 ft"
+   ],
+   [
+    "Framing & walls",
+    "Gypsum board, walls",
+    9634.0,
+    "SF",
+    "partitions both sides + inside of exterior walls"
+   ],
+   [
+    "Openings",
+    "Door A: Exterior, insulated",
+    1,
+    "EA",
+    "3'-0\" x 6'-8\""
+   ],
+   [
+    "Openings",
+    "Door B: Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    6,
+    "EA",
+    "3'-0\" x 6'-8\""
+   ],
+   [
+    "Openings",
+    "Window A: 3'-0\" x 4'-0\" single hung",
+    36,
+    "EA",
+    "3'-0\" x 4'-0\""
+   ],
+   [
+    "Finishes",
+    "Floor finish CPT-T",
+    439.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish CT",
+    654.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish LVP",
+    268.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish LVT",
+    4896.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish SC",
+    1569.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Base CT",
+    163.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Base RB",
+    594.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Base WD",
+    102.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Ceiling ACT",
+    5335.0,
+    "SF",
+    "room areas"
+   ],
+   [
+    "Finishes",
+    "Ceiling EXP",
+    1569.0,
+    "SF",
+    "room areas"
+   ],
+   [
+    "Finishes",
+    "Ceiling GWB-PT",
+    923.0,
+    "SF",
+    "room areas"
+   ],
+   [
+    "Roof",
+    "Low-slope roof membrane",
+    8013.0,
+    "SF",
+    "inside the parapet, no turn-ups"
+   ],
+   [
+    "Roof",
+    "Parapet",
+    374.0,
+    "LF",
+    "3 ft high"
+   ],
+   [
+    "Roof",
+    "Roof drains",
+    2,
+    "EA",
+    "plus overflows - by the design professional"
+   ],
+   [
+    "Site & foundation",
+    "Front walk, 4 ft",
+    80.0,
+    "SF",
+    "front door (or porch) to the lot line"
+   ]
+  ],
+  "rooms": [
+   [
+    "101",
+    "SALES",
+    "4,896",
+    "LVT",
+    "RB",
+    "GWB-PT",
+    "ACT",
+    "10'-0\""
+   ],
+   [
+    "102",
+    "HALL",
+    "268",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "10'-0\""
+   ],
+   [
+    "103",
+    "STOCK",
+    "1,331",
+    "SC",
+    "RB",
+    "GWB-PT",
+    "EXP",
+    "10'-0\""
+   ],
+   [
+    "104",
+    "MECH",
+    "238",
+    "SC",
+    "RB",
+    "GWB",
+    "EXP",
+    "10'-0\""
+   ],
+   [
+    "105",
+    "RESTROOM 1",
+    "327",
+    "CT",
+    "CT",
+    "GWB-MR",
+    "GWB-PT",
+    "10'-0\""
+   ],
+   [
+    "106",
+    "RESTROOM 2",
+    "327",
+    "CT",
+    "CT",
+    "GWB-MR",
+    "GWB-PT",
+    "10'-0\""
+   ],
+   [
+    "107",
+    "OFFICE",
+    "439",
+    "CPT-T",
+    "RB",
+    "GWB-PT",
+    "ACT",
+    "10'-0\""
+   ]
+  ],
+  "scoping": {
+   "accessible_entrances": 1,
+   "public_entrances": 1,
+   "sf_per_story": 7920,
+   "single_user_toilets_cluster": 2,
+   "stories": 1,
+   "title": "III",
+   "toilet_rooms": [
+    {
+     "lavatories": 1,
+     "name": "RESTROOM 1",
+     "water_closets": 1
+    },
+    {
+     "lavatories": 1,
+     "name": "RESTROOM 2",
+     "water_closets": 1
+    }
+   ],
+   "use": "retail"
+  },
+  "sheets": [
+   [
+    "G-001",
+    "Cover"
+   ],
+   [
+    "G-002",
+    "General Notes"
+   ],
+   [
+    "G-003",
+    "Code Summary"
+   ],
+   [
+    "AS-101",
+    "Site Plan"
+   ],
+   [
+    "A-101",
+    "Floor Plan"
+   ],
+   [
+    "A-102",
+    "Roof Plan"
+   ],
+   [
+    "A-201",
+    "Exterior Elevations"
+   ],
+   [
+    "A-301",
+    "Building Section"
+   ],
+   [
+    "A-601",
+    "Room Schedule"
+   ],
+   [
+    "A-602",
+    "Door & Window Schedules"
+   ],
+   [
+    "A-701",
+    "Quantity Summary"
+   ],
+   [
+    "A-801",
+    "Accessibility"
+   ]
+  ],
+  "windows": [
+   [
+    "A",
+    "3'-0\" x 4'-0\" single hung",
+    "3'-0\" x 4'-0\"",
+    "36",
+    "3'-0\"",
+    "7'-0\""
+   ]
+  ]
+ },
+ "house_1story": {
+  "audit": [
+   [
+    "PASS",
+    "Floor fully covered by rooms",
+    ""
+   ],
+   [
+    "PASS",
+    "No rooms overlap",
+    ""
+   ],
+   [
+    "PASS",
+    "Rooms inside the building",
+    ""
+   ],
+   [
+    "PASS",
+    "Habitable rooms at least 7 ft across",
+    ""
+   ],
+   [
+    "PASS",
+    "An entry door from outside",
+    ""
+   ],
+   [
+    "PASS",
+    "Every room has a door",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors don't swing into each other",
+    ""
+   ],
+   [
+    "WARN",
+    "Room sizes within 40% of the program",
+    "MECH, LAUNDRY"
+   ],
+   [
+    "PASS",
+    "Every room reached from an outside door",
+    ""
+   ],
+   [
+    "PASS",
+    "No walking through bedrooms, baths or service rooms",
+    ""
+   ],
+   [
+    "PASS",
+    "Every habitable room has a window",
+    ""
+   ],
+   [
+    "PASS",
+    "Window glass at least 8% of floor area",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors and windows fit their walls, none overlap",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors at least 2'-0\" wide",
+    ""
+   ],
+   [
+    "PASS",
+    "Dimension string closes on the overall size",
+    ""
+   ],
+   [
+    "PASS",
+    "Gross area within 10% of the brief",
+    ""
+   ],
+   [
+    "PASS",
+    "Room schedule totals the plan",
+    "1,559 SF net"
+   ],
+   [
+    "PASS",
+    "Has a bedroom and a bath",
+    ""
+   ],
+   [
+    "PASS",
+    "Building inside the setbacks",
+    "setbacks assumed: front, rear, side"
+   ],
+   [
+    "PASS",
+    "FOR REVIEW - NOT FOR SEALING on the set",
+    ""
+   ]
+  ],
+  "doors": [
+   [
+    "101",
+    "A",
+    "3'-0\" x 6'-8\"",
+    "Exterior, insulated",
+    "EXTERIOR -> 101 LIVING",
+    "W1"
+   ],
+   [
+    "102",
+    "A",
+    "3'-0\" x 6'-8\"",
+    "Exterior, insulated",
+    "EXTERIOR -> 102 KITCHEN",
+    "W3"
+   ],
+   [
+    "103",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "101 LIVING -> 102 KITCHEN",
+    "W5"
+   ],
+   [
+    "104",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "101 LIVING -> 103 DINING",
+    "W6"
+   ],
+   [
+    "105",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "101 LIVING -> 104 HALL",
+    "W7"
+   ],
+   [
+    "106",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "104 HALL -> 105 MECH",
+    "W12"
+   ],
+   [
+    "107",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "104 HALL -> 106 BATH 1",
+    "W13"
+   ],
+   [
+    "108",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "104 HALL -> 107 BATH 2",
+    "W14"
+   ],
+   [
+    "109",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "104 HALL -> 108 PRIMARY BEDROOM",
+    "W15"
+   ],
+   [
+    "110",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "104 HALL -> 109 LAUNDRY",
+    "W16"
+   ],
+   [
+    "111",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "104 HALL -> 110 BEDROOM 2",
+    "W17"
+   ],
+   [
+    "112",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "104 HALL -> 111 BEDROOM 3",
+    "W18"
+   ]
+  ],
+  "notes": [
+   "One-story single-family residence on a slab on grade.",
+   "Wood-frame exterior walls with gable roof; roof framing by others.",
+   "Bedrooms each have an operable window; verify egress requirements.",
+   "Kitchen and bath layouts are diagrammatic; fixture layouts by the design professional.",
+   "Mechanical room size and equipment are to be confirmed."
+  ],
+  "quantities": [
+   [
+    "Site & foundation",
+    "Slab on grade (house)",
+    1641.0,
+    "SF",
+    "outside face of the walls"
+   ],
+   [
+    "Site & foundation",
+    "Slab concrete, 4\" thick",
+    20.1,
+    "CY",
+    "slab area x thickness, no waste"
+   ],
+   [
+    "Site & foundation",
+    "Perimeter footing / thickened edge",
+    166.0,
+    "LF",
+    "house perimeter, outside face"
+   ],
+   [
+    "Framing & walls",
+    "Exterior walls",
+    164.0,
+    "LF",
+    "centreline, 9 ft plate"
+   ],
+   [
+    "Framing & walls",
+    "Exterior wall area, net",
+    1292.0,
+    "SF",
+    "gross less doors and windows (siding, sheathing, insulation)"
+   ],
+   [
+    "Framing & walls",
+    "Interior partitions",
+    193.0,
+    "LF",
+    "centreline, 9 ft"
+   ],
+   [
+    "Framing & walls",
+    "Gypsum board, walls",
+    4415.0,
+    "SF",
+    "partitions both sides + inside of exterior walls"
+   ],
+   [
+    "Openings",
+    "Door A: Exterior, insulated",
+    2,
+    "EA",
+    "3'-0\" x 6'-8\""
+   ],
+   [
+    "Openings",
+    "Door B: Interior, hollow core",
+    10,
+    "EA",
+    "2'-8\" x 6'-8\""
+   ],
+   [
+    "Openings",
+    "Window A: 3'-0\" x 4'-0\" single hung",
+    11,
+    "EA",
+    "3'-0\" x 4'-0\""
+   ],
+   [
+    "Openings",
+    "Window B: 2'-0\" x 3'-0\" (bath, obscure)",
+    2,
+    "EA",
+    "2'-0\" x 3'-0\""
+   ],
+   [
+    "Finishes",
+    "Floor finish CPT",
+    571.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish CT",
+    165.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish LVP",
+    769.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish SC",
+    55.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Base CT",
+    79.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Base RB",
+    36.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Base WD",
+    434.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Ceiling EXP",
+    55.0,
+    "SF",
+    "room areas"
+   ],
+   [
+    "Finishes",
+    "Ceiling GWB-PT",
+    1504.0,
+    "SF",
+    "room areas"
+   ],
+   [
+    "Roof",
+    "Roof, 6:12 gable",
+    2123.0,
+    "SF",
+    "plan area incl. 1.5 ft overhang x slope factor 1.118"
+   ],
+   [
+    "Roof",
+    "Roofing squares",
+    21.2,
+    "SQ",
+    "no waste"
+   ],
+   [
+    "Roof",
+    "Ridge",
+    54.0,
+    "LF",
+    ""
+   ],
+   [
+    "Roof",
+    "Eaves / gutters",
+    107.0,
+    "LF",
+    ""
+   ],
+   [
+    "Roof",
+    "Rakes",
+    79.0,
+    "LF",
+    ""
+   ],
+   [
+    "Site & foundation",
+    "Front walk, 4 ft",
+    100.0,
+    "SF",
+    "front door (or porch) to the lot line"
+   ]
+  ],
+  "rooms": [
+   [
+    "101",
+    "LIVING",
+    "351",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "102",
+    "KITCHEN",
+    "126",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "103",
+    "DINING",
+    "82",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "104",
+    "HALL",
+    "127",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "105",
+    "MECH",
+    "55",
+    "SC",
+    "RB",
+    "GWB",
+    "EXP",
+    "9'-0\""
+   ],
+   [
+    "106",
+    "BATH 1",
+    "82",
+    "CT",
+    "CT",
+    "GWB-MR",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "107",
+    "BATH 2",
+    "82",
+    "CT",
+    "CT",
+    "GWB-MR",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "108",
+    "PRIMARY BEDROOM",
+    "217",
+    "CPT",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "109",
+    "LAUNDRY",
+    "82",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "110",
+    "BEDROOM 2",
+    "179",
+    "CPT",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "111",
+    "BEDROOM 3",
+    "175",
+    "CPT",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ]
+  ],
+  "sheets": [
+   [
+    "G-001",
+    "Cover"
+   ],
+   [
+    "G-002",
+    "General Notes"
+   ],
+   [
+    "AS-101",
+    "Site Plan"
+   ],
+   [
+    "A-101",
+    "Floor Plan"
+   ],
+   [
+    "A-102",
+    "Roof Plan"
+   ],
+   [
+    "A-201",
+    "Exterior Elevations"
+   ],
+   [
+    "A-301",
+    "Building Section"
+   ],
+   [
+    "A-601",
+    "Room Schedule"
+   ],
+   [
+    "A-602",
+    "Door & Window Schedules"
+   ],
+   [
+    "A-701",
+    "Quantity Summary"
+   ]
+  ],
+  "windows": [
+   [
+    "A",
+    "3'-0\" x 4'-0\" single hung",
+    "3'-0\" x 4'-0\"",
+    "11",
+    "3'-0\"",
+    "7'-0\""
+   ],
+   [
+    "B",
+    "2'-0\" x 3'-0\" (bath, obscure)",
+    "2'-0\" x 3'-0\"",
+    "2",
+    "4'-0\"",
+    "7'-0\""
+   ]
+  ]
+ },
+ "house_2story": {
+  "audit": [
+   [
+    "PASS",
+    "Floor fully covered by rooms",
+    ""
+   ],
+   [
+    "PASS",
+    "No rooms overlap",
+    ""
+   ],
+   [
+    "PASS",
+    "Rooms inside the building",
+    ""
+   ],
+   [
+    "PASS",
+    "Habitable rooms at least 7 ft across",
+    ""
+   ],
+   [
+    "PASS",
+    "An entry door from outside",
+    ""
+   ],
+   [
+    "PASS",
+    "Every room has a door",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors don't swing into each other",
+    ""
+   ],
+   [
+    "WARN",
+    "Room sizes within 40% of the program",
+    "L2: PRIMARY BATH"
+   ],
+   [
+    "PASS",
+    "Every room reached from an outside door",
+    ""
+   ],
+   [
+    "PASS",
+    "No walking through bedrooms, baths or service rooms",
+    ""
+   ],
+   [
+    "PASS",
+    "Every habitable room has a window",
+    ""
+   ],
+   [
+    "PASS",
+    "Window glass at least 8% of floor area",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors and windows fit their walls, none overlap",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors at least 2'-0\" wide",
+    ""
+   ],
+   [
+    "PASS",
+    "Dimension string closes on the overall size",
+    ""
+   ],
+   [
+    "PASS",
+    "Gross area within 10% of the brief",
+    ""
+   ],
+   [
+    "PASS",
+    "Room schedule totals the plan",
+    "2,392 SF net"
+   ],
+   [
+    "PASS",
+    "Has a bedroom and a bath",
+    ""
+   ],
+   [
+    "PASS",
+    "Building inside the setbacks",
+    "setbacks assumed: front, rear, side"
+   ],
+   [
+    "PASS",
+    "FOR REVIEW - NOT FOR SEALING on the set",
+    ""
+   ]
+  ],
+  "doors": [
+   [
+    "101",
+    "A",
+    "3'-0\" x 6'-8\"",
+    "Exterior, insulated",
+    "EXTERIOR -> 101 STAIR HALL",
+    "L1 W1"
+   ],
+   [
+    "102",
+    "A",
+    "3'-0\" x 6'-8\"",
+    "Exterior, insulated",
+    "EXTERIOR -> 106 LAUNDRY / MECH",
+    "L1 W3"
+   ],
+   [
+    "103",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "101 STAIR HALL -> 102 LIVING",
+    "L1 W5"
+   ],
+   [
+    "104",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "101 STAIR HALL -> 103 DINING",
+    "L1 W6"
+   ],
+   [
+    "105",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "101 STAIR HALL -> 104 KITCHEN",
+    "L1 W7"
+   ],
+   [
+    "106",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "101 STAIR HALL -> 105 POWDER",
+    "L1 W8"
+   ],
+   [
+    "107",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "104 KITCHEN -> 106 LAUNDRY / MECH",
+    "L1 W11"
+   ],
+   [
+    "201",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "201 STAIR HALL -> 202 BEDROOM 2",
+    "L2 W5"
+   ],
+   [
+    "202",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "201 STAIR HALL -> 203 BEDROOM 3",
+    "L2 W6"
+   ],
+   [
+    "203",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "201 STAIR HALL -> 204 BEDROOM 4",
+    "L2 W7"
+   ],
+   [
+    "204",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "201 STAIR HALL -> 205 PRIMARY BEDROOM",
+    "L2 W8"
+   ],
+   [
+    "205",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "201 STAIR HALL -> 206 BATH",
+    "L2 W9"
+   ],
+   [
+    "206",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "205 PRIMARY BEDROOM -> 207 PRIMARY BATH",
+    "L2 W13"
+   ]
+  ],
+  "notes": [
+   "Two-story single-family residence on a slab on grade; floor to floor 10'-0\" (wood floor framing).",
+   "Stair: 16 risers at about 7.50\", 10\" treads, 3'-6\" wide; guards and handrails by the design professional.",
+   "Bedrooms each have an operable window; verify egress requirements.",
+   "Kitchen and bath layouts are diagrammatic; fixture layouts by the design professional.",
+   "Floor framing, structure and the laundry and mechanical equipment are to be confirmed."
+  ],
+  "quantities": [
+   [
+    "Site & foundation",
+    "Slab on grade (house)",
+    1268.0,
+    "SF",
+    "outside face of the walls"
+   ],
+   [
+    "Site & foundation",
+    "Slab concrete, 4\" thick",
+    15.5,
+    "CY",
+    "slab area x thickness, no waste"
+   ],
+   [
+    "Site & foundation",
+    "Perimeter footing / thickened edge",
+    146.0,
+    "LF",
+    "house perimeter, outside face"
+   ],
+   [
+    "Framing & walls",
+    "L1 Exterior walls",
+    144.0,
+    "LF",
+    "centreline, 9 ft plate"
+   ],
+   [
+    "Framing & walls",
+    "L1 Exterior wall area, net",
+    1154.0,
+    "SF",
+    "gross less doors and windows (siding, sheathing, insulation)"
+   ],
+   [
+    "Framing & walls",
+    "L1 Interior partitions",
+    99.0,
+    "LF",
+    "centreline, 9 ft"
+   ],
+   [
+    "Framing & walls",
+    "L1 Gypsum board, walls",
+    2763.0,
+    "SF",
+    "partitions both sides + inside of exterior walls"
+   ],
+   [
+    "Framing & walls",
+    "L2 Exterior walls",
+    144.0,
+    "LF",
+    "centreline, 9 ft plate"
+   ],
+   [
+    "Framing & walls",
+    "L2 Exterior wall area, net",
+    1188.0,
+    "SF",
+    "gross less doors and windows (siding, sheathing, insulation)"
+   ],
+   [
+    "Framing & walls",
+    "L2 Interior partitions",
+    117.0,
+    "LF",
+    "centreline, 9 ft"
+   ],
+   [
+    "Framing & walls",
+    "L2 Gypsum board, walls",
+    3081.0,
+    "SF",
+    "partitions both sides + inside of exterior walls"
+   ],
+   [
+    "Framing & walls",
+    "Floor framing (level 2)",
+    1268.0,
+    "SF",
+    "over level 1, stairwell not deducted"
+   ],
+   [
+    "Framing & walls",
+    "Stair, 16 risers x 3.5 ft",
+    1,
+    "EA",
+    "7.50\" risers, 10\" treads, plus guards and rails"
+   ],
+   [
+    "Openings",
+    "Door A: Exterior, insulated",
+    2,
+    "EA",
+    "3'-0\" x 6'-8\""
+   ],
+   [
+    "Openings",
+    "Door B: Interior, hollow core",
+    11,
+    "EA",
+    "2'-8\" x 6'-8\""
+   ],
+   [
+    "Openings",
+    "Window A: 3'-0\" x 4'-0\" single hung",
+    16,
+    "EA",
+    "3'-0\" x 4'-0\""
+   ],
+   [
+    "Openings",
+    "Window B: 2'-0\" x 3'-0\" (bath, obscure)",
+    3,
+    "EA",
+    "2'-0\" x 3'-0\""
+   ],
+   [
+    "Finishes",
+    "Floor finish CPT",
+    877.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish CT",
+    167.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish LVP",
+    1348.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Base CT",
+    90.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Base WD",
+    626.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Ceiling GWB-PT",
+    2392.0,
+    "SF",
+    "room areas"
+   ],
+   [
+    "Roof",
+    "Roof, 6:12 gable",
+    1673.0,
+    "SF",
+    "plan area incl. 1.5 ft overhang x slope factor 1.118"
+   ],
+   [
+    "Roof",
+    "Roofing squares",
+    16.7,
+    "SQ",
+    "no waste"
+   ],
+   [
+    "Roof",
+    "Ridge",
+    48.0,
+    "LF",
+    ""
+   ],
+   [
+    "Roof",
+    "Eaves / gutters",
+    95.0,
+    "LF",
+    ""
+   ],
+   [
+    "Roof",
+    "Rakes",
+    70.0,
+    "LF",
+    ""
+   ],
+   [
+    "Site & foundation",
+    "Front walk, 4 ft",
+    100.0,
+    "SF",
+    "front door (or porch) to the lot line"
+   ]
+  ],
+  "rooms": [
+   [
+    "101",
+    "STAIR HALL",
+    "192",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "102",
+    "LIVING",
+    "488",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "103",
+    "DINING",
+    "164",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "104",
+    "KITCHEN",
+    "225",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "105",
+    "POWDER",
+    "40",
+    "CT",
+    "CT",
+    "GWB-MR",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "106",
+    "LAUNDRY / MECH",
+    "86",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "201",
+    "STAIR HALL",
+    "192",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "202",
+    "BEDROOM 2",
+    "244",
+    "CPT",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "203",
+    "BEDROOM 3",
+    "244",
+    "CPT",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "204",
+    "BEDROOM 4",
+    "164",
+    "CPT",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "205",
+    "PRIMARY BEDROOM",
+    "225",
+    "CPT",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "206",
+    "BATH",
+    "74",
+    "CT",
+    "CT",
+    "GWB-MR",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "207",
+    "PRIMARY BATH",
+    "52",
+    "CT",
+    "CT",
+    "GWB-MR",
+    "GWB-PT",
+    "9'-0\""
+   ]
+  ],
+  "sheets": [
+   [
+    "G-001",
+    "Cover"
+   ],
+   [
+    "G-002",
+    "General Notes"
+   ],
+   [
+    "AS-101",
+    "Site Plan"
+   ],
+   [
+    "A-101",
+    "Level 1 Floor Plan"
+   ],
+   [
+    "A-102",
+    "Level 2 Floor Plan"
+   ],
+   [
+    "A-103",
+    "Roof Plan"
+   ],
+   [
+    "A-201",
+    "Exterior Elevations"
+   ],
+   [
+    "A-301",
+    "Building Section"
+   ],
+   [
+    "A-601",
+    "Room Schedule"
+   ],
+   [
+    "A-602",
+    "Door & Window Schedules"
+   ],
+   [
+    "A-701",
+    "Quantity Summary"
+   ]
+  ],
+  "windows": [
+   [
+    "A",
+    "3'-0\" x 4'-0\" single hung",
+    "3'-0\" x 4'-0\"",
+    "16",
+    "3'-0\"",
+    "7'-0\""
+   ],
+   [
+    "B",
+    "2'-0\" x 3'-0\" (bath, obscure)",
+    "2'-0\" x 3'-0\"",
+    "3",
+    "4'-0\"",
+    "7'-0\""
+   ]
+  ]
+ },
+ "house_2story_narrow": {
+  "audit": [
+   [
+    "PASS",
+    "Floor fully covered by rooms",
+    ""
+   ],
+   [
+    "PASS",
+    "No rooms overlap",
+    ""
+   ],
+   [
+    "PASS",
+    "Rooms inside the building",
+    ""
+   ],
+   [
+    "PASS",
+    "Habitable rooms at least 7 ft across",
+    ""
+   ],
+   [
+    "PASS",
+    "An entry door from outside",
+    ""
+   ],
+   [
+    "PASS",
+    "Every room has a door",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors don't swing into each other",
+    ""
+   ],
+   [
+    "PASS",
+    "Room sizes within 40% of the program",
+    ""
+   ],
+   [
+    "PASS",
+    "Every room reached from an outside door",
+    ""
+   ],
+   [
+    "PASS",
+    "No walking through bedrooms, baths or service rooms",
+    ""
+   ],
+   [
+    "PASS",
+    "Every habitable room has a window",
+    ""
+   ],
+   [
+    "PASS",
+    "Window glass at least 8% of floor area",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors and windows fit their walls, none overlap",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors at least 2'-0\" wide",
+    ""
+   ],
+   [
+    "PASS",
+    "Dimension string closes on the overall size",
+    ""
+   ],
+   [
+    "PASS",
+    "Gross area within 10% of the brief",
+    ""
+   ],
+   [
+    "PASS",
+    "Room schedule totals the plan",
+    "2,282 SF net"
+   ],
+   [
+    "PASS",
+    "Has a bedroom and a bath",
+    ""
+   ],
+   [
+    "PASS",
+    "Building inside the setbacks",
+    "setbacks assumed: front, rear"
+   ],
+   [
+    "PASS",
+    "FOR REVIEW - NOT FOR SEALING on the set",
+    ""
+   ]
+  ],
+  "doors": [
+   [
+    "101",
+    "A",
+    "3'-0\" x 6'-8\"",
+    "Exterior, insulated",
+    "EXTERIOR -> 101 STAIR HALL",
+    "L1 W1"
+   ],
+   [
+    "102",
+    "A",
+    "3'-0\" x 6'-8\"",
+    "Exterior, insulated",
+    "EXTERIOR -> 106 KITCHEN",
+    "L1 W3"
+   ],
+   [
+    "103",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "101 STAIR HALL -> 102 LIVING",
+    "L1 W5"
+   ],
+   [
+    "104",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "101 STAIR HALL -> 103 DINING",
+    "L1 W6"
+   ],
+   [
+    "105",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "101 STAIR HALL -> 104 POWDER",
+    "L1 W7"
+   ],
+   [
+    "106",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "106 KITCHEN -> 105 LAUNDRY / MECH",
+    "L1 W14"
+   ],
+   [
+    "107",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "101 STAIR HALL -> 106 KITCHEN",
+    "L1 W8"
+   ],
+   [
+    "201",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "201 STAIR HALL -> 202 PRIMARY BEDROOM",
+    "L2 W5"
+   ],
+   [
+    "202",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "201 STAIR HALL -> 203 BATH",
+    "L2 W6"
+   ],
+   [
+    "203",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "201 STAIR HALL -> 204 BEDROOM 2",
+    "L2 W7"
+   ],
+   [
+    "204",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "201 STAIR HALL -> 205 BEDROOM 3",
+    "L2 W8"
+   ]
+  ],
+  "notes": [
+   "Two-story single-family residence on a slab on grade; floor to floor 10'-0\" (wood floor framing).",
+   "Stair: 16 risers at about 7.50\", 10\" treads, 3'-6\" wide; guards and handrails by the design professional.",
+   "Bedrooms each have an operable window; verify egress requirements.",
+   "Kitchen and bath layouts are diagrammatic; fixture layouts by the design professional.",
+   "Floor framing, structure and the laundry and mechanical equipment are to be confirmed."
+  ],
+  "quantities": [
+   [
+    "Site & foundation",
+    "Slab on grade (house)",
+    1211.0,
+    "SF",
+    "outside face of the walls"
+   ],
+   [
+    "Site & foundation",
+    "Slab concrete, 4\" thick",
+    14.8,
+    "CY",
+    "slab area x thickness, no waste"
+   ],
+   [
+    "Site & foundation",
+    "Perimeter footing / thickened edge",
+    142.0,
+    "LF",
+    "house perimeter, outside face"
+   ],
+   [
+    "Framing & walls",
+    "L1 Exterior walls",
+    140.0,
+    "LF",
+    "centreline, 9 ft plate"
+   ],
+   [
+    "Framing & walls",
+    "L1 Exterior wall area, net",
+    1124.0,
+    "SF",
+    "gross less doors and windows (siding, sheathing, insulation)"
+   ],
+   [
+    "Framing & walls",
+    "L1 Interior partitions",
+    110.0,
+    "LF",
+    "centreline, 9 ft"
+   ],
+   [
+    "Framing & walls",
+    "L1 Gypsum board, walls",
+    2922.0,
+    "SF",
+    "partitions both sides + inside of exterior walls"
+   ],
+   [
+    "Framing & walls",
+    "L2 Exterior walls",
+    140.0,
+    "LF",
+    "centreline, 9 ft plate"
+   ],
+   [
+    "Framing & walls",
+    "L2 Exterior wall area, net",
+    1158.0,
+    "SF",
+    "gross less doors and windows (siding, sheathing, insulation)"
+   ],
+   [
+    "Framing & walls",
+    "L2 Interior partitions",
+    104.0,
+    "LF",
+    "centreline, 9 ft"
+   ],
+   [
+    "Framing & walls",
+    "L2 Gypsum board, walls",
+    2883.0,
+    "SF",
+    "partitions both sides + inside of exterior walls"
+   ],
+   [
+    "Framing & walls",
+    "Floor framing (level 2)",
+    1211.0,
+    "SF",
+    "over level 1, stairwell not deducted"
+   ],
+   [
+    "Framing & walls",
+    "Stair, 16 risers x 3.5 ft",
+    1,
+    "EA",
+    "7.50\" risers, 10\" treads, plus guards and rails"
+   ],
+   [
+    "Openings",
+    "Door A: Exterior, insulated",
+    2,
+    "EA",
+    "3'-0\" x 6'-8\""
+   ],
+   [
+    "Openings",
+    "Door B: Interior, hollow core",
+    9,
+    "EA",
+    "2'-8\" x 6'-8\""
+   ],
+   [
+    "Openings",
+    "Window A: 3'-0\" x 4'-0\" single hung",
+    16,
+    "EA",
+    "3'-0\" x 4'-0\""
+   ],
+   [
+    "Openings",
+    "Window B: 2'-0\" x 3'-0\" (bath, obscure)",
+    1,
+    "EA",
+    "2'-0\" x 3'-0\""
+   ],
+   [
+    "Finishes",
+    "Floor finish CPT",
+    757.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish CT",
+    140.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish LVP",
+    1385.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Base CT",
+    76.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Base WD",
+    628.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Ceiling GWB-PT",
+    2282.0,
+    "SF",
+    "room areas"
+   ],
+   [
+    "Roof",
+    "Roof, 6:12 gable",
+    1602.0,
+    "SF",
+    "plan area incl. 1.5 ft overhang x slope factor 1.118"
+   ],
+   [
+    "Roof",
+    "Roofing squares",
+    16.0,
+    "SQ",
+    "no waste"
+   ],
+   [
+    "Roof",
+    "Ridge",
+    46.0,
+    "LF",
+    ""
+   ],
+   [
+    "Roof",
+    "Eaves / gutters",
+    91.0,
+    "LF",
+    ""
+   ],
+   [
+    "Roof",
+    "Rakes",
+    70.0,
+    "LF",
+    ""
+   ],
+   [
+    "Site & foundation",
+    "Front walk, 4 ft",
+    100.0,
+    "SF",
+    "front door (or porch) to the lot line"
+   ]
+  ],
+  "rooms": [
+   [
+    "101",
+    "STAIR HALL",
+    "280",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "102",
+    "LIVING",
+    "348",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "103",
+    "DINING",
+    "187",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "104",
+    "POWDER",
+    "36",
+    "CT",
+    "CT",
+    "GWB-MR",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "105",
+    "LAUNDRY / MECH",
+    "88",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "106",
+    "KITCHEN",
+    "202",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "201",
+    "STAIR HALL",
+    "280",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "202",
+    "PRIMARY BEDROOM",
+    "327",
+    "CPT",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "203",
+    "BATH",
+    "104",
+    "CT",
+    "CT",
+    "GWB-MR",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "204",
+    "BEDROOM 2",
+    "208",
+    "CPT",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "205",
+    "BEDROOM 3",
+    "223",
+    "CPT",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ]
+  ],
+  "sheets": [
+   [
+    "G-001",
+    "Cover"
+   ],
+   [
+    "G-002",
+    "General Notes"
+   ],
+   [
+    "AS-101",
+    "Site Plan"
+   ],
+   [
+    "A-101",
+    "Level 1 Floor Plan"
+   ],
+   [
+    "A-102",
+    "Level 2 Floor Plan"
+   ],
+   [
+    "A-103",
+    "Roof Plan"
+   ],
+   [
+    "A-201",
+    "Exterior Elevations"
+   ],
+   [
+    "A-301",
+    "Building Section"
+   ],
+   [
+    "A-601",
+    "Room Schedule"
+   ],
+   [
+    "A-602",
+    "Door & Window Schedules"
+   ],
+   [
+    "A-701",
+    "Quantity Summary"
+   ]
+  ],
+  "windows": [
+   [
+    "A",
+    "3'-0\" x 4'-0\" single hung",
+    "3'-0\" x 4'-0\"",
+    "16",
+    "3'-0\"",
+    "7'-0\""
+   ],
+   [
+    "B",
+    "2'-0\" x 3'-0\" (bath, obscure)",
+    "2'-0\" x 3'-0\"",
+    "1",
+    "4'-0\"",
+    "7'-0\""
+   ]
+  ]
+ },
+ "house_garage": {
+  "audit": [
+   [
+    "PASS",
+    "Floor fully covered by rooms",
+    ""
+   ],
+   [
+    "PASS",
+    "No rooms overlap",
+    ""
+   ],
+   [
+    "PASS",
+    "Rooms inside the building",
+    ""
+   ],
+   [
+    "PASS",
+    "Habitable rooms at least 7 ft across",
+    ""
+   ],
+   [
+    "PASS",
+    "An entry door from outside",
+    ""
+   ],
+   [
+    "PASS",
+    "Every room has a door",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors don't swing into each other",
+    ""
+   ],
+   [
+    "WARN",
+    "Room sizes within 40% of the program",
+    "MECH"
+   ],
+   [
+    "PASS",
+    "Every room reached from an outside door",
+    ""
+   ],
+   [
+    "PASS",
+    "No walking through bedrooms, baths or service rooms",
+    ""
+   ],
+   [
+    "PASS",
+    "Every habitable room has a window",
+    ""
+   ],
+   [
+    "PASS",
+    "Window glass at least 8% of floor area",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors and windows fit their walls, none overlap",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors at least 2'-0\" wide",
+    ""
+   ],
+   [
+    "PASS",
+    "Dimension string closes on the overall size",
+    ""
+   ],
+   [
+    "PASS",
+    "Gross area within 10% of the brief",
+    ""
+   ],
+   [
+    "PASS",
+    "Room schedule totals the plan",
+    "1,792 SF net"
+   ],
+   [
+    "PASS",
+    "Has a bedroom and a bath",
+    ""
+   ],
+   [
+    "PASS",
+    "Garage door opens into the house (not a bedroom or bath)",
+    ""
+   ],
+   [
+    "PASS",
+    "No windows into the garage",
+    ""
+   ],
+   [
+    "PASS",
+    "Building inside the setbacks",
+    "setbacks assumed: front, rear, side"
+   ],
+   [
+    "PASS",
+    "FOR REVIEW - NOT FOR SEALING on the set",
+    ""
+   ]
+  ],
+  "doors": [
+   [
+    "101",
+    "A",
+    "3'-0\" x 6'-8\"",
+    "Exterior, insulated",
+    "EXTERIOR -> 101 LIVING",
+    "W1"
+   ],
+   [
+    "102",
+    "A",
+    "3'-0\" x 6'-8\"",
+    "Exterior, insulated",
+    "EXTERIOR -> 102 KITCHEN",
+    "W3"
+   ],
+   [
+    "103",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "101 LIVING -> 102 KITCHEN",
+    "W5"
+   ],
+   [
+    "104",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "101 LIVING -> 103 DINING",
+    "W6"
+   ],
+   [
+    "105",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "101 LIVING -> 104 HALL",
+    "W7"
+   ],
+   [
+    "106",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "104 HALL -> 105 BATH 1",
+    "W12"
+   ],
+   [
+    "107",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "104 HALL -> 106 BATH 2",
+    "W13"
+   ],
+   [
+    "108",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "104 HALL -> 107 PRIMARY BEDROOM",
+    "W14"
+   ],
+   [
+    "109",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "104 HALL -> 108 MECH",
+    "W15"
+   ],
+   [
+    "110",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "104 HALL -> 109 LAUNDRY",
+    "W16"
+   ],
+   [
+    "111",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "104 HALL -> 110 BEDROOM 2",
+    "W17"
+   ],
+   [
+    "112",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "104 HALL -> 111 BEDROOM 3",
+    "W18"
+   ],
+   [
+    "113",
+    "C",
+    "3'-0\" x 6'-8\"",
+    "Garage to house: fire-rated, self-closing (verify locally)",
+    "G01 GARAGE -> 104 HALL",
+    "W2"
+   ],
+   [
+    "OH1",
+    "OH",
+    "16'-0\" x 7'-0\"",
+    "Overhead sectional garage door, insulated",
+    "G01 GARAGE -> EXTERIOR",
+    "GAR"
+   ]
+  ],
+  "notes": [
+   "One-story single-family residence on a slab on grade.",
+   "Wood-frame exterior walls with gable roof; roof framing by others.",
+   "Bedrooms each have an operable window; verify egress requirements.",
+   "Kitchen and bath layouts are diagrammatic; fixture layouts by the design professional.",
+   "Mechanical room size and equipment are to be confirmed."
+  ],
+  "quantities": [
+   [
+    "Site & foundation",
+    "Slab on grade (house)",
+    1880.0,
+    "SF",
+    "outside face of the walls"
+   ],
+   [
+    "Site & foundation",
+    "Slab concrete, 4\" thick",
+    23.0,
+    "CY",
+    "slab area x thickness, no waste"
+   ],
+   [
+    "Site & foundation",
+    "Perimeter footing / thickened edge",
+    178.0,
+    "LF",
+    "house perimeter, outside face"
+   ],
+   [
+    "Framing & walls",
+    "Exterior walls",
+    176.0,
+    "LF",
+    "centreline, 9 ft plate"
+   ],
+   [
+    "Framing & walls",
+    "Exterior wall area, net",
+    1368.0,
+    "SF",
+    "gross less doors and windows (siding, sheathing, insulation)"
+   ],
+   [
+    "Framing & walls",
+    "Interior partitions",
+    208.0,
+    "LF",
+    "centreline, 9 ft"
+   ],
+   [
+    "Framing & walls",
+    "Gypsum board, walls",
+    4761.0,
+    "SF",
+    "partitions both sides + inside of exterior walls"
+   ],
+   [
+    "Openings",
+    "Door A: Exterior, insulated",
+    2,
+    "EA",
+    "3'-0\" x 6'-8\""
+   ],
+   [
+    "Openings",
+    "Door B: Interior, hollow core",
+    10,
+    "EA",
+    "2'-8\" x 6'-8\""
+   ],
+   [
+    "Openings",
+    "Door C: Garage to house: fire-rated, self-closing (verify locally)",
+    1,
+    "EA",
+    "3'-0\" x 6'-8\""
+   ],
+   [
+    "Openings",
+    "Window A: 3'-0\" x 4'-0\" single hung",
+    12,
+    "EA",
+    "3'-0\" x 4'-0\""
+   ],
+   [
+    "Openings",
+    "Window B: 2'-0\" x 3'-0\" (bath, obscure)",
+    2,
+    "EA",
+    "2'-0\" x 3'-0\""
+   ],
+   [
+    "Finishes",
+    "Floor finish CPT",
+    686.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish CT",
+    206.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish LVP",
+    841.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish SC",
+    59.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Base CT",
+    87.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Base RB",
+    38.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Base WD",
+    466.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Ceiling EXP",
+    59.0,
+    "SF",
+    "room areas"
+   ],
+   [
+    "Finishes",
+    "Ceiling GWB-PT",
+    1733.0,
+    "SF",
+    "room areas"
+   ],
+   [
+    "Roof",
+    "Roof, 6:12 gable",
+    2411.0,
+    "SF",
+    "plan area incl. 1.5 ft overhang x slope factor 1.118"
+   ],
+   [
+    "Roof",
+    "Roofing squares",
+    24.1,
+    "SQ",
+    "no waste"
+   ],
+   [
+    "Roof",
+    "Ridge",
+    58.0,
+    "LF",
+    ""
+   ],
+   [
+    "Roof",
+    "Eaves / gutters",
+    115.0,
+    "LF",
+    ""
+   ],
+   [
+    "Roof",
+    "Rakes",
+    84.0,
+    "LF",
+    ""
+   ],
+   [
+    "Site & foundation",
+    "Driveway paving",
+    450.0,
+    "SF",
+    "overhead doors + 1 ft each side, to the lot line"
+   ],
+   [
+    "Site & foundation",
+    "Front walk, 4 ft",
+    100.0,
+    "SF",
+    "front door (or porch) to the lot line"
+   ],
+   [
+    "Garage, porch & deck",
+    "Garage slab (2-car)",
+    495.0,
+    "SF",
+    ""
+   ],
+   [
+    "Garage, porch & deck",
+    "Garage walls (3 sides)",
+    66.0,
+    "LF",
+    "9 ft plate, overhead door openings not deducted"
+   ],
+   [
+    "Garage, porch & deck",
+    "Garage roof",
+    617.0,
+    "SF",
+    ""
+   ],
+   [
+    "Garage, porch & deck",
+    "Overhead door OH1",
+    1,
+    "EA",
+    "16 x 7 ft"
+   ]
+  ],
+  "rooms": [
+   [
+    "101",
+    "LIVING",
+    "389",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "102",
+    "KITCHEN",
+    "137",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "103",
+    "DINING",
+    "102",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "104",
+    "HALL",
+    "139",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "105",
+    "BATH 1",
+    "103",
+    "CT",
+    "CT",
+    "GWB-MR",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "106",
+    "BATH 2",
+    "103",
+    "CT",
+    "CT",
+    "GWB-MR",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "107",
+    "PRIMARY BEDROOM",
+    "306",
+    "CPT",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "108",
+    "MECH",
+    "59",
+    "SC",
+    "RB",
+    "GWB",
+    "EXP",
+    "9'-0\""
+   ],
+   [
+    "109",
+    "LAUNDRY",
+    "74",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "110",
+    "BEDROOM 2",
+    "192",
+    "CPT",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "111",
+    "BEDROOM 3",
+    "188",
+    "CPT",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "G01",
+    "GARAGE (2-CAR) - NOT HEATED",
+    "462",
+    "SC",
+    "-",
+    "GWB-FR",
+    "EXP",
+    "9'-0\""
+   ]
+  ],
+  "sheets": [
+   [
+    "G-001",
+    "Cover"
+   ],
+   [
+    "G-002",
+    "General Notes"
+   ],
+   [
+    "AS-101",
+    "Site Plan"
+   ],
+   [
+    "A-101",
+    "Floor Plan"
+   ],
+   [
+    "A-102",
+    "Roof Plan"
+   ],
+   [
+    "A-201",
+    "Exterior Elevations"
+   ],
+   [
+    "A-301",
+    "Building Section"
+   ],
+   [
+    "A-601",
+    "Room Schedule"
+   ],
+   [
+    "A-602",
+    "Door & Window Schedules"
+   ],
+   [
+    "A-701",
+    "Quantity Summary"
+   ]
+  ],
+  "windows": [
+   [
+    "A",
+    "3'-0\" x 4'-0\" single hung",
+    "3'-0\" x 4'-0\"",
+    "12",
+    "3'-0\"",
+    "7'-0\""
+   ],
+   [
+    "B",
+    "2'-0\" x 3'-0\" (bath, obscure)",
+    "2'-0\" x 3'-0\"",
+    "2",
+    "4'-0\"",
+    "7'-0\""
+   ]
+  ]
+ },
+ "house_narrow_lot": {
+  "audit": [
+   [
+    "PASS",
+    "Floor fully covered by rooms",
+    ""
+   ],
+   [
+    "PASS",
+    "No rooms overlap",
+    ""
+   ],
+   [
+    "PASS",
+    "Rooms inside the building",
+    ""
+   ],
+   [
+    "PASS",
+    "Habitable rooms at least 7 ft across",
+    ""
+   ],
+   [
+    "PASS",
+    "An entry door from outside",
+    ""
+   ],
+   [
+    "PASS",
+    "Every room has a door",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors don't swing into each other",
+    ""
+   ],
+   [
+    "WARN",
+    "Room sizes within 40% of the program",
+    "MECH"
+   ],
+   [
+    "PASS",
+    "Every room reached from an outside door",
+    ""
+   ],
+   [
+    "PASS",
+    "No walking through bedrooms, baths or service rooms",
+    ""
+   ],
+   [
+    "PASS",
+    "Every habitable room has a window",
+    ""
+   ],
+   [
+    "PASS",
+    "Window glass at least 8% of floor area",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors and windows fit their walls, none overlap",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors at least 2'-0\" wide",
+    ""
+   ],
+   [
+    "PASS",
+    "Dimension string closes on the overall size",
+    ""
+   ],
+   [
+    "PASS",
+    "Gross area within 10% of the brief",
+    ""
+   ],
+   [
+    "PASS",
+    "Room schedule totals the plan",
+    "1,581 SF net"
+   ],
+   [
+    "PASS",
+    "Has a bedroom and a bath",
+    ""
+   ],
+   [
+    "PASS",
+    "Building inside the setbacks",
+    "setbacks assumed: front, rear"
+   ],
+   [
+    "PASS",
+    "FOR REVIEW - NOT FOR SEALING on the set",
+    ""
+   ]
+  ],
+  "doors": [
+   [
+    "101",
+    "A",
+    "3'-0\" x 6'-8\"",
+    "Exterior, insulated",
+    "EXTERIOR -> 101 LIVING",
+    "W1"
+   ],
+   [
+    "102",
+    "A",
+    "3'-0\" x 6'-8\"",
+    "Exterior, insulated",
+    "EXTERIOR -> 104 HALL",
+    "W3"
+   ],
+   [
+    "103",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "101 LIVING -> 102 KITCHEN",
+    "W5"
+   ],
+   [
+    "104",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "101 LIVING -> 103 DINING",
+    "W6"
+   ],
+   [
+    "105",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "101 LIVING -> 104 HALL",
+    "W7"
+   ],
+   [
+    "106",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "104 HALL -> 105 BATH 1",
+    "W12"
+   ],
+   [
+    "107",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "104 HALL -> 106 BATH 2",
+    "W13"
+   ],
+   [
+    "108",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "104 HALL -> 107 PRIMARY BEDROOM",
+    "W14"
+   ],
+   [
+    "109",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "104 HALL -> 108 MECH",
+    "W15"
+   ],
+   [
+    "110",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "104 HALL -> 109 LAUNDRY",
+    "W16"
+   ],
+   [
+    "111",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "104 HALL -> 110 BEDROOM 2",
+    "W17"
+   ],
+   [
+    "112",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "104 HALL -> 111 BEDROOM 3",
+    "W18"
+   ]
+  ],
+  "notes": [
+   "One-story single-family residence on a slab on grade.",
+   "Wood-frame exterior walls with gable roof; roof framing by others.",
+   "Bedrooms each have an operable window; verify egress requirements.",
+   "Kitchen and bath layouts are diagrammatic; fixture layouts by the design professional.",
+   "Mechanical room size and equipment are to be confirmed."
+  ],
+  "quantities": [
+   [
+    "Site & foundation",
+    "Slab on grade (house)",
+    1667.0,
+    "SF",
+    "outside face of the walls"
+   ],
+   [
+    "Site & foundation",
+    "Slab concrete, 4\" thick",
+    20.4,
+    "CY",
+    "slab area x thickness, no waste"
+   ],
+   [
+    "Site & foundation",
+    "Perimeter footing / thickened edge",
+    174.0,
+    "LF",
+    "house perimeter, outside face"
+   ],
+   [
+    "Framing & walls",
+    "Exterior walls",
+    172.0,
+    "LF",
+    "centreline, 9 ft plate"
+   ],
+   [
+    "Framing & walls",
+    "Exterior wall area, net",
+    1364.0,
+    "SF",
+    "gross less doors and windows (siding, sheathing, insulation)"
+   ],
+   [
+    "Framing & walls",
+    "Interior partitions",
+    190.0,
+    "LF",
+    "centreline, 9 ft"
+   ],
+   [
+    "Framing & walls",
+    "Gypsum board, walls",
+    4433.0,
+    "SF",
+    "partitions both sides + inside of exterior walls"
+   ],
+   [
+    "Openings",
+    "Door A: Exterior, insulated",
+    2,
+    "EA",
+    "3'-0\" x 6'-8\""
+   ],
+   [
+    "Openings",
+    "Door B: Interior, hollow core",
+    10,
+    "EA",
+    "2'-8\" x 6'-8\""
+   ],
+   [
+    "Openings",
+    "Window A: 3'-0\" x 4'-0\" single hung",
+    11,
+    "EA",
+    "3'-0\" x 4'-0\""
+   ],
+   [
+    "Openings",
+    "Window B: 2'-0\" x 3'-0\" (bath, obscure)",
+    2,
+    "EA",
+    "2'-0\" x 3'-0\""
+   ],
+   [
+    "Finishes",
+    "Floor finish CPT",
+    570.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish CT",
+    188.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish LVP",
+    776.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish SC",
+    47.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Base CT",
+    79.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Base RB",
+    32.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Base WD",
+    440.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Ceiling EXP",
+    47.0,
+    "SF",
+    "room areas"
+   ],
+   [
+    "Finishes",
+    "Ceiling GWB-PT",
+    1534.0,
+    "SF",
+    "room areas"
+   ],
+   [
+    "Roof",
+    "Roof, 6:12 gable",
+    2166.0,
+    "SF",
+    "plan area incl. 1.5 ft overhang x slope factor 1.118"
+   ],
+   [
+    "Roof",
+    "Roofing squares",
+    21.7,
+    "SQ",
+    "no waste"
+   ],
+   [
+    "Roof",
+    "Ridge",
+    62.0,
+    "LF",
+    ""
+   ],
+   [
+    "Roof",
+    "Eaves / gutters",
+    123.0,
+    "LF",
+    ""
+   ],
+   [
+    "Roof",
+    "Rakes",
+    70.0,
+    "LF",
+    ""
+   ],
+   [
+    "Site & foundation",
+    "Front walk, 4 ft",
+    100.0,
+    "SF",
+    "front door (or porch) to the lot line"
+   ]
+  ],
+  "rooms": [
+   [
+    "101",
+    "LIVING",
+    "368",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "102",
+    "KITCHEN",
+    "115",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "103",
+    "DINING",
+    "88",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "104",
+    "HALL",
+    "147",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "105",
+    "BATH 1",
+    "94",
+    "CT",
+    "CT",
+    "GWB-MR",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "106",
+    "BATH 2",
+    "94",
+    "CT",
+    "CT",
+    "GWB-MR",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "107",
+    "PRIMARY BEDROOM",
+    "244",
+    "CPT",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "108",
+    "MECH",
+    "47",
+    "SC",
+    "RB",
+    "GWB",
+    "EXP",
+    "9'-0\""
+   ],
+   [
+    "109",
+    "LAUNDRY",
+    "59",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "110",
+    "BEDROOM 2",
+    "164",
+    "CPT",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "111",
+    "BEDROOM 3",
+    "162",
+    "CPT",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ]
+  ],
+  "sheets": [
+   [
+    "G-001",
+    "Cover"
+   ],
+   [
+    "G-002",
+    "General Notes"
+   ],
+   [
+    "AS-101",
+    "Site Plan"
+   ],
+   [
+    "A-101",
+    "Floor Plan"
+   ],
+   [
+    "A-102",
+    "Roof Plan"
+   ],
+   [
+    "A-201",
+    "Exterior Elevations"
+   ],
+   [
+    "A-301",
+    "Building Section"
+   ],
+   [
+    "A-601",
+    "Room Schedule"
+   ],
+   [
+    "A-602",
+    "Door & Window Schedules"
+   ],
+   [
+    "A-701",
+    "Quantity Summary"
+   ]
+  ],
+  "windows": [
+   [
+    "A",
+    "3'-0\" x 4'-0\" single hung",
+    "3'-0\" x 4'-0\"",
+    "11",
+    "3'-0\"",
+    "7'-0\""
+   ],
+   [
+    "B",
+    "2'-0\" x 3'-0\" (bath, obscure)",
+    "2'-0\" x 3'-0\"",
+    "2",
+    "4'-0\"",
+    "7'-0\""
+   ]
+  ]
+ },
+ "house_porch": {
+  "audit": [
+   [
+    "PASS",
+    "Floor fully covered by rooms",
+    ""
+   ],
+   [
+    "PASS",
+    "No rooms overlap",
+    ""
+   ],
+   [
+    "PASS",
+    "Rooms inside the building",
+    ""
+   ],
+   [
+    "PASS",
+    "Habitable rooms at least 7 ft across",
+    ""
+   ],
+   [
+    "PASS",
+    "An entry door from outside",
+    ""
+   ],
+   [
+    "PASS",
+    "Every room has a door",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors don't swing into each other",
+    ""
+   ],
+   [
+    "WARN",
+    "Room sizes within 40% of the program",
+    "MECH, LAUNDRY"
+   ],
+   [
+    "PASS",
+    "Every room reached from an outside door",
+    ""
+   ],
+   [
+    "PASS",
+    "No walking through bedrooms, baths or service rooms",
+    ""
+   ],
+   [
+    "PASS",
+    "Every habitable room has a window",
+    ""
+   ],
+   [
+    "PASS",
+    "Window glass at least 8% of floor area",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors and windows fit their walls, none overlap",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors at least 2'-0\" wide",
+    ""
+   ],
+   [
+    "PASS",
+    "Dimension string closes on the overall size",
+    ""
+   ],
+   [
+    "PASS",
+    "Gross area within 10% of the brief",
+    ""
+   ],
+   [
+    "PASS",
+    "Room schedule totals the plan",
+    "1,559 SF net"
+   ],
+   [
+    "PASS",
+    "Has a bedroom and a bath",
+    ""
+   ],
+   [
+    "PASS",
+    "Building inside the setbacks",
+    "setbacks assumed: front, rear, side"
+   ],
+   [
+    "PASS",
+    "FOR REVIEW - NOT FOR SEALING on the set",
+    ""
+   ]
+  ],
+  "doors": [
+   [
+    "101",
+    "A",
+    "3'-0\" x 6'-8\"",
+    "Exterior, insulated",
+    "EXTERIOR -> 101 LIVING",
+    "W1"
+   ],
+   [
+    "102",
+    "A",
+    "3'-0\" x 6'-8\"",
+    "Exterior, insulated",
+    "EXTERIOR -> 102 KITCHEN",
+    "W3"
+   ],
+   [
+    "103",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "101 LIVING -> 102 KITCHEN",
+    "W5"
+   ],
+   [
+    "104",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "101 LIVING -> 103 DINING",
+    "W6"
+   ],
+   [
+    "105",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "101 LIVING -> 104 HALL",
+    "W7"
+   ],
+   [
+    "106",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "104 HALL -> 105 MECH",
+    "W12"
+   ],
+   [
+    "107",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "104 HALL -> 106 BATH 1",
+    "W13"
+   ],
+   [
+    "108",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "104 HALL -> 107 BATH 2",
+    "W14"
+   ],
+   [
+    "109",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "104 HALL -> 108 PRIMARY BEDROOM",
+    "W15"
+   ],
+   [
+    "110",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "104 HALL -> 109 LAUNDRY",
+    "W16"
+   ],
+   [
+    "111",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "104 HALL -> 110 BEDROOM 2",
+    "W17"
+   ],
+   [
+    "112",
+    "B",
+    "2'-8\" x 6'-8\"",
+    "Interior, hollow core",
+    "104 HALL -> 111 BEDROOM 3",
+    "W18"
+   ]
+  ],
+  "notes": [
+   "One-story single-family residence on a slab on grade.",
+   "Wood-frame exterior walls with gable roof; roof framing by others.",
+   "Bedrooms each have an operable window; verify egress requirements.",
+   "Kitchen and bath layouts are diagrammatic; fixture layouts by the design professional.",
+   "Mechanical room size and equipment are to be confirmed."
+  ],
+  "quantities": [
+   [
+    "Site & foundation",
+    "Slab on grade (house)",
+    1641.0,
+    "SF",
+    "outside face of the walls"
+   ],
+   [
+    "Site & foundation",
+    "Slab concrete, 4\" thick",
+    20.1,
+    "CY",
+    "slab area x thickness, no waste"
+   ],
+   [
+    "Site & foundation",
+    "Perimeter footing / thickened edge",
+    166.0,
+    "LF",
+    "house perimeter, outside face"
+   ],
+   [
+    "Framing & walls",
+    "Exterior walls",
+    164.0,
+    "LF",
+    "centreline, 9 ft plate"
+   ],
+   [
+    "Framing & walls",
+    "Exterior wall area, net",
+    1292.0,
+    "SF",
+    "gross less doors and windows (siding, sheathing, insulation)"
+   ],
+   [
+    "Framing & walls",
+    "Interior partitions",
+    193.0,
+    "LF",
+    "centreline, 9 ft"
+   ],
+   [
+    "Framing & walls",
+    "Gypsum board, walls",
+    4415.0,
+    "SF",
+    "partitions both sides + inside of exterior walls"
+   ],
+   [
+    "Openings",
+    "Door A: Exterior, insulated",
+    2,
+    "EA",
+    "3'-0\" x 6'-8\""
+   ],
+   [
+    "Openings",
+    "Door B: Interior, hollow core",
+    10,
+    "EA",
+    "2'-8\" x 6'-8\""
+   ],
+   [
+    "Openings",
+    "Window A: 3'-0\" x 4'-0\" single hung",
+    11,
+    "EA",
+    "3'-0\" x 4'-0\""
+   ],
+   [
+    "Openings",
+    "Window B: 2'-0\" x 3'-0\" (bath, obscure)",
+    2,
+    "EA",
+    "2'-0\" x 3'-0\""
+   ],
+   [
+    "Finishes",
+    "Floor finish CPT",
+    571.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish CT",
+    165.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish LVP",
+    769.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish SC",
+    55.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Base CT",
+    79.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Base RB",
+    36.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Base WD",
+    434.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Ceiling EXP",
+    55.0,
+    "SF",
+    "room areas"
+   ],
+   [
+    "Finishes",
+    "Ceiling GWB-PT",
+    1504.0,
+    "SF",
+    "room areas"
+   ],
+   [
+    "Roof",
+    "Roof, 6:12 gable",
+    2123.0,
+    "SF",
+    "plan area incl. 1.5 ft overhang x slope factor 1.118"
+   ],
+   [
+    "Roof",
+    "Roofing squares",
+    21.2,
+    "SQ",
+    "no waste"
+   ],
+   [
+    "Roof",
+    "Ridge",
+    54.0,
+    "LF",
+    ""
+   ],
+   [
+    "Roof",
+    "Eaves / gutters",
+    107.0,
+    "LF",
+    ""
+   ],
+   [
+    "Roof",
+    "Rakes",
+    79.0,
+    "LF",
+    ""
+   ],
+   [
+    "Site & foundation",
+    "Front walk, 4 ft",
+    76.0,
+    "SF",
+    "front door (or porch) to the lot line"
+   ],
+   [
+    "Garage, porch & deck",
+    "Porch slab",
+    106.0,
+    "SF",
+    ""
+   ],
+   [
+    "Garage, porch & deck",
+    "Porch roof",
+    122.0,
+    "SF",
+    ""
+   ],
+   [
+    "Garage, porch & deck",
+    "Porch posts",
+    3,
+    "EA",
+    ""
+   ],
+   [
+    "Garage, porch & deck",
+    "Deck",
+    160.0,
+    "SF",
+    "framing and decking"
+   ],
+   [
+    "Garage, porch & deck",
+    "Deck guard",
+    36.0,
+    "LF",
+    "36\" - verify stairs and guards locally"
+   ]
+  ],
+  "rooms": [
+   [
+    "101",
+    "LIVING",
+    "351",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "102",
+    "KITCHEN",
+    "126",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "103",
+    "DINING",
+    "82",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "104",
+    "HALL",
+    "127",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "105",
+    "MECH",
+    "55",
+    "SC",
+    "RB",
+    "GWB",
+    "EXP",
+    "9'-0\""
+   ],
+   [
+    "106",
+    "BATH 1",
+    "82",
+    "CT",
+    "CT",
+    "GWB-MR",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "107",
+    "BATH 2",
+    "82",
+    "CT",
+    "CT",
+    "GWB-MR",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "108",
+    "PRIMARY BEDROOM",
+    "217",
+    "CPT",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "109",
+    "LAUNDRY",
+    "82",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "110",
+    "BEDROOM 2",
+    "179",
+    "CPT",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ],
+   [
+    "111",
+    "BEDROOM 3",
+    "175",
+    "CPT",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "9'-0\""
+   ]
+  ],
+  "sheets": [
+   [
+    "G-001",
+    "Cover"
+   ],
+   [
+    "G-002",
+    "General Notes"
+   ],
+   [
+    "AS-101",
+    "Site Plan"
+   ],
+   [
+    "A-101",
+    "Floor Plan"
+   ],
+   [
+    "A-102",
+    "Roof Plan"
+   ],
+   [
+    "A-201",
+    "Exterior Elevations"
+   ],
+   [
+    "A-301",
+    "Building Section"
+   ],
+   [
+    "A-601",
+    "Room Schedule"
+   ],
+   [
+    "A-602",
+    "Door & Window Schedules"
+   ],
+   [
+    "A-701",
+    "Quantity Summary"
+   ]
+  ],
+  "windows": [
+   [
+    "A",
+    "3'-0\" x 4'-0\" single hung",
+    "3'-0\" x 4'-0\"",
+    "11",
+    "3'-0\"",
+    "7'-0\""
+   ],
+   [
+    "B",
+    "2'-0\" x 3'-0\" (bath, obscure)",
+    "2'-0\" x 3'-0\"",
+    "2",
+    "4'-0\"",
+    "7'-0\""
+   ]
+  ]
+ },
+ "office": {
+  "ada": [
+   [
+    "PASS",
+    "Door clear width",
+    "Every door 32 in. clear minimum",
+    "404.2.3"
+   ],
+   [
+    "PASS",
+    "Door maneuvering depth",
+    "60 in. pull side and 48 in. push side available",
+    "404.2.4.1"
+   ],
+   [
+    "PASS",
+    "Latch-side clearance",
+    "18 in. of wall beside each interior door",
+    "404.2.4.1"
+   ],
+   [
+    "PASS",
+    "Restroom turning space",
+    "60 in. turning circle fits in each restroom",
+    "603.2.1 / 304.3.1"
+   ],
+   [
+    "WARN",
+    "Water closet clearance",
+    "Lay out 60 x 56 in. clear at the toilet, its centerline 16-18 in. from the side wall; grab bars per 604.5",
+    "604.2 / 604.3.1"
+   ],
+   [
+    "PASS",
+    "Accessible route width",
+    "Halls and routes 36 in. clear minimum",
+    "403.5.1"
+   ],
+   [
+    "PASS",
+    "Route to every room",
+    "Every room is reached through doors from the entrance",
+    "206.2.4"
+   ],
+   [
+    "PASS",
+    "Accessible entrance",
+    "1 entrance door(s), 36 in. leaf; keep the landing level and the threshold 1/2 in. max",
+    "206.4 / 404.2.5"
+   ]
+  ],
+  "audit": [
+   [
+    "PASS",
+    "Floor fully covered by rooms",
+    ""
+   ],
+   [
+    "PASS",
+    "No rooms overlap",
+    ""
+   ],
+   [
+    "PASS",
+    "Rooms inside the building",
+    ""
+   ],
+   [
+    "PASS",
+    "Habitable rooms at least 7 ft across",
+    ""
+   ],
+   [
+    "PASS",
+    "An entry door from outside",
+    ""
+   ],
+   [
+    "PASS",
+    "Every room has a door",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors don't swing into each other",
+    ""
+   ],
+   [
+    "PASS",
+    "Room sizes within 40% of the program",
+    ""
+   ],
+   [
+    "PASS",
+    "Every room reached from an outside door",
+    ""
+   ],
+   [
+    "PASS",
+    "No walking through bedrooms, baths or service rooms",
+    ""
+   ],
+   [
+    "PASS",
+    "Every habitable room has a window",
+    ""
+   ],
+   [
+    "PASS",
+    "Window glass at least 8% of floor area",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors and windows fit their walls, none overlap",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors at least 2'-0\" wide",
+    ""
+   ],
+   [
+    "PASS",
+    "Dimension string closes on the overall size",
+    ""
+   ],
+   [
+    "PASS",
+    "Gross area within 10% of the brief",
+    ""
+   ],
+   [
+    "PASS",
+    "Room schedule totals the plan",
+    "2,328 SF net"
+   ],
+   [
+    "PASS",
+    "Has a restroom",
+    ""
+   ],
+   [
+    "PASS",
+    "Building inside the setbacks",
+    "setbacks assumed: front, rear, side"
+   ],
+   [
+    "PASS",
+    "FOR REVIEW - NOT FOR SEALING on the set",
+    ""
+   ]
+  ],
+  "doors": [
+   [
+    "101",
+    "A",
+    "3'-0\" x 6'-8\"",
+    "Exterior, insulated",
+    "EXTERIOR -> 101 OPEN OFFICE",
+    "W1"
+   ],
+   [
+    "102",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "101 OPEN OFFICE -> 102 CONFERENCE",
+    "W5"
+   ],
+   [
+    "103",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "101 OPEN OFFICE -> 103 BREAK ROOM",
+    "W6"
+   ],
+   [
+    "104",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "101 OPEN OFFICE -> 104 HALL",
+    "W7"
+   ],
+   [
+    "105",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "104 HALL -> 105 RESTROOM 1",
+    "W12"
+   ],
+   [
+    "106",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "104 HALL -> 106 STORAGE",
+    "W13"
+   ],
+   [
+    "107",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "104 HALL -> 107 OFFICE 1",
+    "W14"
+   ],
+   [
+    "108",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "104 HALL -> 108 MECH",
+    "W15"
+   ],
+   [
+    "109",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "104 HALL -> 109 RESTROOM 2",
+    "W16"
+   ],
+   [
+    "110",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "104 HALL -> 110 OFFICE 2",
+    "W17"
+   ]
+  ],
+  "notes": [
+   "One-story commercial building on a slab on grade.",
+   "Flat roof with parapet; roof drainage by others.",
+   "Restrooms are diagrammatic; fixture counts and accessible layouts by the design professional.",
+   "Tenant finishes are as scheduled unless noted otherwise.",
+   "Storefront and exterior door hardware to be confirmed."
+  ],
+  "quantities": [
+   [
+    "Site & foundation",
+    "Slab on grade (house)",
+    2432.0,
+    "SF",
+    "outside face of the walls"
+   ],
+   [
+    "Site & foundation",
+    "Slab concrete, 4\" thick",
+    29.7,
+    "CY",
+    "slab area x thickness, no waste"
+   ],
+   [
+    "Site & foundation",
+    "Perimeter footing / thickened edge",
+    210.0,
+    "LF",
+    "house perimeter, outside face"
+   ],
+   [
+    "Framing & walls",
+    "Exterior walls",
+    208.0,
+    "LF",
+    "centreline, 12 ft plate"
+   ],
+   [
+    "Framing & walls",
+    "Exterior wall area, net",
+    2320.0,
+    "SF",
+    "gross less doors and windows (siding, sheathing, insulation)"
+   ],
+   [
+    "Framing & walls",
+    "Interior partitions",
+    196.0,
+    "LF",
+    "centreline, 12 ft"
+   ],
+   [
+    "Framing & walls",
+    "Gypsum board, walls",
+    6652.0,
+    "SF",
+    "partitions both sides + inside of exterior walls"
+   ],
+   [
+    "Openings",
+    "Door A: Exterior, insulated",
+    1,
+    "EA",
+    "3'-0\" x 6'-8\""
+   ],
+   [
+    "Openings",
+    "Door B: Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    9,
+    "EA",
+    "3'-0\" x 6'-8\""
+   ],
+   [
+    "Openings",
+    "Window A: 3'-0\" x 4'-0\" single hung",
+    13,
+    "EA",
+    "3'-0\" x 4'-0\""
+   ],
+   [
+    "Finishes",
+    "Floor finish CPT-T",
+    1589.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish CT",
+    206.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish LVP",
+    160.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish LVT",
+    194.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish SC",
+    179.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Base CT",
+    85.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Base RB",
+    446.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Base WD",
+    66.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Ceiling ACT",
+    1783.0,
+    "SF",
+    "room areas"
+   ],
+   [
+    "Finishes",
+    "Ceiling EXP",
+    179.0,
+    "SF",
+    "room areas"
+   ],
+   [
+    "Finishes",
+    "Ceiling GWB-PT",
+    367.0,
+    "SF",
+    "room areas"
+   ],
+   [
+    "Roof",
+    "Low-slope roof membrane",
+    2432.0,
+    "SF",
+    "inside the parapet, no turn-ups"
+   ],
+   [
+    "Roof",
+    "Parapet",
+    210.0,
+    "LF",
+    "3 ft high"
+   ],
+   [
+    "Roof",
+    "Roof drains",
+    2,
+    "EA",
+    "plus overflows - by the design professional"
+   ],
+   [
+    "Site & foundation",
+    "Front walk, 4 ft",
+    80.0,
+    "SF",
+    "front door (or porch) to the lot line"
+   ]
+  ],
+  "rooms": [
+   [
+    "101",
+    "OPEN OFFICE",
+    "973",
+    "CPT-T",
+    "RB",
+    "GWB-PT",
+    "ACT",
+    "10'-0\""
+   ],
+   [
+    "102",
+    "CONFERENCE",
+    "266",
+    "CPT-T",
+    "RB",
+    "GWB-PT",
+    "ACT",
+    "10'-0\""
+   ],
+   [
+    "103",
+    "BREAK ROOM",
+    "194",
+    "LVT",
+    "RB",
+    "GWB-PT",
+    "ACT",
+    "10'-0\""
+   ],
+   [
+    "104",
+    "HALL",
+    "160",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "10'-0\""
+   ],
+   [
+    "105",
+    "RESTROOM 1",
+    "96",
+    "CT",
+    "CT",
+    "GWB-MR",
+    "GWB-PT",
+    "10'-0\""
+   ],
+   [
+    "106",
+    "STORAGE",
+    "96",
+    "SC",
+    "RB",
+    "GWB-PT",
+    "EXP",
+    "10'-0\""
+   ],
+   [
+    "107",
+    "OFFICE 1",
+    "175",
+    "CPT-T",
+    "RB",
+    "GWB-PT",
+    "ACT",
+    "10'-0\""
+   ],
+   [
+    "108",
+    "MECH",
+    "82",
+    "SC",
+    "RB",
+    "GWB",
+    "EXP",
+    "10'-0\""
+   ],
+   [
+    "109",
+    "RESTROOM 2",
+    "110",
+    "CT",
+    "CT",
+    "GWB-MR",
+    "GWB-PT",
+    "10'-0\""
+   ],
+   [
+    "110",
+    "OFFICE 2",
+    "175",
+    "CPT-T",
+    "RB",
+    "GWB-PT",
+    "ACT",
+    "10'-0\""
+   ]
+  ],
+  "scoping": {
+   "accessible_entrances": 1,
+   "public_entrances": 1,
+   "sf_per_story": 2380,
+   "single_user_toilets_cluster": 2,
+   "stories": 1,
+   "title": "III",
+   "toilet_rooms": [
+    {
+     "lavatories": 1,
+     "name": "RESTROOM 1",
+     "water_closets": 1
+    },
+    {
+     "lavatories": 1,
+     "name": "RESTROOM 2",
+     "water_closets": 1
+    }
+   ],
+   "use": "office"
+  },
+  "sheets": [
+   [
+    "G-001",
+    "Cover"
+   ],
+   [
+    "G-002",
+    "General Notes"
+   ],
+   [
+    "G-003",
+    "Code Summary"
+   ],
+   [
+    "AS-101",
+    "Site Plan"
+   ],
+   [
+    "A-101",
+    "Floor Plan"
+   ],
+   [
+    "A-102",
+    "Roof Plan"
+   ],
+   [
+    "A-201",
+    "Exterior Elevations"
+   ],
+   [
+    "A-301",
+    "Building Section"
+   ],
+   [
+    "A-601",
+    "Room Schedule"
+   ],
+   [
+    "A-602",
+    "Door & Window Schedules"
+   ],
+   [
+    "A-701",
+    "Quantity Summary"
+   ],
+   [
+    "A-801",
+    "Accessibility"
+   ]
+  ],
+  "windows": [
+   [
+    "A",
+    "3'-0\" x 4'-0\" single hung",
+    "3'-0\" x 4'-0\"",
+    "13",
+    "3'-0\"",
+    "7'-0\""
+   ]
+  ]
+ },
+ "office_8000": {
+  "ada": [
+   [
+    "PASS",
+    "Door clear width",
+    "Every door 32 in. clear minimum",
+    "404.2.3"
+   ],
+   [
+    "PASS",
+    "Door maneuvering depth",
+    "60 in. pull side and 48 in. push side available",
+    "404.2.4.1"
+   ],
+   [
+    "PASS",
+    "Latch-side clearance",
+    "18 in. of wall beside each interior door",
+    "404.2.4.1"
+   ],
+   [
+    "PASS",
+    "Restroom turning space",
+    "60 in. turning circle fits in each restroom",
+    "603.2.1 / 304.3.1"
+   ],
+   [
+    "WARN",
+    "Water closet clearance",
+    "Lay out 60 x 56 in. clear at the toilet, its centerline 16-18 in. from the side wall; grab bars per 604.5",
+    "604.2 / 604.3.1"
+   ],
+   [
+    "PASS",
+    "Accessible route width",
+    "Halls and routes 36 in. clear minimum",
+    "403.5.1"
+   ],
+   [
+    "PASS",
+    "Route to every room",
+    "Every room is reached through doors from the entrance",
+    "206.2.4"
+   ],
+   [
+    "PASS",
+    "Accessible entrance",
+    "1 entrance door(s), 36 in. leaf; keep the landing level and the threshold 1/2 in. max",
+    "206.4 / 404.2.5"
+   ]
+  ],
+  "audit": [
+   [
+    "PASS",
+    "Floor fully covered by rooms",
+    ""
+   ],
+   [
+    "PASS",
+    "No rooms overlap",
+    ""
+   ],
+   [
+    "PASS",
+    "Rooms inside the building",
+    ""
+   ],
+   [
+    "PASS",
+    "Habitable rooms at least 7 ft across",
+    ""
+   ],
+   [
+    "PASS",
+    "An entry door from outside",
+    ""
+   ],
+   [
+    "PASS",
+    "Every room has a door",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors don't swing into each other",
+    ""
+   ],
+   [
+    "PASS",
+    "Room sizes within 40% of the program",
+    ""
+   ],
+   [
+    "PASS",
+    "Every room reached from an outside door",
+    ""
+   ],
+   [
+    "PASS",
+    "No walking through bedrooms, baths or service rooms",
+    ""
+   ],
+   [
+    "PASS",
+    "Every habitable room has a window",
+    ""
+   ],
+   [
+    "PASS",
+    "Window glass at least 8% of floor area",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors and windows fit their walls, none overlap",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors at least 2'-0\" wide",
+    ""
+   ],
+   [
+    "PASS",
+    "Dimension string closes on the overall size",
+    ""
+   ],
+   [
+    "PASS",
+    "Gross area within 10% of the brief",
+    ""
+   ],
+   [
+    "PASS",
+    "Room schedule totals the plan",
+    "7,827 SF net"
+   ],
+   [
+    "PASS",
+    "Has a restroom",
+    ""
+   ],
+   [
+    "PASS",
+    "Building inside the setbacks",
+    "setbacks assumed: front, rear, side"
+   ],
+   [
+    "PASS",
+    "FOR REVIEW - NOT FOR SEALING on the set",
+    ""
+   ]
+  ],
+  "doors": [
+   [
+    "101",
+    "A",
+    "3'-0\" x 6'-8\"",
+    "Exterior, insulated",
+    "EXTERIOR -> 101 OPEN OFFICE",
+    "W1"
+   ],
+   [
+    "102",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "101 OPEN OFFICE -> 102 CONFERENCE",
+    "W5"
+   ],
+   [
+    "103",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "101 OPEN OFFICE -> 103 BREAK ROOM",
+    "W6"
+   ],
+   [
+    "104",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "101 OPEN OFFICE -> 104 HALL",
+    "W7"
+   ],
+   [
+    "105",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "104 HALL -> 105 RESTROOM 1",
+    "W12"
+   ],
+   [
+    "106",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "104 HALL -> 106 STORAGE",
+    "W13"
+   ],
+   [
+    "107",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "104 HALL -> 107 OFFICE 1",
+    "W14"
+   ],
+   [
+    "108",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "104 HALL -> 108 MECH",
+    "W15"
+   ],
+   [
+    "109",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "104 HALL -> 109 RESTROOM 2",
+    "W16"
+   ],
+   [
+    "110",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "104 HALL -> 110 OFFICE 2",
+    "W17"
+   ]
+  ],
+  "notes": [
+   "One-story commercial building on a slab on grade.",
+   "Flat roof with parapet; roof drainage by others.",
+   "Restrooms are diagrammatic; fixture counts and accessible layouts by the design professional.",
+   "Tenant finishes are as scheduled unless noted otherwise.",
+   "Storefront and exterior door hardware to be confirmed."
+  ],
+  "quantities": [
+   [
+    "Site & foundation",
+    "Slab on grade (house)",
+    8013.0,
+    "SF",
+    "outside face of the walls"
+   ],
+   [
+    "Site & foundation",
+    "Slab concrete, 4\" thick",
+    97.9,
+    "CY",
+    "slab area x thickness, no waste"
+   ],
+   [
+    "Site & foundation",
+    "Perimeter footing / thickened edge",
+    374.0,
+    "LF",
+    "house perimeter, outside face"
+   ],
+   [
+    "Framing & walls",
+    "Exterior walls",
+    372.0,
+    "LF",
+    "centreline, 12 ft plate"
+   ],
+   [
+    "Framing & walls",
+    "Exterior wall area, net",
+    3976.0,
+    "SF",
+    "gross less doors and windows (siding, sheathing, insulation)"
+   ],
+   [
+    "Framing & walls",
+    "Interior partitions",
+    368.0,
+    "LF",
+    "centreline, 12 ft"
+   ],
+   [
+    "Framing & walls",
+    "Gypsum board, walls",
+    12460.0,
+    "SF",
+    "partitions both sides + inside of exterior walls"
+   ],
+   [
+    "Openings",
+    "Door A: Exterior, insulated",
+    1,
+    "EA",
+    "3'-0\" x 6'-8\""
+   ],
+   [
+    "Openings",
+    "Door B: Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    9,
+    "EA",
+    "3'-0\" x 6'-8\""
+   ],
+   [
+    "Openings",
+    "Window A: 3'-0\" x 4'-0\" single hung",
+    39,
+    "EA",
+    "3'-0\" x 4'-0\""
+   ],
+   [
+    "Finishes",
+    "Floor finish CPT-T",
+    5548.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish CT",
+    744.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish LVP",
+    268.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish LVT",
+    612.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish SC",
+    654.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Base CT",
+    169.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Base RB",
+    836.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Base WD",
+    102.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Ceiling ACT",
+    6160.0,
+    "SF",
+    "room areas"
+   ],
+   [
+    "Finishes",
+    "Ceiling EXP",
+    654.0,
+    "SF",
+    "room areas"
+   ],
+   [
+    "Finishes",
+    "Ceiling GWB-PT",
+    1012.0,
+    "SF",
+    "room areas"
+   ],
+   [
+    "Roof",
+    "Low-slope roof membrane",
+    8013.0,
+    "SF",
+    "inside the parapet, no turn-ups"
+   ],
+   [
+    "Roof",
+    "Parapet",
+    374.0,
+    "LF",
+    "3 ft high"
+   ],
+   [
+    "Roof",
+    "Roof drains",
+    2,
+    "EA",
+    "plus overflows - by the design professional"
+   ],
+   [
+    "Site & foundation",
+    "Front walk, 4 ft",
+    80.0,
+    "SF",
+    "front door (or porch) to the lot line"
+   ]
+  ],
+  "rooms": [
+   [
+    "101",
+    "OPEN OFFICE",
+    "3,420",
+    "CPT-T",
+    "RB",
+    "GWB-PT",
+    "ACT",
+    "10'-0\""
+   ],
+   [
+    "102",
+    "CONFERENCE",
+    "864",
+    "CPT-T",
+    "RB",
+    "GWB-PT",
+    "ACT",
+    "10'-0\""
+   ],
+   [
+    "103",
+    "BREAK ROOM",
+    "612",
+    "LVT",
+    "RB",
+    "GWB-PT",
+    "ACT",
+    "10'-0\""
+   ],
+   [
+    "104",
+    "HALL",
+    "268",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "10'-0\""
+   ],
+   [
+    "105",
+    "RESTROOM 1",
+    "357",
+    "CT",
+    "CT",
+    "GWB-MR",
+    "GWB-PT",
+    "10'-0\""
+   ],
+   [
+    "106",
+    "STORAGE",
+    "357",
+    "SC",
+    "RB",
+    "GWB-PT",
+    "EXP",
+    "10'-0\""
+   ],
+   [
+    "107",
+    "OFFICE 1",
+    "617",
+    "CPT-T",
+    "RB",
+    "GWB-PT",
+    "ACT",
+    "10'-0\""
+   ],
+   [
+    "108",
+    "MECH",
+    "298",
+    "SC",
+    "RB",
+    "GWB",
+    "EXP",
+    "10'-0\""
+   ],
+   [
+    "109",
+    "RESTROOM 2",
+    "387",
+    "CT",
+    "CT",
+    "GWB-MR",
+    "GWB-PT",
+    "10'-0\""
+   ],
+   [
+    "110",
+    "OFFICE 2",
+    "647",
+    "CPT-T",
+    "RB",
+    "GWB-PT",
+    "ACT",
+    "10'-0\""
+   ]
+  ],
+  "scoping": {
+   "accessible_entrances": 1,
+   "public_entrances": 1,
+   "sf_per_story": 7920,
+   "single_user_toilets_cluster": 2,
+   "stories": 1,
+   "title": "III",
+   "toilet_rooms": [
+    {
+     "lavatories": 1,
+     "name": "RESTROOM 1",
+     "water_closets": 1
+    },
+    {
+     "lavatories": 1,
+     "name": "RESTROOM 2",
+     "water_closets": 1
+    }
+   ],
+   "use": "office"
+  },
+  "sheets": [
+   [
+    "G-001",
+    "Cover"
+   ],
+   [
+    "G-002",
+    "General Notes"
+   ],
+   [
+    "G-003",
+    "Code Summary"
+   ],
+   [
+    "AS-101",
+    "Site Plan"
+   ],
+   [
+    "A-101",
+    "Floor Plan"
+   ],
+   [
+    "A-102",
+    "Roof Plan"
+   ],
+   [
+    "A-201",
+    "Exterior Elevations"
+   ],
+   [
+    "A-301",
+    "Building Section"
+   ],
+   [
+    "A-601",
+    "Room Schedule"
+   ],
+   [
+    "A-602",
+    "Door & Window Schedules"
+   ],
+   [
+    "A-701",
+    "Quantity Summary"
+   ],
+   [
+    "A-801",
+    "Accessibility"
+   ]
+  ],
+  "windows": [
+   [
+    "A",
+    "3'-0\" x 4'-0\" single hung",
+    "3'-0\" x 4'-0\"",
+    "39",
+    "3'-0\"",
+    "7'-0\""
+   ]
+  ]
+ },
+ "retail": {
+  "ada": [
+   [
+    "PASS",
+    "Door clear width",
+    "Every door 32 in. clear minimum",
+    "404.2.3"
+   ],
+   [
+    "PASS",
+    "Door maneuvering depth",
+    "60 in. pull side and 48 in. push side available",
+    "404.2.4.1"
+   ],
+   [
+    "WARN",
+    "Latch-side clearance",
+    "Under 18 in. of wall past the door: door 102",
+    "404.2.4.1"
+   ],
+   [
+    "PASS",
+    "Restroom turning space",
+    "60 in. turning circle fits in each restroom",
+    "603.2.1 / 304.3.1"
+   ],
+   [
+    "WARN",
+    "Water closet clearance",
+    "Lay out 60 x 56 in. clear at the toilet, its centerline 16-18 in. from the side wall; grab bars per 604.5",
+    "604.2 / 604.3.1"
+   ],
+   [
+    "PASS",
+    "Accessible route width",
+    "Halls and routes 36 in. clear minimum",
+    "403.5.1"
+   ],
+   [
+    "PASS",
+    "Route to every room",
+    "Every room is reached through doors from the entrance",
+    "206.2.4"
+   ],
+   [
+    "PASS",
+    "Accessible entrance",
+    "1 entrance door(s), 36 in. leaf; keep the landing level and the threshold 1/2 in. max",
+    "206.4 / 404.2.5"
+   ]
+  ],
+  "audit": [
+   [
+    "PASS",
+    "Floor fully covered by rooms",
+    ""
+   ],
+   [
+    "PASS",
+    "No rooms overlap",
+    ""
+   ],
+   [
+    "PASS",
+    "Rooms inside the building",
+    ""
+   ],
+   [
+    "PASS",
+    "Habitable rooms at least 7 ft across",
+    ""
+   ],
+   [
+    "PASS",
+    "An entry door from outside",
+    ""
+   ],
+   [
+    "PASS",
+    "Every room has a door",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors don't swing into each other",
+    ""
+   ],
+   [
+    "PASS",
+    "Room sizes within 40% of the program",
+    ""
+   ],
+   [
+    "PASS",
+    "Every room reached from an outside door",
+    ""
+   ],
+   [
+    "PASS",
+    "No walking through bedrooms, baths or service rooms",
+    ""
+   ],
+   [
+    "PASS",
+    "Every habitable room has a window",
+    ""
+   ],
+   [
+    "PASS",
+    "Window glass at least 8% of floor area",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors and windows fit their walls, none overlap",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors at least 2'-0\" wide",
+    ""
+   ],
+   [
+    "PASS",
+    "Dimension string closes on the overall size",
+    ""
+   ],
+   [
+    "PASS",
+    "Gross area within 10% of the brief",
+    ""
+   ],
+   [
+    "PASS",
+    "Room schedule totals the plan",
+    "3,893 SF net"
+   ],
+   [
+    "PASS",
+    "Has a restroom",
+    ""
+   ],
+   [
+    "PASS",
+    "Building inside the setbacks",
+    "setbacks assumed: front, rear, side"
+   ],
+   [
+    "PASS",
+    "FOR REVIEW - NOT FOR SEALING on the set",
+    ""
+   ]
+  ],
+  "doors": [
+   [
+    "101",
+    "A",
+    "3'-0\" x 6'-8\"",
+    "Exterior, insulated",
+    "EXTERIOR -> 101 SALES",
+    "W1"
+   ],
+   [
+    "102",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "101 SALES -> 102 HALL",
+    "W5"
+   ],
+   [
+    "103",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "102 HALL -> 103 STOCK",
+    "W8"
+   ],
+   [
+    "104",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "102 HALL -> 104 MECH",
+    "W9"
+   ],
+   [
+    "105",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "102 HALL -> 105 RESTROOM 1",
+    "W10"
+   ],
+   [
+    "106",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "102 HALL -> 106 RESTROOM 2",
+    "W11"
+   ],
+   [
+    "107",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "102 HALL -> 107 OFFICE",
+    "W12"
+   ]
+  ],
+  "notes": [
+   "One-story commercial building on a slab on grade.",
+   "Flat roof with parapet; roof drainage by others.",
+   "Restrooms are diagrammatic; fixture counts and accessible layouts by the design professional.",
+   "Tenant finishes are as scheduled unless noted otherwise.",
+   "Storefront and exterior door hardware to be confirmed."
+  ],
+  "quantities": [
+   [
+    "Site & foundation",
+    "Slab on grade (house)",
+    4027.0,
+    "SF",
+    "outside face of the walls"
+   ],
+   [
+    "Site & foundation",
+    "Slab concrete, 4\" thick",
+    49.2,
+    "CY",
+    "slab area x thickness, no waste"
+   ],
+   [
+    "Site & foundation",
+    "Perimeter footing / thickened edge",
+    270.0,
+    "LF",
+    "house perimeter, outside face"
+   ],
+   [
+    "Framing & walls",
+    "Exterior walls",
+    268.0,
+    "LF",
+    "centreline, 12 ft plate"
+   ],
+   [
+    "Framing & walls",
+    "Exterior wall area, net",
+    2980.0,
+    "SF",
+    "gross less doors and windows (siding, sheathing, insulation)"
+   ],
+   [
+    "Framing & walls",
+    "Interior partitions",
+    169.0,
+    "LF",
+    "centreline, 12 ft"
+   ],
+   [
+    "Framing & walls",
+    "Gypsum board, walls",
+    6802.0,
+    "SF",
+    "partitions both sides + inside of exterior walls"
+   ],
+   [
+    "Openings",
+    "Door A: Exterior, insulated",
+    1,
+    "EA",
+    "3'-0\" x 6'-8\""
+   ],
+   [
+    "Openings",
+    "Door B: Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    6,
+    "EA",
+    "3'-0\" x 6'-8\""
+   ],
+   [
+    "Openings",
+    "Window A: 3'-0\" x 4'-0\" single hung",
+    18,
+    "EA",
+    "3'-0\" x 4'-0\""
+   ],
+   [
+    "Finishes",
+    "Floor finish CPT-T",
+    239.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish CT",
+    300.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish LVP",
+    174.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish LVT",
+    2382.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish SC",
+    799.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Base CT",
+    107.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Base RB",
+    418.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Base WD",
+    80.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Ceiling ACT",
+    2621.0,
+    "SF",
+    "room areas"
+   ],
+   [
+    "Finishes",
+    "Ceiling EXP",
+    799.0,
+    "SF",
+    "room areas"
+   ],
+   [
+    "Finishes",
+    "Ceiling GWB-PT",
+    474.0,
+    "SF",
+    "room areas"
+   ],
+   [
+    "Roof",
+    "Low-slope roof membrane",
+    4027.0,
+    "SF",
+    "inside the parapet, no turn-ups"
+   ],
+   [
+    "Roof",
+    "Parapet",
+    270.0,
+    "LF",
+    "3 ft high"
+   ],
+   [
+    "Roof",
+    "Roof drains",
+    2,
+    "EA",
+    "plus overflows - by the design professional"
+   ],
+   [
+    "Site & foundation",
+    "Front walk, 4 ft",
+    80.0,
+    "SF",
+    "front door (or porch) to the lot line"
+   ]
+  ],
+  "rooms": [
+   [
+    "101",
+    "SALES",
+    "2,382",
+    "LVT",
+    "RB",
+    "GWB-PT",
+    "ACT",
+    "10'-0\""
+   ],
+   [
+    "102",
+    "HALL",
+    "174",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "10'-0\""
+   ],
+   [
+    "103",
+    "STOCK",
+    "686",
+    "SC",
+    "RB",
+    "GWB-PT",
+    "EXP",
+    "10'-0\""
+   ],
+   [
+    "104",
+    "MECH",
+    "112",
+    "SC",
+    "RB",
+    "GWB",
+    "EXP",
+    "10'-0\""
+   ],
+   [
+    "105",
+    "RESTROOM 1",
+    "150",
+    "CT",
+    "CT",
+    "GWB-MR",
+    "GWB-PT",
+    "10'-0\""
+   ],
+   [
+    "106",
+    "RESTROOM 2",
+    "150",
+    "CT",
+    "CT",
+    "GWB-MR",
+    "GWB-PT",
+    "10'-0\""
+   ],
+   [
+    "107",
+    "OFFICE",
+    "239",
+    "CPT-T",
+    "RB",
+    "GWB-PT",
+    "ACT",
+    "10'-0\""
+   ]
+  ],
+  "scoping": {
+   "accessible_entrances": 1,
+   "public_entrances": 1,
+   "sf_per_story": 3960,
+   "single_user_toilets_cluster": 2,
+   "stories": 1,
+   "title": "III",
+   "toilet_rooms": [
+    {
+     "lavatories": 1,
+     "name": "RESTROOM 1",
+     "water_closets": 1
+    },
+    {
+     "lavatories": 1,
+     "name": "RESTROOM 2",
+     "water_closets": 1
+    }
+   ],
+   "use": "retail"
+  },
+  "sheets": [
+   [
+    "G-001",
+    "Cover"
+   ],
+   [
+    "G-002",
+    "General Notes"
+   ],
+   [
+    "G-003",
+    "Code Summary"
+   ],
+   [
+    "AS-101",
+    "Site Plan"
+   ],
+   [
+    "A-101",
+    "Floor Plan"
+   ],
+   [
+    "A-102",
+    "Roof Plan"
+   ],
+   [
+    "A-201",
+    "Exterior Elevations"
+   ],
+   [
+    "A-301",
+    "Building Section"
+   ],
+   [
+    "A-601",
+    "Room Schedule"
+   ],
+   [
+    "A-602",
+    "Door & Window Schedules"
+   ],
+   [
+    "A-701",
+    "Quantity Summary"
+   ],
+   [
+    "A-801",
+    "Accessibility"
+   ]
+  ],
+  "windows": [
+   [
+    "A",
+    "3'-0\" x 4'-0\" single hung",
+    "3'-0\" x 4'-0\"",
+    "18",
+    "3'-0\"",
+    "7'-0\""
+   ]
+  ]
+ },
+ "retail_existing": {
+  "ada": [
+   [
+    "PASS",
+    "Door clear width",
+    "Every door 32 in. clear minimum",
+    "404.2.3"
+   ],
+   [
+    "PASS",
+    "Door maneuvering depth",
+    "60 in. pull side and 48 in. push side available",
+    "404.2.4.1"
+   ],
+   [
+    "PASS",
+    "Latch-side clearance",
+    "18 in. of wall beside each interior door",
+    "404.2.4.1"
+   ],
+   [
+    "PASS",
+    "Restroom turning space",
+    "60 in. turning circle fits in each restroom",
+    "603.2.1 / 304.3.1"
+   ],
+   [
+    "WARN",
+    "Water closet clearance",
+    "Lay out 60 x 56 in. clear at the toilet, its centerline 16-18 in. from the side wall; grab bars per 604.5",
+    "604.2 / 604.3.1"
+   ],
+   [
+    "PASS",
+    "Accessible route width",
+    "Halls and routes 36 in. clear minimum",
+    "403.5.1"
+   ],
+   [
+    "PASS",
+    "Route to every room",
+    "Every room is reached through doors from the entrance",
+    "206.2.4"
+   ],
+   [
+    "PASS",
+    "Accessible entrance",
+    "1 entrance door(s), 36 in. leaf; keep the landing level and the threshold 1/2 in. max",
+    "206.4 / 404.2.5"
+   ]
+  ],
+  "audit": [
+   [
+    "PASS",
+    "Floor fully covered by rooms",
+    ""
+   ],
+   [
+    "PASS",
+    "No rooms overlap",
+    ""
+   ],
+   [
+    "PASS",
+    "Rooms inside the building",
+    ""
+   ],
+   [
+    "PASS",
+    "Habitable rooms at least 7 ft across",
+    ""
+   ],
+   [
+    "PASS",
+    "An entry door from outside",
+    ""
+   ],
+   [
+    "PASS",
+    "Every room has a door",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors don't swing into each other",
+    ""
+   ],
+   [
+    "PASS",
+    "Room sizes within 40% of the program",
+    ""
+   ],
+   [
+    "PASS",
+    "Every room reached from an outside door",
+    ""
+   ],
+   [
+    "PASS",
+    "No walking through bedrooms, baths or service rooms",
+    ""
+   ],
+   [
+    "PASS",
+    "Every habitable room has a window",
+    ""
+   ],
+   [
+    "PASS",
+    "Window glass at least 8% of floor area",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors and windows fit their walls, none overlap",
+    ""
+   ],
+   [
+    "PASS",
+    "Doors at least 2'-0\" wide",
+    ""
+   ],
+   [
+    "PASS",
+    "Dimension string closes on the overall size",
+    ""
+   ],
+   [
+    "PASS",
+    "Gross area within 10% of the brief",
+    ""
+   ],
+   [
+    "PASS",
+    "Room schedule totals the plan",
+    "2,906 SF net"
+   ],
+   [
+    "PASS",
+    "Has a restroom",
+    ""
+   ],
+   [
+    "PASS",
+    "Building inside the setbacks",
+    "setbacks assumed: front, rear, side"
+   ],
+   [
+    "PASS",
+    "FOR REVIEW - NOT FOR SEALING on the set",
+    ""
+   ]
+  ],
+  "doors": [
+   [
+    "101",
+    "A",
+    "3'-0\" x 6'-8\"",
+    "Exterior, insulated",
+    "EXTERIOR -> 101 SALES",
+    "W1"
+   ],
+   [
+    "102",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "101 SALES -> 102 HALL",
+    "W5"
+   ],
+   [
+    "103",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "102 HALL -> 103 STOCK",
+    "W8"
+   ],
+   [
+    "104",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "102 HALL -> 104 MECH",
+    "W9"
+   ],
+   [
+    "105",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "102 HALL -> 105 RESTROOM 1",
+    "W10"
+   ],
+   [
+    "106",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "102 HALL -> 106 RESTROOM 2",
+    "W11"
+   ],
+   [
+    "107",
+    "B",
+    "3'-0\" x 6'-8\"",
+    "Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    "102 HALL -> 107 OFFICE",
+    "W12"
+   ]
+  ],
+  "notes": [
+   "One-story commercial building on a slab on grade.",
+   "Flat roof with parapet; roof drainage by others.",
+   "Restrooms are diagrammatic; fixture counts and accessible layouts by the design professional.",
+   "Tenant finishes are as scheduled unless noted otherwise.",
+   "Storefront and exterior door hardware to be confirmed."
+  ],
+  "quantities": [
+   [
+    "Site & foundation",
+    "Slab on grade (house)",
+    3022.0,
+    "SF",
+    "outside face of the walls"
+   ],
+   [
+    "Site & foundation",
+    "Slab concrete, 4\" thick",
+    36.9,
+    "CY",
+    "slab area x thickness, no waste"
+   ],
+   [
+    "Site & foundation",
+    "Perimeter footing / thickened edge",
+    234.0,
+    "LF",
+    "house perimeter, outside face"
+   ],
+   [
+    "Framing & walls",
+    "Exterior walls",
+    232.0,
+    "LF",
+    "centreline, 12 ft plate"
+   ],
+   [
+    "Framing & walls",
+    "Exterior wall area, net",
+    2596.0,
+    "SF",
+    "gross less doors and windows (siding, sheathing, insulation)"
+   ],
+   [
+    "Framing & walls",
+    "Interior partitions",
+    144.0,
+    "LF",
+    "centreline, 12 ft"
+   ],
+   [
+    "Framing & walls",
+    "Gypsum board, walls",
+    5818.0,
+    "SF",
+    "partitions both sides + inside of exterior walls"
+   ],
+   [
+    "Openings",
+    "Door A: Exterior, insulated",
+    1,
+    "EA",
+    "3'-0\" x 6'-8\""
+   ],
+   [
+    "Openings",
+    "Door B: Interior, solid core, 3'-0\" (ADA 32 in. clear)",
+    6,
+    "EA",
+    "3'-0\" x 6'-8\""
+   ],
+   [
+    "Openings",
+    "Window A: 3'-0\" x 4'-0\" single hung",
+    14,
+    "EA",
+    "3'-0\" x 4'-0\""
+   ],
+   [
+    "Finishes",
+    "Floor finish CPT-T",
+    169.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish CT",
+    220.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish LVP",
+    178.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish LVT",
+    1791.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Floor finish SC",
+    547.0,
+    "SF",
+    "room areas, no waste"
+   ],
+   [
+    "Finishes",
+    "Base CT",
+    91.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Base RB",
+    356.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Base WD",
+    72.0,
+    "LF",
+    "room perimeters, doors not deducted"
+   ],
+   [
+    "Finishes",
+    "Ceiling ACT",
+    1960.0,
+    "SF",
+    "room areas"
+   ],
+   [
+    "Finishes",
+    "Ceiling EXP",
+    547.0,
+    "SF",
+    "room areas"
+   ],
+   [
+    "Finishes",
+    "Ceiling GWB-PT",
+    399.0,
+    "SF",
+    "room areas"
+   ],
+   [
+    "Roof",
+    "Low-slope roof membrane",
+    3022.0,
+    "SF",
+    "inside the parapet, no turn-ups"
+   ],
+   [
+    "Roof",
+    "Parapet",
+    234.0,
+    "LF",
+    "3 ft high"
+   ],
+   [
+    "Roof",
+    "Roof drains",
+    2,
+    "EA",
+    "plus overflows - by the design professional"
+   ],
+   [
+    "Site & foundation",
+    "Front walk, 4 ft",
+    80.0,
+    "SF",
+    "front door (or porch) to the lot line"
+   ]
+  ],
+  "rooms": [
+   [
+    "101",
+    "SALES",
+    "1,791",
+    "LVT",
+    "RB",
+    "GWB-PT",
+    "ACT",
+    "10'-0\""
+   ],
+   [
+    "102",
+    "HALL",
+    "178",
+    "LVP",
+    "WD",
+    "GWB-PT",
+    "GWB-PT",
+    "10'-0\""
+   ],
+   [
+    "103",
+    "STOCK",
+    "469",
+    "SC",
+    "RB",
+    "GWB-PT",
+    "EXP",
+    "10'-0\""
+   ],
+   [
+    "104",
+    "MECH",
+    "79",
+    "SC",
+    "RB",
+    "GWB",
+    "EXP",
+    "10'-0\""
+   ],
+   [
+    "105",
+    "RESTROOM 1",
+    "110",
+    "CT",
+    "CT",
+    "GWB-MR",
+    "GWB-PT",
+    "10'-0\""
+   ],
+   [
+    "106",
+    "RESTROOM 2",
+    "110",
+    "CT",
+    "CT",
+    "GWB-MR",
+    "GWB-PT",
+    "10'-0\""
+   ],
+   [
+    "107",
+    "OFFICE",
+    "169",
+    "CPT-T",
+    "RB",
+    "GWB-PT",
+    "ACT",
+    "10'-0\""
+   ]
+  ],
+  "scoping": {
+   "accessible_entrances": 1,
+   "public_entrances": 1,
+   "sf_per_story": 2964,
+   "single_user_toilets_cluster": 2,
+   "stories": 1,
+   "title": "III",
+   "toilet_rooms": [
+    {
+     "lavatories": 1,
+     "name": "RESTROOM 1",
+     "water_closets": 1
+    },
+    {
+     "lavatories": 1,
+     "name": "RESTROOM 2",
+     "water_closets": 1
+    }
+   ],
+   "use": "retail"
+  },
+  "sheets": [
+   [
+    "G-001",
+    "Cover"
+   ],
+   [
+    "G-002",
+    "General Notes"
+   ],
+   [
+    "G-003",
+    "Code Summary"
+   ],
+   [
+    "AS-101",
+    "Site Plan"
+   ],
+   [
+    "A-101",
+    "Floor Plan"
+   ],
+   [
+    "A-102",
+    "Roof Plan"
+   ],
+   [
+    "A-201",
+    "Exterior Elevations"
+   ],
+   [
+    "A-301",
+    "Building Section"
+   ],
+   [
+    "A-601",
+    "Room Schedule"
+   ],
+   [
+    "A-602",
+    "Door & Window Schedules"
+   ],
+   [
+    "A-701",
+    "Quantity Summary"
+   ],
+   [
+    "A-801",
+    "Accessibility"
+   ]
+  ],
+  "windows": [
+   [
+    "A",
+    "3'-0\" x 4'-0\" single hung",
+    "3'-0\" x 4'-0\"",
+    "14",
+    "3'-0\"",
+    "7'-0\""
+   ]
+  ]
+ }
+}

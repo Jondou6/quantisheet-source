@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2563eb">
+<title>QuantiSheet Field</title>
+<link rel="manifest" href="manifest.json">
+<style>
+:root{--bg:#f4f5f7;--card:#fff;--text:#16181d;--muted:#5f6470;--line:#e2e4e9;
+--accent:#2563eb;--soft:#e3ecff;--ok:#12865a;--warn:#b54708;--bad:#d92d20;}
+@media (prefers-color-scheme:dark){:root{--bg:#1b1c1f;--card:#232428;--text:#e8e9ec;
+--muted:#9a9da6;--line:#3a3c43;--accent:#4c8dff;--soft:#25344f;--ok:#3fb27f;--warn:#e3a008;--bad:#f05252;}}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.4 -apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text);
+padding-bottom:calc(72px + env(safe-area-inset-bottom))}
+header{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--line);
+padding:12px 16px;display:flex;align-items:center;gap:10px}
+header h1{font-size:17px;margin:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sync{font-size:12px;color:var(--muted)}
+main{padding:12px 16px;max-width:720px;margin:0 auto}
+nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);
+display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:5}
+nav button{flex:1;border:0;background:none;color:var(--muted);padding:10px 0 8px;font-size:12px}
+nav button.on{color:var(--accent);font-weight:600}
+nav svg{display:block;margin:0 auto 2px;width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:0 0 10px}
+.item{display:flex;gap:12px;align-items:center;cursor:pointer}
+.item .t{flex:1;min-width:0}.item .t b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item small{color:var(--muted)}
+.thumb{width:52px;height:52px;border-radius:8px;object-fit:cover;background:var(--line);flex:none}
+.pill{font-size:12px;font-weight:600;border-radius:10px;padding:2px 8px;border:1px solid currentColor;white-space:nowrap}
+.good{color:var(--ok)}.warn{color:var(--warn)}.bad{color:var(--bad)}.acc{color:var(--accent)}.mut{color:var(--muted)}
+.chips{display:flex;gap:8px;overflow-x:auto;margin:0 0 12px}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:16px;padding:6px 14px;font-size:14px;white-space:nowrap}
+.chip.on{background:var(--soft);border-color:var(--accent);font-weight:600}
+label{display:block;font-size:13px;color:var(--muted);margin:12px 0 4px}
+input,textarea,select{width:100%;font:inherit;color:var(--text);background:var(--card);border:1px solid var(--line);
+border-radius:10px;padding:11px 12px}
+textarea{min-height:90px}
+button.big{width:100%;border:0;border-radius:12px;padding:14px;font:600 16px inherit;background:var(--accent);color:#fff;margin-top:14px}
+button.ghost{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px;font:600 15px inherit;background:var(--card);color:var(--text);margin-top:10px}
+.fab{position:fixed;right:18px;bottom:calc(84px + env(safe-area-inset-bottom));width:56px;height:56px;border-radius:28px;
+border:0;background:var(--accent);color:#fff;font-size:30px;box-shadow:0 6px 18px rgba(0,0,0,.25);z-index:6}
+.photos{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.photos img{width:96px;height:96px;object-fit:cover;border-radius:8px}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.empty{text-align:center;color:var(--muted);padding:40px 10px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(90px + env(safe-area-inset-bottom));background:#16181d;color:#fff;
+padding:10px 16px;border-radius:10px;font-size:14px;z-index:9;display:none}
+.back{border:0;background:none;color:var(--accent);font-size:16px;padding:0}
+h2{font-size:20px;margin:6px 0 4px}.meta{color:var(--muted);font-size:13px}
+.hist{font-size:14px;border-left:2px solid var(--line);padding-left:10px;margin-top:6px}
+</style>
+</head>
+<body>
+<header><h1 id="title">QuantiSheet Field</h1><span class="sync" id="sync"></span></header>
+<main id="main"></main>
+<nav id="nav" style="display:none">
+ <button data-tab="punch" class="on"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Punch</button>
+ <button data-tab="daily"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Daily log</button>
+ <button data-tab="timecard"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Time</button>
+ <button data-tab="observation"><svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>Observe</button>
+ <button data-tab="rfi"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17v.5"/></svg>RFIs</button>
+</nav>
+<div class="toast" id="toast"></div>
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const S = JSON.parse(localStorage.getItem("quantisheet.field") || "{}");
+const DB = {records: {}, seq: 0};
+let ws = null, nextId = 1, waiting = {}, tab = "punch", filter = "Open";
+const TOOLS = {
+  punch: {one:"Punch item", prefix:"P-", width:4, title:"title",
+    closed:["Closed"], statuses:["Work Required","Ready for Review","Not Accepted","Ready to Close","Closed"]},
+  observation: {one:"Observation", prefix:"OBS-", width:3, title:"title", closed:["Closed"],
+    statuses:["Initiated","Ready for Review","Not Accepted","Closed"]},
+  rfi: {one:"RFI", prefix:"RFI-", width:3, title:"subject", closed:["Closed"], statuses:["Draft","Open","Closed"]},
+  daily: {one:"Daily log", prefix:"DL-", width:4, title:"date", closed:["Submitted"], statuses:["Draft","Submitted"]},
+  timecard: {one:"Time card", prefix:"TC-", width:4, title:"date", closed:["Approved"], statuses:["Draft","Submitted","Approved"]},
+};
+const COLORS = {"Closed":"good","Approved":"good","Submitted":"good","Ready for Review":"acc","Ready to Close":"acc",
+  "Open":"acc","Initiated":"acc","Work Required":"warn","Not Accepted":"bad","Draft":"mut"};
+function toast(t){const e=$("#toast");e.textContent=t;e.style.display="block";clearTimeout(e._t);e._t=setTimeout(()=>e.style.display="none",3500);}
+function wsUrl(){
+  const p = new URLSearchParams(location.search);
+  if (p.get("ws")) return p.get("ws");
+  const sec = location.protocol === "https:";
+  if (location.port === "8766") return `ws://${location.hostname}:8765`;
+  return `${sec ? "wss" : "ws"}://${location.host}/`;
+}
+function connect(){
+  return new Promise((ok, bad) => {
+    ws = new WebSocket(wsUrl());
+    ws.onopen = () => ws.send(JSON.stringify({type:"api", client_id:S.user||"phone"}));
+    ws.onmessage = ev => {
+      const m = JSON.parse(ev.data);
+      if (m.type === "api_ready") return ok();
+      if (m.type === "api_reply" && waiting[m.id]) { const w = waiting[m.id]; delete waiting[m.id];
+        m.ok ? w.ok(m.result) : w.bad(new Error(m.error)); }
+    };
+    ws.onerror = () => bad(new Error("Can't reach the project server."));
+    ws.onclose = () => { ws = null; for (const k in waiting) { waiting[k].bad(new Error("Connection lost.")); delete waiting[k]; } };
+  });
+}
+async function call(op, args){
+  if (!ws || ws.readyState !== 1) await connect();
+  const id = nextId++;
+  return new Promise((ok, bad) => { waiting[id] = {ok, bad}; ws.send(JSON.stringify({id, op, args})); });
+}
+function auth(){ return {project:S.project, key:S.key}; }
+async function pull(){
+  $("#sync").textContent = "Syncing…";
+  try {
+    const r = await call("rec.changes", {...auth(), since: DB.seq});
+    for (const rec of r.records) (DB.records[rec._coll] ||= {})[rec._id] = rec;
+    DB.seq = r.seq; $("#sync").textContent = "Up to date";
+    localStorage.setItem("quantisheet.cache."+S.project, JSON.stringify(DB));
+  } catch (e) { $("#sync").textContent = "Offline"; if (/key/i.test(e.message)) logout(); }
+}
+async function put(coll, rec, base){
+  const t = TOOLS[coll];
+  const r = await call("rec.put", {...auth(), coll, record: rec, base_rev: base, user: S.user, prefix: t.prefix, width: t.width});
+  if (r.denied) throw new Error(r.denied);
+  if (r.conflict) { const again = await call("rec.put", {...auth(), coll, record: rec, base_rev: r.current._rev, user: S.user,
+      prefix: t.prefix, width: t.width}); (DB.records[coll] ||= {})[again.record._id] = again.record; return again.record; }
+  (DB.records[coll] ||= {})[r.record._id] = r.record; return r.record;
+}
+function list(coll){ return Object.values(DB.records[coll] || {}).filter(r => !r._deleted).sort((a,b) => (b._n||0)-(a._n||0)); }
+function isMe(who){ return S.user && who && who.toLowerCase().includes(S.user.toLowerCase().split(" ")[0]); }
+function pill(st){ return st ? `<span class="pill ${COLORS[st]||"mut"}">${esc(st)}</span>` : ""; }
+function photoUrl(ref){ return `/hub/att/${encodeURIComponent(S.project)}/${ref.sha256}?k=${encodeURIComponent(S.key)}`; }
+function fmtDate(d){ if(!d) return ""; const x=new Date(d+"T12:00"); return x.toLocaleDateString(undefined,{month:"short",day:"numeric"}); }
+async function shrink(file){
+  const img = await createImageBitmap(file); const max = 1600;
+  const r = Math.min(1, max / Math.max(img.width, img.height));
+  const c = document.createElement("canvas"); c.width = Math.round(img.width*r); c.height = Math.round(img.height*r);
+  c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+  const blob = await new Promise(ok => c.toBlob(ok, "image/jpeg", 0.82));
+  const b64 = await new Promise(ok => { const fr = new FileReader(); fr.onload = () => ok(fr.result.split(",")[1]); fr.readAsDataURL(blob); });
+  return b64;
+}
+async function uploadPhotos(input){
+  const refs = [];
+  for (const f of input.files) {
+    toast("Uploading photo…");
+    const data = await shrink(f);
+    const r = await call("att.put", {...auth(), name: f.name || "photo.jpg", data});
+    refs.push({name: r.name.replace(/\.\w+$/,"")+".jpg", sha256: r.sha256, size: r.size, ext: ".jpg", by: S.user, at: new Date().toISOString()});
+  }
+  return refs;
+}
+
+// ---------------------------------------------------------------- screens
+function login(err){
+  $("#nav").style.display = "none";
+  $("#title").textContent = "QuantiSheet Field";
+  $("#main").innerHTML = `
+   <div class="card"><h2>Join your project</h2>
+   <p class="meta">Ask the project manager for the project name and password.</p>
+   ${err ? `<p class="bad">${esc(err)}</p>` : ""}
+   <label>Project name</label><input id="p" value="${esc(S.project||"")}" autocapitalize="words">
+   <label>Your email <span class="meta">(if the project uses logins)</span></label><input id="em" type="email" value="${esc(S.email||"")}" autocomplete="email">
+   <label>Password <span class="meta">(project password, or your own)</span></label><input id="pw" type="password">
+   <label>Your name</label><input id="u" value="${esc(S.user||"")}" autocomplete="name" placeholder="as it appears in the Directory">
+   <button class="big" id="go">Open project</button></div>`;
+  $("#go").onclick = async () => {
+    try {
+      const em = $("#em").value.trim();
+      const args = {project: $("#p").value.trim(), password: $("#pw").value, user: $("#u").value.trim()};
+      if (em) args.email = em;
+      const r = await call("proj.open", args);
+      Object.assign(S, {project: r.project, key: r.key, email: em, role: r.role || "admin", user: r.user || $("#u").value.trim()});
+      localStorage.setItem("quantisheet.field", JSON.stringify(S)); start();
+    } catch (e) { login(e.message); }
+  };
+}
+function logout(){ try { navigator.serviceWorker && navigator.serviceWorker.controller && navigator.serviceWorker.controller.postMessage({type: "logout"}); } catch (e) {} delete S.key; localStorage.setItem("quantisheet.field", JSON.stringify(S)); login("Please sign in again."); }
+async function start(){
+  $("#title").textContent = S.project; $("#nav").style.display = "flex";
+  Object.assign(DB, JSON.parse(localStorage.getItem("quantisheet.cache."+S.project) || '{"records":{},"seq":0}'));
+  show(); await pull(); show();
+  setInterval(async () => { if (document.visibilityState === "visible") { await pull(); if (!document.querySelector("#detail")) show(); } }, 30000);
+}
+function show(){
+  function timecard(){
+  // the foreman's daily time card: crew hours, equipment hours and what got installed, by cost code
+  const today = new Date(); const iso = new Date(today - today.getTimezoneOffset()*60000).toISOString().slice(0,10);
+  let r = list("timecard").find(x => x.date === iso && (!x.foreman || isMe(x.foreman))) ||
+          {date: iso, crew: [], equipment: [], production: [], status: "Draft", foreman: S.user};
+  const L = {
+    crew: {cols: [["name","Name","text",""], ["class","Class","text","90px"], ["hours","Hrs","number","70px"]], add: "+ Add worker"},
+    equipment: {cols: [["code","Equipment","text",""], ["hours","Hrs","number","70px"]], add: "+ Add equipment"},
+    production: {cols: [["cost_code","Cost code","text",""], ["qty","Qty","number","80px"], ["unit","Unit","text","60px"], ["hours","Crew hrs","number","80px"]], add: "+ Add quantity"},
+  };
+  const rowHtml = (k, m) => `<div class="row" style="margin-top:6px">` + L[k].cols.map(([f,ph,t,w]) =>
+     `<input data-f="${f}" ${t==="number"?'type="number" inputmode="decimal"':""} placeholder="${ph}" value="${esc(m[f])}"${w?` style="flex:0 0 ${w}"`:""}>`).join("") + `</div>`;
+  const block = (k, label) => `<label>${label}</label><div id="tc_${k}">${(r[k]||[]).map(m => rowHtml(k, m)).join("")}</div><button class="ghost" data-add="${k}">${L[k].add}</button>`;
+  const locked = r.status === "Approved";
+  $("#main").innerHTML = `<div id="detail"><h2>Time card</h2><div class="meta">${today.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"})} ${pill(r.status)}</div>
+   ${block("crew", "Crew hours")}${block("equipment", "Equipment hours")}${block("production", "Quantities installed")}
+   <label>Notes</label><textarea id="tc_notes">${esc(r.notes)}</textarea>
+   ${locked ? `<div class="meta">Approved - ask the office to change it.</div>` :
+     `<button class="big" id="save">Save</button><button class="ghost" id="submit">Submit for approval</button>`}</div>`;
+  document.querySelectorAll("[data-add]").forEach(b => b.onclick = () => $("#tc_" + b.dataset.add).insertAdjacentHTML("beforeend", rowHtml(b.dataset.add, {})));
+  const read = k => [...document.querySelectorAll(`#tc_${k} .row`)].map(row => {
+      const o = {}; row.querySelectorAll("input").forEach(i => o[i.dataset.f] = i.type === "number" ? (i.value === "" ? null : Number(i.value)) : i.value.trim()); return o;
+    }).filter(o => Object.values(o).some(v => v !== null && v !== ""));
+  const save = async status => {
+    const rec = {_id: r._id, date: iso, foreman: r.foreman || S.user, crew: read("crew"), equipment: read("equipment"),
+      production: read("production"), notes: $("#tc_notes").value.trim(), status};
+    try { const s = await put("timecard", rec, r._rev); toast(`Saved ${s._no}`); r = s; timecard(); } catch (x) { toast(x.message); }
+  };
+  if (!locked) { $("#save").onclick = () => save(r.status || "Draft"); $("#submit").onclick = () => save("Submitted"); }
+}
+document.querySelectorAll("nav button").forEach(b => b.classList.toggle("on", b.dataset.tab === tab));
+  if (tab === "daily") return daily();
+  if (tab === "timecard") return timecard();
+  const t = TOOLS[tab];
+  let recs = list(tab);
+  const ball = r => tab === "punch" ? ({"Work Required":r.assignee,"Not Accepted":r.assignee,"Initiated":r.assignee,
+     "Ready for Review":r.manager,"Ready to Close":r.final_approver||r.manager})[r.status] :
+     tab === "rfi" ? (r.status === "Open" ? r.to : "") : (r.status === "Ready for Review" ? r._by : r.assignee);
+  if (filter === "Open") recs = recs.filter(r => !t.closed.includes(r.status));
+  if (filter === "Mine") recs = recs.filter(r => !t.closed.includes(r.status) && isMe(ball(r)));
+  if (filter === "Closed") recs = recs.filter(r => t.closed.includes(r.status));
+  const chips = ["Open","Mine","Closed","All"].map(c => `<button class="chip ${c===filter?"on":""}" data-f="${c}">${c}</button>`).join("");
+  $("#main").innerHTML = `<div class="chips">${chips}</div>` + (recs.length ? recs.map(r => {
+      const ph = (r.photos||[])[0];
+      return `<div class="card item" data-id="${r._id}">${ph ? `<img class="thumb" loading="lazy" src="${photoUrl(ph)}">` : ""}
+      <div class="t"><b>${esc(r[t.title])}</b><small>${esc(r._no)} · ${esc(r.location || r.to || "")}${r.due ? " · due "+fmtDate(r.due) : ""}</small></div>${pill(r.status)}</div>`;
+    }).join("") : `<div class="empty">Nothing here. Tap + to add one.</div>`) +
+    `<button class="fab" id="add">+</button>`;
+  document.querySelectorAll(".chip").forEach(b => b.onclick = () => { filter = b.dataset.f; show(); });
+  document.querySelectorAll(".item").forEach(e => e.onclick = () => detail(tab, e.dataset.id));
+  $("#add").onclick = () => edit(tab);
+}
+function edit(coll, rec){
+  rec = rec || {}; const t = TOOLS[coll]; let photos = rec.photos || [];
+  const people = list("member").map(m => `<option value="${esc(m.name)}">`).join("");
+  const fields = coll === "rfi" ? `
+    <label>Subject</label><input id="f_subject" value="${esc(rec.subject)}">
+    <label>Question</label><textarea id="f_question">${esc(rec.question)}</textarea>
+    <label>Location / drawing</label><input id="f_location" value="${esc(rec.location)}">` : `
+    <label>${coll === "punch" ? "What needs fixing" : "What did you see"}</label><textarea id="f_title">${esc(rec.title)}</textarea>
+    ${coll === "observation" ? `<label>Type</label><select id="f_type">${["Quality","Safety","Commissioning","Environmental","Warranty","Work to Complete"]
+       .map(o => `<option ${o===(rec.type||"Quality")?"selected":""}>${o}</option>`).join("")}</select>` : ""}
+    <label>Location</label><input id="f_location" value="${esc(rec.location)}" placeholder="e.g. Room 104, north wall">
+    <label>Assignee</label><input id="f_assignee" list="ppl" value="${esc(rec.assignee)}" placeholder="Sub or person">`;
+  $("#main").innerHTML = `<div id="detail"><button class="back" id="bk">‹ Back</button>
+    <h2>${rec._id ? "Edit" : "New"} ${t.one.toLowerCase()}</h2><datalist id="ppl">${people}</datalist>${fields}
+    <label>Photos</label><div class="photos" id="ph"></div>
+    <button class="ghost" id="cam">📷 Take or add photos</button><input type="file" id="file" accept="image/*" capture="environment" multiple hidden>
+    <button class="big" id="save">${rec._id ? "Save" : "Add"}</button></div>`;
+  const drawPh = () => $("#ph").innerHTML = photos.map(p => `<img src="${photoUrl(p)}">`).join("");
+  drawPh();
+  $("#bk").onclick = () => rec._id ? detail(coll, rec._id) : show();
+  $("#cam").onclick = () => $("#file").click();
+  $("#file").onchange = async e => { try { photos = photos.concat(await uploadPhotos(e.target)); drawPh(); } catch (x) { toast(x.message); } };
+  $("#save").onclick = async () => {
+    const r = {_id: rec._id, photos};
+    document.querySelectorAll("[id^=f_]").forEach(i => r[i.id.slice(2)] = i.value.trim());
+    if (!(r.title || r.subject)) return toast("Please describe it first.");
+    if (!rec._id) Object.assign(r, coll === "punch" ? {status:"Work Required", manager:S.user, priority:"Normal"} :
+      coll === "rfi" ? {status:"Draft", from:S.user} : {status:"Initiated", priority:"Medium"});
+    try { const saved = await put(coll, r, rec._rev); toast(`Saved ${saved._no}`); detail(coll, saved._id); }
+    catch (x) { toast(x.message); }
+  };
+}
+function detail(coll, id){
+  const r = DB.records[coll][id], t = TOOLS[coll];
+  const acts = [];
+  if (coll === "punch") {
+    if (["Work Required","Not Accepted","Initiated"].includes(r.status)) acts.push(["Ready for Review","Mark fixed - ready for review"]);
+    if (r.status === "Ready for Review") { acts.push(["Closed","Accept and close"]); acts.push(["Not Accepted","Not accepted"]); }
+    if (r.status === "Ready to Close") acts.push(["Closed","Close"]);
+  } else if (coll === "observation") {
+    if (["Initiated","Not Accepted"].includes(r.status)) acts.push(["Ready for Review","Fixed - ready for review"]);
+    if (r.status === "Ready for Review") { acts.push(["Closed","Close"]); acts.push(["Not Accepted","Not accepted"]); }
+  }
+  const hist = (r.thread||[]).map(m => `<div class="hist"><b>${esc(m.by)}</b> <span class="meta">${esc((m.at||"").replace("T"," "))}</span><br>${esc(m.text)}</div>`).join("");
+  $("#main").innerHTML = `<div id="detail"><button class="back" id="bk">‹ Back</button>
+   <h2>${esc(r[t.title])}</h2><div class="meta">${esc(r._no)} · ${pill(r.status)}</div>
+   <div class="card" style="margin-top:12px">
+    ${r.location ? `<div><span class="meta">Location</span><br>${esc(r.location)}</div>` : ""}
+    ${r.assignee ? `<div style="margin-top:8px"><span class="meta">Assignee</span><br>${esc(r.assignee)}</div>` : ""}
+    ${r.due ? `<div style="margin-top:8px"><span class="meta">Due</span><br>${fmtDate(r.due)}</div>` : ""}
+    ${r.question ? `<div style="margin-top:8px"><span class="meta">Question</span><br>${esc(r.question)}</div>` : ""}
+    ${r.answer ? `<div style="margin-top:8px"><span class="meta">Answer</span><br><b>${esc(r.answer)}</b></div>` : ""}
+    ${r.description ? `<div style="margin-top:8px">${esc(r.description)}</div>` : ""}
+    <div class="photos">${(r.photos||[]).map(p => `<a href="${photoUrl(p)}" target="_blank"><img src="${photoUrl(p)}"></a>`).join("")}</div>
+   </div>
+   ${acts.map(a => `<button class="big" data-st="${a[0]}">${a[1]}</button>`).join("")}
+   <button class="ghost" id="ed">Edit / add photos</button>
+   <label>Comments</label>${hist || '<p class="meta">No comments yet.</p>'}
+   <div class="row" style="margin-top:8px"><input id="cm" placeholder="Add a comment"><button class="chip" id="post" style="flex:0 0 auto">Post</button></div></div>`;
+  $("#bk").onclick = show; $("#ed").onclick = () => edit(coll, r);
+  document.querySelectorAll("[data-st]").forEach(b => b.onclick = async () => {
+    try { await put(coll, {_id: r._id, status: b.dataset.st}, r._rev); toast("Updated"); detail(coll, r._id); } catch (x) { toast(x.message); } });
+  $("#post").onclick = async () => {
+    const text = $("#cm").value.trim(); if (!text) return;
+    const thread = (r.thread||[]).concat([{by:S.user, at:new Date().toISOString().slice(0,16), text}]);
+    try { await put(coll, {_id: r._id, thread}, r._rev); detail(coll, r._id); } catch (x) { toast(x.message); }
+  };
+}
+function daily(){
+  const today = new Date(); const iso = new Date(today - today.getTimezoneOffset()*60000).toISOString().slice(0,10);
+  let r = list("daily").find(x => x.date === iso) || {date: iso, manpower: [], photos: [], status: "Draft", author: S.user};
+  let photos = r.photos || [];
+  const rows = (r.manpower||[]).map((m,i) => `<div class="row" data-i="${i}" style="margin-top:6px">
+     <input class="mc" placeholder="Company" value="${esc(m.company)}"><input class="mw" type="number" inputmode="numeric" placeholder="Crew" value="${esc(m.workers)}" style="flex:0 0 90px"><input class="mh" type="number" inputmode="decimal" placeholder="Hrs" value="${esc(m.hours)}" style="flex:0 0 70px"></div>`).join("");
+  const w = r.weather || {};
+  $("#main").innerHTML = `<div id="detail"><h2>Daily log</h2><div class="meta">${today.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"})} ${pill(r.status)}</div>
+   <label>Weather</label><div class="row"><input id="w_high" placeholder="High °F" inputmode="numeric" value="${esc(w.high)}"><input id="w_low" placeholder="Low °F" inputmode="numeric" value="${esc(w.low)}"><input id="w_sky" placeholder="Sky" value="${esc(w.sky)}"></div>
+   <label>Manpower</label><div id="mp">${rows}</div><button class="ghost" id="addrow">+ Add crew</button>
+   <label>Work performed</label><textarea id="work">${esc(r.work)}</textarea>
+   <label>Delays, safety, visitors</label><textarea id="notes" placeholder="Anything else worth recording">${esc(r.safety)}</textarea>
+   <label>Photos</label><div class="photos" id="ph"></div>
+   <button class="ghost" id="cam">📷 Add photos</button><input type="file" id="file" accept="image/*" capture="environment" multiple hidden>
+   <button class="big" id="save">Save log</button></div>`;
+  const drawPh = () => $("#ph").innerHTML = photos.map(p => `<img src="${photoUrl(p)}">`).join(""); drawPh();
+  $("#addrow").onclick = () => { $("#mp").insertAdjacentHTML("beforeend", `<div class="row" style="margin-top:6px"><input class="mc" placeholder="Company"><input class="mw" type="number" inputmode="numeric" placeholder="Crew" style="flex:0 0 90px"><input class="mh" type="number" inputmode="decimal" placeholder="Hrs" style="flex:0 0 70px"></div>`); };
+  $("#cam").onclick = () => $("#file").click();
+  $("#file").onchange = async e => { try { photos = photos.concat(await uploadPhotos(e.target)); drawPh(); } catch (x) { toast(x.message); } };
+  $("#save").onclick = async () => {
+    const manpower = [...document.querySelectorAll("#mp .row")].map(row => ({company: row.querySelector(".mc").value.trim(),
+       workers: Number(row.querySelector(".mw").value) || null, hours: Number(row.querySelector(".mh").value) || null})).filter(m => m.company);
+    const rec = {_id: r._id, date: iso, manpower, work: $("#work").value.trim(), safety: $("#notes").value.trim(), photos,
+      weather: {high: $("#w_high").value.trim(), low: $("#w_low").value.trim(), sky: $("#w_sky").value.trim()},
+      status: r.status || "Draft", author: r.author || S.user};
+    try { const s = await put("daily", rec, r._rev); toast(`Saved ${s._no}`); r = s; } catch (x) { toast(x.message); }
+  };
+}
+document.querySelectorAll("nav button").forEach(b => b.onclick = () => { tab = b.dataset.tab; filter = "Open"; show(); });
+if (S.key && S.project) start(); else login();
+</script>
+</body>
+</html>

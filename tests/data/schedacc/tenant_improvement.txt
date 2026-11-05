@@ -1,0 +1,34 @@
+SECTION 01 11 00 - SUMMARY OF WORK
+Project: Suite 400 Dental Fit-Out, a tenant improvement on an occupied floor.
+No roofing and no structural frame are in this contract.
+
+SECTION 01 32 00 - CONSTRUCTION PROGRESS DOCUMENTATION
+The Work shall be substantially complete within two hundred eighty (280) calendar days after Notice to Proceed.
+The Work shall be finally complete within 310 calendar days after Notice to Proceed.
+
+SECTION 01 33 00 - SUBMITTAL PROCEDURES
+Submittals will be reviewed within 10 calendar days.
+
+SECTION 01 45 00 - QUALITY CONTROL
+The above-ceiling rough-in shall be inspected before gypsum board cover.
+
+SECTION 01 77 00 - CLOSEOUT PROCEDURES
+Closeout includes operation and maintenance manuals and training.
+
+SECTION 01 91 00 - COMMISSIONING
+Commissioning follows test and balance.
+
+SECTION 02 41 19 - SELECTIVE DEMOLITION
+Remove the existing partitions and ceilings shown on the demolition plan.
+
+SECTION 09 29 00 - GYPSUM BOARD
+New partitions, ceilings and finishes.
+
+SECTION 22 11 00 - FACILITY WATER DISTRIBUTION
+Plumbing rough-in for the treatment rooms.
+
+SECTION 23 73 00 - AIR HANDLING UNITS
+The custom air handler lead time is 12 weeks.
+
+SECTION 26 05 00 - COMMON WORK RESULTS FOR ELECTRICAL
+Electrical rough-in for the suite.

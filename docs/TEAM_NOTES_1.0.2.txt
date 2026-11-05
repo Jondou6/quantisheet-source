@@ -1,0 +1,19 @@
+QuantiSheet 1.0.2
+- AI Takeoff: reads more door and window schedules, finds more rooms (shower and toilet stalls too), better gross floor area; rooms that share floor no longer count it twice.
+- AI items stay out of totals until you accept them: one Review Queue, least sure first, with Accept, Deny and Undo. The bid check warns if any are still waiting.
+- Run AI Takeoff again without counting anything twice.
+- AI marks show dashed with an "AI" badge until accepted.
+- Each sheet's scale gets a confidence score; a doubtful scale is held for you to confirm.
+- Reshape an outline: drag a corner, drag a side's dot to add one, Ctrl+click a corner to remove it.
+- Select several markups (drag a box or Ctrl+click): combined total, Move Selected to Item, Delete together.
+- Markups List Origin column, including "AI, edited".
+- Right-click a count > Show Uncounted Copies / Count the Uncounted Copies.
+- Review Queue: Report Missed, then box one copy and the program finds the rest (in review).
+- Select a dashed AI markup and press A to accept or D to deny (or right-click).
+- Count library: right-click a count > Add to the Count Library; Takeoff > Try the Count Library on the next job.
+- Count by Label lists every hit first; wildcards P-# and WH-*.
+- AI Takeoff Zones (AI menu): Only Here / Leave Out boxes on a sheet.
+- AI Takeoff remembers the names you give its items (Takeoff > Item Names Learned).
+- Fire extinguishers are looked for on the life safety and floor plans.
+- This team copy now checks once a day for a newer team build (Help > Check for Updates).
+- ClaimIT 0.2.2: start page, rooms by size (feet and inches), odd-shaped rooms, line kits, undo, autosave, checklist, diary and payments, rooms and payments in the exports.

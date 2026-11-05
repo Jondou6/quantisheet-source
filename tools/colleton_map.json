@@ -1,0 +1,770 @@
+{
+ "version": 3,
+ "about": [
+  "Explicit map from QuantiSheet AI Takeoff result lines to the human takeoff groups (Group_ID) in the reviewer's Colleton_Human_vs_AI_Comparison.xlsx, sheet Mapping (Colleton County EOC). Same rules and format as tools/aiken_map.json; read by tools/aiken_eval.py --set colleton.",
+  "Quantities only. No prices, no cost data.",
+  "v1 (Oct 27): empty start - rules are added from the first run's ai_lines.csv against the Mapping groups.",
+  "v1: first mapping from the 0.13.10-dev run's lines (Oct 27). Only lines that are plainly the same item as a human group; untagged review lines left unmapped.",
+  "v2: fire alarm devices (now counted on the fire alarm plan), occupancy sensors, and the HVAC equipment marks (IFC, IHP, OHP, EF, SF, KH) mapped.",
+  "v3: wall types read from the information floor plan (A-101): Wall Type 1 / 2 LF to H09-WT1 / H09-WT2; the exterior wall length scored once, from the outer face loop (walls:Exterior Walls -> H09-EXTWALL); types 4 and 5 (the exterior walls) listed as info."
+ ],
+ "groups": {},
+ "rules": [
+  {
+   "key": "walls:Wall Type 1",
+   "group": "H09-WT1"
+  },
+  {
+   "key": "walls:Wall Type 2",
+   "group": "H09-WT2"
+  },
+  {
+   "key": "walls:Exterior Walls",
+   "group": "H09-EXTWALL"
+  },
+  {
+   "key": "slab:Slab on grade 4\" - concrete",
+   "group": "H03-SOG-CY"
+  },
+  {
+   "key": "slab:Slab on grade 4\"",
+   "group": "H03-SOG-SF"
+  },
+  {
+   "key": "slab:Slab on grade - vapor barrier",
+   "group": "H03-VAPOR"
+  },
+  {
+   "regex": "^footings:Footing F4 concrete$",
+   "group": "H03-PAD-CY"
+  },
+  {
+   "key": "steel:HSS4X4X1/4",
+   "group": "H05-HSS4"
+  },
+  {
+   "key": "steel:W12X26",
+   "group": "H05-W12"
+  },
+  {
+   "key": "roof:Metal roof deck 1.5B20",
+   "group": "H05-DECK"
+  },
+  {
+   "key": "roof:Roof area 4:12 (sloped)",
+   "group": "H07-ROOF"
+  },
+  {
+   "key": "roof:Roof area 5:12 (sloped)",
+   "group": "H07-ROOF"
+  },
+  {
+   "key": "roof:Roof eave (gutter line)",
+   "group": "H07-GUTTER"
+  },
+  {
+   "key": "roof:Valley (plan length)",
+   "group": "H07-HIPVAL"
+  },
+  {
+   "key": "roof:Hip (plan length)",
+   "group": "H07-HIPVAL"
+  },
+  {
+   "key": "roof:Downspouts (length)",
+   "group": "H07-DS"
+  },
+  {
+   "key": "schedules:Doors",
+   "group": "H08-DOORS"
+  },
+  {
+   "regex": "^schedules:EL-1 ",
+   "group": "H08-LOUV-EL-1"
+  },
+  {
+   "regex": "^schedules:EL-2 ",
+   "group": "H08-LOUV-EL-2"
+  },
+  {
+   "regex": "^schedules:IL-1 ",
+   "group": "H08-LOUV-IL-1"
+  },
+  {
+   "regex": "^schedules:IL-2 ",
+   "group": "H08-LOUV-IL-2"
+  },
+  {
+   "regex": "^schedules:IL-3 ",
+   "group": "H08-LOUV-IL-3"
+  },
+  {
+   "regex": "^schedules:RL-1 ",
+   "group": "H08-LOUV-RL-1"
+  },
+  {
+   "regex": "^schedules:RL-2 ",
+   "group": "H08-LOUV-RL-2"
+  },
+  {
+   "key": "schedules:Sealant & backer rod at door frames",
+   "group": "H07-SEAL"
+  },
+  {
+   "regex": "^finishes:Floor CPT-1( / CPT-2)?$",
+   "group": "H09-CPT"
+  },
+  {
+   "key": "finishes:Floor CT-1",
+   "group": "H09-FLR-CT-1"
+  },
+  {
+   "key": "finishes:Floor LVT-1",
+   "group": "H09-FLR-LVT-1"
+  },
+  {
+   "key": "finishes:Floor SC",
+   "group": "H09-FLR-SC"
+  },
+  {
+   "key": "finishes:Base CTB",
+   "group": "H09-BASE-CTB"
+  },
+  {
+   "key": "finishes:Base RB-1",
+   "group": "H09-BASE-RB-1"
+  },
+  {
+   "key": "finishes:Base RB-2",
+   "group": "H09-BASE-RB-2"
+  },
+  {
+   "regex": "^finishes:Ceiling ACT-[12]( \\(rooms with .*\\))?$",
+   "group": "H09-CEIL"
+  },
+  {
+   "regex": "^finishes:Ceiling PT( \\(rooms with .*\\))?$",
+   "group": "H09-CEILPT"
+  },
+  {
+   "key": "finishes:Gypsum board ceiling",
+   "group": "H09-CEILPT"
+  },
+  {
+   "key": "finishes:Wall finish PT",
+   "group": "H09-WALLPT"
+  },
+  {
+   "regex": "^schedules:Accessory CH ",
+   "group": "H10-TA-CH"
+  },
+  {
+   "regex": "^schedules:Accessory FSS ",
+   "group": "H10-TA-FSS"
+  },
+  {
+   "regex": "^schedules:Accessory GB18 ",
+   "group": "H10-TA-GB18"
+  },
+  {
+   "regex": "^schedules:Accessory GB36 ",
+   "group": "H10-TA-GB36"
+  },
+  {
+   "regex": "^schedules:Accessory GB42 ",
+   "group": "H10-TA-GB42"
+  },
+  {
+   "regex": "^schedules:Accessory GBSH ",
+   "group": "H10-TA-GBSH"
+  },
+  {
+   "regex": "^schedules:Accessory MG1 ",
+   "group": "H10-TA-MG1"
+  },
+  {
+   "regex": "^schedules:Accessory MOP ",
+   "group": "H10-TA-MOP"
+  },
+  {
+   "regex": "^schedules:Accessory PT/W ",
+   "group": "H10-TA-PTW"
+  },
+  {
+   "regex": "^schedules:Accessory SCR ",
+   "group": "H10-TA-SCR"
+  },
+  {
+   "regex": "^schedules:Accessory SD ",
+   "group": "H10-TA-SD"
+  },
+  {
+   "regex": "^schedules:Accessory SDU ",
+   "group": "H10-TA-SDU"
+  },
+  {
+   "regex": "^schedules:Accessory TT ",
+   "group": "H10-TA-TT"
+  },
+  {
+   "key": "pipes:1/2\" HW",
+   "group": "H22-P-12HW"
+  },
+  {
+   "key": "pipes:3/4\" HW",
+   "group": "H22-P-34HW"
+  },
+  {
+   "key": "pipes:1\" HW",
+   "group": "H22-P-1HW"
+  },
+  {
+   "key": "pipes:1/2\" CW",
+   "group": "H22-P-12CW"
+  },
+  {
+   "key": "pipes:3/4\" CW",
+   "group": "H22-P-34CW"
+  },
+  {
+   "key": "pipes:1\" CW",
+   "group": "H22-P-1CW"
+  },
+  {
+   "key": "pipes:1-1/2\" CW",
+   "group": "H22-P-112CW"
+  },
+  {
+   "key": "pipes:1-1/4\" CW",
+   "group": "H22-P-114CW"
+  },
+  {
+   "key": "pipes:2\" CW",
+   "group": "H22-P-2CW"
+  },
+  {
+   "key": "pipes:3/4\" G",
+   "group": "H22-P-34G"
+  },
+  {
+   "key": "pipes:1\" G",
+   "group": "H22-P-1G"
+  },
+  {
+   "key": "pipes:1-1/2\" G",
+   "group": "H22-P-112G"
+  },
+  {
+   "key": "pipes:1-1/4\" G",
+   "group": "H22-P-114G"
+  },
+  {
+   "key": "pipes:2\" G",
+   "group": "H22-P-2G"
+  },
+  {
+   "key": "pipes:4\" W",
+   "group": "H22-P-4W"
+  },
+  {
+   "key": "pipes:2\" W",
+   "group": "H22-P-2W"
+  },
+  {
+   "key": "pipes:3\" W",
+   "group": "H22-P-3W"
+  },
+  {
+   "key": "pipes:1-1/2\" V",
+   "group": "H22-P-112V"
+  },
+  {
+   "regex": "^pipes:2\" (V|VTR)$",
+   "group": "H22-P-2V"
+  },
+  {
+   "regex": "^pipes:3\" (V|VTR)$",
+   "group": "H22-P-3V"
+  },
+  {
+   "regex": "^spec:Pipe insulation",
+   "group": "H22-PIPEINS"
+  },
+  {
+   "regex": "^schedules:P-1 ",
+   "group": "H22-FX-P1"
+  },
+  {
+   "regex": "^schedules:P-2 ",
+   "group": "H22-FX-P2"
+  },
+  {
+   "regex": "^schedules:P-3 ",
+   "group": "H22-FX-P3"
+  },
+  {
+   "regex": "^schedules:P-4 ",
+   "group": "H22-FX-P4"
+  },
+  {
+   "regex": "^schedules:P-5 ",
+   "group": "H22-FX-P5"
+  },
+  {
+   "regex": "^schedules:P-6 ",
+   "group": "H22-FX-P6"
+  },
+  {
+   "regex": "^schedules:P-7 ",
+   "group": "H22-FX-P7"
+  },
+  {
+   "regex": "^schedules:P-8 ",
+   "group": "H22-FX-P8"
+  },
+  {
+   "regex": "^schedules:P-9 ",
+   "group": "H22-FX-P9"
+  },
+  {
+   "regex": "^schedules:P-10 ",
+   "group": "H22-FX-P10"
+  },
+  {
+   "regex": "^schedules:WDB ",
+   "group": "H22-WDB"
+  },
+  {
+   "regex": "^schedules:GWH-1 ",
+   "group": "H22-GWH"
+  },
+  {
+   "regex": "^schedules:EWH-1 ",
+   "group": "H22-EWH"
+  },
+  {
+   "regex": "^schedules:PMP-1 ",
+   "group": "H22-PMP"
+  },
+  {
+   "regex": "^schedules:CM-1 ",
+   "group": "H22-CM"
+  },
+  {
+   "regex": "^schedules:IB-1 ",
+   "group": "H22-IB"
+  },
+  {
+   "regex": "^schedules:1/2\"-HB ",
+   "group": "H22-HB"
+  },
+  {
+   "key": "ducts:4\" round",
+   "group": "H23-D-725"
+  },
+  {
+   "key": "ducts:7\" round",
+   "group": "H23-D-727"
+  },
+  {
+   "key": "ducts:8\" round",
+   "group": "H23-D-728"
+  },
+  {
+   "key": "ducts:10\" round",
+   "group": "H23-D-729"
+  },
+  {
+   "key": "ducts:14\" round",
+   "group": "H23-D-730"
+  },
+  {
+   "key": "ducts:16\" round",
+   "group": "H23-D-731"
+  },
+  {
+   "key": "ducts:6x6",
+   "group": "H23-D-735"
+  },
+  {
+   "key": "ducts:8x8",
+   "group": "H23-D-736"
+  },
+  {
+   "key": "ducts:10x10",
+   "group": "H23-D-737"
+  },
+  {
+   "key": "ducts:12x12",
+   "group": "H23-D-738"
+  },
+  {
+   "key": "ducts:14x14",
+   "group": "H23-D-739"
+  },
+  {
+   "key": "ducts:16x16",
+   "group": "H23-D-740"
+  },
+  {
+   "key": "ducts:18x18",
+   "group": "H23-D-741"
+  },
+  {
+   "key": "ducts:20x20",
+   "group": "H23-D-742"
+  },
+  {
+   "key": "ducts:8x12",
+   "group": "H23-D-743"
+  },
+  {
+   "key": "ducts:10x14",
+   "group": "H23-D-744"
+  },
+  {
+   "key": "ducts:12x14",
+   "group": "H23-D-745"
+  },
+  {
+   "key": "ducts:16x14",
+   "group": "H23-D-746"
+  },
+  {
+   "key": "ducts:18x14",
+   "group": "H23-D-747"
+  },
+  {
+   "key": "ducts:18x16",
+   "group": "H23-D-748"
+  },
+  {
+   "key": "ducts:20x16",
+   "group": "H23-D-749"
+  },
+  {
+   "key": "ducts:3\" round",
+   "group": "H23-D-3PVC"
+  },
+  {
+   "regex": "^spec:Duct insulation",
+   "group": "H23-DUCTINS"
+  },
+  {
+   "regex": "^schedules:EG-1 ",
+   "group": "H23-AD-EG-1"
+  },
+  {
+   "regex": "^schedules:EG-2 ",
+   "group": "H23-AD-EG-2"
+  },
+  {
+   "regex": "^schedules:EG-3 ",
+   "group": "H23-AD-EG-3"
+  },
+  {
+   "regex": "^schedules:RG-1 ",
+   "group": "H23-AD-RG-1"
+  },
+  {
+   "regex": "^schedules:RG-2 ",
+   "group": "H23-AD-RG-2"
+  },
+  {
+   "regex": "^schedules:RG-3 ",
+   "group": "H23-AD-RG-3"
+  },
+  {
+   "regex": "^schedules:RG-4 ",
+   "group": "H23-AD-RG-4"
+  },
+  {
+   "regex": "^schedules:SD-1 ",
+   "group": "H23-AD-SD-1"
+  },
+  {
+   "regex": "^schedules:SD-2 ",
+   "group": "H23-AD-SD-2"
+  },
+  {
+   "regex": "^schedules:SD-3 ",
+   "group": "H23-AD-SD-3"
+  },
+  {
+   "regex": "^schedules:SD-4 ",
+   "group": "H23-AD-SD-4"
+  },
+  {
+   "regex": "^schedules:TG-1 ",
+   "group": "H23-AD-TG-1"
+  },
+  {
+   "regex": "^schedules:TG-2 ",
+   "group": "H23-AD-TG-2"
+  },
+  {
+   "regex": "^schedules:OCU-1 ",
+   "group": "H23-EQ-OCU-1"
+  },
+  {
+   "regex": "^schedules:OCU-2 ",
+   "group": "H23-EQ-OCU-2"
+  },
+  {
+   "regex": "^schedules:OCU-3 ",
+   "group": "H23-EQ-OCU-3"
+  },
+  {
+   "regex": "^schedules:OCU-4 ",
+   "group": "H23-EQ-OCU-4"
+  },
+  {
+   "regex": "^schedules:OCU-5 ",
+   "group": "H23-EQ-OCU-5"
+  },
+  {
+   "regex": "^schedules:Light A ",
+   "group": "H26-LT-A"
+  },
+  {
+   "regex": "^schedules:Light AE ",
+   "group": "H26-LT-AE"
+  },
+  {
+   "regex": "^schedules:Light B ",
+   "group": "H26-LT-B"
+  },
+  {
+   "regex": "^schedules:Light BE ",
+   "group": "H26-LT-BE"
+  },
+  {
+   "regex": "^schedules:Light D ",
+   "group": "H26-LT-D"
+  },
+  {
+   "regex": "^schedules:Light X ",
+   "group": "H26-LT-X"
+  },
+  {
+   "regex": "^schedules:Light M ",
+   "group": "H26-POLE"
+  },
+  {
+   "regex": "^devices:(DUPLEX|QUADRUPLEX) CONVENIENCE OUTLET",
+   "group": "H26-REC"
+  },
+  {
+   "regex": "^schedules:Panel LP[123]$",
+   "group": "H26-PANEL"
+  },
+  {
+   "regex": "^devices:WALL MOUNTED DATA OUTLET",
+   "group": "H27-DATA"
+  },
+  {
+   "key": "devices:FIRE ALARM CONTROL PANEL",
+   "group": "H28-FACP"
+  },
+  {
+   "key": "civil:Silt fence",
+   "group": "H31-SILT"
+  },
+  {
+   "regex": "^schedules:Plant Cr ",
+   "group": "H32-PL-Cr"
+  },
+  {
+   "regex": "^schedules:Plant Mm ",
+   "group": "H32-PL-Mm"
+  },
+  {
+   "regex": "^schedules:Plant Ng ",
+   "group": "H32-PL-Ng"
+  },
+  {
+   "regex": "^schedules:Plant Qs ",
+   "group": "H32-PL-Qs"
+  },
+  {
+   "regex": "^schedules:Plant Hw ",
+   "group": "H32-PL-Hw"
+  },
+  {
+   "regex": "^schedules:Plant Hp ",
+   "group": "H32-PL-Hp"
+  },
+  {
+   "regex": "^schedules:Plant Ig ",
+   "group": "H32-PL-Ig"
+  },
+  {
+   "regex": "^schedules:Plant Id ",
+   "group": "H32-PL-Id"
+  },
+  {
+   "regex": "^schedules:Plant Ra ",
+   "group": "H32-PL-Ra"
+  },
+  {
+   "regex": "^schedules:Plant Sr ",
+   "group": "H32-PL-Sr"
+  },
+  {
+   "regex": "^schedules:Plant Ch ",
+   "group": "H32-SOD"
+  },
+  {
+   "regex": "^schedules:Plant DBFGM ",
+   "group": "H32-SEED"
+  },
+  {
+   "key": "site:Asphalt paving",
+   "group": "H32-PAVE"
+  },
+  {
+   "key": "civil:12\" RCP storm, depth unknown",
+   "group": "H33-RCP12"
+  },
+  {
+   "key": "civil:15\" RCP storm, depth unknown",
+   "group": "H33-RCP15"
+  },
+  {
+   "key": "civil:6\" storm, depth unknown",
+   "group": "H33-RD6"
+  },
+  {
+   "key": "civil:8\" storm, depth unknown",
+   "group": "H33-RD8"
+  },
+  {
+   "key": "civil:10\" storm, depth unknown",
+   "group": "H33-RD10"
+  },
+  {
+   "key": "civil:2\" water, depth unknown",
+   "group": "H33-WS2"
+  },
+  {
+   "key": "civil:4\" water, depth unknown",
+   "group": "H33-WS4"
+  },
+  {
+   "key": "civil:4\" PVC sanitary, depth unknown",
+   "group": "H33-SS4"
+  },
+  {
+   "key": "civil:Sewer cleanout, depth unknown",
+   "group": "H33-CO"
+  },
+  {
+   "key": "walls:Gross floor area",
+   "group": "H01-GSF"
+  },
+  {
+   "regex": "^devices:FIRE ALARM CEILING MOUNTED SMOKE DETECTOR",
+   "group": "H28-SMK"
+  },
+  {
+   "regex": "^devices:FIRE ALARM WALL MOUNTED AUDIO/VISUAL",
+   "group": "H28-AV"
+  },
+  {
+   "regex": "^devices:FIRE ALARM WALL MOUNTED VISUAL DEVICE",
+   "group": "H28-V"
+  },
+  {
+   "regex": "^devices:FIRE ALARM MANUAL PULL STATION",
+   "group": "H28-PULL"
+  },
+  {
+   "regex": "^devices:(CEILING MOUNTED )?(DUAL TECHNOLOGY )?OCCUPANCY SENSOR",
+   "group": "H26-OS"
+  },
+  {
+   "regex": "^schedules:IFC-1\\b",
+   "group": "H23-EQ-IFC-1"
+  },
+  {
+   "regex": "^schedules:IFC-2\\b",
+   "group": "H23-EQ-IFC-2"
+  },
+  {
+   "regex": "^schedules:IFC-3\\b",
+   "group": "H23-EQ-IFC-3"
+  },
+  {
+   "regex": "^schedules:IFC-4\\b",
+   "group": "H23-EQ-IFC-4"
+  },
+  {
+   "regex": "^schedules:IFC-5\\b",
+   "group": "H23-EQ-IFC-5"
+  },
+  {
+   "regex": "^schedules:IHP-1\\b",
+   "group": "H23-EQ-IHP-1"
+  },
+  {
+   "regex": "^schedules:OHP-1\\b",
+   "group": "H23-EQ-OHP-1"
+  },
+  {
+   "regex": "^schedules:IHP-2\\b",
+   "group": "H23-EQ-IHP-2"
+  },
+  {
+   "regex": "^schedules:OHP-2\\b",
+   "group": "H23-EQ-OHP-2"
+  },
+  {
+   "regex": "^schedules:IHP-3\\b",
+   "group": "H23-EQ-IHP-3"
+  },
+  {
+   "regex": "^schedules:OHP-3\\b",
+   "group": "H23-EQ-OHP-3"
+  },
+  {
+   "regex": "^schedules:EF-1\\b",
+   "group": "H23-EQ-EF-1"
+  },
+  {
+   "regex": "^schedules:EF-2\\b",
+   "group": "H23-EQ-EF-2"
+  },
+  {
+   "regex": "^schedules:SF-1\\b",
+   "group": "H23-EQ-SF-1"
+  },
+  {
+   "regex": "^schedules:KH-1\\b",
+   "group": "H23-EQ-KH-1"
+  }
+ ],
+ "info": [
+  {
+   "regex": "^walls:Wall Type [45]( wall area)?$",
+   "why": "exterior wall types - the exterior wall length is scored once, from the outer face loop (walls:Exterior Walls -> H09-EXTWALL)"
+  },
+  {
+   "regex": "^rooms:",
+   "why": "room floor area - the human carries finishes, not room areas"
+  },
+  {
+   "regex": "^finishes:.*\\(code unknown\\)$",
+   "why": "finish with no code in the finish schedule (review only)"
+  },
+  {
+   "regex": "^devices:.*",
+   "why": "legend text with no count (notes, sheet-reference lines) unless mapped above"
+  },
+  {
+   "regex": "^walls:Wall \\d.*",
+   "why": "untagged walls by thickness (review only)"
+  }
+ ],
+ "checks": {},
+ "regroup": {}
+}

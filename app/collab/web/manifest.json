@@ -1,0 +1,14 @@
+{
+  "name": "QuantiSheet Mobile",
+  "short_name": "QuantiSheet",
+  "start_url": "index.html",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#1e1e1e",
+  "theme_color": "#1e1e1e",
+  "description": "Join a QuantiSheet collaboration room from your phone.",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

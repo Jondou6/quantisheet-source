@@ -1,0 +1,8 @@
+# HTTPS in front of the self-service server. Replace the host name.
+selfservice.example.com {
+	encode gzip
+	reverse_proxy qsbo-server:8080
+	request_body {
+		max_size 5MB
+	}
+}

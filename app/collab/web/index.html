@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1e1e1e">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>QuantiSheet Mobile</title>
+<style>
+  :root {
+    --bg: #1e1e1e; --panel: #2a2a2a; --line: #3a3a3a; --text: #ececec;
+    --muted: #9a9a9a; --accent: #4f9cf9; --danger: #ff6b6b; --ok: #4cc38a;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+    font: 15px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  button, input { font: inherit; color: inherit; }
+  button { background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    padding: 8px 12px; min-height: 40px; cursor: pointer; }
+  button:active { transform: translateY(1px); }
+  button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button:disabled { opacity: .4; }
+  input { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line);
+    background: #141414; }
+  label { display: block; margin: 12px 0 4px; color: var(--muted); font-size: 13px; }
+
+  #join { max-width: 420px; margin: 0 auto; padding: 32px 16px; }
+  #join h1 { font-size: 22px; margin: 0 0 4px; }
+  #join p { color: var(--muted); margin: 0 0 12px; }
+  #join .go { width: 100%; margin-top: 20px; background: var(--accent); border-color: var(--accent); color: #fff; }
+  #joinErr { color: var(--danger); min-height: 1.4em; margin-top: 12px; }
+
+  #app { display: none; height: 100%; flex-direction: column; }
+  #bar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 8px;
+    padding-top: max(8px, env(safe-area-inset-top)); background: var(--panel);
+    border-bottom: 1px solid var(--line); }
+  #bar .grow { flex: 1; }
+  #pageInfo { min-width: 64px; text-align: center; color: var(--muted); font-variant-numeric: tabular-nums; }
+  #status { font-size: 12px; color: var(--muted); padding: 4px 10px; border-bottom: 1px solid var(--line); }
+  #status .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--danger); margin-right: 6px; vertical-align: middle; }
+  #status.live .dot { background: var(--ok); }
+  #viewer { flex: 1; overflow: auto; -webkit-overflow-scrolling: touch; background: #111;
+    display: flex; justify-content: center; align-items: flex-start; padding: 12px; }
+  #stack { position: relative; box-shadow: 0 2px 12px #0008; background: #fff; }
+  #stack canvas { display: block; }
+  #overlay { position: absolute; left: 0; top: 0; }
+  #overlay.draw { touch-action: none; cursor: crosshair; }
+  #empty { color: var(--muted); text-align: center; margin-top: 30vh; padding: 0 24px; }
+</style>
+</head>
+<body>
+
+<section id="join">
+  <h1>QuantiSheet</h1>
+  <p>Join a collaboration room hosted from the desktop app.</p>
+  <label for="wsUrl">Relay address</label>
+  <input id="wsUrl" autocomplete="off" autocapitalize="off" spellcheck="false">
+  <label for="room">Room</label>
+  <input id="room" value="default" autocapitalize="off">
+  <label for="pw">Password</label>
+  <input id="pw" type="password">
+  <button class="go" id="joinBtn">Join</button>
+  <div id="joinErr"></div>
+</section>
+
+<section id="app">
+  <div id="bar">
+    <button id="prev" aria-label="Previous page">‹</button>
+    <span id="pageInfo">–</span>
+    <button id="next" aria-label="Next page">›</button>
+    <button id="zoomOut" aria-label="Zoom out">−</button>
+    <button id="zoomIn" aria-label="Zoom in">+</button>
+    <span class="grow"></span>
+    <button data-tool="" class="on">Pan</button>
+    <button data-tool="add_highlight">Highlight</button>
+    <button data-tool="add_rect">Box</button>
+    <button data-tool="add_note">Note</button>
+  </div>
+  <div id="status"><span class="dot"></span><span id="statusText">connecting…</span></div>
+  <div id="viewer">
+    <div id="empty">Waiting for the host to send the document…</div>
+    <div id="stack" hidden><canvas id="pdf"></canvas><canvas id="overlay"></canvas></div>
+  </div>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+"use strict";
+// ---------------------------------------------------------------------------
+// SHA-256 (WebCrypto is unavailable on plain-http LAN pages, so do it here).
+// ---------------------------------------------------------------------------
+const sha256hex = (() => {
+  const K = new Uint32Array([
+    0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+    0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+    0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+    0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+    0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+    0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+    0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+    0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2]);
+  const rotr = (x, n) => (x >>> n) | (x << (32 - n));
+  return (str) => {
+    const msg = new TextEncoder().encode(str);
+    const len = msg.length, total = ((len + 9 + 63) >> 6) << 6;
+    const buf = new Uint8Array(total);
+    buf.set(msg); buf[len] = 0x80;
+    const dv = new DataView(buf.buffer);
+    dv.setUint32(total - 8, Math.floor(len / 0x20000000));
+    dv.setUint32(total - 4, (len << 3) >>> 0);
+    const H = new Uint32Array([0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,
+                               0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19]);
+    const W = new Uint32Array(64);
+    for (let off = 0; off < total; off += 64) {
+      for (let i = 0; i < 16; i++) W[i] = dv.getUint32(off + i * 4);
+      for (let i = 16; i < 64; i++) {
+        const s0 = rotr(W[i-15], 7) ^ rotr(W[i-15], 18) ^ (W[i-15] >>> 3);
+        const s1 = rotr(W[i-2], 17) ^ rotr(W[i-2], 19) ^ (W[i-2] >>> 10);
+        W[i] = (W[i-16] + s0 + W[i-7] + s1) >>> 0;
+      }
+      let [a, b, c, d, e, f, g, h] = H;
+      for (let i = 0; i < 64; i++) {
+        const t1 = (h + (rotr(e, 6) ^ rotr(e, 11) ^ rotr(e, 25)) + ((e & f) ^ (~e & g)) + K[i] + W[i]) >>> 0;
+        const t2 = ((rotr(a, 2) ^ rotr(a, 13) ^ rotr(a, 22)) + ((a & b) ^ (a & c) ^ (b & c))) >>> 0;
+        h = g; g = f; f = e; e = (d + t1) >>> 0; d = c; c = b; b = a; a = (t1 + t2) >>> 0;
+      }
+      H[0] += a; H[1] += b; H[2] += c; H[3] += d; H[4] += e; H[5] += f; H[6] += g; H[7] += h;
+    }
+    return Array.from(H, x => x.toString(16).padStart(8, "0")).join("");
+  };
+})();
+
+// JSON with sorted keys, matching Python's
+// json.dumps(sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+function canonical(v) {
+  if (Array.isArray(v)) return "[" + v.map(canonical).join(",") + "]";
+  if (v && typeof v === "object")
+    return "{" + Object.keys(v).sort().map(k => JSON.stringify(k) + ":" + canonical(v[k])).join(",") + "}";
+  return JSON.stringify(v);
+}
+const r2 = n => Math.round(n * 100) / 100;   // keep numbers simple and stable
+
+// ---------------------------------------------------------------------------
+// State
+// ---------------------------------------------------------------------------
+const $ = id => document.getElementById(id);
+// keep the relay token out of the address bar, history and screenshots
+try {
+  const u = new URL(location.href);
+  if (u.searchParams.has("t") || /(^|[#&])t=/.test(u.hash)) {
+    u.searchParams.delete("t");
+    u.hash = "";
+    history.replaceState(null, "", u.pathname + u.search);
+  }
+} catch (e) {}
+const store = {
+  get(k, d) { try { return localStorage.getItem(k) ?? d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+};
+const S = {
+  ws: null, room: "", password: "", url: "", stopped: false, retry: 1000,
+  // the relay token, from the invite link (#t=..., or ?t=... from older
+  // versions); taken out of the address bar right away (see below)
+  token: new URLSearchParams(location.hash.slice(1)).get("t") ||
+         new URLSearchParams(location.search).get("t") || "",
+  clientId: Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, "0")).join(""),
+  seq: 0, clock: 0,
+  ops: new Map(),            // id -> op
+  baked: new Set(),          // op ids already drawn into the current PDF
+  haveSnapshot: false, forceNext: false, skipSnapshotOps: false,
+  pdf: null, pageNo: 1, zoom: 1, page: null, viewport: null,
+  tool: "", drag: null, cursors: new Map(), peers: 0,
+};
+
+// ---------------------------------------------------------------------------
+// Connection
+// ---------------------------------------------------------------------------
+function setStatus(text, live) {
+  $("statusText").textContent = text;
+  $("status").classList.toggle("live", !!live);
+}
+
+function send(msg) {
+  if (S.ws && S.ws.readyState === 1) S.ws.send(JSON.stringify(msg));
+}
+function sendEvent(name, payload) {
+  send({ type: "event", name, client_id: S.clientId, payload: payload || {} });
+}
+
+function connect() {
+  setStatus("connecting…");
+  let ws;
+  try { ws = new WebSocket(S.url); }
+  catch (e) { return fail("That relay address isn't valid."); }
+  S.ws = ws;
+  ws.onopen = () => {
+    S.retry = 1000;
+    ws.send(JSON.stringify({ type: "hello", room: S.room, password: S.password,
+                             token: S.token || null, client_id: S.clientId }));
+    setStatus("connected", true);
+    if (S.ops.size) sendEvent("ops", { ops: [...S.ops.values()] });
+    if (!S.haveSnapshot) sendEvent("request_snapshot");
+  };
+  ws.onmessage = ev => {
+    let m; try { m = JSON.parse(ev.data); } catch { return; }
+    if (!m || typeof m !== "object") return;
+    try { onMessage(m); } catch (e) { console.error(e); }
+  };
+  ws.onclose = () => {
+    S.ws = null;
+    if (S.stopped) return;
+    setStatus("disconnected — retrying…");
+    setTimeout(connect, S.retry);
+    S.retry = Math.min(S.retry * 2, 15000);
+  };
+}
+
+function fail(msg) {
+  S.stopped = true;
+  if (S.ws) S.ws.close();
+  $("app").style.display = "none";
+  $("join").style.display = "block";
+  $("joinErr").textContent = msg;
+}
+
+function onMessage(m) {
+  switch (m.type) {
+    case "error": return fail(m.msg || "The relay refused the connection.");
+    case "peer_join": case "peer_leave": case "peer_list": {
+      const prev = S.peers; S.peers = m.count | 0;
+      setStatus(`connected — ${S.peers} in room`, true);
+      if (S.peers > prev && prev) {
+        if (S.ops.size) sendEvent("ops", { ops: [...S.ops.values()] });
+        if (!S.haveSnapshot) sendEvent("request_snapshot");
+      }
+      return;
+    }
+    case "snapshot": return onSnapshot(m.data || "");
+    case "snapshot_part": {               // big PDFs come in parts
+      const n = m.n | 0, i = m.i | 0;
+      if (n < 1 || n > 256 || i < 0 || i >= n) return;
+      if (!S.parts || S.parts.sid !== m.sid) S.parts = { sid: m.sid, n, got: {}, count: 0 };
+      if (!(i in S.parts.got)) { S.parts.got[i] = m.data || ""; S.parts.count++; }
+      if (S.parts.count === S.parts.n) {
+        let whole = "";
+        for (let k = 0; k < S.parts.n; k++) whole += S.parts.got[k];
+        S.parts = null;
+        return onSnapshot(whole);
+      }
+      return;
+    }
+    case "cursor":
+      if (m.client_id !== S.clientId) {
+        S.cursors.set(m.client_id, { page: m.page | 0, x: +m.x, y: +m.y, t: Date.now() });
+        drawOverlay();
+      }
+      return;
+    case "event": return onEvent(m.name, m.payload || {});
+  }
+}
+
+function onEvent(name, p) {
+  if (name === "snapshot_incoming") S.forceNext = !!p.force;
+  else if (name === "snapshot_ops") {
+    mergeOps(p.ops || []);
+    if (S.skipSnapshotOps) S.skipSnapshotOps = false;
+    else S.baked = new Set((p.ids || []).filter(i => typeof i === "string"));
+    drawOverlay();
+  }
+  else if (name === "op" && p.op) { mergeOps([p.op]); drawOverlay(); }
+  else if (name === "ops" && Array.isArray(p.ops)) { mergeOps(p.ops); drawOverlay(); }
+}
+
+function mergeOps(list) {
+  for (const o of list) {
+    if (!o || typeof o.id !== "string" || typeof o.kind !== "string") continue;
+    if (!Number.isInteger(o.page) || o.page < 0) continue;
+    if (S.ops.has(o.id)) continue;
+    S.ops.set(o.id, o);
+    S.clock = Math.max(S.clock, o.lamport | 0);
+  }
+}
+
+async function onSnapshot(b64) {
+  const accept = !S.haveSnapshot || S.forceNext;
+  S.forceNext = false;
+  S.skipSnapshotOps = !accept;
+  if (!accept) return;
+  const bin = atob(b64), bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  try {
+    const pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
+    if (S.pdf) S.pdf.destroy();
+    S.pdf = pdf;
+    S.haveSnapshot = true;
+    S.baked = new Set();
+    S.pageNo = Math.min(S.pageNo, pdf.numPages);
+    $("empty").hidden = true;
+    $("stack").hidden = false;
+    await renderPage();
+  } catch (e) {
+    console.error(e);
+    setStatus("received a document that couldn't be opened");
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Rendering
+// ---------------------------------------------------------------------------
+let renderTask = null;
+async function renderPage() {
+  if (!S.pdf) return;
+  const page = await S.pdf.getPage(S.pageNo);
+  const fit = ($("viewer").clientWidth - 24) / page.getViewport({ scale: 1 }).width;
+  const vp = page.getViewport({ scale: Math.max(0.2, fit * S.zoom) });
+  const dpr = window.devicePixelRatio || 1;
+  const c = $("pdf"), o = $("overlay");
+  for (const cv of [c, o]) {
+    cv.width = Math.floor(vp.width * dpr); cv.height = Math.floor(vp.height * dpr);
+    cv.style.width = vp.width + "px"; cv.style.height = vp.height + "px";
+  }
+  S.page = page; S.viewport = vp;
+  if (renderTask) renderTask.cancel();
+  renderTask = page.render({ canvasContext: c.getContext("2d"), viewport: vp,
+                             transform: dpr !== 1 ? [dpr, 0, 0, dpr, 0, 0] : null });
+  try { await renderTask.promise; } catch { /* cancelled by a newer render */ }
+  $("pageInfo").textContent = `${S.pageNo} / ${S.pdf.numPages}`;
+  $("prev").disabled = S.pageNo <= 1;
+  $("next").disabled = S.pageNo >= S.pdf.numPages;
+  drawOverlay();
+}
+
+// Our ops use page coordinates with the origin at the top-left of the
+// unrotated page (as PyMuPDF does). pdf.js wants PDF user space (origin
+// bottom-left); the viewport then handles zoom and page rotation.
+function toScreen(x, y) {
+  const v = S.page.view;
+  return S.viewport.convertToViewportPoint(v[0] + x, v[3] - y);
+}
+function fromScreen(sx, sy) {
+  const v = S.page.view;
+  const [px, py] = S.viewport.convertToPdfPoint(sx, sy);
+  return [r2(px - v[0]), r2(v[3] - py)];
+}
+function screenRect(r) {
+  const [ax, ay] = toScreen(r[0], r[1]), [bx, by] = toScreen(r[2], r[3]);
+  return [Math.min(ax, bx), Math.min(ay, by), Math.abs(bx - ax), Math.abs(by - ay)];
+}
+const rgb = (c, a) => Array.isArray(c) && c.length === 3
+  ? `rgba(${c.map(x => Math.round(x * 255)).join(",")},${a})` : null;
+
+function drawOverlay() {
+  const o = $("overlay");
+  if (!S.viewport) return;
+  const ctx = o.getContext("2d");
+  const dpr = window.devicePixelRatio || 1;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, o.width, o.height);
+  const pageIdx = S.pageNo - 1;
+  const dead = new Set([...S.ops.values()]
+    .filter(o => o.kind === "delete_annot" && typeof o.payload?.target === "string")
+    .map(o => o.payload.target));
+  const ordered = [...S.ops.values()].sort((a, b) =>
+    (a.lamport - b.lamport) || (a.client_id < b.client_id ? -1 : a.client_id > b.client_id ? 1 : 0) || (a.seq - b.seq));
+  for (const op of ordered) {
+    if (op.page !== pageIdx || S.baked.has(op.id) || dead.has(op.id)) continue;
+    drawOp(ctx, op);
+  }
+  if (S.drag) {
+    ctx.setLineDash([4, 3]); ctx.strokeStyle = "#4f9cf9"; ctx.lineWidth = 1;
+    const { x0, y0, x1, y1 } = S.drag;
+    ctx.strokeRect(Math.min(x0, x1), Math.min(y0, y1), Math.abs(x1 - x0), Math.abs(y1 - y0));
+    ctx.setLineDash([]);
+  }
+  const scale = S.viewport.scale;
+  for (const [, c] of S.cursors) {
+    if (c.page !== pageIdx || Date.now() - c.t > 10000) continue;
+    ctx.strokeStyle = "#ff8c00"; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(c.x * scale, c.y * scale, 6, 0, Math.PI * 2); ctx.stroke();
+  }
+}
+
+function drawOp(ctx, op) {
+  const p = op.payload || {};
+  const color = c => rgb(p.color, 1);
+  if (Array.isArray(p.rect) && p.rect.length === 4) {
+    const [x, y, w, h] = screenRect(p.rect);
+    switch (op.kind) {
+      case "add_highlight":
+        ctx.fillStyle = rgb(p.color, 0.35) || "rgba(255,255,0,.35)"; ctx.fillRect(x, y, w, h); return;
+      case "add_underline": case "add_strike": {
+        ctx.strokeStyle = color() || "red"; ctx.lineWidth = 1.5;
+        const yy = op.kind === "add_underline" ? y + h : y + h / 2;
+        ctx.beginPath(); ctx.moveTo(x, yy); ctx.lineTo(x + w, yy); ctx.stroke(); return;
+      }
+      case "add_rect": case "add_cloud":
+        ctx.strokeStyle = color() || (op.kind === "add_cloud" ? "red" : "blue");
+        ctx.lineWidth = 1.5; if (op.kind === "add_cloud") ctx.setLineDash([6, 3]);
+        ctx.strokeRect(x, y, w, h); ctx.setLineDash([]); return;
+      case "add_ellipse":
+        ctx.strokeStyle = color() || "blue"; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, Math.PI * 2); ctx.stroke(); return;
+      case "add_redact": case "replace_span":
+        ctx.fillStyle = op.kind === "add_redact" ? "#000" : "#fff"; ctx.fillRect(x, y, w, h);
+        if (op.kind === "replace_span" && p.text) { ctx.fillStyle = "#000"; ctx.font = "11px sans-serif"; ctx.fillText(p.text, x + 2, y + h - 3); }
+        return;
+    }
+  }
+  if (Array.isArray(p.pt) && p.pt.length === 2) {
+    const [x, y] = toScreen(p.pt[0], p.pt[1]);
+    if (op.kind === "add_note") {
+      ctx.fillStyle = "#ffcc00"; ctx.fillRect(x, y, 16, 16);
+      ctx.fillStyle = "#000"; ctx.font = "bold 12px sans-serif"; ctx.fillText("✎", x + 3, y + 13);
+    } else if (op.kind === "add_count" || op.kind === "add_text") {
+      ctx.fillStyle = color() || (op.kind === "add_count" ? "red" : "#000");
+      ctx.font = "12px sans-serif"; ctx.fillText(String(op.kind === "add_count" ? p.n : p.text ?? ""), x + 2, y);
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Editing
+// ---------------------------------------------------------------------------
+function addOp(kind, payload) {
+  S.clock += 1; S.seq += 1;
+  const op = { kind, client_id: S.clientId, seq: S.seq, page: S.pageNo - 1,
+               payload, lamport: S.clock };
+  op.id = sha256hex(canonical(op)).slice(0, 32);
+  op.ts = Date.now() / 1000;
+  S.ops.set(op.id, op);
+  sendEvent("op", { op });
+  drawOverlay();
+}
+
+function pos(e) {
+  const r = $("overlay").getBoundingClientRect();
+  return [e.clientX - r.left, e.clientY - r.top];
+}
+const overlay = $("overlay");
+overlay.addEventListener("pointerdown", e => {
+  if (!S.tool || !S.viewport) return;
+  overlay.setPointerCapture(e.pointerId);
+  const [x, y] = pos(e);
+  S.drag = { x0: x, y0: y, x1: x, y1: y };
+});
+let lastCursor = 0;
+overlay.addEventListener("pointermove", e => {
+  const [x, y] = pos(e);
+  if (S.drag) { S.drag.x1 = x; S.drag.y1 = y; drawOverlay(); }
+  const now = Date.now();
+  if (S.viewport && now - lastCursor > 60) {
+    lastCursor = now;
+    const s = S.viewport.scale;
+    send({ type: "cursor", client_id: S.clientId, page: S.pageNo - 1, x: r2(x / s), y: r2(y / s) });
+  }
+});
+overlay.addEventListener("pointerup", () => {
+  const d = S.drag; S.drag = null;
+  if (!d) return;
+  if (S.tool === "add_note") {
+    const text = prompt("Note:");
+    if (text && text.trim()) addOp("add_note", { pt: fromScreen(d.x1, d.y1), text });
+    else drawOverlay();
+    return;
+  }
+  if (Math.abs(d.x1 - d.x0) < 4 || Math.abs(d.y1 - d.y0) < 4) return drawOverlay();
+  const [ax, ay] = fromScreen(d.x0, d.y0), [bx, by] = fromScreen(d.x1, d.y1);
+  addOp(S.tool, { rect: [Math.min(ax, bx), Math.min(ay, by), Math.max(ax, bx), Math.max(ay, by)] });
+});
+overlay.addEventListener("pointercancel", () => { S.drag = null; drawOverlay(); });
+
+// ---------------------------------------------------------------------------
+// Controls
+// ---------------------------------------------------------------------------
+for (const b of document.querySelectorAll("[data-tool]")) {
+  b.addEventListener("click", () => {
+    S.tool = b.dataset.tool;
+    document.querySelectorAll("[data-tool]").forEach(x => x.classList.toggle("on", x === b));
+    overlay.classList.toggle("draw", !!S.tool);
+  });
+}
+$("prev").onclick = () => { if (S.pageNo > 1) { S.pageNo--; renderPage(); } };
+$("next").onclick = () => { if (S.pdf && S.pageNo < S.pdf.numPages) { S.pageNo++; renderPage(); } };
+$("zoomIn").onclick = () => { S.zoom = Math.min(5, S.zoom * 1.25); renderPage(); };
+$("zoomOut").onclick = () => { S.zoom = Math.max(0.3, S.zoom / 1.25); renderPage(); };
+let resizeTimer;
+window.addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(renderPage, 200); });
+setInterval(drawOverlay, 3000);   // let stale remote cursors fade out
+
+const params = new URLSearchParams(location.search);
+$("wsUrl").value = params.get("ws") || store.get("quantisheet.ws",
+  `ws://${location.hostname || "localhost"}:8765`);
+$("room").value = params.get("room") || store.get("quantisheet.room", "default");
+
+$("joinBtn").onclick = () => {
+  if (typeof pdfjsLib === "undefined") {
+    $("joinErr").textContent = "Couldn't load the PDF viewer (needs an internet connection the first time).";
+    return;
+  }
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  S.url = $("wsUrl").value.trim();
+  S.room = $("room").value.trim() || "default";
+  S.password = $("pw").value;
+  store.set("quantisheet.ws", S.url); store.set("quantisheet.room", S.room);
+  $("joinErr").textContent = "";
+  S.stopped = false;
+  $("join").style.display = "none";
+  $("app").style.display = "flex";
+  connect();
+};
+
+if ("serviceWorker" in navigator && window.isSecureContext) {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+</script>
+</body>
+</html>

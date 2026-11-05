@@ -1,0 +1,90 @@
+{
+ "n": 3,
+ "state": {
+  "activities": [
+   {
+    "_coll": "activity",
+    "_n": 1,
+    "_no": "A0001",
+    "_rev": 0,
+    "duration": 2,
+    "name": "GC mobilize",
+    "start": "2026-11-02"
+   },
+   {
+    "_coll": "activity",
+    "_ext": "msp:2",
+    "_n": 2,
+    "_no": "A0002",
+    "_rev": 0,
+    "actual_finish": "",
+    "actual_start": "2026-11-02",
+    "area": "Electrical",
+    "baseline_finish": "2026-11-06",
+    "baseline_start": "2026-11-02",
+    "duration": 5.0,
+    "name": "Rough-in",
+    "notes": "Level 1 first",
+    "percent": "25",
+    "preds": [],
+    "start": "2026-11-02",
+    "status": "In Progress"
+   },
+   {
+    "_coll": "activity",
+    "_ext": "msp:3",
+    "_n": 3,
+    "_no": "A0003",
+    "_rev": 0,
+    "actual_finish": "",
+    "actual_start": "",
+    "area": "Electrical",
+    "duration": 2.5,
+    "name": "Trim",
+    "percent": "",
+    "preds": [
+     {
+      "id": "A0002",
+      "lag": 1.0,
+      "type": "FS"
+     }
+    ],
+    "start": "",
+    "status": "Not Started"
+   },
+   {
+    "_coll": "activity",
+    "_ext": "msp:4",
+    "_n": 4,
+    "_no": "A0004",
+    "_rev": 0,
+    "actual_finish": "",
+    "actual_start": "",
+    "area": "Electrical",
+    "duration": 0,
+    "name": "Power on",
+    "percent": "",
+    "preds": [
+     {
+      "id": "A0003",
+      "lag": "",
+      "type": "SS"
+     }
+    ],
+    "start": "",
+    "status": "Not Started"
+   }
+  ],
+  "next": {
+   "activity": 5
+  },
+  "pending": 4,
+  "settings": {
+   "data_date": "2026-10-01",
+   "holidays": [
+    "2026-11-26",
+    "2026-11-27"
+   ]
+  }
+ }
+}

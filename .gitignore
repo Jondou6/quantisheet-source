@@ -1,0 +1,37 @@
+# never in the repository (private data, keys, builds)
+app/onboard.py
+tools/unlock_code.py
+app/data/company_sender.json
+app/data/company_dropbox.json
+app/data/contacts.sealed
+app/data/build.json
+*.sealed
+*.pem
+*.key
+.env*
+*.xlsx
+*.xls
+*.vcf
+*.pst
+*.msi
+*.exe
+*.log
+release/
+dist/
+build/
+.run/
+# the relay server's data (its secret is made on first start)
+server/data/
+.venv/
+.venv-pm2/
+__pycache__/
+*.pyc
+# real client documents (layout reference only)
+private/
+# research briefs, reviews and notes for Claude (never ship, review #21)
+*DEEP_DIVE*
+*_BRIEF.md
+*_BRIEF.pdf
+FOR_CLAUDE_*
+*.esx
+.work/
