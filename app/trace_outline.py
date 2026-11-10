@@ -23,6 +23,7 @@ viewer (PdfView.trace_index).
 """
 import heapq
 import math
+from .dmoney import c2 as _c2
 
 CELL = 24.0                  # grid cell, points
 MAX_SEGMENTS = 300_000       # dense sheets: index the first this many
@@ -146,7 +147,7 @@ class Snap:
         self.x, self.y, self.kind, self.chain, self.pos = x, y, kind, chain, pos
 
     def __repr__(self):
-        return (f"Snap({self.x:.2f}, {self.y:.2f}, {self.kind}, "
+        return (f"Snap({_c2(self.x):.2f}, {_c2(self.y):.2f}, {self.kind}, "
                 f"chain={self.chain}, pos={self.pos:.3f})")
 
 
@@ -399,7 +400,7 @@ def measures(pts, ppu):
 def readout(pts, ppu, unit, fmt=None):
     """One line for the live readout: area, perimeter, length, points."""
     m = measures(pts, ppu)
-    f = fmt or (lambda v, u: f"{v:,.2f} {u}")
-    return (f"Area {m['area']:,.2f} sq {unit} · Perim "
+    f = fmt or (lambda v, u: f"{_c2(v):,.2f} {u}")
+    return (f"Area {_c2(m['area']):,.2f} sq {unit} · Perim "
             f"{f(m['perimeter'], unit)} · Len {f(m['length'], unit)} "
             f"· {m['points']} pts")

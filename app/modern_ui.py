@@ -103,7 +103,12 @@ def rail_label(a, limit=9):
     t = t.split("(")[0].strip() or t
     if len(t) > limit:
         words = t.split()
-        t = words[0] if len(words[0]) <= limit + 2 else t[:limit]
+        if len(words[0]) <= limit + 2:
+            t = words[0]
+        else:
+            # cut with an ellipsis, so it reads as shortened and not as a
+            # label that ran off the edge ("Accessibi"; seen Nov 9)
+            t = words[0][:limit - 1] + "…"
     return t
 
 
@@ -684,7 +689,7 @@ class Layouts:
         for host in (getattr(self.win, "_view_menu_bar", None),
                      getattr(self.win, "_file_menu", None)):
             if host is not None:
-                host.addMenu(m)
+                _add_above_exit(host, m)
         return m
 
     def bars(self):
@@ -1082,3 +1087,13 @@ class AllToolsPane(QWidget):
 def install(win):
     win.layouts = Layouts(win)
     return win.layouts
+
+
+def _add_above_exit(menu, sub):
+    """Add a submenu, keeping Exit (and Help) at the bottom of File."""
+    from .ribbon import clean
+    exit_a = next((a for a in menu.actions()
+                   if clean(a.text()).lower() == "exit"), None)
+    if exit_a is None:
+        return menu.addMenu(sub)
+    return menu.insertMenu(exit_a, sub)

@@ -8,6 +8,7 @@ import re
 
 from . import pricedb
 from . import vocab_core as core
+from .dmoney import c2 as _c2
 
 normalize = core.normalize
 
@@ -189,10 +190,10 @@ def classify(desc, unit, m, auto=0.92, review=0.75, check_units=True):
     base = {"item_id": item_id, "match": canonical, "score": round(score, 3)}
     if score < review:
         return dict(base, status="new", item_id=None,
-                    reason=f"below review floor ({score:.2f})")
+                    reason=f"below review floor ({_c2(score):.2f})")
     if score < auto:
         return dict(base, status="review",
-                    reason=f"low confidence ({score:.2f})")
+                    reason=f"low confidence ({_c2(score):.2f})")
     if len(tops) > 1 and (score - tops[1][0]) < AMBIGUITY_GAP:
         return dict(base, status="review",
                     reason=f"ambiguous vs '{tops[1][2]}'")

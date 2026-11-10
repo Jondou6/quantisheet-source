@@ -31,6 +31,7 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Sequence
+from .dmoney import c2 as _c2
 
 # --------------------------------------------------------------------------
 # Defaults - national average, union-ish. Override everything.
@@ -200,24 +201,24 @@ def print_breakdown(rate: LoadedRate, as_json: bool) -> None:
 
     print(f"\n{rate.trade}")
     print("-" * 46)
-    print(f"  base wage                     {b['base']:>10,.2f}")
-    print(f"  fringes                       {b['fringes']:>10,.2f}")
-    print(f"  direct (base + fringes)       {b['direct']:>10,.2f}")
-    print(f"  payroll burden  {rate.burden_pct:>5.1f}%         {b['burden']:>10,.2f}")
-    print(f"  workers' comp   {rate.wc_pct:>5.1f}%         {b['workers_comp']:>10,.2f}")
-    print(f"  general liab.   {rate.gl_pct:>5.1f}%         {b['general_liability']:>10,.2f}")
-    print(f"  small tools     {rate.tools_pct:>5.1f}%         {b['small_tools']:>10,.2f}")
+    print(f"  base wage                     {_c2(b['base']):>10,.2f}")
+    print(f"  fringes                       {_c2(b['fringes']):>10,.2f}")
+    print(f"  direct (base + fringes)       {_c2(b['direct']):>10,.2f}")
+    print(f"  payroll burden  {rate.burden_pct:>5.1f}%         {_c2(b['burden']):>10,.2f}")
+    print(f"  workers' comp   {rate.wc_pct:>5.1f}%         {_c2(b['workers_comp']):>10,.2f}")
+    print(f"  general liab.   {rate.gl_pct:>5.1f}%         {_c2(b['general_liability']):>10,.2f}")
+    print(f"  small tools     {rate.tools_pct:>5.1f}%         {_c2(b['small_tools']):>10,.2f}")
     if rate.super_pct:
-        print(f"  supervision     {rate.super_pct:>5.1f}%         {b['supervision']:>10,.2f}")
+        print(f"  supervision     {rate.super_pct:>5.1f}%         {_c2(b['supervision']):>10,.2f}")
     if rate.per_diem:
-        print(f"  per diem                      {b['per_diem']:>10,.2f}")
+        print(f"  per diem                      {_c2(b['per_diem']):>10,.2f}")
     print("-" * 46)
-    print(f"  LOADED RATE                   {b['loaded_rate']:>10,.2f} /hr")
+    print(f"  LOADED RATE                   {_c2(b['loaded_rate']):>10,.2f} /hr")
     if rate.conditions:
         print(f"\n  productivity factor           {b['productivity_factor']:>10,.3f}")
         for name, mult in rate.conditions.items():
             print(f"    {name:<14} x{mult:.3f}   {CONDITIONS[name][1]}")
-    print(f"\n  EFFECTIVE RATE                {b['effective_rate']:>10,.2f} /hr")
+    print(f"\n  EFFECTIVE RATE                {_c2(b['effective_rate']):>10,.2f} /hr")
     print(f"  burden is {b['burden_pct_of_loaded']:.0f}% of loaded cost\n")
 
 
@@ -258,12 +259,12 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     if args.list_trades:
         for name, preset in sorted(presets.items()):
-            print(f"{name:<22} base {preset.base:>7.2f}  fringes {preset.fringes:>6.2f}  wc {preset.wc:>5.1f}%")
+            print(f"{name:<22} base {_c2(preset.base):>7.2f}  fringes {_c2(preset.fringes):>6.2f}  wc {preset.wc:>5.1f}%")
         return 0
 
     if args.list_conditions:
         for name, (factor, note) in sorted(CONDITIONS.items()):
-            print(f"{name:<14} x{factor:.2f}   {note}")
+            print(f"{name:<14} x{_c2(factor):.2f}   {note}")
         return 0
 
     conditions = parse_conditions(args.conditions)
@@ -304,10 +305,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         else:
             for m, r in zip(crew, rates):
                 b = r.breakdown()
-                print(f"{m.count:>4.1f} x {m.trade:<20} loaded {b['loaded_rate']:>9,.2f}  effective {b['effective_rate']:>9,.2f}")
+                print(f"{m.count:>4.1f} x {m.trade:<20} loaded {_c2(b['loaded_rate']):>9,.2f}  effective {_c2(b['effective_rate']):>9,.2f}")
             print("-" * 60)
-            print(f"     crew hours {hours:>6.1f}            blended loaded {blended_loaded:>9,.2f}")
-            print(f"{'':>36}blended effective {blended_effective:>9,.2f}\n")
+            print(f"     crew hours {hours:>6.1f}            blended loaded {_c2(blended_loaded):>9,.2f}")
+            print(f"{'':>36}blended effective {_c2(blended_effective):>9,.2f}\n")
         return 0
 
     if not args.trade:

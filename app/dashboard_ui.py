@@ -20,6 +20,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QComboBox,
 
 from . import dashboard as db
 from . import theme
+from .dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 ALL = "All"
@@ -784,8 +785,8 @@ class EstimatingDashboard(QDialog):
             QMessageBox.warning(self, "Estimating Dashboard", str(e))
             return None
         gap = (j["bid"] - v) if j.get("bid") is not None else None
-        self.status.setText(f"{j['name']}: low bid ${v:,.2f}" + (
-            f", we were ${gap:,.2f} over" if gap and gap > 0 else
+        self.status.setText(f"{j['name']}: low bid ${_c2(v):,.2f}" + (
+            f", we were ${_c2(gap):,.2f} over" if gap and gap > 0 else
             " - we were low" if gap is not None and gap <= 0 else ""))
         self.refresh_view()
         return v

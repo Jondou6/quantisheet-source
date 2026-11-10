@@ -27,6 +27,8 @@ from collections import defaultdict
 import fitz
 
 from . import tradetakeoff as tt
+from .dmoney import half_up as _hu
+from .dmoney import c2 as _c2
 
 # ------------------------------------------------------------- text lines
 def lines(page):
@@ -522,7 +524,7 @@ def structures(page):
     for rec in out.values():
         if rec["rim"] is not None and rec["inverts"]:
             d = rec["rim"] - min(i["el"] for i in rec["inverts"])
-            rec["depth"] = round(d, 2) if 0 < d < 60 else None
+            rec["depth"] = _hu(d, 2) if 0 < d < 60 else None
     return list(out.values())
 
 
@@ -713,7 +715,7 @@ def pipe_systems(page, ppu, unit="ft", min_ft=4.0, reach_ft=25.0,
         lab = labs[li]
         if DEBUG is not None:
             DEBUG.append(("label", lab["text"], None if best is None else
-                          (tt.style_name(runs_all[best][0]), round(bd, 1),
+                          (tt.style_name(runs_all[best][0]), _hu(bd, 1),
                            round(tt.poly_len(runs_all[best][1]) / per_ft))))
         if best is not None and (best not in mine or bd < mine[best][1]):
             mine[best] = (lab, bd)
@@ -1552,7 +1554,7 @@ def _cl_depth(pts, cls, grade, size_in, reach):
         return None
     cl = sum(els) / len(els)
     d = grade - (cl - (size_in or 0) / 24.0)
-    return round(d, 2) if 0 < d < 30 else None
+    return _hu(d, 2) if 0 < d < 30 else None
 
 
 def finished_grade(structs):
@@ -1580,7 +1582,7 @@ def _run_depth(pts, structs, reach):
                     best, bd = s, d
         if best is not None:
             ds.append(best["depth"])
-    return round(sum(ds) / len(ds), 2) if ds else None
+    return _hu(sum(ds) / len(ds), 2) if ds else None
 
 
 # ------------------------------------------------------------- whole set
@@ -1682,7 +1684,7 @@ def takeoff(doc, pages=None, scales=None, progress=None):
     if est:
         checks.append(f"depth of {est:,.0f} LF of pipe estimated from its "
                       f"centerline elevations (CL) and a finished grade of "
-                      f"{grade:.2f} (the middle manhole rim) - check "
+                      f"{_c2(grade):.2f} (the middle manhole rim) - check "
                       "against the grading plan")
     services = {}
     for pno in pages:
@@ -1778,7 +1780,7 @@ def structure_summary(structs):
             rec["depths"].append(s["depth"])
     for rec in out.values():
         d = rec.pop("depths")
-        rec["avg_depth"] = round(sum(d) / len(d), 2) if d else None
+        rec["avg_depth"] = _hu(sum(d) / len(d), 2) if d else None
     return out
 
 
@@ -1810,7 +1812,7 @@ def _mid_depth(pipe, band):
     ds = [r["depth"] for r in pipe["runs"] if band_of(r["depth"]) == band
           and r["depth"] is not None]
     if ds:
-        return round(sum(r["length"] * r["depth"] for r in pipe["runs"]
+        return _hu(sum(r["length"] * r["depth"] for r in pipe["runs"]
                          if band_of(r["depth"]) == band and
                          r["depth"] is not None) /
                      max(1e-9, sum(r["length"] for r in pipe["runs"]

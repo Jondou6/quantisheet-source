@@ -11,6 +11,7 @@ import re
 from datetime import date
 
 import fitz
+from ..dmoney import c2 as _c2
 
 AWARD = """{date}
 
@@ -67,7 +68,7 @@ class _Safe(dict):
 
 def _money(v):
     try:
-        return f"${float(v):,.2f}"
+        return f"${_c2(float(v)):,.2f}"
     except (TypeError, ValueError):
         return str(v or "")
 

@@ -78,6 +78,12 @@ class ProtectDialog(QDialog):
         self.msg = QLabel("")
         form.addRow("Password to open", self.open_pw)
         form.addRow("Confirm", self.open_pw2)
+        # L3: without its own password, anyone who can open the file
+        # can also change the permissions
+        self.owner_pw.setToolTip(
+            "Optional. Without a separate permissions password, anyone "
+            "with the open password can lift the print / copy / edit "
+            "limits.")
         form.addRow("Permissions password", self.owner_pw)
         form.addRow(self.print_)
         form.addRow(self.copy)
@@ -131,14 +137,18 @@ class RedactDialog(QDialog):
         self.case = QCheckBox("Match case")
         self.case.toggled.connect(self._search)
         self.result = QLabel("")
+        self.result.setWordWrap(True)        # was cut off (Chief, Nov 7)
         form.addRow("Find", self.kind)
         form.addRow("Text", self.text)
         form.addRow(self.whole)
         form.addRow(self.case)
         form.addRow(self.result)
-        form.addRow(QLabel("<small>Redaction permanently removes the text "
+        self.note = QLabel("<small>Redaction permanently removes the text "
                            "and anything under it. You can undo until you "
-                           "save.</small>"))
+                           "save.</small>")
+        self.note.setWordWrap(True)
+        form.addRow(self.note)
+        self.setMinimumWidth(460)
         bb = QDialogButtonBox()
         self.go = bb.addButton("Redact All", QDialogButtonBox.AcceptRole)
         bb.addButton(QDialogButtonBox.Cancel)

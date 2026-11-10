@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox,
                                QWidget)
 
 from . import datecalc as dc
+from .dmoney import c2 as _c2
 
 
 def _qd(d):
@@ -164,10 +165,10 @@ class DurationTab(_Tab):
         self.show_result(
             f"<b>{_plural(r['days'], 'day')}, {_plural(r['hours'], 'hour')}"
             f", {_plural(r['minutes'], 'minute')}</b>{neg}<br>"
-            f"= {r['total_hours']:,.2f} hours<br>"
+            f"= {_c2(r['total_hours']):,.2f} hours<br>"
             f"= {_plural(r['total_minutes'], 'minute')}",
             f"{_fmt_dt(a)} to {_fmt_dt(b)}: {r['days']} days "
-            f"{r['hours']} h {r['minutes']} min ({r['total_hours']:.2f} h)")
+            f"{r['hours']} h {r['minutes']} min ({_c2(r['total_hours']):.2f} h)")
         return r
 
 

@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (QComboBox, QDialog, QHBoxLayout,
                                QVBoxLayout)
 
 from . import review
+from .dmoney import c2 as _c2
 
 
 class ReviewDialog(QDialog):
@@ -118,7 +119,7 @@ class ReviewDialog(QDialog):
             self.unit.clear()
             return None
         q = it.get("qty")
-        qs = f"{q:,.2f}".rstrip("0").rstrip(".") \
+        qs = f"{_c2(q):,.2f}".rstrip("0").rstrip(".") \
             if isinstance(q, (int, float)) else "no quantity"
         self.title.setText(f"{it.get('name') or 'Item'} - {qs} "
                            f"{it.get('unit') or ''}".strip())
@@ -357,7 +358,7 @@ class ReviewQueueDialog(QDialog):
             self.unit.clear()
             return None
         q = e.get("qty")
-        qs = f"{q:,.2f}".rstrip("0").rstrip(".") \
+        qs = f"{_c2(q):,.2f}".rstrip("0").rstrip(".") \
             if isinstance(q, (int, float)) else ""
         self.title.setText(f"{KIND_NAMES.get(e['kind'], 'Item')}: "
                            f"{e['name']}" + (f" - {qs} {e['unit']}"

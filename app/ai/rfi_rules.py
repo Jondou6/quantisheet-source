@@ -17,6 +17,7 @@ reference, quote, page, doc, source="check", severity ("high" | "medium" |
 "low"), cites [{"sheet", "page", "quote", "doc"}], proposal.
 """
 import re
+from ..dmoney import c2 as _c2
 
 ID = r"(?:SAN\s+)?((?:MH|SMH|SSMH|CO|CB|INL|WW|LS)\s?-?\s?\d{1,4}[A-Z]?)"
 SEG = re.compile(
@@ -248,7 +249,7 @@ def _distinct(mentions, key, tol=0.0):
 
 
 def _fmt(v):
-    return f"{v:.2f}" if isinstance(v, float) else str(v)
+    return f"{_c2(v):.2f}" if isinstance(v, float) else str(v)
 
 
 # ---- the checks -------------------------------------------------------------------
@@ -324,9 +325,9 @@ def pipe_checks(segs, structs, spec_classes=None):
                     out.append(_f(
                         "slope_math", f"{a}/{b}",
                         f"{name}: labelled slope doesn't match the inverts",
-                        f"{name} is labelled {g['slope']:.2f}% over "
-                        f"{g['len']:g} LF, but invert out {up:.2f} at {a} "
-                        f"and invert in {dn:.2f} at {b} give {calc:.2f}%. "
+                        f"{name} is labelled {_c2(g['slope']):.2f}% over "
+                        f"{g['len']:g} LF, but invert out {_c2(up):.2f} at {a} "
+                        f"and invert in {_c2(dn):.2f} at {b} give {_c2(calc):.2f}%. "
                         "Which governs: the slope or the inverts?",
                         "Slope and inverts can't both be met; it changes "
                         "depth, dewatering and possibly the pipe class.",
@@ -339,10 +340,10 @@ def pipe_checks(segs, structs, spec_classes=None):
                 0 <= g["slope"] < MIN_SLOPE[g["size"]] - 1e-9:
             out.append(_f(
                 "min_slope", f"{a}/{b}",
-                f"{name}: {g['size']}\" at {g['slope']:.2f}% is below the "
-                f"{MIN_SLOPE[g['size']]:.2f}% minimum",
-                f"{name} is {g['size']}\" at {g['slope']:.2f}%, below the "
-                f"{MIN_SLOPE[g['size']]:.2f}% minimum slope for "
+                f"{name}: {g['size']}\" at {_c2(g['slope']):.2f}% is below the "
+                f"{_c2(MIN_SLOPE[g['size']]):.2f}% minimum",
+                f"{name} is {g['size']}\" at {_c2(g['slope']):.2f}%, below the "
+                f"{_c2(MIN_SLOPE[g['size']]):.2f}% minimum slope for "
                 f"{g['size']}\" sewer in the Ten States Standards. Please "
                 "confirm the slope is intended, or provide revised inverts.",
                 "A flat sewer may fail acceptance (deflection/mandrel and "
@@ -640,6 +641,30 @@ def spec_pipe_classes(specs):
 
 
 ORDER = {"high": 0, "medium": 1, "low": 2}
+
+
+CHECKED = ("pipe runs, rims and inverts, slopes", "sheet and detail "
+           "callouts", "spec sections cited", "schedules", "open scope "
+           "(TBD, by others, verify)")
+
+
+def coverage_text(plans, found=0):
+    """What a scan looked at, in words, so "nothing found" is never a
+    bare blank (Chief's estimator test, Nov 7: a real 7-page set found
+    nothing and didn't say why)."""
+    n = len(plans or [])
+    thin = [p[0] + 1 for p in plans or [] if len((p[3] or "").strip()) < 40]
+    out = f"Checked {n} page(s) for " + ", ".join(CHECKED) + "."
+    if thin:
+        pages = ", ".join(str(x) for x in thin[:12]) + \
+            ("…" if len(thin) > 12 else "")
+        out += (f" {len(thin)} of {n} page(s) have little or no readable "
+                f"text (page {pages}) - scanned sheets need Make "
+                "Searchable (OCR) first, or there is nothing to check.")
+    if not found:
+        out += (" Nothing matched these checks; that doesn't mean the set "
+                "has no questions - review it yourself too.")
+    return out
 
 
 def find(plans, specs=None):

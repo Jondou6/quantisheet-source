@@ -35,7 +35,9 @@ def test_only_the_company_domain_passes():
     assert onboard.accepted(f"jon@{FAKE}")
     assert onboard.accepted(f"  Pat.Morgan@{FAKE.upper()} ")
     for bad in ("jon@gmail.com", f"jon@{FAKE}x", f"jon@sub.{FAKE}", FAKE,
-                f"@{FAKE}", "", "not an email"):
+                f"@{FAKE}", "", "not an email", f"jo n@{FAKE}",
+                f"jon @{FAKE}", "a" * 5000 + f"@{FAKE}",
+                "a" * 65 + f"@{FAKE}"):
         assert not onboard.accepted(bad), bad
 
 

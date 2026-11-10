@@ -79,9 +79,7 @@ def test_ai_takeoff_dialog_and_ribbon(qapp, win, tmp_path):
     d.save(path)
     win.open_path(path)
     names = list(win.ribbon.pages)
-    # 1.1.1 folds the AI tab into Takeoff / Project / Tools / Review
-    # (quickaccess.FOLD); "classic_tabs" brings the old AI tab back
-    assert "AI" not in names, names
+    assert "AI" in names, names
     assert "Takeoff" in names, names
     assert not [m for m in win._ribbon_missing if "AI" in m or "Voice" in m]
     dlg = win.ai_takeoff(show=False)

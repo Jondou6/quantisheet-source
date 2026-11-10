@@ -12,20 +12,22 @@ from test_gui import win, qapp                                 # noqa: E402,F401
 
 def test_large_buttons_share_one_top(win):
     win.resize(1900, 900)
+    win.show()
     rb = win.ribbon
     for name in list(rb.pages):
         rb.show_page(name)
         win.repaint()
         page = rb.pages[name]
         page.widget().layout().activate()
-        tops = set()
+        tops, heights = set(), set()
         for g in page.groups.values():
             g.layout().activate()
             for b in g.buttons:
-                if isinstance(b, RibbonButton) and b.height() == 70 and \
-                        b.isVisibleTo(page):
+                if isinstance(b, RibbonButton) and b.isVisibleTo(page):
                     tops.add(b.mapTo(page.widget(), QPoint(0, 0)).y())
+                    heights.add(b.height())
         assert len(tops) <= 1, (name, sorted(tops))
+        assert len(heights) <= 1, (name, sorted(heights))
 
 
 def test_wide_tab_shows_more_arrows(qapp):

@@ -157,7 +157,8 @@ def test_fill_in_pdf_uses_the_company_and_keeps_fields(tmp_path, monkeypatch):
         text = "".join(page.get_text() for page in doc)
         assert "Test Plumbing Co" in text
         assert "555-0100" in text
-        assert "Profit" in text
+        # the customer copy keeps cost and profit off (Chief, Nov 7)
+        assert "Profit" not in text and "Cost " not in text
         assert "Test coil" in text
         images = [img for page in doc for img in page.get_images()]
     assert len(images) >= 2  # company logo and the coil photo

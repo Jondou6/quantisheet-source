@@ -35,6 +35,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QAbstractSpinBox,
                                QWidget)
 
 from . import owner_report as orp
+from ..dmoney import c2 as _c2
 
 OPTION_LABELS = [
     ("captions", "Photo captions (number, date taken, location)"),
@@ -796,7 +797,7 @@ class OwnerReportWindow(QDialog):
         else:                               # no list: the typed totals
             imp, cl = self.impacted.value(), self.claimed.value()
         w.update(impacted=imp, claimed=cl,
-                 threshold_in=round(self.threshold.value(), 2),
+                 threshold_in=_c2(self.threshold.value()),
                  gap_note=self.gap_note.text())
         for k, cb in self.log_on.items():
             r.setdefault("logs", {}).setdefault(k, {}).update(
@@ -1366,11 +1367,11 @@ class OwnerReportWindow(QDialog):
             it.setData(Qt.UserRole, d.get("date"))
             self.days.setItem(r, 0, it)
             rain = d.get("rain_in")
-            ri = QTableWidgetItem("" if rain is None else f"{float(rain):.2f}")
+            ri = QTableWidgetItem("" if rain is None else f"{_c2(float(rain)):.2f}")
             if d.get("source") == "typed":
                 dl = d.get("download_in")
                 ri.setToolTip("Typed" + ("" if dl is None else
-                                         f" (download {float(dl):.2f} in)"))
+                                         f" (download {_c2(float(dl)):.2f} in)"))
             self.days.setItem(r, 1, ri)
             c = QTableWidgetItem()
             c.setFlags(c.flags() | Qt.ItemIsUserCheckable)
@@ -1389,7 +1390,7 @@ class OwnerReportWindow(QDialog):
             return
         if it.column() == 1:
             try:
-                day["rain_in"] = round(float(it.text() or 0), 2)
+                day["rain_in"] = _c2(float(it.text() or 0))
             except ValueError:
                 return
             day["tracked"] = day["rain_in"] >= float(

@@ -26,6 +26,7 @@ from decimal import Decimal, InvalidOperation
 
 from .. import embfiles
 from . import _io
+from ..dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 
@@ -212,14 +213,14 @@ def export(result, path):
                 cells.append("MISSING")
             else:
                 cells.append(("PLUG " if c["plug"] else "") +
-                             f"{c['amount']:.2f}")
+                             f"{_c2(c['amount']):.2f}")
         rows.append([r["id"], r["desc"], r["unit"], r["qty"],
-                     "" if r["plug"] is None else f"{r['plug']:.2f}"] + cells)
+                     "" if r["plug"] is None else f"{_c2(r['plug']):.2f}"] + cells)
     by = {b["name"]: b for b in result["bidders"]}
     rows.append(["", "As quoted", "", "", ""] +
-                [f"{by[n]['as_quoted']:.2f}" for n in names])
+                [f"{_c2(by[n]['as_quoted']):.2f}" for n in names])
     rows.append(["", "Leveled (with plugs)", "", "", ""] +
-                [f"{by[n]['total']:.2f}" for n in names])
+                [f"{_c2(by[n]['total']):.2f}" for n in names])
     rows.append(["", "Complete quote", "", "", ""] +
                 ["yes" if by[n]["complete"] else "no" for n in names])
     rows.append(["", f"Lowest leveled: {result['lowest_leveled'] or '-'}; "
@@ -432,8 +433,8 @@ def applied_problems(doc):
         if str(now["total"]) != ap.get("total"):
             out.append((pkg, pkg, "stale",
                         f"{pkg}: {name}'s leveled total is now "
-                        f"{now['total']:.2f}, the estimate has "
-                        f"{Decimal(ap.get('total') or 0):.2f} - use the "
+                        f"{_c2(now['total']):.2f}, the estimate has "
+                        f"{_c2(Decimal(ap.get('total') or 0)):.2f} - use the "
                         "quote again"))
         if ap.get("auto") and result["lowest_complete"] and \
                 result["lowest_complete"] != name:
@@ -450,7 +451,7 @@ def applied_problems(doc):
                     p["total"])):
                 out.append((pkg, desc.get(i, i), "stale",
                             f"{pkg}: the line for item {i} was changed by "
-                            f"hand ({p['total']:.2f}, quoted "
+                            f"hand ({_c2(p['total']):.2f}, quoted "
                             f"{ap['amounts'][i]})"))
     return out
 

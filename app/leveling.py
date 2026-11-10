@@ -4,6 +4,7 @@ totals - each bidder's price with omitted scope added back at the
 median. Works on a bid tab project in the price database or on files."""
 from . import level_core as core
 from . import pricedb
+from .dmoney import c2 as _c2
 
 DEFAULTS = {"carry": 1.5, "buyin": 0.65, "outlier_z": 3.5, "min_bidders": 2,
             "front_load_gap": 0.10}
@@ -213,7 +214,7 @@ def cell(res, item, bidder):
             mark = "buyin"
     if item in res["analysis"]["outliers"].get(bidder, []):
         mark = mark or "outlier"
-    return f"{p:,.2f}", mark
+    return f"{_c2(p):,.2f}", mark
 
 
 def export_xlsx(res, path):
@@ -223,9 +224,9 @@ def export_xlsx(res, path):
                 "Adjustments", "Leveled", "Carries", "Buy-ins", "Outliers",
                 "Flag", "Plugs and adjustments"]]
     for r in res["results"]:
-        summary.append([r["bidder"], round(r["base"], 2), r["omissions"],
-                        round(r["added"], 2), round(r.get("adjust", 0), 2),
-                        round(r["leveled"], 2), r["carries"], r["buyins"],
+        summary.append([r["bidder"], _c2(r["base"]), r["omissions"],
+                        _c2(r["added"]), _c2(r.get("adjust", 0)),
+                        _c2(r["leveled"]), r["carries"], r["buyins"],
                         r["outliers"], r["flag"],
                         "; ".join(r.get("plug_notes") or [])])
     if res["risk"]:
@@ -233,8 +234,8 @@ def export_xlsx(res, path):
     matrix = [["Item", "Description", "Unit", "Qty", "Median", "Spread %"]
               + b]
     for it in res["items"]:
-        row = [it.item_no, it.desc, it.unit, round(it.qty, 2),
-               round(it.median, 2), round(it.spread)]
+        row = [it.item_no, it.desc, it.unit, _c2(it.qty),
+               _c2(it.median), round(it.spread)]
         for bd in b:
             text, mark = cell(res, it, bd)
             row.append(text + {"carry": " ^", "buyin": " v", "outlier": " *"}
@@ -244,9 +245,9 @@ def export_xlsx(res, path):
              "Omission value", "Spread %"]]
     for it in res["gaps"]:
         om = [x for x in b if x not in it.prices and x not in it.included]
-        gaps.append([it.item_no, it.desc, it.unit, round(it.qty, 2),
-                     round(it.median, 2), "; ".join(om),
-                     round(it.median * it.qty, 2), round(it.spread)])
+        gaps.append([it.item_no, it.desc, it.unit, _c2(it.qty),
+                     _c2(it.median), "; ".join(om),
+                     _c2(it.median * it.qty), round(it.spread)])
     acrobat.write_xlsx(path, [("Leveling", summary), ("Matrix", matrix),
                               ("Scope Gaps", gaps)])
     return path

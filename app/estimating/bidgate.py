@@ -23,6 +23,7 @@ findings are dicts like checks.py's.
 import datetime
 import logging
 from decimal import Decimal
+from ..dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 
@@ -199,7 +200,7 @@ def placeholders(doc):
 
 def placeholder_findings(doc):
     return [_f("placeholder", x["item"], f"{x['kind']} of "
-               f"${x['amount']:,.2f} still in the estimate",
+               f"${_c2(x['amount']):,.2f} still in the estimate",
                line_id=x["line_id"], kind=x["kind"])
             for x in placeholders(doc)]
 
@@ -312,7 +313,7 @@ def double_counts(doc, lines=None):
             # more, or a line that calls itself a total, is a subtotal
             if run == t and (n >= 3 or (n >= 2 and said)):
                 out.append(_f("subtotal_twice", r["desc"] or r["code"],
-                              f"${t:,.2f} = the {n} lines above it "
+                              f"${_c2(t):,.2f} = the {n} lines above it "
                               "added up", line_id=r["id"]))
                 break
     return out
@@ -394,5 +395,5 @@ def escalation_line(result, buy_date):
                        cost_type="Other", sub=result["total"],
                        source="Escalation Projector",
                        note="; ".join(f"{r['type']} {r['pct_year']:g}%/yr x "
-                                      f"{r['months']} mo = ${r['rise']:,.2f}"
+                                      f"{r['months']} mo = ${_c2(r['rise']):,.2f}"
                                       for r in result["rows"] if r["rise"]))

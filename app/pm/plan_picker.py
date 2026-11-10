@@ -31,6 +31,7 @@ from PySide6.QtWidgets import (QDialog, QHBoxLayout, QInputDialog, QLabel,
                                QScrollArea, QVBoxLayout, QWidget)
 
 from . import owner_report as orp
+from ..dmoney import c2 as _c2
 
 ZOOM = 1.5
 STEPS = (0.5, 0.67, 0.8, 1.0, 1.25, 1.5, 2.0, 2.5, 3.0)
@@ -211,7 +212,7 @@ class PlanPicker(QDialog):
     def view_to_page(self, x, y):
         """Canvas pixel -> unrotated page point (x, y)."""
         p = self._fitz.Point(x / self.zoom, y / self.zoom) * self._derot
-        return (round(p.x, 2), round(p.y, 2))
+        return (_c2(p.x), _c2(p.y))
 
     def page_to_view(self, x, y):
         """Unrotated page point -> canvas pixel (x, y)."""

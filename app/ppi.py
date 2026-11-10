@@ -14,6 +14,7 @@ import re
 
 from . import bls_core as core
 from . import pricedb, settings
+from .dmoney import c2 as _c2
 
 CACHE_KEY = "ppi_cache"
 FETCHED_KEY = "ppi_fetched"
@@ -97,7 +98,7 @@ def trade_rates(start_ym, end_ym):
             continue
         for t in row["trades"]:
             got.setdefault(t, []).append(row["annual_pct"])
-    return {t: round(sum(v) / len(v), 2) for t, v in got.items()}
+    return {t: _c2(sum(v) / len(v)) for t, v in got.items()}
 
 
 def divisions_of(trade):

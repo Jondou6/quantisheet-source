@@ -190,7 +190,9 @@ def test_export_head_passes_and_injection_fails(tmp_path):
     names = _names(out)
     assert "PUBLIC_SOURCE_README.md" in names
     assert "tools/public_source_scrub.json" not in names
-    assert "app/onboard.py" not in names
+    # tools/public_source.py REQUIRED_UNTRACKED: the release's sign-in
+    # gate is part of the corresponding source (passed with --add above)
+    assert "app/onboard.py" in names
     assert "tools/unlock_code.py" not in names
     assert "app/issue_report.py" in names
     assert "installer/msix_identity.json" in names

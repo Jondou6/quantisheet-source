@@ -32,6 +32,7 @@ from collections import Counter
 
 from . import schedule
 from . import schedule_types as _types
+from ..dmoney import c2 as _c2
 
 # ------------------------------------------------------------- contract time
 _MONTHS = ("jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec")
@@ -172,7 +173,7 @@ def contract_time(pages):
         if len(cnt) > 1:
             out["conflicts"].append(
                 "Liquidated damages are stated differently: " +
-                ", ".join(f"${v:,.2f} (p. {p})" for v, p, _t in lds))
+                ", ".join(f"${_c2(v):,.2f} (p. {p})" for v, p, _t in lds))
     else:
         out["ld_per_day"], out["ld_pages"] = None, []
     return out
@@ -1220,7 +1221,7 @@ def summary_text(ct, sc, result):
                    ct.get("dates")):
         lines.append("No contract time found in the specs - enter it.")
     if ct and ct.get("ld_per_day"):
-        lines.append(f"Liquidated damages: ${ct['ld_per_day']:,.2f} per day "
+        lines.append(f"Liquidated damages: ${_c2(ct['ld_per_day']):,.2f} per day "
                      f"(p. {', '.join(map(str, ct['ld_pages']))}).")
     for c in (ct or {}).get("conflicts", []):
         lines.append("CHECK: " + c)

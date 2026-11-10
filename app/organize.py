@@ -5,6 +5,8 @@ them, then Apply - one undoable step.
 The dialog only edits a plan, [(source page, extra rotation)], so Cancel
 leaves the document untouched; apply_plan() makes it so.
 """
+import logging
+
 import fitz
 from PySide6.QtCore import QSize, Qt, QTimer
 from PySide6.QtGui import QIcon, QImage, QPixmap, QTransform
@@ -16,6 +18,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QDialog, QDialogButtonBox,
 from . import icons, jobdata
 
 ROLE = Qt.UserRole
+log = logging.getLogger(__name__)
 
 
 def apply_plan(doc, plan):
@@ -86,7 +89,9 @@ class OrganizeDialog(QDialog):
         self.list.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.list.setSpacing(12)
         self.list.setWordWrap(True)
-        self.list.setUniformItemSizes(True)
+        # not uniform sizes: Qt would size every cell from the first item
+        # before its picture arrived, and the pictures drew blank (Chief's
+        # user test, Nov 6)
         self.list.model().rowsMoved.connect(self._renumber)
         self.list.itemSelectionChanged.connect(self._status)
         v.addWidget(self.list, 1)
@@ -107,7 +112,7 @@ class OrganizeDialog(QDialog):
     # ------------------------------------------------------------ items
     def _item(self, src, rot):
         it = QListWidgetItem()
-        it.setData(ROLE, (src, rot))
+        it.setData(ROLE, (int(src), int(rot)))
         it.setFlags(it.flags() | Qt.ItemIsDragEnabled)
         it.setFlags(it.flags() & ~Qt.ItemIsDropEnabled)
         it.setTextAlignment(Qt.AlignHCenter)
@@ -125,13 +130,36 @@ class OrganizeDialog(QDialog):
             pm = self._thumbs[src] = QPixmap.fromImage(img)
         return pm
 
+    def _blank(self, src):
+        """A white page the shape of the real one, shown until its picture
+        is drawn - never an empty cell."""
+        page = self.doc[src]
+        w, h = page.rect.width or 1, page.rect.height or 1
+        z = 260 / max(w, h)
+        pm = QPixmap(max(1, int(w * z)), max(1, int(h * z)))
+        pm.fill(Qt.white)
+        return pm
+
     def _paint(self, it, load=False):
+        src, rot = self._data(it)
+        try:
+            pm = (self._thumb(src) if load or src in self._thumbs
+                  else self._blank(src))
+        except Exception:                                 # noqa: BLE001
+            log.warning("page %s thumbnail failed", src + 1, exc_info=True)
+            pm = self._blank(src)
+        if rot % 360:
+            pm = pm.transformed(QTransform().rotate(rot))
+        it.setIcon(QIcon(pm))
+        px = self.list.iconSize().width() if hasattr(self, "list") else 170
+        it.setSizeHint(QSize(px + 26, px + 52))
+
+    @staticmethod
+    def _data(it):
+        """(source page, rotation) - Qt may hand a stored tuple back as a
+        list, which never equals the tuple plan()'s callers compare with."""
         src, rot = it.data(ROLE)
-        if load or src in self._thumbs:
-            pm = self._thumb(src)
-            if rot % 360:
-                pm = pm.transformed(QTransform().rotate(rot))
-            it.setIcon(QIcon(pm))
+        return int(src), int(rot)
 
     def _load_some(self):
         """Render thumbnails a few at a time so big sets open at once."""
@@ -140,23 +168,26 @@ class OrganizeDialog(QDialog):
                 return
             src = self._queue.pop(0)
             for it in self.items():
-                if it.data(ROLE)[0] == src:
+                if self._data(it)[0] == src:
                     self._paint(it, load=True)
+        self.list.viewport().update()
         QTimer.singleShot(0, self._load_some)
 
     def items(self):
         return [self.list.item(i) for i in range(self.list.count())]
 
     def plan(self):
-        return [it.data(ROLE) for it in self.items()]
+        return [self._data(it) for it in self.items()]
 
     def _resize(self, px):
         self.list.setIconSize(QSize(px, px))
         self.list.setGridSize(QSize(px + 26, px + 52))
+        for it in self.items():
+            it.setSizeHint(QSize(px + 26, px + 52))
 
     def _renumber(self, *_):
         for n, it in enumerate(self.items()):
-            src, rot = it.data(ROLE)
+            src, rot = self._data(it)
             moved = "" if src == n else f"  (was {src + 1})"
             it.setText(f"{n + 1}{moved}")
         self._status()
@@ -175,7 +206,7 @@ class OrganizeDialog(QDialog):
     def rotate(self, deg):
         for r in self._selected():
             it = self.list.item(r)
-            src, rot = it.data(ROLE)
+            src, rot = self._data(it)
             it.setData(ROLE, (src, (rot + deg) % 360))
             self._paint(it, load=True)
         self._status()
@@ -183,7 +214,7 @@ class OrganizeDialog(QDialog):
     def duplicate(self):
         rows = self._selected()
         for k, r in enumerate(rows):
-            src, rot = self.list.item(r + k).data(ROLE)
+            src, rot = self._data(self.list.item(r + k))
             self.list.insertItem(r + k + 1, self._item(src, rot))
         self._renumber()
 
@@ -198,7 +229,7 @@ class OrganizeDialog(QDialog):
 
     def reverse(self):
         rows = self._selected() or list(range(self.list.count()))
-        data = [self.list.item(r).data(ROLE) for r in rows]
+        data = [self._data(self.list.item(r)) for r in rows]
         for r, d in zip(rows, reversed(data)):
             it = self.list.item(r)
             it.setData(ROLE, d)

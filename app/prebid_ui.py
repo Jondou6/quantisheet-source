@@ -11,6 +11,7 @@ from PySide6.QtWidgets import (QDialog, QFileDialog, QHBoxLayout,
 
 from . import annotate, prebid
 from .reportname import report_file_name
+from .dmoney import c2 as _c2
 
 
 def _report_path(doc, kind, ext):
@@ -120,7 +121,7 @@ class PrebidDialog(QDialog):
         if lk:
             self.lock_lbl.setText(
                 f"Locked {lk['at'].replace('T', ' ')} by {lk['by']} at "
-                f"${float(lk['total']):,.2f}." +
+                f"${_c2(float(lk['total'])):,.2f}." +
                 (" <b style='color:#b91414'>The takeoff has changed since "
                  "- unlock and lock again.</b>" if lk["stale"] else ""))
         else:

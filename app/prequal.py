@@ -10,6 +10,7 @@ import re
 from datetime import date, timedelta
 
 import fitz
+from .dmoney import c2 as _c2
 
 # (key, label, kind) - kind: text, long, yesno
 QUESTIONS = [
@@ -161,10 +162,10 @@ def score(ans):
         notes.append("No EMR given.")
     elif max(emr) > 1.2:
         pts -= 30
-        notes.append(f"EMR as high as {max(emr):.2f} (over 1.2).")
+        notes.append(f"EMR as high as {_c2(max(emr)):.2f} (over 1.2).")
     elif max(emr) > 1.0:
         pts -= 12
-        notes.append(f"EMR up to {max(emr):.2f} (over 1.0).")
+        notes.append(f"EMR up to {_c2(max(emr)):.2f} (over 1.0).")
     yrs = _nums(ans.get("years"))
     if not yrs:
         pts -= 10

@@ -11,6 +11,7 @@ from datetime import date
 
 from . import schema
 from .schema import workdays_from
+from ..dmoney import c2 as _c2
 
 
 def _today():
@@ -516,7 +517,7 @@ def pa_subs(ctx, r):
         ctx.notify(str(e))
         return None
     msg = (f"{len(rep['subs'])} approved sub pay app(s) rolled in: "
-           f"${rep['work']:,.2f} work, ${rep['stored']:,.2f} stored, on "
+           f"${_c2(rep['work']):,.2f} work, ${_c2(rep['stored']):,.2f} stored, on "
            f"{len(rep['fed'])} line(s).")
     if rep["kept"]:
         msg += " Kept what you'd typed on: " + ", ".join(rep["kept"]) + "."
@@ -568,12 +569,12 @@ def pa_paid(ctx, r):
         due = cost.payapp_values(ctx.store, r)["g702"]["8"]
     except Exception:
         due = 0.0
-    amt = ctx.ask_text("Amount received", f"{due:.2f}")
+    amt = ctx.ask_text("Amount received", f"{_c2(due):.2f}")
     if amt in (None, ""):
         return None
     try:
-        r["received"] = round(float(str(amt).replace("$", "")
-                                    .replace(",", "")), 2)
+        r["received"] = _c2(float(str(amt).replace("$", "")
+                                    .replace(",", "")))
     except ValueError:
         ctx.notify("Not an amount.")
         return None

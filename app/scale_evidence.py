@@ -37,6 +37,7 @@ is checked against printed dimension strings only - never by counting
 raster pixels along something of known length.
 """
 import re
+from .dmoney import c2 as _c2
 
 REVIEW_BELOW = 60
 _SCALE_WORD = re.compile(r"\bSCALE\b", re.I)
@@ -241,8 +242,8 @@ def evidence(page, scale, source="text", dpi=None, dims=None, user=False,
             else:
                 s -= 35
                 reasons.append(f"printed dimensions measure "
-                               f"{dims['ppu']:.2f} pt/ft, not "
-                               f"{scale[1]:.2f} - wrong scale or printed "
+                               f"{_c2(dims['ppu']):.2f} pt/ft, not "
+                               f"{_c2(scale[1]):.2f} - wrong scale or printed "
                                "to fit? (-35)")
     elif ratio is None and source != "ocr":
         reasons.append("no printed dimensions to check it against")

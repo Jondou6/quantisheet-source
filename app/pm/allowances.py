@@ -2,6 +2,7 @@
 spent so far), which the owner report pack prints with what's left
 (owner_report_auto reads the "allowances" project setting)."""
 from ..dmoney import bad
+from ..dmoney import c2 as _c2
 
 SETTING = "allowances"
 
@@ -17,7 +18,7 @@ def _money(v):
         return 0.0
     if bad(t):
         raise AllowanceError(f"can't read {v!r} as an amount")
-    return round(float(t), 2)
+    return _c2(float(t))
 
 
 def read(store):

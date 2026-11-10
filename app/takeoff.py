@@ -1,6 +1,8 @@
 import math
 import re
 import fitz
+from .dmoney import half_up as _hu
+from .dmoney import c2 as _c2
 
 
 class Calibration:
@@ -41,7 +43,7 @@ def annotate_distance(page, cal, a, b, unit=None):
     val = distance(cal, a, b)
     page.draw_line(a, b, color=(0, 0, 0), width=1)
     mid = fitz.Point((a.x + b.x) / 2, (a.y + b.y) / 2)
-    page.insert_text((mid.x, mid.y - 3), f"{val:.2f} {unit}", fontsize=8)
+    page.insert_text((mid.x, mid.y - 3), f"{_c2(val):.2f} {unit}", fontsize=8)
     return val
 
 
@@ -55,7 +57,7 @@ def annotate_area(page, cal, pts, unit=None):
     cx = sum(p.x for p in pts) / len(pts)
     cy = sum(p.y for p in pts) / len(pts)
     val = area(cal, pts)
-    page.insert_text((cx, cy), f"{val:.2f} {unit}", fontsize=8)
+    page.insert_text((cx, cy), f"{_c2(val):.2f} {unit}", fontsize=8)
     return val
 
 
@@ -89,13 +91,13 @@ def fmt(value, unit):
         sign = "-" if value < 0 else ""
         value = abs(value)
         feet = int(value)
-        inches = round((value - feet) * 12, 1)
+        inches = _hu((value - feet) * 12, 1)
         if inches >= 12:
             feet, inches = feet + 1, 0
         if sign and not feet and not inches:
             sign = ""
         return f"{sign}{feet}' {inches:g}\""
-    return f"{value:,.2f} {unit}"
+    return f"{_c2(value):,.2f} {unit}"
 
 
 _QUOTES = str.maketrans({"\u2019": "'", "\u2032": "'", "\u201d": '"',

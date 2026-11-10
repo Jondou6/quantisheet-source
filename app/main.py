@@ -3,6 +3,7 @@ import os
 import sys
 import threading
 import time
+from .dmoney import c2 as _c2
 
 _T0 = time.perf_counter()
 _MARKS = []
@@ -11,7 +12,7 @@ _MARKS = []
 def _mark(name):
     """Start-up timing: seconds since the program began, per step (in the
     log, and written out for tools/time_launch.py)."""
-    _MARKS.append((name, round(time.perf_counter() - _T0, 2)))
+    _MARKS.append((name, _c2(time.perf_counter() - _T0)))
 
 from PySide6.QtWidgets import QApplication, QSplashScreen
 # MainWindow (and everything it pulls in) is imported in run(), after the
@@ -151,6 +152,9 @@ def run(argv=None):
         try:                # already running (or starting): it comes forward
             from . import singleinstance
             first = singleinstance.claim()
+            # a file, or another copy running or starting: hand over.
+            # With one running, keep trying for a while - a busy window
+            # (rendering a big sheet) can be slow to answer (Nov 5).
             if (files or not first) and singleinstance.bring_forward(
                     files, wait_s=0.0 if first else 45.0):
                 logging.getLogger("quantisheet").info(
@@ -355,7 +359,7 @@ def _smoke(app, out_path):
         try:
             v = fn()
             res["checks"][name] = {"ok": True, "value": v,
-                                   "s": round(time.time() - t, 2)}
+                                   "s": _c2(time.time() - t)}
         except Exception:
             res["checks"][name] = {"ok": False,
                                    "error": traceback.format_exc()[-800:]}

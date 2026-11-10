@@ -102,6 +102,9 @@ def test_store_splash_replaces_the_company_one(tmp_path):
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     store = os.path.join(root, "splash_store.png")
     company = os.path.join(root, "splash.png")
+    if not os.path.isfile(store):
+        # the Store splash is an owner's file kept out of git
+        _pytest.skip("splash_store.png isn't in this copy (not in git)")
     assert os.path.isfile(store)
     # Nov 3 (Jon): no company is built into anyone's splash any more -
     # the company saved on a computer is drawn on at start - so the two

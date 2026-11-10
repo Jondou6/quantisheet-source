@@ -73,9 +73,13 @@ function updateTotal(){ if (!info || !info.form.length) return; let base = 0;
     if (cell) cell.textContent = ["Lump sum","Unit price","Allowance"].includes(ln.type) ? money(t) : (ln.type === "Alternate" && num(values[k]) !== null ? money(num(values[k])) : "");
     if (["Lump sum","Unit price","Allowance"].includes(ln.type)) base += t; });
   const b = $("#base"); if (b) b.textContent = money(base); }
-function wsUrl(){ const p = new URLSearchParams(location.search); if (p.get("ws")) return p.get("ws");
+function wsUrl(){
+  // Nov 6 security fix: the socket address comes only from the page's own
+  // host. A "ws" value in the link is ignored - it could send logins,
+  // signatures or bids to someone else's server.
   if (location.port === "8766") return `ws://${location.hostname}:8765`;
-  return `${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/`; }
+  return `${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/`;
+}
 function call(op, args){
   return new Promise((ok, bad) => {
     const go = () => { const id = nextId++; waiting[id] = {ok, bad}; ws.send(JSON.stringify({id, op, args})); };

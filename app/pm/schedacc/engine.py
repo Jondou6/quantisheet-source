@@ -8,7 +8,7 @@ the review queue.
 import datetime as _dt
 
 from . import ai_extract, buildnet, cpm, extract, health, ingest, merge
-from . import narrative, reviewq, rubric
+from . import bidset, narrative, reviewq, rubric
 from .model import as_date
 from .options import FALLBACK_MODEL, RECOMMENDED_MODEL, load as load_settings
 
@@ -24,8 +24,14 @@ def compile_schedule(spec_pages=None, drawings=None, spec_pdf=None,
                      ntp=None, data_date=None, project_name="Project",
                      template_dir=None, settings=None, ask=None,
                      progress=None, holidays=None, area_sf=None, stories=1,
-                     ocr=None, weather_months=None):
+                     ocr=None, weather_months=None, bid_set=None):
+    """bid_set: the bid documents in the order issued - bid form, sheets,
+    addenda, Q&A ({"kind", "id", "text"}, see bidset). Later documents
+    win; removed scope is kept on doc["scope"]["removed"]."""
     cfg = dict(load_settings(template_dir))
+    bid = bidset.resolve(bid_set) if bid_set else None
+    if bid is not None and not project_type:
+        project_type = "tenant_improvement"
     if isinstance(settings, dict):
         cfg.update(settings)
     _progress(progress, "ingest", "Reading specs and drawings")
@@ -69,7 +75,7 @@ def compile_schedule(spec_pages=None, drawings=None, spec_pdf=None,
         cost_book=cost_book, productivity=productivity, actuals=actuals,
         ntp=ntp, data_date=data_date, holidays=holidays, name=project_name,
         template_dir=template_dir, area_sf=area_sf, stories=stories,
-        weather_months=weather_months)
+        weather_months=weather_months, bid=bid)
     doc["model_errors"] = errors
     doc["conflicts"] = conflicts
     doc["options"]["near_critical_days"] = cfg.get("near_critical_days") or 10

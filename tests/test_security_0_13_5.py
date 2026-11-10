@@ -657,10 +657,16 @@ def test_reduce_file_size_keeps_protection(tmp_path, case, user, typed):
     copy = safeio.protected_copy(doc, typed)      # what the app reduces
     out = tmp_path / "small.pdf"
     try:
-        acrobat.reduce_size(copy, str(out))
+        # the main window hands reduce_size its throwaway copy, in place
+        before = src.read_bytes()
+        acrobat.reduce_size(copy, str(out), in_place=True)
     finally:
         copy.close()
         doc.close()
+    # the result is at `out`, and the original file wasn't touched
+    # (Venice, Nov 9 - N6)
+    assert out.exists() and out.stat().st_size > 0
+    assert src.read_bytes() == before
     assert_same_protection(out, src, user=user)
     r = fitz.open(str(out))
     if user:

@@ -13,10 +13,12 @@ from PySide6.QtWidgets import (
 
 from . import theme as _theme
 from . import annotate, money
+from .dmoney import c2 as _c2
 
 
 def _m(v):
-    return f"${v:,.2f}" if v >= 0 else f"(${-v:,.2f})"
+    v = _c2(v)                                  # half up, as the totals
+    return f"${_c2(v):,.2f}" if v >= 0 else f"(${_c2(-v):,.2f})"
 
 
 def _item(text, editable=False, right=False, bold=False):
@@ -58,6 +60,22 @@ def project_note(store):
             "pay application(s) are there. The billing on this window is a "
             "separate ledger kept inside this PDF.")
 
+
+
+def friendly(e):
+    """An error in words a person reads - never Python's own text, such as
+    "could not convert string to float: 'abc'" (Chief's estimator test,
+    Nov 7)."""
+    import re
+    t = str(e).strip()
+    m = re.match(r"could not convert string to (?:float|int)(?: with base "
+                 r"\d+)?: ?'?(.*?)'?$", t) or \
+        re.match(r"invalid literal for int\(\) with base \d+: '?(.*?)'?$", t)
+    if m:
+        return f"\"{m.group(1)}\" isn't a number. Type a number, such as 1250.00."
+    if isinstance(e, KeyError):
+        return f"{t.strip(chr(39))} isn't on file."
+    return t.strip("'") or "That couldn't be done."
 
 class BillingDialog(QDialog):
     """Non-modal: stays open beside the drawings."""
@@ -116,8 +134,7 @@ class BillingDialog(QDialog):
         try:
             out = fn(*a, **k)
         except (money.BillingError, KeyError, ValueError) as e:
-            QMessageBox.warning(self, "Contract & Billing",
-                                str(e).strip("'"))
+            QMessageBox.warning(self, "Contract & Billing", friendly(e))
             return None
         self._changed()
         return out if out is not None else True
@@ -233,6 +250,10 @@ class BillingDialog(QDialog):
                                             "Scheduled value $"])
         self.sov.horizontalHeader().setSectionResizeMode(
             2, QHeaderView.Stretch)
+        # wide enough for its heading ("cheduled value"; Nov 10)
+        self.sov.horizontalHeader().setSectionResizeMode(
+            3, QHeaderView.ResizeToContents)
+        self.sov.horizontalHeader().setMinimumSectionSize(60)
         v.addWidget(self.sov)
         row = QHBoxLayout()
         for label, fn in (("Add Line", self._sov_add),
@@ -258,7 +279,7 @@ class BillingDialog(QDialog):
             self.sov.setItem(r, 1, _item(l.get("csi", ""), not co))
             self.sov.setItem(r, 2, _item(l.get("desc", ""), not co))
             n = money._num(l.get("scheduled"))
-            it = _item(str(l["scheduled"]) if n is None else f"{n:,.2f}",
+            it = _item(str(l["scheduled"]) if n is None else f"{_c2(n):,.2f}",
                        not co, True)
             it.setData(Qt.UserRole, l.get("co", ""))
             self.sov.setItem(r, 3, it)
@@ -531,8 +552,8 @@ class BillingDialog(QDialog):
         self.app.setRowCount(len(v["rows"]) + 1)
         for r, row in enumerate(v["rows"]):
             vals = [row["item"], row["desc"], _m(row["scheduled"]),
-                    _m(row["previous"]), f"{row['this']:,.2f}",
-                    f"{row['stored']:,.2f}", _m(row["completed"]),
+                    _m(row["previous"]), f"{_c2(row['this']):,.2f}",
+                    f"{_c2(row['stored']):,.2f}", _m(row["completed"]),
                     f"{row['percent']:.1f}", _m(row["balance"]),
                     _m(row["retainage"])]
             for c, val in enumerate(vals):
@@ -574,7 +595,7 @@ class BillingDialog(QDialog):
         try:
             money.set_progress(self.doc, no, item, **kw)
         except (money.BillingError, KeyError, ValueError) as e:
-            QMessageBox.warning(self, "Contract & Billing", str(e))
+            QMessageBox.warning(self, "Contract & Billing", friendly(e))
         # rebuild after this signal returns (the edited cell is replaced)
         QTimer.singleShot(0, self._changed)
 
@@ -582,6 +603,7 @@ class BillingDialog(QDialog):
         if period_to is None:
             dlg = QDialog(self)
             dlg.setWindowTitle("New Pay Application")
+            dlg.setMinimumWidth(340)            # room for the title (Nov 10)
             f = QFormLayout(dlg)
             end = _date()
             f.addRow("Period to:", end)
@@ -794,8 +816,8 @@ class ChangeDialog(QDialog):
 
     def _price(self, *_):
         if self.cost.value():
-            self.amount.setValue(round(self.cost.value() *
-                                       (1 + self.markup.value() / 100), 2))
+            self.amount.setValue(_c2(self.cost.value() *
+                                       (1 + self.markup.value() / 100)))
 
     def values(self):
         return {"title": self.title.text(),

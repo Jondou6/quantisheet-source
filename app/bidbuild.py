@@ -14,6 +14,7 @@ schedule of values add up to the bid to the cent. With only tax, overhead
 and profit set it gives exactly the old proposal prices.
 """
 import re
+from .dmoney import c2 as _c2
 
 # Your BOND_TABLE as a graduated (marginal) schedule: the first $1M at 1.5%,
 # the next $4M at 1.25% ... so the premium never drops as the contract grows.
@@ -148,7 +149,7 @@ def build(lines, data, cents=True):
         running += amt
         steps.append({"key": key, "label": label, "rate": rate,
                       "basis": basis, "amount": amt, "running": running})
-    total = round(running, 2)
+    total = _c2(running)
     if cents:
         _cents(work, total)
     by_trade = {}
@@ -172,10 +173,10 @@ def build(lines, data, cents=True):
 def _cents(rows, total, key="price"):
     """Round to cents; put the penny drift on the largest row."""
     for r in rows:
-        r[key] = round(r[key], 2)
+        r[key] = _c2(r[key])
     if rows:
         big = max(rows, key=lambda r: abs(r[key]))
-        big[key] = round(big[key] + total - sum(r[key] for r in rows), 2)
+        big[key] = _c2(big[key] + total - sum(r[key] for r in rows))
 
 
 # ---- front loading ------------------------------------------------------------
@@ -220,7 +221,7 @@ def front_load(values, factor=0.06, months=12, discount=7.0, retention=10.0,
     scale = total / sum(raw) if sum(raw) else 1.0
     loaded = [x * scale for x in raw]
     rows = [{"price": x} for x in loaded]
-    _cents(rows, round(total, 2))
+    _cents(rows, _c2(total))
     loaded = [r["price"] for r in rows]
     # value moves, time doesn't: the work earned each month is the same, the
     # billing against it follows the loaded values over the same timeline

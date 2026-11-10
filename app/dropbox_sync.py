@@ -538,7 +538,7 @@ def _error_message(status, summary, text=""):
         return ("The Dropbox app is missing a permission. In the app's "
                 "Permissions tab, tick files.metadata.read, "
                 "files.content.read and files.content.write, Submit, then "
-                "sign out and in again (File > Dropbox Settings…).")
+                "sign out and in again (File > Copies & Cloud > Dropbox Settings…).")
     if status == 409:
         if "not_found" in s:
             return "That file or folder isn't in Dropbox any more."
@@ -554,8 +554,8 @@ def _error_message(status, summary, text=""):
             return "The file is too large for Dropbox."
         return f"Dropbox couldn't do that ({s.split('/')[0] or 'error'})."
     if status == 401:
-        return ("Dropbox signed you out. Sign in again in File > Dropbox "
-                "Settings…")
+        return ("Dropbox signed you out. Sign in again in File > Copies & "
+                "Cloud > Dropbox Settings…")
     if status == 403:
         return "Dropbox refused access to that file or folder."
     if status == 429:
@@ -645,8 +645,8 @@ class Client:
         with _lock:
             rt = self.tokens.get("refresh_token")
             if not rt or not self.key:
-                raise NotSignedIn("Sign in to Dropbox first (File > Dropbox "
-                                  "Settings…).")
+                raise NotSignedIn("Sign in to Dropbox first (File > Copies & "
+                                  "Cloud > Dropbox Settings…).")
             status, data = self._form({"grant_type": "refresh_token",
                                        "refresh_token": rt,
                                        "client_id": self.key})

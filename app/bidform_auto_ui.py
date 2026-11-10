@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (QCheckBox, QDateTimeEdit, QDialog,
                                QVBoxLayout)
 
 from . import bidform_auto as BA
+from .dmoney import c2 as _c2
 
 
 def _grid(heads, rows=4):
@@ -42,7 +43,7 @@ class BidFormDialog(QDialog):
         lay = QVBoxLayout(self)
         try:
             v = BA.values(doc)
-            head = (f"Base bid from the estimate: <b>${v['base']:,.2f}</b>"
+            head = (f"Base bid from the estimate: <b>${_c2(v['base']):,.2f}</b>"
                     f"<br><i>{v['words']}</i><br>Addenda to acknowledge: "
                     f"{', '.join(str(n) for n in sorted(v['addenda'])) or 'none'}")
         except Exception as e:                            # noqa: BLE001

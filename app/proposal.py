@@ -25,6 +25,7 @@ import fitz
 
 from . import assemblies, settings
 from . import embfiles
+from .dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 
@@ -103,6 +104,30 @@ def _num(v, default=0.0):
 
 # ---- pricing -------------------------------------------------------------------
 
+def _split_cents(amounts, total):
+    """Whole cents for each amount, adding up to round(total, 2) exactly:
+    each is rounded down, then the cents left go to the largest remainders
+    (ties to the earliest). Signs are kept."""
+    if not amounts:
+        return []
+    from decimal import Decimal, ROUND_FLOOR, ROUND_HALF_UP
+
+    def d(x):
+        return Decimal(repr(float(x))) * 100
+    want = int(d(total).quantize(Decimal(1), rounding=ROUND_HALF_UP))
+    raw = [d(a) for a in amounts]
+    base = [int(x.quantize(Decimal(1), rounding=ROUND_FLOOR)) for x in raw]
+    left = want - sum(base)
+    order = sorted(range(len(raw)), key=lambda i: (-(raw[i] - base[i]), i))
+    if left >= 0:
+        for k in range(left):
+            base[order[k % len(order)]] += 1
+    else:
+        for k in range(-left):
+            base[order[::-1][k % len(order)]] -= 1
+    return base
+
+
 def price(doc, data, page=None):
     """The proposal's lines and totals. Returns a dict:
     lines: [{trade, name, qty, unit, price}] at the chosen detail,
@@ -123,17 +148,24 @@ def price(doc, data, page=None):
                           "part": q, "direct": m + lab,
                           "material": q.get("material_only", m)})
     built = bidbuild.build(parts, data, cents=False)
+    # every format is made from the same part prices in cents, split so
+    # they add up to the total exactly - a part, its assembly and its trade
+    # never differ by a penny between formats (Chief's estimator test,
+    # Nov 7: $799.59 / $799.60)
+    part_cents = _split_cents([w["price"] for w in built["lines"]],
+                              built["total"])
     lines, by_trade, by_row = [], {}, {}
-    for w in built["lines"]:
-        r, q, p = w["row"], w["part"], w["price"]
+    for w, pc in zip(built["lines"], part_cents):
+        r, q, p = w["row"], w["part"], pc / 100
         if detail == "parts":
             lines.append({"trade": r["trade"], "name":
                           f"{r['name']} - {q['name']}", "qty": q["qty"],
                           "unit": q["unit"], "price": p,
                           "assembly": r["name"], "part": q["name"]})
-        by_row[id(r)] = by_row.get(id(r), 0.0) + p
+        by_row[id(r)] = by_row.get(id(r), 0) + pc
+    row_c = dict(by_row)                       # whole cents per row
     for r in rows:
-        r_price = by_row.get(id(r), 0.0)
+        r_price = row_c.get(id(r), 0) / 100
         if detail in ("assembly", "csi"):
             lines.append({"trade": r["trade"], "name": r["name"],
                           "qty": r["quantity"], "unit": r["unit"],
@@ -142,10 +174,13 @@ def price(doc, data, page=None):
                                 {"trade": r["trade"] or "General",
                                  "name": r["trade"] or "General", "qty": None,
                                  "unit": "", "price": 0.0, "items": []})
-        t["price"] += r_price
+        t["_c"] = t.get("_c", 0) + row_c.get(id(r), 0)
+        t["price"] = t["_c"] / 100
         t["items"].append(r["name"])
     if detail == "trade":
         lines = list(by_trade.values())
+        for ln in lines:
+            ln.pop("_c", None)
     elif detail == "csi":
         for ln in lines:
             ln["division"], ln["group"] = division_group(ln.get("csi"))
@@ -158,12 +193,11 @@ def price(doc, data, page=None):
     overhead = step.get("overhead", 0.0)
     profit = step.get("profit", 0.0)
     total = built["total"]
-    # round each line to cents and make them add up to the total exactly
-    for ln in lines:
-        ln["price"] = round(ln["price"], 2)
-    if lines:
-        lines[-1]["price"] = round(
-            lines[-1]["price"] + total - sum(ln["price"] for ln in lines), 2)
+    for ln in lines:                     # already whole cents
+        ln["price"] = _c2(ln["price"])
+    if lines and not part_cents:
+        lines[-1]["price"] = _c2(
+            lines[-1]["price"] + total - sum(ln["price"] for ln in lines))
     loc = _location(doc, parts, total)
     return {"lines": lines, "material": material, "tax": tax_amt,
             "location": loc,
@@ -278,8 +312,8 @@ def _location(doc, parts, total):
     try:
         return [(label, float(v)) for label, v in
                 estimate_lines.location_lines(
-                    round(total, 2), round(mat, 2), round(lab, 2),
-                    round(eqp, 2), estimate_lines.job_region(doc))]
+                    _c2(total), _c2(mat), _c2(lab),
+                    _c2(eqp), estimate_lines.job_region(doc))]
     except Exception:                                     # noqa: BLE001
         log.warning("location adjustment left off", exc_info=True)
         return []
@@ -290,7 +324,7 @@ def _location(doc, parts, total):
 # layout is exact and predictable on every machine.
 
 def _money(v):
-    return f"${v:,.2f}"
+    return f"${_c2(v):,.2f}"                  # half up, as the totals
 
 
 def _lines(text):
@@ -482,7 +516,7 @@ def _pricing(w, data, priced):
         w.text(0, y, _money(ln["price"]), 10, align="right", right=px,
                color=GREY if detail == "parts" else INK)
         if detail != "trade":
-            w.text(0, y, f"{ln['qty']:,.2f}", 10, align="right", right=qx)
+            w.text(0, y, f"{_c2(ln['qty']):,.2f}", 10, align="right", right=qx)
             w.text(ux, y, ln["unit"], 10)
         for i, part in enumerate(name_lines):
             w.text(LEFT + indent, y + 13 * i, part, 10,

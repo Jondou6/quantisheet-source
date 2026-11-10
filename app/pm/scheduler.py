@@ -36,6 +36,7 @@ from .. import icons, settings
 from ..reportname import report_file_name
 from . import schedule
 from .scheduleui import HEAD, ROW, SCALES, GanttChart
+from ..dmoney import c2 as _c2
 
 COLS = [("ID", 40), ("Activity", 260), ("Duration", 70), ("Start", 84),
         ("Finish", 84), ("Predecessors", 110), ("% Done", 60),
@@ -1233,6 +1234,22 @@ class BuildFromPlansDialog(QDialog):
                                                                          t))
             row.addWidget(b)
             f.addRow(label, row)
+        # Nov 5 (bid set): addenda and bidder Q&A, in the order issued -
+        # the detailed draft applies them before building (later wins)
+        self.addenda = []
+        arow = QHBoxLayout()
+        self.addenda_lbl = QLabel("None")
+        self.addenda_lbl.setWordWrap(True)
+        arow.addWidget(self.addenda_lbl, 1)
+        ab = QPushButton("Add…")
+        ab.setToolTip("Addenda and bidder questions and answers, oldest "
+                      "first. Removed items stay off the schedule.")
+        ab.clicked.connect(lambda: self.add_addenda())
+        arow.addWidget(ab)
+        cb = QPushButton("Clear")
+        cb.clicked.connect(lambda: self.add_addenda([], replace=True))
+        arow.addWidget(cb)
+        f.addRow("Addenda and Q&A (in order)", arow)
         today = _dt.date.today()
         nxt = today + _dt.timedelta(days=(7 - today.weekday()) % 7 or 7)
         self.ntp = QLineEdit(nxt.strftime("%m/%d/%y"))
@@ -1318,9 +1335,17 @@ class BuildFromPlansDialog(QDialog):
             ptype = "plumbing_hvac_service"
         spec = self.spec.text().strip() or None
         plans = self.plans.text().strip() or None
+        bid_set = None
+        if self.addenda:
+            from .schedacc import bidset
+            bid_set = bidset.from_files(
+                spec if spec and os.path.isfile(spec) else None,
+                plans if plans and os.path.isfile(plans) else None,
+                [p for p in self.addenda if os.path.isfile(p)])
         QApplication.setOverrideCursor(Qt.WaitCursor)
         try:
             doc = engine.compile_schedule(
+                bid_set=bid_set,
                 spec_pdf=spec if spec and os.path.isfile(spec) else None,
                 drawings_pdf=plans if plans and os.path.isfile(plans)
                 else None,
@@ -1361,6 +1386,8 @@ class BuildFromPlansDialog(QDialog):
                              (", completeness check passed" if
                               doc.get("status") == "finished" else
                               " (with gaps to finish)"))
+        if doc.get("caveat"):
+            self.last_message += "\n\n" + doc["caveat"]
         if not getattr(self.sched, "_quiet", False):
             QMessageBox.information(self.sched, "Detailed Draft",
                                     self.last_message)
@@ -1374,6 +1401,20 @@ class BuildFromPlansDialog(QDialog):
         if show:
             dlg.exec()
         return dlg
+
+    def add_addenda(self, paths=None, replace=False):
+        if paths is None:
+            paths, _ = QFileDialog.getOpenFileNames(
+                self, "Addenda and Q&A (oldest first)", "",
+                "PDF or text (*.pdf *.txt)")
+        self.addenda = list(paths) if replace else self.addenda + [
+            p for p in paths if p not in self.addenda]
+        self.addenda_lbl.setText("; ".join(
+            f"{i}. {os.path.basename(p)}" for i, p in
+            enumerate(self.addenda, 1)) or "None")
+        if self.addenda:
+            self.detailed.setChecked(True)     # only the detailed draft
+        return self.addenda
 
     def _pick(self, ed, title):
         p, _ = QFileDialog.getOpenFileName(self, title, ed.text(),
@@ -1450,7 +1491,7 @@ class BuildFromPlansDialog(QDialog):
                          f"({x['kind'].replace('_', ' ')}) - "
                          f"<i>{_esc(x['text'][:160])}</i>")
         if ct.get("ld_per_day"):
-            lines.append(f"Liquidated damages ${ct['ld_per_day']:,.2f}/day "
+            lines.append(f"Liquidated damages ${_c2(ct['ld_per_day']):,.2f}/day "
                          f"(p. {', '.join(map(str, ct['ld_pages']))}).")
         for c in ct.get("conflicts", []):
             lines.append(f"<span style='color:#c62828'><b>Check:</b> "

@@ -44,6 +44,18 @@ def as_date(v):
     return dt.date.fromisoformat(v) if v else None
 
 
+# a typing slip, not a real amount: 1e29 used to stop the program with a
+# Python error (Chief's re-test, Nov 7)
+MAX_MONEY = Decimal("100000000")          # $100,000,000.00
+MAX_QTY = Decimal("1000000")
+
+
+def _not_too_big(d, what, cap, money_=False):
+    if abs(d) > cap:
+        raise FileError(f"{what} is too large - check the number (the "
+                        f"most is {'$' if money_ else ''}{cap:,}).")
+
+
 def money(v, what, allow_blank=False):
     """Cent text, or '' when blank is allowed. Negative amounts are refused."""
     if v in (None, "") and allow_blank:
@@ -51,6 +63,7 @@ def money(v, what, allow_blank=False):
     if dmoney.bad(v, blank_ok=False):
         raise FileError(f"{what} isn't a dollar amount.")
     d = dmoney.D(v)
+    _not_too_big(d, what, MAX_MONEY, True)
     if d < 0:
         raise FileError(f"{what} can't be negative.")
     return dmoney.text(d)
@@ -59,6 +72,7 @@ def money(v, what, allow_blank=False):
 def qty(v, what, places="0.01"):
     if dmoney.bad(v, blank_ok=False):
         raise FileError(f"{what} isn't a number.")
+    _not_too_big(dmoney.D(v), what, MAX_QTY)
     d = dmoney.D(v).quantize(Decimal(places), rounding=ROUND_HALF_UP)
     if d <= 0:
         raise FileError(f"{what} must be more than zero.")
@@ -69,6 +83,7 @@ def lbs(v, what, allow_zero=True):
     """Pounds to a thousandth (refrigerant added or recovered)."""
     if dmoney.bad(v, blank_ok=False):
         raise FileError(f"{what} isn't a number of pounds.")
+    _not_too_big(dmoney.D(v), what, MAX_QTY)
     d = dmoney.D(v).quantize(Decimal("0.001"), rounding=ROUND_HALF_UP)
     if d < 0:
         raise FileError(f"{what} can't be negative.")

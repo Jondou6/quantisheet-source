@@ -30,6 +30,8 @@ import re
 import fitz
 
 from . import autowalls
+from .dmoney import half_up as _hu
+from .dmoney import c2 as _c2
 
 # ------------------------------------------------------------- styles
 def _rgb(c):
@@ -1138,8 +1140,8 @@ def mep_runs(page, ppu, unit="ft", min_ft=1.0, reach_ft=4.0, gap_ft=3.0,
                         continue
                     t = label.get(ri)
                     print(f"  [{style_name(style)}] run {ri} "
-                          f"{lens[ri] / per_ft:5.2f} ft kind={kd[ri]!r} "
-                          f"dbl={doubled(si, ri):.2f} "
+                          f"{_c2(lens[ri] / per_ft):5.2f} ft kind={kd[ri]!r} "
+                          f"dbl={_c2(doubled(si, ri)):.2f} "
                           f"pair={pair_info.get((si, ri))} "
                           f"label={t['name'] if t else None} "
                           f"nb={sorted(nb[ri])[:8]} "
@@ -1249,9 +1251,9 @@ def steel_weight(name):
     if m.group(4):                          # HSS a x b x t
         a, b, t = float(m.group(5)), float(m.group(6)), _frac(m.group(7))
         # nominal wall, less the rounded corners (matches AISC within 2%)
-        return round((2 * t * (a + b) - 4 * t * t) * 3.40 * 0.973, 2)
+        return _hu((2 * t * (a + b) - 4 * t * t) * 3.40 * 0.973, 2)
     a, b, t = float(m.group(9)), float(m.group(10)), _frac(m.group(11))
-    return round(t * (a + b - t) * 3.40, 2)
+    return _hu(t * (a + b - t) * 3.40, 2)
 
 
 def steel_members(page, ppu, unit="ft", reach_ft=4.0, min_ft=2.0):
@@ -2088,7 +2090,7 @@ def _dark_fill(p, lo=2.0, hi=20.0):
     for q0, q1 in zip(pts, pts[1:] + pts[:1]):
         a2 += q0.x * q1.y - q1.x * q0.y
     full = abs(a2) / 2.0 / max(r.width * r.height, 1e-6)
-    return r, round(full, 2)
+    return r, _hu(full, 2)
 
 
 def fill_ring_signature(paths, box):
@@ -2588,7 +2590,7 @@ def roof_status(n, squares, flagged, steep, any_pitch, default):
     review, and the over-12:12 labels - nothing overwrites anything
     (H3)."""
     def fmt(v):
-        return f"{v:,.2f}".rstrip("0").rstrip(".")
+        return f"{_c2(v):,.2f}".rstrip("0").rstrip(".")
     parts = [f"{n} roof area(s), {fmt(squares)} squares with waste."
              if n else ("No area measurements on this page yet."
                         if not flagged else "No roof area taken off.")]
@@ -3124,7 +3126,7 @@ def flex_runs(page, ppu, unit):
         if L / ppu < 1.0:
             continue
         out.append({"name": f'{size}" round flex', "size_in": size,
-                    "length": round(L / ppu, 2), "n_ticks": len(comp),
+                    "length": _hu(L / ppu, 2), "n_ticks": len(comp),
                     "pts": [list(p) for p in path]})
     return out
 

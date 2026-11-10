@@ -218,12 +218,16 @@ def test_a_new_drawing_process_starts_after_one_dies(qapp, win, drawer,
     first = drawer.proc.pid
     drawer.proc.terminate()
     drawer.proc.join(5)
-    _wait(qapp, lambda: not drawer.ok, 5)
+    # no waiting for the pipe to report it (on Windows that can come late,
+    # Nov 5): the next request notices the dead process and starts a new one
     qapp.processEvents()
     got = {}
     rid = drawer.render(v._path, 0, 1.0, None, True, None,
                         lambda m: got.setdefault("m", m))
-    assert rid is not None and drawer.proc.pid != first
+    assert rid is not None and drawer.proc.pid != first, (
+        rid, drawer.ok, drawer.failed, drawer._starts,
+        drawer.proc is not None and drawer.proc.is_alive(),
+        drawer.proc.pid if drawer.proc else None, first)
     assert _wait(qapp, lambda: "m" in got)
     assert got["m"][0] == "img"
     # a late "I'm gone" from the old process must not stop the new one
@@ -293,3 +297,76 @@ def test_paging_away_drops_what_is_no_longer_wanted(qapp, win, drawer,
     v._pf_pending[(id(v.doc), 1, 0, 1.0, 0)] = 77
     v.stop_timers()                           # closing the tab
     assert not v._pf_pending and calls[-1] == [77]
+
+
+def test_release_lets_go_of_a_file(qapp, drawer, tmp_path):
+    """Chief's re-test, Nov 7 (F1): the drawing process kept the original
+    open, so Windows refused Copy Back's replace ("Access denied")."""
+    src = str(tmp_path / "Example.pdf")
+    d = fitz.open()
+    d.new_page()
+    d.save(src)
+    d.close()
+    got = {}
+    with fitz.open(src) as d:
+        sig = render_worker.page_sig(d, 0)
+    drawer.render(src, 0, 1.0, None, True, sig,
+                  lambda m: got.setdefault("m", m))
+    assert _wait(qapp, lambda: "m" in got)          # it has the file open
+    assert render_worker.release(src, wait=10.0) is True
+    new = str(tmp_path / "new.pdf")
+    d = fitz.open()
+    d.new_page().insert_text((72, 72), "replaced")
+    d.save(new)
+    d.close()
+    os.replace(new, src)                 # refused on Windows before
+    with fitz.open(src) as d:
+        assert "replaced" in d[0].get_text()
+
+
+def test_copy_back_with_the_drawing_process_running(qapp, drawer,
+                                                    tmp_path, monkeypatch):
+    """The whole of F1, without faking the replace: open, local copy, add
+    a rectangle, Copy Back - the original gets the rectangle."""
+    from app import settings
+    from app.main_window import MainWindow
+    from PySide6.QtWidgets import QMessageBox
+    monkeypatch.setattr(settings, "DIR", str(tmp_path / "cfg"))
+    monkeypatch.setattr(settings, "_cache", None)
+    warned = []
+    monkeypatch.setattr(QMessageBox, "warning", staticmethod(
+        lambda *a, **k: warned.append(a)))
+    orig = str(tmp_path / "share" / "Example plan.pdf")
+    os.makedirs(os.path.dirname(orig))
+    d = fitz.open()
+    d.new_page()
+    d.new_page()
+    d.save(orig)
+    d.close()
+    w = MainWindow()
+    try:
+        assert w.open_path(orig)
+        got = {}
+        sig = render_worker.page_sig(w._view.doc, 0)
+        drawer.render(orig, 0, 1.0, None, True, sig,
+                      lambda m: got.setdefault("m", m))
+        assert _wait(qapp, lambda: "m" in got)      # the process has it
+        local = w.work_on_local_copy()
+        assert local and local != orig
+        a = w._view.doc[0].add_rect_annot(fitz.Rect(50, 50, 200, 200))
+        a.update()
+        w._view.dirty = True
+        assert w.copy_back_original() == orig, warned
+        assert not warned
+        with fitz.open(orig) as d:
+            assert len(list(d[0].annots())) == 1
+        assert not os.path.exists(orig + ".qscopy")
+        assert "didn't happen" not in w.statusBar().currentMessage()
+    finally:
+        for i in range(w.tabs.count()):
+            v = getattr(w.tabs.widget(i), "view", None)
+            if v is not None:
+                v.dirty = False
+        w.close()
+        w.deleteLater()
+        qapp.processEvents()

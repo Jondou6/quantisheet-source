@@ -110,12 +110,13 @@ def _file_for(path):
     return full
 
 
-def _http(path):
-    """(status, content type, body) for a plain HTTP request."""
+def _http(path, headers=None):
+    """(status, content type, body) for a plain HTTP request. The headers
+    go to the hub (attachments need "Authorization: Bearer <key>")."""
     if path.startswith("/healthz"):
         return 200, "text/plain", b"ok"
     if path.startswith("/hub/") and HUB is not None:
-        return HUB.get(path)
+        return HUB.get(path, headers)
     full = _file_for(path)
     if full is None:
         return 404, "text/plain", b"not found"
@@ -162,11 +163,12 @@ if NEW_API:
                 return Response(401, "Unauthorized", Headers(
                     [("Content-Length", "17")]), b"Bad relay token.\n")
             return None
-        status, ctype, body = _http(request.path)
+        status, ctype, body = _http(request.path, request.headers)
         headers = Headers([("Content-Type", ctype),
                            ("Content-Length", str(len(body))),
                            ("Cache-Control", "no-cache")])
-        return Response(status, {200: "OK", 403: "Forbidden"}.get(
+        return Response(status, {200: "OK", 401: "Unauthorized",
+                                 403: "Forbidden"}.get(
             status, "Not Found"),
                         headers, body)
 else:
@@ -175,7 +177,7 @@ else:
             if _bad_bearer(request_headers):
                 return 401, [("Content-Length", "17")], b"Bad relay token.\n"
             return None
-        status, ctype, body = _http(path)
+        status, ctype, body = _http(path, request_headers)
         return status, [("Content-Type", ctype),
                         ("Content-Length", str(len(body)))], body
 

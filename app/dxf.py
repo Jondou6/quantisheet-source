@@ -19,6 +19,7 @@ import math
 import re
 
 import fitz
+from .dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 
@@ -165,7 +166,7 @@ def _style(doc, e, layer):
     if lw == -1 and lay is not None:
         lw = lay.dxf.get("lineweight", -3)
     width = max(0.2, lw / 100 * 72 / 25.4) if lw and lw > 0 else 0.4
-    return dash, round(width, 2)
+    return dash, _c2(width)
 
 
 def _flat(p, tol):

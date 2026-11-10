@@ -18,6 +18,7 @@ from PySide6.QtWidgets import (
 from . import safecell
 from . import annotate, estimate, toolchest
 from .viewer import TOOLS
+from .dmoney import c2 as _c2
 
 
 def _report_name(kind, doc, ext):
@@ -289,7 +290,7 @@ class MarkupsPanel(QWidget):
             summary = columns.group_summary(shown, by, self.values)
             parts = []
             for name, n, tot in summary[:40]:
-                q = ", ".join(f"{v:,.2f} {u}" for u, v in tot.items())
+                q = ", ".join(f"{_c2(v):,.2f} {u}" for u, v in tot.items())
                 parts.append(f"<b>{html.escape(name)}</b>: {n}" +
                              (f" ({q})" if q else ""))
             self.groups.setText(f"By {html.escape(by)}: " +
@@ -604,8 +605,8 @@ class PropertiesPanel(QWidget):
         name = "Solid"
         if dashes:
             for n, d in styles.line_styles().items():
-                if d and [round(x, 2) for x in d] == \
-                        [round(float(x), 2) for x in dashes]:
+                if d and [_c2(x) for x in d] == \
+                        [_c2(float(x)) for x in dashes]:
                     name = n
                     break
             else:
@@ -714,7 +715,7 @@ class ToolChestPanel(QWidget):
                 if it.get("unit"):
                     more.append(it["unit"])
                 if it.get("unit_cost") not in (None, ""):
-                    more.append(f"${float(it['unit_cost']):,.2f}")
+                    more.append(f"${_c2(float(it['unit_cost'])):,.2f}")
                 if it.get("height"):
                     more.append(f"h {it['height']}")
                 if it.get("rise"):
@@ -1209,13 +1210,15 @@ class EstimatePanel(QWidget):
         vals = {self.C_CODE: g.get("code", ""), self.C_DESC: g["name"],
                 self.C_CTYPE: g.get("cost_type", ""),
                 self.C_TYPE: g["type"].title(), self.C_COUNT: str(g["count"]),
-                self.C_QTY: f"{g['quantity']:,.2f}", self.C_UNIT: g["unit"],
+                self.C_QTY: f"{_c2(g['quantity']):,.2f}", self.C_UNIT: g["unit"],
                 self.C_WASTE: f"{g['waste']:g}",
                 self.C_MULT: f"{g['multiplier']:g}",
-                self.C_ADJ: f"{g['adjusted']:,.2f}", self.C_MAT: "",
+                self.C_ADJ: f"{_c2(g['adjusted']):,.2f}", self.C_MAT: "",
                 self.C_LAB: "", self.C_EQP: "", self.C_SUB: "",
-                self.C_UC: f"{g['unit_cost']:,.2f}",
-                self.C_TOTAL: f"{g['total']:,.2f}"}
+                # as typed, up to 4 places - 4.125 isn't shown as 4.13
+                # (hands-on pass, Nov 10), like the lines added below
+                self.C_UC: _dec(repr(round(float(g['unit_cost'] or 0), 4))),
+                self.C_TOTAL: f"{_c2(g['total']):,.2f}"}
         for col, text in vals.items():
             self._cell(r, col, text, col in self.EDITABLE,
                        right=col >= self.C_COUNT and col != self.C_UNIT,
@@ -1234,13 +1237,16 @@ class EstimatePanel(QWidget):
                 self.C_CTYPE: p["cost_type"] or p["kind"],
                 self.C_TYPE: typ,
                 self.C_COUNT: str(p["count"]) if p.get("count") else "",
-                self.C_QTY: f"{p['quantity']:,.2f}",
+                # a typed quantity as typed (it is priced exactly);
+                # a measured one to the 2 places it is priced at
+                self.C_QTY: (f"{_c2(p['quantity']):,.2f}" if link
+                             else _dec(p["quantity"])),
                 self.C_UNIT: p["unit"] or p["unit_label"], self.C_WASTE: "",
                 self.C_MULT: "", self.C_ADJ: "",
                 self.C_MAT: _dec(up["mat"]), self.C_LAB: _dec(up["lab"]),
                 self.C_EQP: _dec(up["eqp"]), self.C_SUB: _dec(up["sub"]),
                 self.C_UC: _dec(p["unit_cost"]),
-                self.C_TOTAL: f"{p['total']:,.2f}"}
+                self.C_TOTAL: f"{_c2(p['total']):,.2f}"}
         for col, text in vals.items():
             editable = col in self.ADDED_EDIT and not (
                 col == self.C_QTY and link)
@@ -1257,8 +1263,8 @@ class EstimatePanel(QWidget):
                     tip += f"\n{p['note']}"
             elif col == self.C_TOTAL:
                 e = p["ext"]
-                tip = (f"Mat ${e['mat']:,.2f} + Lab ${e['lab']:,.2f} + Eqp "
-                       f"${e['eqp']:,.2f} + Sub ${e['sub']:,.2f}")
+                tip = (f"Mat ${_c2(e['mat']):,.2f} + Lab ${_c2(e['lab']):,.2f} + Eqp "
+                       f"${_c2(e['eqp']):,.2f} + Sub ${_c2(e['sub']):,.2f}")
             it = self._cell(r, col, text, editable,
                             right=col >= self.C_COUNT and col != self.C_UNIT,
                             tip=tip)
@@ -1596,7 +1602,7 @@ def _dec(v):
     from decimal import Decimal
     d = Decimal(v)
     if d == d.quantize(Decimal("0.01")):
-        return f"{d:,.2f}"
+        return f"{_c2(d):,.2f}"
     return f"{d.normalize():,f}"
 
 

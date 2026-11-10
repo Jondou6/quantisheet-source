@@ -13,6 +13,7 @@ import urllib.parse
 import urllib.error
 import urllib.request
 from datetime import date, timedelta
+from ..dmoney import c2 as _c2
 
 SKY = {0: "Clear", 1: "Mostly clear", 2: "Partly cloudy", 3: "Overcast",
        45: "Fog", 48: "Fog", 51: "Drizzle", 53: "Drizzle", 55: "Drizzle",
@@ -173,7 +174,7 @@ def daily(place, day=None):
     if hi is None:
         raise ValueError(f"No weather for {day} yet.")
     return {"high": f"{hi:.0f}", "low": f"{lo:.0f}",
-            "precip": f"{first('precipitation_sum') or 0:.2f}",
+            "precip": f"{_c2(first('precipitation_sum') or 0):.2f}",
             "sky": SKY.get(first("weather_code"), ""),
             "wind": f"{first('wind_speed_10m_max') or 0:.0f}",
             "source": f"Open-Meteo, {label}"}

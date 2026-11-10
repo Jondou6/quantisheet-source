@@ -9,6 +9,7 @@ import logging
 
 from . import annotate
 from . import embfiles
+from .dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 
@@ -153,7 +154,7 @@ def values_for(doc, items, data=None):
             if c["type"] == "formula":
                 try:
                     v = evaluate(c.get("formula", ""), names)
-                    row[c["name"]] = f"{v:,.2f}"
+                    row[c["name"]] = f"{_c2(v):,.2f}"
                     names[var_name(c["name"])] = v
                 except FormulaError as e:
                     row[c["name"]] = f"#ERR {e}"[:60]

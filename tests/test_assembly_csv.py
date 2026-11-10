@@ -102,8 +102,9 @@ def test_catalog_in_library_takeoff_inputs_and_cost_book(tmp_path):
     sog = {p["name"]: p for p in
            {r["name"]: r for r in rows}[SOG]["parts"]}
     assert sog["Concrete, 3500 psi"]["cost"] == pytest.approx(150)
+    # material is to the cent per part (Chief's re-test, Nov 7)
     assert sog["Concrete, 3500 psi"]["material"] == pytest.approx(
-        150 * 1000 * 4 / 12 / 27 * 1.05)
+        150 * 1000 * 4 / 12 / 27 * 1.05, abs=0.005)
 
 
 def test_import_export_round_trip(tmp_path):

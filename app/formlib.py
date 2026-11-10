@@ -134,8 +134,10 @@ def add(path, category="General", name=None, notes=""):
     elif ext in OFFICE:
         from . import acrobat2
         doc = acrobat2.create_pdf(path)
-        doc.save(dest, garbage=3, deflate=True)
-        doc.close()
+        try:                       # closed even when the save fails (L6)
+            doc.save(dest, garbage=3, deflate=True)
+        finally:
+            doc.close()
         keep = os.path.join(dest_dir, "originals")
         os.makedirs(keep, exist_ok=True)
         source = os.path.join(keep, os.path.basename(path))

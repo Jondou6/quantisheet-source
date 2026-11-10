@@ -16,6 +16,7 @@ import csv
 import math
 import re
 from fractions import Fraction
+from .dmoney import c2 as _c2
 
 ROOF_TYPES = ["facet", "lowslope", "ridge", "hip", "valley", "eave", "rake",
               "drip", "step", "headwall", "parapet", "drain", "scupper",
@@ -454,5 +455,5 @@ def export_summary(path, rows):
 
 def _cell(v, col):
     if isinstance(v, float):
-        return f"{v:.4f}" if col == 5 else f"{v:.2f}"
+        return f"{v:.4f}" if col == 5 else f"{_c2(v):.2f}"
     return v

@@ -44,6 +44,7 @@ import copy
 import datetime as _dt
 
 from . import schedule
+from ..dmoney import c2 as _c2
 
 LIMIT = 44            # workdays: "high" float / duration
 CP_ADD = 600          # workdays added in the critical path test
@@ -506,7 +507,7 @@ def check(store, today=None):
                            target else "No target date: set the contract "
                            "completion date to measure CPLI."))
     else:
-        items.append(_item("cpli", f"{cpli:.2f}", cpli >= 0.95 - 1e-9, (),
+        items.append(_item("cpli", f"{_c2(cpli):.2f}", cpli >= 0.95 - 1e-9, (),
                            f"Critical path {cpl} workdays from the data "
                            f"date, {tf:+d} workdays of float to the {src} "
                            f"({_when(target)})."))
@@ -515,7 +516,7 @@ def check(store, today=None):
     completed = [r for r in rows if _done(r)]
     if due:
         bei = len(completed) / len(due)
-        items.append(_item("bei", f"{bei:.2f} ({len(completed)} done / "
+        items.append(_item("bei", f"{_c2(bei):.2f} ({len(completed)} done / "
                            f"{len(due)} due)", bei >= 0.95 - 1e-9,
                            [o for o in missed if "not finished" in
                             o["detail"]]))

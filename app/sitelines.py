@@ -17,6 +17,7 @@ import re
 import fitz
 
 from . import tradetakeoff as tt
+from .dmoney import half_up as _hu
 
 
 def _shoelace(pts):
@@ -66,7 +67,7 @@ def labelled(page, per_ft, label_rx):
         (w[3] - w[1]) for w in words), max_turn=12.0)
     chains = _chain(closed, tol=6.0)
     L = sum(tt.poly_len(c) for c in chains)
-    out["length_ft"] = round(L / per_ft, 1)
+    out["length_ft"] = _hu(L / per_ft, 1)
     loops = [c for c in chains if len(c) > 3 and
              math.hypot(c[0][0] - c[-1][0], c[0][1] - c[-1][1]) <= 12.0]
     if loops:
@@ -163,9 +164,9 @@ def marked_lines(page, per_ft, max_marker_pt=7.0):
                 n_on += n
         if keep:
             out.append({"style": tt.style_name(st), "markers": n_on,
-                        "marker_in": round(sum(m[2] for m in marks) /
+                        "marker_in": _hu(sum(m[2] for m in marks) /
                                            len(marks) / per_ft * 12, 1),
-                        "length_ft": round(sum(tt.poly_len(r) for r in keep)
+                        "length_ft": _hu(sum(tt.poly_len(r) for r in keep)
                                            / per_ft, 1), "runs": keep})
     out.sort(key=lambda g: -g["markers"])
     return out
@@ -309,10 +310,9 @@ def marker_chains(page, per_ft, max_marker_pt=7.0, min_markers=5):
             continue
         out.append({"size_pt": size, "color": col,
                     "markers": sum(len(c) for c in chains),
-                    "spacing_ft": round(sp / per_ft, 2),
-                    "length_ft": round(total / per_ft, 1),
-                    "drawn_ft": round(drawn.get((size, col), 0.0) / per_ft,
-                                      1),
+                    "spacing_ft": _hu(sp / per_ft, 2),
+                    "length_ft": _hu(total / per_ft, 1),
+                    "drawn_ft": _hu(drawn.get((size, col), 0.0) / per_ft, 1),
                     "chains": chains})
     out.sort(key=lambda g: -g["length_ft"])
     return out

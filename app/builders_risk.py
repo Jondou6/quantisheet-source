@@ -9,6 +9,7 @@ when Mail > Review Before Sending is on - mail.review_first)."""
 import datetime
 import re
 from decimal import Decimal
+from .dmoney import c2 as _c2
 
 S_AGENT = "builders_risk_agent"       # the insurance contact, remembered
 
@@ -94,7 +95,7 @@ def request_pdf(v, path, spec_doc=None, spec_items=None):
     y[0] += 6
     amt = v.get("amount")
     try:
-        amt_s = f"${Decimal(str(amt)):,.2f}"
+        amt_s = f"${_c2(Decimal(str(amt))):,.2f}"
     except Exception:                                     # noqa: BLE001
         amt_s = str(amt or "")
     for label, val in (("Project", v.get("project")),

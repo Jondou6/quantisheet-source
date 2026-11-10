@@ -44,6 +44,7 @@ import math
 import os
 import re
 import time
+from .dmoney import c2 as _c2
 
 try:
     import numpy as np
@@ -990,6 +991,17 @@ class Plan:
         cv2.drawContours(t, [c - off], -1, 1, -1)
         ink = cv2.dilate((self.wl[y0:y1, x0:x1] > 0).astype(np.uint8),
                          np.ones((3, 3), np.uint8))
+        # a built-in bench drawn with detail lines (seat edge, lip) reads as
+        # wall: its lines are under FACE_WALL_FT apart. Its outline and
+        # inside are floor (Nov 5, Jon: count the floor under benches;
+        # HMB 109's two benches were left out and the passage beside each
+        # was shut like a door)
+        bench0 = 0
+        if BENCH_MAX_SF:
+            bm = _bench_footprints(ink, self.ppf)
+            if bm.any():
+                bench0 = int(bm.sum())
+                ink = ink & (1 - bm)
         # openings up to FACE_GAP_FT are shut as doorways only between
         # wall-thick ink: filled poche, or two face lines up to
         # FACE_WALL_FT apart (a hollow-drawn wall). Thin wall-layer lines -
@@ -1026,6 +1038,7 @@ class Plan:
             r0 = int(r.sum())
             r = _with_benches(r, ink, thick, self.ppf)
             bench = int(r.sum()) - r0        # never counted against the gain
+            bench += bench0
         cnts, _ = cv2.findContours(r, cv2.RETR_EXTERNAL,
                                    cv2.CHAIN_APPROX_SIMPLE)
         if not cnts:
@@ -1160,6 +1173,8 @@ BENCH_MAX_SF = 8.0      # a space closed off by a thin outline up to this is a
 BENCH_MAX_DEPTH_FT = 3.0  # built-in bench (no deeper than this): its floor counts
 BENCH_EDGE_SHARE = 0.4  # ...when this much of its edge is that outline
 BENCH_LINE_FT = 0.25    # an outline no wider than this (3") parts it from the floor
+BENCH_MIN_DEPTH_FT = 0.75  # a bench is at least this deep (9"): door leaves,
+                           # grab bars and partitions are thinner
 STALL_DOORS = (1.4, 2.2, 3.0)  # narrow bridging tried for an untagged room
 STALL_MAX_SF = 40.0          # a stall / shower / alcove pocket, at most
 POCKET_SF = 40.0             # a usual trace under this is the tag's pocket
@@ -1588,7 +1603,7 @@ def _fine_pen(page):
         w = p.get("width")
         if w and p.get("type") in ("s", "fs") and _dark(p.get("color")):
             r = p.get("rect")
-            use[round(w, 2)] += (r.width + r.height) if r else 1
+            use[_c2(w)] += (r.width + r.height) if r else 1
     if len(use) < 2:
         return None
     # hairline pens (up to ~0.1 mm) draw fixtures, casework, hatching and
@@ -1936,6 +1951,70 @@ def _bezier(p0, p1, p2, p3, n=10):
     return out
 
 
+def _bench_footprints(ink, ppf):
+    """Built-in benches drawn as a small closed outline against a wall,
+    with or without detail lines inside (Nov 5, HMB 109): 1 on each
+    bench's inside and its own outline lines, 0 elsewhere. A bench is
+    the small spaces the wall-layer lines close off (each up to
+    BENCH_MAX_SF) taken together when only lines no wider than
+    BENCH_LINE_FT part them; the group is BENCH_MIN_DEPTH_FT to
+    BENCH_MAX_DEPTH_FT deep, up to BENCH_MAX_SF, and stands against solid
+    wall. Door leaves, grab bars and partitions are thinner than
+    BENCH_MIN_DEPTH_FT; tubs, closets and counters are bigger."""
+    H, W = ink.shape
+    out = np.zeros_like(ink)
+    holes = (1 - ink).astype(np.uint8)
+    n, lab, st, _c = cv2.connectedComponentsWithStats(holes, connectivity=4)
+    if n <= 1:
+        return out
+    max_px = BENCH_MAX_SF * ppf ** 2
+    small = np.zeros_like(ink)
+    big = set()
+    for i in range(1, n):
+        x, y, w, h, a = st[i]
+        if a > max_px or x == 0 or y == 0 or x + w >= W or y + h >= H:
+            if a > max_px:
+                big.add(i)
+            continue
+        small[lab == i] = 1
+    if not small.any():
+        return out
+    line = max(3, int(round(BENCH_LINE_FT * ppf)))
+    k = 2 * line + 1
+    group = cv2.morphologyEx(small, cv2.MORPH_CLOSE, np.ones((k, k), np.uint8))
+    group &= np.maximum(small, ink)
+    # solid wall (poche): ink that survives an opening 4" across
+    t = max(3, int(round(ppf / 3)))
+    core = cv2.morphologyEx(ink, cv2.MORPH_OPEN, np.ones((t, t), np.uint8))
+    n2, lab2, st2, _c2 = cv2.connectedComponentsWithStats(
+        group, connectivity=4)
+    lo, hi = BENCH_MIN_DEPTH_FT * ppf, BENCH_MAX_DEPTH_FT * ppf
+    for i in range(1, n2):
+        x, y, w, h, a = st2[i]
+        if a > max_px or not (lo <= min(w, h) <= hi):
+            continue
+        g = (lab2[y:y + h, x:x + w] == i).astype(np.uint8)
+        inside = small[y:y + h, x:x + w] & g
+        if inside.sum() < 0.6 * g.sum():       # mostly lines: not a bench
+            continue
+        y0, y1 = max(0, y - line - 2), min(H, y + h + line + 2)
+        x0, x1 = max(0, x - line - 2), min(W, x + w + line + 2)
+        gg = np.zeros((y1 - y0, x1 - x0), np.uint8)
+        gg[y - y0:y - y0 + h, x - x0:x - x0 + w] = g
+        near = cv2.dilate(gg, np.ones((k, k), np.uint8))
+        if not (near & core[y0:y1, x0:x1]).any():
+            continue                            # not against a wall
+        # a bench opens onto one floor; a chase or pocket between two
+        # rooms touches two - taking its lines out would join the rooms
+        rooms = set(np.unique(lab[y0:y1, x0:x1][near > 0])) & big
+        if len(rooms) > 1:
+            continue
+        # the bench and its own outline, never the wall it stands on
+        take = (near & ink[y0:y1, x0:x1] & (1 - core[y0:y1, x0:x1])) | gg
+        out[y0:y1, x0:x1] |= take
+    return out
+
+
 def _with_benches(r, ink, thick, ppf):
     """The room's floor `r` with the footprint of each built-in bench drawn
     against its walls (Nov 3, Jon: count the floor under a shower bench,
@@ -2107,8 +2186,8 @@ def score_room(r):
     if tag and sf:
         diff = sf - tag
         pct = diff / tag * 100
-        r["tag_diff_sf"] = round(diff, 2)
-        r["tag_diff_pct"] = round(pct, 2)
+        r["tag_diff_sf"] = _c2(diff)
+        r["tag_diff_pct"] = _c2(pct)
         d = abs(diff) / tag
         if d <= NOTE_DIFF:
             conf = 0.95
@@ -2665,12 +2744,12 @@ def all_rooms(page, scale, progress=None, skip_measured=True, budget_s=None,
         info["partial"] = [_result(plans[i], out[i], tags[i])
                            for i in range(min(len(out), len(plans)))
                            if out[i] is not None]
-        info["elapsed"] = round(time.perf_counter() - t_start, 2)
+        info["elapsed"] = _c2(time.perf_counter() - t_start)
         return [], tags
     info["resolved"] = resolve_overlaps(found, plan.pts_per_ft,
                                         lines=_straight_lines(page)[0])
     info["overlaps"] = flag_overlaps(found, plan.pts_per_ft)
-    info["elapsed"] = round(time.perf_counter() - t_start, 2)
+    info["elapsed"] = _c2(time.perf_counter() - t_start)
     return found, missed
 
 

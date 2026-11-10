@@ -12,6 +12,7 @@ import json
 import os
 import threading
 import time
+from .dmoney import c2 as _c2
 
 TICK_SECONDS = 10
 IDLE_SECONDS = 120
@@ -66,9 +67,9 @@ def rows(data=None):
                 t, r = k.get("takeoff", 0) / 60, k.get("review", 0) / 60
                 out.append({"job": job, "name": j.get("name", ""),
                             "day": day, "sheet": sheet,
-                            "takeoff_min": round(t, 2),
-                            "review_min": round(r, 2),
-                            "total_min": round(t + r, 2)})
+                            "takeoff_min": _c2(t),
+                            "review_min": _c2(r),
+                            "total_min": _c2(t + r)})
     return out
 
 
@@ -79,7 +80,7 @@ def totals(data=None):
         t = out.setdefault(r["name"], {"takeoff_min": 0.0,
                                        "review_min": 0.0, "total_min": 0.0})
         for k in t:
-            t[k] = round(t[k] + r[k], 2)
+            t[k] = _c2(t[k] + r[k])
     return out
 
 

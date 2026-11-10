@@ -42,6 +42,7 @@ import math
 import re
 
 import fitz
+from .dmoney import c2 as _c2
 
 MIN_T_IN, MAX_T_IN = 3.0, 16.0          # wall thickness range, inches
 MIN_RUN_FT = 1.5                        # side-by-side run to be a wall
@@ -321,7 +322,7 @@ def walls(page, ppu, unit="ft", min_t=MIN_T_IN, max_t=None,
                     continue               # a farther face covers this run
                 pieces.append((a, oi + d / 2, t0, t1, oi, oi + d))
     # merge pieces of the same wall (stud lines inside finish lines)
-    pieces.sort(key=lambda p: (round(p[0], 2), p[1], p[2]))
+    pieces.sort(key=lambda p: (_c2(p[0]), p[1], p[2]))
     walls_out = []
     for a, off, t0, t1, f0, f1 in pieces:
         hit = None
@@ -574,7 +575,7 @@ def _drop_shared_face(walls_out, per_ft):
     faces = {}
     for k, w in enumerate(walls_out):
         for side in ("f0", "f1"):
-            faces.setdefault((round(w["a"], 2), round(w[side] / q)),
+            faces.setdefault((_c2(w["a"]), round(w[side] / q)),
                              []).append((k, side))
 
     def th_in(w):
@@ -596,7 +597,7 @@ def _drop_shared_face(walls_out, per_ft):
         if k in drop:
             continue
         for side, other in (("f1", "f0"), ("f0", "f1")):
-            key = (round(w["a"], 2), round(w[side] / q))
+            key = (_c2(w["a"]), round(w[side] / q))
             for dk in (-1, 0, 1):
                 for j, s2 in faces.get((key[0], key[1] + dk), ()):
                     if j == k or j in drop or s2 != other:
@@ -1292,7 +1293,7 @@ def _runs(ws, per_ft):
         t0, t1 = sorted((x0 * ux + y0 * uy, x1 * ux + y1 * uy))
         geo.append((a, off, t0, t1))
     gap = RUN_GAP_FT * per_ft
-    order = sorted(range(n), key=lambda i: (round(geo[i][0], 2),
+    order = sorted(range(n), key=lambda i: (_c2(geo[i][0]),
                                             geo[i][1]))
     for ii, i in enumerate(order):
         a, off, t0, t1 = geo[i]

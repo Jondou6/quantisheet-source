@@ -1,6 +1,6 @@
 // Offline cache for the app shell and the PDF viewer library.
 // (Browsers only run service workers on https:// or localhost pages.)
-const CACHE = 'quantisheet-v4';
+const CACHE = 'quantisheet-v5';   // v5: attachments by header (Nov 6)
 const MAX_ENTRIES = 60;   // keep the offline cache small
 const ASSETS = ['./index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
@@ -16,8 +16,8 @@ self.addEventListener('activate', e => {
   );
 });
 
-// Project data (/hub/...: attachments, envelope pages, bid files) carries a
-// key in the URL and is private: it is never cached (review 3 #28).
+// Project data (/hub/...: attachments, envelope pages, bid files) is
+// private: it is never cached (review 3 #28).
 function isPrivate(url) {
   try { return new URL(url).pathname.indexOf('/hub/') !== -1; } catch (e) { return true; }
 }

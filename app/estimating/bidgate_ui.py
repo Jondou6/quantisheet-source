@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (QDateEdit, QDialog, QDialogButtonBox,
                                QVBoxLayout)
 
 from . import bidgate
+from ..dmoney import c2 as _c2
 
 
 def _table(heads):
@@ -36,7 +37,7 @@ class PlaceholdersDialog(QDialog):
         total = sum((r["amount"] for r in self.rows), 0)
         lay.addWidget(QLabel(
             f"<b>{len(self.rows)}</b> placeholder(s), plug(s) and "
-            f"allowance(s) still in the estimate, <b>${total:,.2f}</b>. "
+            f"allowance(s) still in the estimate, <b>${_c2(total):,.2f}</b>. "
             "Replace each with takeoff or a real quote, or keep it on "
             "purpose." if self.rows else
             "Nothing left to replace: no placeholders, plugs or allowances "
@@ -45,7 +46,7 @@ class PlaceholdersDialog(QDialog):
         self.table.setRowCount(len(self.rows))
         for i, r in enumerate(self.rows):
             for c, v in enumerate((r["kind"].title(), r["item"],
-                                   f"${r['amount']:,.2f}", r["source"])):
+                                   f"${_c2(r['amount']):,.2f}", r["source"])):
                 self.table.setItem(i, c, QTableWidgetItem(v))
         lay.addWidget(self.table, 1)
         bb = QDialogButtonBox(QDialogButtonBox.Close)
@@ -64,7 +65,7 @@ class PlaceholdersDialog(QDialog):
             w = csv.writer(f)
             w.writerow(["Kind", "Item", "Amount", "From"])
             for r in self.rows:
-                w.writerow([r["kind"], r["item"], f"{r['amount']:.2f}",
+                w.writerow([r["kind"], r["item"], f"{_c2(r['amount']):.2f}",
                             r["source"]])
         return path
 
@@ -125,11 +126,11 @@ class EscalationDialog(QDialog):
         r = self.result()
         self.table.setRowCount(len(r["rows"]))
         for i, x in enumerate(r["rows"]):
-            for c, v in enumerate((x["type"], f"${x['amount']:,.2f}",
+            for c, v in enumerate((x["type"], f"${_c2(x['amount']):,.2f}",
                                    f"{x['pct_year']:g}%", f"{x['months']}",
-                                   f"${x['rise']:,.2f}")):
+                                   f"${_c2(x['rise']):,.2f}")):
                 self.table.setItem(i, c, QTableWidgetItem(v))
-        self.total.setText(f"<b>Projected rise: ${r['total']:,.2f}</b>")
+        self.total.setText(f"<b>Projected rise: ${_c2(r['total']):,.2f}</b>")
         return r
 
     def add(self):

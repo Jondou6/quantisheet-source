@@ -23,6 +23,7 @@ import logging
 import fitz
 
 from . import embfiles
+from .dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 
@@ -75,8 +76,8 @@ def snapshot(doc):
         k = f"{it['group'] or it['type'].title()}|{it['unit']}"
         qty[k] = round(qty.get(k, 0.0) + float(it["value"]), 4)
         n += 1
-    return {"when": _now(), "total": round(total, 2),
-            "direct": round(direct, 2), "items": items, "quantities": qty,
+    return {"when": _now(), "total": _c2(total),
+            "direct": _c2(direct), "items": items, "quantities": qty,
             "measurements": n}
 
 
@@ -110,7 +111,7 @@ def value_of(doc, refs):
         pr = float(data.get("profit") or 0)
         markup = ((1 + oh / 100) * (1 + pr / 100) - 1) * 100
         _cost, price, _problems = money.price_markups(doc, list(refs), markup)
-        return round(float(price), 2)
+        return _c2(float(price))
     except Exception:
         log.warning("could not price flagged takeoffs", exc_info=True)
         return 0.0
@@ -166,7 +167,7 @@ def log_rows(doc, now=None):
                     "flagged": r.get("flagged", 0),
                     "open": n_open,
                     "at_risk": r.get("at_risk", 0.0), "before": b,
-                    "after": a, "change": round(a - b, 2),
+                    "after": a, "change": _c2(a - b),
                     "change_pct": (a - b) / b * 100 if b else 0.0,
                     "latest": i + 1 == len(revs)})
     return out
@@ -192,7 +193,7 @@ def changes(before, after):
         rows.append({"name": n, "trade": a.get("trade") or b.get("trade"),
                      "unit": a.get("unit") or b.get("unit"),
                      "qty_before": qb, "qty_after": qa, "before": pb,
-                     "after": pa, "change": round(pa - pb, 2)})
+                     "after": pa, "change": _c2(pa - pb)})
     rows.sort(key=lambda r: -abs(r["change"]))
     qty = []
     for k in set(before["quantities"]) | set(after["quantities"]):
@@ -226,9 +227,9 @@ def export_xlsx(doc, path):
                 "Bid after ($)", "Change ($)", "Change (%)"]]
     for r in rows:
         summary.append([r["no"], r["label"], r["date"][:10], len(r["sheets"]),
-                        r["flagged"], r["open"], round(r["at_risk"], 2),
-                        round(r["before"], 2), round(r["after"], 2),
-                        round(r["change"], 2), round(r["change_pct"], 2)])
+                        r["flagged"], r["open"], _c2(r["at_risk"]),
+                        _c2(r["before"]), _c2(r["after"]),
+                        _c2(r["change"]), _c2(r["change_pct"])])
     sheets = [("Revisions", summary)]
     for r in rows:
         ch = revision_changes(doc, r["no"], now, revs)
@@ -237,8 +238,8 @@ def export_xlsx(doc, path):
         for it in ch["items"]:
             det.append([it["name"], it["trade"] or "", it["unit"] or "",
                         round(it["qty_before"], 3), round(it["qty_after"], 3),
-                        round(it["before"], 2), round(it["after"], 2),
-                        round(it["change"], 2)])
+                        _c2(it["before"]), _c2(it["after"]),
+                        _c2(it["change"])])
         sheets.append((f"Rev {r['no']} detail", det))
     acrobat.write_xlsx(path, sheets)
     return path

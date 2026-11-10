@@ -16,6 +16,7 @@ import logging
 from decimal import Decimal
 
 from . import csi, dmoney, safecell
+from .dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 
@@ -112,11 +113,35 @@ def collect(doc):
     return out
 
 
-def unpriced(doc):
+def priced_by_assembly(doc, names, priced_names):
+    """{takeoff line name: assembly name} for the takeoff groups an
+    assembly prices (the group name finds the assembly, as the rollup
+    does). `priced_names`: the assemblies that came out with a price."""
+    from . import assemblies
+    if doc is None or not priced_names:
+        return {}
+    try:
+        job, lib = assemblies.read_job(doc), assemblies.library()
+    except Exception:                                     # noqa: BLE001
+        log.warning("assemblies unavailable", exc_info=True)
+        return {}
+    out = {}
+    for n in names:
+        a = assemblies.find(doc, n, job, lib)
+        if a and a.get("name") in priced_names:
+            out[n] = a["name"]
+    return out
+
+
+def unpriced(doc, priced_names=None):
     """Takeoff lines with a quantity but no price yet (review r41 F01: an
     export of measured-but-unpriced takeoffs used to be an empty $0.00
     summary). [{code, division, title, desc, qty, unit}] - listed in the
-    exports with a blank price; never added to any total."""
+    exports with a blank price; never added to any total.
+
+    A takeoff priced by its assembly is priced (Chief's estimator test,
+    Nov 7: all 11 assembly-priced items were listed here again).
+    `priced_names`: the assemblies with a price (worked out when None)."""
     from . import estimate
     if doc is None:
         return []
@@ -125,9 +150,15 @@ def unpriced(doc):
     except Exception:                                     # noqa: BLE001
         log.warning("takeoff lines left out", exc_info=True)
         return []
+    if priced_names is None:
+        priced_names = {ln["desc"] for ln in collect(doc)
+                        if ln["source"] == "assembly"}
+    by_asm = priced_by_assembly(doc, [g["name"] for g in tl], priced_names)
     out = []
     for g in tl:
         if dmoney.cents(g.get("total") or 0):
+            continue
+        if g["name"] in by_asm:
             continue
         q = g.get("adjusted", g.get("quantity")) or 0
         if not q:
@@ -187,7 +218,9 @@ def summary(doc=None, lines=None):
             types.get("Equipment", Z), estimate_lines.job_region(doc))
     return {"lines": lines, "divisions": out,
             "types": {k: types[k] for k in TYPES if k in types},
-            "total": total, "location": loc, "unpriced": unpriced(doc)}
+            "total": total, "location": loc,
+            "unpriced": unpriced(doc, {ln["desc"] for ln in lines
+                                       if ln["source"] == "assembly"})}
 
 
 def _project(doc):
@@ -393,7 +426,7 @@ def make_pdf(s, project="", comp=None):
             w.text(0, y, P._money(float(ln["total"])), 9.5, color=P.GREY,
                    align="right", right=px)
             if ln["qty"]:
-                w.text(0, y, f"{float(ln['qty']):,.2f}", 9.5, color=P.GREY,
+                w.text(0, y, f"{_c2(float(ln['qty'])):,.2f}", 9.5, color=P.GREY,
                        align="right", right=qx)
                 w.text(ux, y, ln["unit"], 9.5, color=P.GREY)
             for i, part in enumerate(parts):
@@ -413,7 +446,7 @@ def make_pdf(s, project="", comp=None):
             parts = P._wrap(label, name_w - 12, 9.5)
             w.need(13 * len(parts) + 6)
             y = w.y + 12
-            w.text(0, y, f"{float(u['qty']):,.2f}", 9.5, color=P.GREY,
+            w.text(0, y, f"{_c2(float(u['qty'])):,.2f}", 9.5, color=P.GREY,
                    align="right", right=qx)
             w.text(ux, y, u["unit"], 9.5, color=P.GREY)
             w.text(0, y, "-", 9.5, color=P.GREY, align="right", right=px)

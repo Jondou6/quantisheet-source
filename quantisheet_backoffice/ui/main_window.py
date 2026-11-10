@@ -196,17 +196,70 @@ class BillingPage(Page):
         self.lay.addWidget(heading("Billing"))
         self.job = job_picker(office)
         self.lay.addWidget(self.job)
+        # 1.2 (Nov 5): closed service work orders' invoices, posted once
+        from PySide6.QtWidgets import QPushButton
+        self.svc_btn = QPushButton("Bring In QuantiSheet Service Invoices")
+        self.svc_btn.setEnabled(office.can("ar.edit"))
+        self.svc_btn.clicked.connect(lambda _c=False: self.service_invoices())
+        self.lay.addWidget(self.svc_btn)
+        self.svc_msg = QLabel("")
+        self.svc_msg.setWordWrap(True)
+        self.lay.addWidget(self.svc_msg)
         self.holder = QVBoxLayout()
         self.lay.addLayout(self.holder)
-        reg = billing.register(office)
-        self.lay.addWidget(table(["Invoice", "Type", "Date", "Customer",
-                                  "Total", "Status"],
-                                 [(r["number"], r["type"], r["invoice_date"],
-                                   r["customer"], r["total"], r["status"])
-                                  for r in reg], money_cols=(4,)))
+        self.register_box = QVBoxLayout()
+        self.lay.addLayout(self.register_box)
+        self.register_table = None
+        self.show_register()
         self._cp = ContractPage
         self.job.currentIndexChanged.connect(self.refresh)
         self.refresh()
+
+    def show_register(self):
+        """The invoice register, read again (after an import it showed 0
+        rows until reopened - Chief's re-test, Nov 7)."""
+        from .. import billing
+        if self.register_table is not None:
+            self.register_box.removeWidget(self.register_table)
+            self.register_table.deleteLater()
+        reg = billing.register(self.office)
+        self.register_table = table(
+            ["Invoice", "Type", "Date", "Customer", "Total", "Status"],
+            [(r["number"], r["type"], r["invoice_date"], r["customer"],
+              r["total"], r["status"]) for r in reg], money_cols=(4,))
+        self.register_box.addWidget(self.register_table)
+        return self.register_table
+
+    def service_invoices(self, ask=None):
+        """Bring in the service invoices of the picked job (the QuantiSheet
+        service department's job). Posting needs ar.approve and a yes."""
+        from .. import billing
+        jid = self.job.currentData()
+        if jid is None:
+            self.svc_msg.setText("Pick the service job first.")
+            return None
+        post = self.office.can("ar.approve")
+        if post:
+            if ask is None:
+                from PySide6.QtWidgets import QMessageBox
+                ask = lambda t: QMessageBox.question(           # noqa: E731
+                    self, "Service invoices", t) == QMessageBox.Yes
+            post = ask("Post the new service invoices to the books now? "
+                       "(No: bring them in as Draft.) Each invoice is posted "
+                       "once; one already here adds nothing.")
+        res = billing.import_service_invoices(self.office, jid, post=post)
+        self.svc_msg.setText(
+            f"{len(res['created'])} service invoice(s) brought in"
+            + (f", {len(res['posted'])} posted" if res["posted"] else
+               " as Draft")
+            + (f"; {len(res['reversed'])} reversed" if res["reversed"]
+               else "")
+            + (f"; skipped: " + "; ".join(f"{n} ({w})"
+                                          for n, w in res["skipped"])
+               if res["skipped"] else "") + ".")
+        self.show_register()
+        self.refresh()
+        return res
 
     def refresh(self):
         while self.holder.count():

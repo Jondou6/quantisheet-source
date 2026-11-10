@@ -80,8 +80,8 @@ tut("navigate", "Getting started", "Open, view and move around", 4,
 # ------------------------------------------------------------- editing
 tut("edittext", "Editing PDFs", "Edit text and pictures on the page", 4,
     "Change words, fonts and pictures right on the page.",
-    ["Document tab > <b>Edit Text</b>. Every paragraph and picture gets a "
-     "light outline.",
+    ["PDF Management tab > <b>Edit Text</b>. Every paragraph and picture "
+     "gets a light outline.",
      "Click inside a paragraph and type. It keeps the paragraph's own font "
      "and wraps to its box.",
      "Use the small bar above it for font, size, <b>B</b>old, <i>I</i>talic, "
@@ -568,7 +568,7 @@ tut("prebid", "Estimating", "Pre-bid checklist: nothing missed before "
      " <b>Link to Estimate Line</b> (it stays priced only while that line "
      "is in the estimate), Excluded (with a reason) or Sent as an RFI "
      "(logs the RFI too).",
-     "Estimate > <b>Show Unpriced Markups</b> outlines everything still "
+     "Takeoff > <b>Show Unpriced Markups</b> outlines everything still "
      "open in red.",
      "Compare Revisions > Cloud clouds only the changes your takeoff "
      "doesn't cover yet; decisions carry to the new set, and anything on a "
@@ -879,7 +879,7 @@ tut("exports", "Working together", "Export: Excel, Word, CAD and images",
     3, "Get drawings, markups and quantities into other programs.",
     ["File > <b>Export To</b>: Word, Excel, PowerPoint, web page, text, "
      "AutoCAD DXF (this page), PDF/A, PNG or JPEG images.",
-     "Quantities: Estimate tab > <b>Export Quantities (CSV)</b> or "
+     "Quantities: Takeoff tab > <b>Export Quantities (CSV)</b> or "
      "<b>Link Quantities to Excel</b> (the workbook updates when the "
      "takeoff changes).",
      "Markups for another PDF program: File > <b>Export Markups "
@@ -887,12 +887,12 @@ tut("exports", "Working together", "Export: Excel, Word, CAD and images",
      "For people outside the company: File > Export > <b>External Issue "
      "(strip pricing)</b> keeps markups and removes prices, margins and job "
      "data.",
-     "Document > <b>Remove Hidden Information</b> removes metadata, "
+     "PDF Management > <b>Remove Hidden Information</b> removes metadata, "
      "scripts, attachments and hidden text before you send a file; it tells "
      "you if a damaged file kept anything."],
     ["Reduce File Size makes big scanned sets easier to email. It only "
      "writes a copy when the copy is smaller.",
-     "File > Check / Repair PDF checks a damaged file page by page and "
+     "File > Protect & Repair > Check / Repair PDF checks a damaged file page by page and "
      "saves a repaired copy next to it; Pages > Booklet / N-up lays pages "
      "out for printing in a new PDF."],
     ["Excel Workbook (.xlsx)…"])
@@ -1159,7 +1159,8 @@ tut("bidworkbook", "Estimating", "Bid form workbook, addenda and builder's "
 # ------------------------------------------------------------- shortcuts
 SHORTCUTS = [
     ("Find any command", "Ctrl+K"), ("Open", "Ctrl+O"), ("Save", "Ctrl+S"),
-    ("Undo / Redo", "Ctrl+Z / Ctrl+Y"), ("Find text", "Ctrl+F"),
+    ("Undo / Redo", "Ctrl+Z / Ctrl+Y or Ctrl+Shift+Z"),
+    ("Find text", "Ctrl+F"),
     ("Fit page / width / actual size", "Ctrl+0 / Ctrl+2 / Ctrl+1"),
     ("Previous view", "Alt+Left"), ("Go to page", "Ctrl+G"),
     ("Next / previous page", "PgDn / PgUp"), ("Select tool", "V"),
@@ -1271,10 +1272,18 @@ class HelpCenter(QDialog):
         nav.addWidget(self.show_b)
         rv.addLayout(nav)
         split.addWidget(right)
-        split.setSizes([280, 700])
         v.addWidget(split, 1)
         self.items = {}
         self.fill()
+        # wide enough for the longest title (Chief's user test, Nov 6:
+        # entries were cut off); the rest goes to the page
+        fm = self.tree.fontMetrics()
+        longest = max((fm.horizontalAdvance(t["title"]) for t in T),
+                      default=200)
+        left = min(max(280, longest + 70), 440)
+        if self.width() < left + 640:
+            self.resize(left + 640, self.height())
+        split.setSizes([left, self.width() - left])
         self.open_tutorial(start)
 
     def fill(self):
@@ -1290,6 +1299,7 @@ class HelpCenter(QDialog):
                 g.setFlags(Qt.ItemIsEnabled)
                 self.tree.addTopLevelItem(g)
             it = QTreeWidgetItem([t["title"]])
+            it.setToolTip(0, t["title"])
             it.setData(0, Qt.UserRole, t["id"])
             g.addChild(it)
             self.items[t["id"]] = it

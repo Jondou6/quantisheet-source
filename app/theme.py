@@ -7,7 +7,7 @@ as "theme": "system" | "dark" | "light".
 import logging
 from PySide6.QtCore import QObject, Qt, Signal
 from PySide6.QtGui import QColor, QFont, QGuiApplication, QPalette
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication, QWidget
 
 from . import settings
 
@@ -15,16 +15,21 @@ DARK = {
     "window": "#1b1c1f", "surface": "#232428", "surface2": "#2b2d32",
     "raised": "#33353b", "border": "#3a3c43", "border2": "#4a4d55",
     "text": "#e8e9ec", "muted": "#9a9da6", "faint": "#6b6e77",
-    "accent": "#4c8dff", "accent2": "#77a8ff", "on_accent": "#ffffff",
-    "accent_soft": "#25344f", "canvas": "#131416", "danger": "#f05252",
+    # Nov 6 (Jon): the tile green instead of blue. Fills use the tile
+    # green itself; green text and lines on the dark background use a
+    # lighter shade of it (the tile green is 2.6:1 there, this is 7.2:1).
+    "accent": "#0e6a60", "accent2": "#1f746b", "on_accent": "#ffffff",
+    "accent_text": "#3dbba9",
+    "accent_soft": "#173430", "canvas": "#131416", "danger": "#f05252",
     "ok": "#3fb27f", "warn": "#e3a008", "tip": "#2b2d32",
 }
 LIGHT = {
     "window": "#f3f4f6", "surface": "#ffffff", "surface2": "#f5f6f8",
     "raised": "#eceef2", "border": "#e5e7eb", "border2": "#d1d5db",
     "text": "#16181d", "muted": "#5f6470", "faint": "#9aa0ab",
-    "accent": "#2563eb", "accent2": "#1d4ed8", "on_accent": "#ffffff",
-    "accent_soft": "#e8efff", "canvas": "#e4e7ec", "danger": "#d92d20",
+    "accent": "#0e6a60", "accent2": "#0b5a51", "on_accent": "#ffffff",
+    "accent_text": "#0e6a60",
+    "accent_soft": "#e2f1ee", "canvas": "#e4e7ec", "danger": "#d92d20",
     "ok": "#12865a", "warn": "#b54708", "tip": "#16181d",
 }
 MODES = ("system", "dark", "light")
@@ -89,7 +94,7 @@ def _palette(t):
                       (QPalette.BrightText, "danger"),
                       (QPalette.Highlight, "accent"),
                       (QPalette.HighlightedText, "on_accent"),
-                      (QPalette.Link, "accent"),
+                      (QPalette.Link, "accent_text"),
                       (QPalette.PlaceholderText, "faint"),
                       (QPalette.Mid, "border"),
                       (QPalette.Dark, "border2"),
@@ -142,7 +147,7 @@ QToolTip {{ background: {t['tip']}; color: #ffffff; border: none;
 #Ribbon {{ background: {t['surface']}; border-bottom: 1px solid {t['border']}; }}
 #RibbonHeader {{ background: {t['surface']}; }}
 #RibbonBody {{ background: {t['surface']}; }}
-#RibbonMore {{ background: {t['surface2']}; color: {t['accent']};
+#RibbonMore {{ background: {t['surface2']}; color: {t['accent_text']};
     border: 1px solid {t['border2']}; border-radius: 6px; }}
 #RibbonMore:hover {{ background: {t['accent_soft']}; }}
 #AppButton {{ background: {t['accent']}; color: {t['on_accent']};
@@ -153,19 +158,19 @@ QToolTip {{ background: {t['tip']}; color: #ffffff; border: none;
     border-bottom: 2px solid transparent; color: {t['muted']};
     padding: 6px 12px 5px 12px; border-radius: 0; font-weight: 500; }}
 #RibbonTab:hover {{ color: {t['text']}; border-bottom-color: {t['border2']}; }}
-#RibbonTab:checked {{ color: {t['accent']}; background: transparent;
-    border-bottom-color: {t['accent']}; font-weight: 600; }}
-#RibbonGroup {{ background: transparent; }}
-#RibbonGroupLabel {{ color: {t['faint']}; font-size: 8pt; }}
-#RibbonSep {{ background: {t['border']}; }}
-#RibbonButton {{ background: transparent; border: 1px solid transparent;
-    border-radius: 8px; padding: 3px 4px; color: {t['text']}; }}
-#RibbonButton:hover {{ background: {t['surface2']}; border-color: {t['border']}; }}
-#RibbonButton:pressed {{ background: {t['raised']}; }}
-#RibbonButton:checked {{ background: {t['accent_soft']};
-    border-color: {t['accent']}; color: {t['accent']}; }}
-#RibbonButton:disabled {{ color: {t['faint']}; }}
+#RibbonTab:checked {{ color: {t['accent_text']}; background: transparent;
+    border-bottom-color: {t['accent_text']}; font-weight: 600; }}
+#RibbonGroup {{ background: transparent; border: none; }}
+#RibbonGroupLabel {{ color: {t['text']}; font-size: 8pt; font-weight: 600; }}
+#RibbonSep {{ background: transparent; }}
+#RibbonButton {{ background: transparent; border: none; padding: 0;
+    color: {t['text']}; }}
+#RibbonButton:hover, #RibbonButton:pressed, #RibbonButton:checked,
+#RibbonButton:disabled {{ background: transparent; border: none; }}
 #RibbonButton::menu-indicator {{ image: none; width: 0; }}
+#quick_bar {{ background: {t['surface']}; border: none;
+    border-top: 1px solid {t['border']}; padding: 1px 4px; }}
+#ModelStatus {{ background: transparent; }}
 #CommandSearch {{ background: {t['surface2']}; border: 1px solid {t['border']};
     border-radius: 8px; padding: 5px 10px; color: {t['muted']};
     text-align: left; }}
@@ -181,7 +186,7 @@ QToolTip {{ background: {t['tip']}; color: #ffffff; border: none;
     border-radius: 6px; padding: 5px 7px; }}
 #modern_top_bar QToolButton:hover {{ background: {t['surface2']}; }}
 #modern_top_bar QToolButton:checked {{ background: {t['accent_soft']};
-    color: {t['accent']}; font-weight: 600; }}
+    color: {t['accent_text']}; font-weight: 600; }}
 #modern_top_bar QToolButton::menu-indicator {{ image: none; width: 0; }}
 #modern_tool_rail {{ background: {t['surface']}; border: none;
     border-right: 1px solid {t['border']}; padding: 6px 3px; spacing: 2px; }}
@@ -190,8 +195,8 @@ QToolTip {{ background: {t['tip']}; color: #ffffff; border: none;
     font-size: 8pt; color: {t['muted']}; }}
 #RailButton:hover {{ background: {t['surface2']}; color: {t['text']}; }}
 #RailButton:checked {{ background: {t['accent_soft']};
-    border: 1px solid transparent; border-left: 3px solid {t['accent']};
-    color: {t['accent']}; font-weight: 600; }}
+    border: 1px solid transparent; border-left: 3px solid {t['accent_text']};
+    color: {t['accent_text']}; font-weight: 600; }}
 #RailButton:disabled {{ color: {t['faint']}; }}
 #RailSep {{ color: {t['border']}; background: {t['border']}; max-height: 1px;
     margin: 4px 6px; border: none; }}
@@ -199,9 +204,9 @@ QToolTip {{ background: {t['tip']}; color: #ffffff; border: none;
     border-bottom: 1px solid {t['border']}; padding: 3px 10px; spacing: 8px; }}
 #modern_tool_strip QToolButton {{ background: {t['surface']};
     border: 1px solid {t['border']}; border-radius: 6px; padding: 3px 8px; }}
-#modern_tool_strip QToolButton:hover {{ border-color: {t['accent']}; }}
-#modern_tool_strip QToolButton:checked {{ border-color: {t['accent']};
-    color: {t['accent']}; }}
+#modern_tool_strip QToolButton:hover {{ border-color: {t['accent_text']}; }}
+#modern_tool_strip QToolButton:checked {{ border-color: {t['accent_text']};
+    color: {t['accent_text']}; }}
 #StripTitle {{ color: {t['text']}; padding: 0 4px; }}
 #StripHint {{ color: {t['muted']}; }}
 #StripWarn {{ color: {t['warn']}; font-weight: 600; }}
@@ -210,7 +215,7 @@ QToolTip {{ background: {t['tip']}; color: #ffffff; border: none;
 #StripDone:hover {{ background: {t['accent2']}; }}
 #AllToolsSearch {{ background: {t['surface2']}; border: 1px solid {t['border']};
     border-radius: 8px; padding: 6px 10px; }}
-#AllToolsSearch:focus {{ border-color: {t['accent']}; }}
+#AllToolsSearch:focus {{ border-color: {t['accent_text']}; }}
 #AllToolsTree {{ background: transparent; border: none; }}
 #AllToolsTree::item {{ padding: 5px 4px; border-radius: 6px; }}
 #AllToolsTree::item:hover {{ background: {t['surface2']}; }}
@@ -234,7 +239,7 @@ QTabBar::tab {{ background: transparent; color: {t['muted']};
     padding: 7px 14px; border: none; border-bottom: 2px solid transparent;
     margin-right: 2px; }}
 QTabBar::tab:hover {{ color: {t['text']}; }}
-QTabBar::tab:selected {{ color: {t['text']}; border-bottom-color: {t['accent']}; }}
+QTabBar::tab:selected {{ color: {t['text']}; border-bottom-color: {t['accent_text']}; }}
 #docTab, #docTab > QWidget > QWidget {{ background: {t['canvas']}; }}
 
 /* docks */
@@ -249,10 +254,10 @@ QMainWindow::separator:hover {{ background: {t['accent']}; }}
 QLineEdit, QPlainTextEdit, QTextEdit, QSpinBox, QDoubleSpinBox, QDateEdit,
 QComboBox {{ background: {t['surface']}; border: 1px solid {t['border2']};
     border-radius: 7px; padding: 4px 8px;
-    selection-background-color: {t['accent']}; }}
+    selection-background-color: {t['accent_text']}; }}
 QLineEdit:focus, QPlainTextEdit:focus, QTextEdit:focus, QSpinBox:focus,
 QDoubleSpinBox:focus, QDateEdit:focus, QComboBox:focus {{
-    border-color: {t['accent']}; }}
+    border-color: {t['accent_text']}; }}
 QComboBox::drop-down {{ border: none; width: 18px; }}
 QComboBox QAbstractItemView {{ background: {t['surface']};
     border: 1px solid {t['border2']}; selection-background-color: {t['accent_soft']};
@@ -261,7 +266,7 @@ QPushButton {{ background: {t['surface']}; border: 1px solid {t['border2']};
     border-radius: 7px; padding: 5px 14px; min-height: 18px; }}
 QPushButton:hover {{ background: {t['raised']}; }}
 QPushButton:default {{ background: {t['accent']}; color: {t['on_accent']};
-    border-color: {t['accent']}; }}
+    border-color: {t['accent_text']}; }}
 QPushButton:default:hover {{ background: {t['accent2']}; }}
 QPushButton:disabled {{ color: {t['faint']}; }}
 QCheckBox, QRadioButton {{ spacing: 7px; }}
@@ -306,7 +311,7 @@ QStatusBar {{ background: {t['surface']}; border-top: 1px solid {t['border']};
     color: {t['muted']}; }}
 QStatusBar::item {{ border: none; }}
 #StatusChip {{ color: {t['muted']}; padding: 0 8px; }}
-#StatusChipAccent {{ color: {t['accent']}; padding: 0 8px; font-weight: 600; }}
+#StatusChipAccent {{ color: {t['accent_text']}; padding: 0 8px; font-weight: 600; }}
 
 #StartPage {{ background: {t['window']}; }}
 #StartScroll, #StartBody {{ background: {t['window']}; border: none; }}
@@ -318,7 +323,7 @@ QStatusBar::item {{ border: none; }}
 #StartHead {{ color: {t['muted']}; font-weight: 600; margin-top: 10px; }}
 #StartCard {{ background: {t['surface']}; border: 1px solid {t['border']};
     border-radius: 12px; padding: 0; }}
-#StartCard:hover {{ border-color: {t['accent']}; background: {t['surface']}; }}
+#StartCard:hover {{ border-color: {t['accent_text']}; background: {t['surface']}; }}
 #StartCard:pressed {{ background: {t['accent_soft']}; }}
 #StartCard QLabel {{ background: transparent; }}
 #StartCardIcon {{ background: {t['accent_soft']}; border-radius: 10px; }}
@@ -341,15 +346,15 @@ QCheckBox::indicator, QTableView::indicator, QListView::indicator,
 QTreeView::indicator {{ width: 15px; height: 15px;
     border: 1px solid {t['border2']}; border-radius: 4px;
     background: {t['surface']}; }}
-QCheckBox::indicator:hover {{ border-color: {t['accent']}; }}
+QCheckBox::indicator:hover {{ border-color: {t['accent_text']}; }}
 QCheckBox::indicator:checked, QTableView::indicator:checked,
 QListView::indicator:checked, QTreeView::indicator:checked {{
-    background: {t['accent']}; border-color: {t['accent']};
+    background: {t['accent']}; border-color: {t['accent_text']};
     image: url({a['check']}); }}
 QRadioButton::indicator {{ width: 15px; height: 15px; border-radius: 8px;
     border: 1px solid {t['border2']}; background: {t['surface']}; }}
 QRadioButton::indicator:checked {{ background: {t['accent']};
-    border-color: {t['accent']}; image: url({a['dot']}); }}
+    border-color: {t['accent_text']}; image: url({a['dot']}); }}
 QComboBox::down-arrow {{ image: url({a['down']}); width: 11px; height: 11px; }}
 QSpinBox::up-button, QDoubleSpinBox::up-button, QDateEdit::up-button,
 QSpinBox::down-button, QDoubleSpinBox::down-button, QDateEdit::down-button {{
@@ -370,7 +375,7 @@ QSlider::groove:horizontal {{ height: 4px; background: {t['border2']};
     border-radius: 2px; }}
 QSlider::sub-page:horizontal {{ background: {t['accent']}; border-radius: 2px; }}
 QSlider::handle:horizontal {{ background: {t['surface']};
-    border: 2px solid {t['accent']}; width: 12px; height: 12px;
+    border: 2px solid {t['accent_text']}; width: 12px; height: 12px;
     margin: -6px 0; border-radius: 8px; }}
 #thumbs {{ background: {t['canvas']}; border: none; }}
 #thumbs::item {{ color: {t['muted']}; border-radius: 6px; padding: 4px; }}
@@ -436,10 +441,143 @@ def apply(app=None, m=None, save=False):
     if not _current.get("font_set"):
         app.setFont(_font())
         _current["font_set"] = True
+    _qt_scheme(app, n == "dark")      # before our palette, which then wins
     app.setPalette(_palette(t))
     app.setStyleSheet(stylesheet(t, _assets(t, n)))
     hub.changed.emit(n)
+    _repaint_now(app, n)
     return n
+
+
+# ---- Windows title bars and the repaint after a switch (Chief, Nov 6) ------
+DWMWA_USE_IMMERSIVE_DARK_MODE = 20         # Windows 10 20H1 and later
+DWMWA_USE_IMMERSIVE_DARK_MODE_OLD = 19     # Windows 10 1809-1909
+_SWP = 0x0001 | 0x0002 | 0x0004 | 0x0010 | 0x0020   # no size/move/z/activate,
+#                                                       frame changed
+
+
+def _qt_scheme(app, dark):
+    """Tell Qt the colour scheme too (Qt 6.8+). Qt sets the Windows
+    caption itself from it, and otherwise put it back to light after we
+    had made it dark (Chief's re-test, Nov 7: attribute 20 read back 0)."""
+    try:
+        from PySide6.QtCore import Qt
+        hints = app.styleHints()
+        if hasattr(hints, "setColorScheme"):
+            hints.setColorScheme(Qt.ColorScheme.Dark if dark
+                                 else Qt.ColorScheme.Light)
+            return True
+    except Exception:                                     # noqa: BLE001
+        logging.getLogger(__name__).debug("color scheme", exc_info=True)
+    return False
+
+
+def caption_is_dark(widget):
+    """What Windows has for the caption now: True / False, or None when it
+    can't be read (not Windows)."""
+    import sys
+    if sys.platform != "win32" or widget is None:
+        return None
+    try:
+        import ctypes
+        from ctypes import wintypes
+        hwnd = wintypes.HWND(int(widget.winId()))
+        val = ctypes.c_int(0)
+        for attr in (DWMWA_USE_IMMERSIVE_DARK_MODE,
+                     DWMWA_USE_IMMERSIVE_DARK_MODE_OLD):
+            if ctypes.windll.dwmapi.DwmGetWindowAttribute(
+                    hwnd, attr, ctypes.byref(val), ctypes.sizeof(val)) == 0:
+                return bool(val.value)
+    except Exception:                                     # noqa: BLE001
+        pass
+    return None
+
+
+def title_bar(widget, dark, again=True):
+    """Dark or light caption bar for one top-level window (Windows only).
+    Returns True when Windows took it; anywhere else it does nothing.
+    Set again a moment later too: Qt can reset it while the window is
+    being shown or activated."""
+    import sys
+    if sys.platform != "win32" or widget is None or not widget.isWindow():
+        return False
+    if again:
+        try:
+            from PySide6.QtCore import QTimer
+            for ms in (60, 400):
+                QTimer.singleShot(ms, widget, lambda w=widget, d=dark:
+                                  _again(w, d))
+        except Exception:                                 # noqa: BLE001
+            pass
+    try:
+        import ctypes
+        from ctypes import wintypes
+        hwnd = wintypes.HWND(int(widget.winId()))
+        val = ctypes.c_int(1 if dark else 0)
+        dwm = ctypes.windll.dwmapi
+        ok = False
+        for attr in (DWMWA_USE_IMMERSIVE_DARK_MODE,
+                     DWMWA_USE_IMMERSIVE_DARK_MODE_OLD):
+            if dwm.DwmSetWindowAttribute(hwnd, attr, ctypes.byref(val),
+                                         ctypes.sizeof(val)) == 0:
+                ok = True
+                break
+        if ok:          # redraw the caption now, not on the next activation
+            ctypes.windll.user32.SetWindowPos(hwnd, None, 0, 0, 0, 0, _SWP)
+        widget.setProperty("qs_dark_caption", bool(dark))
+        return ok
+    except Exception:                                     # noqa: BLE001
+        logging.getLogger(__name__).debug("title bar", exc_info=True)
+        return False
+
+
+def _again(widget, dark):
+    try:
+        if widget.isVisible() and is_dark() == dark and \
+                caption_is_dark(widget) is not dark:
+            title_bar(widget, dark, again=False)
+    except RuntimeError:                       # the window is gone
+        pass
+
+
+def _caption_for_new_window(app, qwin):
+    """A window that just got focus (a dialog, the Help Center...) gets the
+    current caption colour. Focus changes are rare, unlike an app-wide
+    event filter, which would run for every event."""
+    if qwin is None:
+        return
+    dark = is_dark()
+    for w in app.topLevelWidgets():
+        try:
+            if w.windowHandle() is qwin and \
+                    w.property("qs_dark_caption") != dark:
+                title_bar(w, dark)
+        except Exception:                                 # noqa: BLE001
+            pass
+
+
+def _repaint_now(app, n):
+    """Every open window repaints with the new colours at once (it used to
+    wait for the mouse to pass over each part) and its caption follows."""
+    dark = n == "dark"
+    if _current.get("caption_app") is not app:
+        try:
+            app.focusWindowChanged.connect(
+                lambda qw, a=app: _caption_for_new_window(a, qw))
+        except Exception:                                 # noqa: BLE001
+            pass
+        _current["caption_app"] = app
+    for w in app.topLevelWidgets():
+        try:
+            if not w.isVisible():
+                continue
+            title_bar(w, dark)
+            w.update()
+            for c in w.findChildren(QWidget):
+                if c.isVisible():
+                    c.update()
+        except Exception:                                 # noqa: BLE001
+            logging.getLogger(__name__).debug("repaint", exc_info=True)
 
 
 def follow_system(app=None):

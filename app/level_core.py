@@ -36,6 +36,7 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 from typing import Iterable, Sequence
+from .dmoney import c2 as _c2
 
 try:                                  # spreadsheet formula guard (CSV)
     from . import safecell
@@ -275,8 +276,8 @@ def write_matrix(path: Path, items: Sequence[Item], bidders: Sequence[str],
         writer.writerow(["item_no", "description", "unit", "qty", "median", "spread_pct"]
                         + list(bidders))
         for item in items:
-            row = [item.item_no, item.desc, item.unit, f"{item.qty:.2f}",
-                   f"{item.median:.2f}", f"{item.spread:.0f}"]
+            row = [item.item_no, item.desc, item.unit, f"{_c2(item.qty):.2f}",
+                   f"{_c2(item.median):.2f}", f"{item.spread:.0f}"]
             for bidder in bidders:
                 if bidder in item.included:
                     row.append("INCL")
@@ -292,7 +293,7 @@ def write_matrix(path: Path, items: Sequence[Item], bidders: Sequence[str],
                         mark = " ^"
                     elif ratio <= buyin_ratio:
                         mark = " v"
-                row.append(f"{price:.2f}{mark}")
+                row.append(f"{_c2(price):.2f}{mark}")
             writer.writerow(row)
 
 
@@ -307,9 +308,9 @@ def write_gaps(path: Path, items: Sequence[Item], bidders: Sequence[str],
                        and b not in item.included]
             if not omitted or len(item.prices) < min_bidders:
                 continue
-            writer.writerow([item.item_no, item.desc, item.unit, f"{item.qty:.2f}",
-                             f"{item.median:.2f}", "; ".join(omitted),
-                             f"{item.median * item.qty:.2f}", f"{item.spread:.0f}"])
+            writer.writerow([item.item_no, item.desc, item.unit, f"{_c2(item.qty):.2f}",
+                             f"{_c2(item.median):.2f}", "; ".join(omitted),
+                             f"{_c2(item.median * item.qty):.2f}", f"{item.spread:.0f}"])
 
 
 def main(argv: Sequence[str] | None = None) -> int:

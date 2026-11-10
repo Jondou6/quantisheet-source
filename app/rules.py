@@ -63,7 +63,7 @@ def _compile(pattern):
         return re.compile(re.escape(pattern), re.IGNORECASE)
 
 
-def search_regex(page, pattern):
+def search_regex(page, pattern, keep=None):
     """Rects of regex matches on a page, one per match, within a text line.
 
     PyMuPDF's search_for() only takes plain strings; the original code
@@ -78,6 +78,8 @@ def search_regex(page, pattern):
             chars = [c for s in line.get("spans", []) for c in s.get("chars", [])]
             text = "".join(c["c"] for c in chars)
             for m in pat.finditer(text):
+                if keep is not None and not keep(m.group(0)):
+                    continue
                 hit = chars[m.start():m.end()]
                 if not hit:
                     continue

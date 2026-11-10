@@ -2,6 +2,7 @@ import logging
 import os
 import re
 import tempfile
+import time
 
 import fitz
 from PySide6.QtCore import Qt, QEvent, QPoint, QSize, QTimer
@@ -20,6 +21,7 @@ from .docks import (BookmarksPanel, DocumentsPanel, EstimatePanel,
 from .panels import QuantitiesPanel, SearchBar, ThumbList
 from .assembly_ui import AssembliesPanel, chest_item
 from .viewer import PdfView, TOOLS
+from .dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 
@@ -93,6 +95,16 @@ TYPE_TOOL = {"Highlight": "add_highlight", "Underline": "add_underline",
              "Ink": "add_ink", "Text": "add_note", "FreeText": "add_textbox"}
 TAKEOFF_TOOL = {"Line": "measure_length", "PolyLine": "measure_polylength",
                 "Polygon": "measure_area", "FreeText": "count"}
+# Tool Chest follows takeoff work: the Takeoff tab, or one of these tools
+# (a Length on the quick bar counts, even from another tab). Zone tools
+# are left out; they mark a sheet for AI Takeoff and are not a measurement.
+TAKEOFF_MODE_TOOLS = frozenset({
+    "calibrate", "measure_length", "measure_polylength", "measure_wall",
+    "measure_area", "measure_cutout", "measure_volume", "measure_angle",
+    "measure_radius", "measure_diameter", "viewport", "auto_area",
+    "trace_length", "trace_outline", "count", "symbol", "symbol_sample",
+    "missed_example",
+})
 
 
 def _replace_in_place(tmp, path):
@@ -356,7 +368,7 @@ def repaired_notice(path):
     was opened (item 5, 0.13.5)."""
     return (f"{os.path.basename(path)} was damaged and was repaired when "
             "it opened - some pages or objects may be missing. Use File > "
-            "Check / Repair PDF… to check it and save a repaired copy.")
+            "Protect & Repair > Check / Repair PDF… to check it and save a repaired copy.")
 
 
 class MainWindow(QMainWindow):
@@ -671,42 +683,49 @@ class MainWindow(QMainWindow):
         mb = self.menuBar()
         f = mb.addMenu("&File")
         self._file_menu = f
+        # One column that fits a laptop screen (Chief's user test, Nov 6:
+        # 40-odd top-level rows spilled into two columns). Related commands
+        # sit in submenus; every command keeps its name and shortcut.
         self._act(f, "Open…", QKeySequence.Open, self.open_file, False)
         self._act(f, "New Window", None, lambda: self.new_window(), False)
-        self._act(f, "Open Bid Download (.zip) as a Job…", None,
-                  lambda: self.open_bid_zip(), False)
         self.recent_menu = f.addMenu("Open Recent")
         self.recent_menu.aboutToShow.connect(self._fill_recent)
+        self._act(f, "Open Bid Download (.zip) as a Job…", None,
+                  lambda: self.open_bid_zip(), False)
+        self._act(f, "Open Project Folder…", None, self._choose_project, False)
         self._act(f, "Close Tab", QKeySequence.Close,
                   lambda: self.close_tab(self.tabs.currentIndex()))
+        f.addSeparator()
         self._act(f, "Save", QKeySequence.Save, self.save_file)
         self._act(f, "Save As…", QKeySequence.SaveAs, self.save_as)
-        self._act(f, "Work on a Local Copy", None,
-                  lambda: self.work_on_local_copy())
-        self._act(f, "Copy Back to the Original", None,
-                  lambda: self.copy_back_original())
-        # Open from / Save to Dropbox (hidden when IT turns Dropbox off)
-        from . import dropbox_ui
-        dropbox_ui.add_actions(self, f)
         self.autosave_action = self._act(f, "AutoSave", None,
                                          lambda: self.toggle_autosave(),
                                          False)
         self.autosave_action.setCheckable(True)
         self._act(f, "Recover Unsaved Files…", None,
                   lambda: self.recover_unsaved(ask_if_none=True), False)
-        self._act(f, "Print…", QKeySequence.Print, self.print_doc)
-        self._act(f, "Print Preview…", None, self.print_preview)
-        self._act(f, "New From Form Library…", "Ctrl+Shift+N",
+        cs = f.addMenu("Copies && Cloud")
+        self._act(cs, "Work on a Local Copy", None,
+                  lambda: self.work_on_local_copy())
+        self._act(cs, "Copy Back to the Original", None,
+                  lambda: self.copy_back_original())
+        # Open from / Save to Dropbox (hidden when IT turns Dropbox off)
+        from . import dropbox_ui
+        dropbox_ui.add_actions(self, cs)
+        self._act(cs, "Version History…", None, self.show_versions)
+        f.addSeparator()
+        new = f.addMenu("Create")
+        self._act(new, "New From Form Library…", "Ctrl+Shift+N",
                   lambda: self.new_from_form(), False)
-        self._act(f, "Generate Set…", None, lambda: self.generate_set(),
+        self._act(new, "Generate Set…", None, lambda: self.generate_set(),
                   False)
-        self._act(f, "Create PDF From File…", None, self.create_pdf, False)
-        self._act(f, "Combine Files…", None, self.combine_files, False)
-        self._act(f, "Import AutoCAD DXF…", None, lambda: self.import_dxf(),
+        self._act(new, "Create PDF From File…", None, self.create_pdf, False)
+        self._act(new, "Combine Files…", None, self.combine_files, False)
+        imp = f.addMenu("Import")
+        self._act(imp, "Import AutoCAD DXF…", None, lambda: self.import_dxf(),
                   False)
-        self._act(f, "Import Markups (PDF or XFDF)…", None,
+        self._act(imp, "Import Markups (PDF or XFDF)…", None,
                   self.import_markups)
-        self._act(f, "Export Markups (XFDF)…", None, self.export_xfdf)
         exp = f.addMenu("Export To")
         self._act(exp, "Word Document (.docx)…", None,
                   lambda: self.export_as("docx"))
@@ -728,33 +747,43 @@ class MainWindow(QMainWindow):
                   lambda: self.export_external())
         self._act(exp, "Images (PNG)…", None, lambda: self.export_as("png"))
         self._act(exp, "Images (JPEG)…", None, lambda: self.export_as("jpg"))
-        prot = f.addMenu("Protect")
+        exp.addSeparator()
+        self._act(exp, "Export Markups (XFDF)…", None, self.export_xfdf)
+        cmp_ = f.addMenu("Compare")
+        self._act(cmp_, "Compare…", "Ctrl+Alt+C", lambda: self.compare())
+        self._act(cmp_, "Compare Text With…", None, self.compare_with)
+        self._act(cmp_, "Compare Revisions (Overlay)…", "Ctrl+Alt+O",
+                  self.compare_revisions)
+        self._act(cmp_, "Quick Compare (Same Sheets)…", None,
+                  self.compare_visual)
+        prot = f.addMenu("Protect && Repair")
         self._act(prot, "Password Protect…", None, self.protect)
         self._act(prot, "Remove Security…", None, self.unprotect)
         self._act(prot, "Remove Hidden Information…", None, self.sanitize)
-        self._act(f, "Reduce File Size…", None, self.reduce_size)
-        self._act(f, "Check / Repair PDF…", None, self.check_repair)
+        prot.addSeparator()
+        self._act(prot, "Reduce File Size…", None, self.reduce_size)
+        self._act(prot, "Check / Repair PDF…", None, self.check_repair)
+        sig = f.addMenu("Sign")
+        self._act(sig, "Sign…", None, self.sign)
+        self._act(sig, "Verify Signatures…", None, self.verify)
+        self._act(sig, "Signing Timestamp Server…", None,
+                  lambda: self.timestamp_server(), False)
         f.addSeparator()
-        self._act(f, "Open Project Folder…", None, self._choose_project, False)
-        self._act(f, "Version History…", None, self.show_versions)
-        self._act(f, "Compare…", "Ctrl+Alt+C", lambda: self.compare())
-        self._act(f, "Compare Text With…", None, self.compare_with)
-        self._act(f, "Compare Revisions (Overlay)…", "Ctrl+Alt+O",
-                  self.compare_revisions)
-        self._act(f, "Quick Compare (Same Sheets)…", None, self.compare_visual)
+        self._act(f, "Print…", QKeySequence.Print, self.print_doc)
+        self._act(f, "Print Preview…", None, self.print_preview)
         self._act(f, "Document Properties…", "Ctrl+D", self.doc_properties)
         self._act(f, "Attachments…", None, lambda: self.attachments())
-        f.addSeparator()
-        self._act(f, "Sign…", None, self.sign)
-        self._act(f, "Verify Signatures…", None, self.verify)
-        self._act(f, "Signing Timestamp Server…", None,
-                  lambda: self.timestamp_server(), False)
         f.addSeparator()
         self._act(f, "Exit", QKeySequence.Quit, self.close, False)
 
         e = mb.addMenu("&Edit")
         self._undo_act = self._act(e, "Undo", QKeySequence.Undo, self.undo)
         self._redo_act = self._act(e, "Redo", QKeySequence.Redo, self.redo)
+        # both redo keys on every platform, and Ctrl+Shift+Z never falls
+        # through to Undo (Chief's estimator test, Nov 7)
+        self._undo_act.setShortcuts([QKeySequence("Ctrl+Z")])
+        self._redo_act.setShortcuts([QKeySequence("Ctrl+Y"),
+                                     QKeySequence("Ctrl+Shift+Z")])
         e.addSeparator()
         self._act(e, "Copy Text", QKeySequence.Copy, self.copy_text)
         self._act(e, "Copy as Table (for Excel)", "Ctrl+Shift+C",
@@ -1153,6 +1182,7 @@ class MainWindow(QMainWindow):
 
         dm = mb.addMenu("&Document")
         self._act(dm, "Make Searchable (OCR)…", None, self.make_searchable)
+        self._act(dm, "Check Scan Quality…", None, self.scan_quality)
         self._act(dm, "Preflight / PDF/X…", None,
                   lambda: self.preflight())
         self._act(dm, "Request Signatures…", None,
@@ -1218,6 +1248,8 @@ class MainWindow(QMainWindow):
                   lambda: self.spec_risk(), False)
         self._act(r, "AI: Translate Markups…", None, self.translate_markups)
         self._act(r, "AI: Find RFIs && Questions…", None, self.ai_find_rfis)
+        self._act(r, "Local AI Models…", None, lambda: self.ai_models(),
+                  False)
         r.addSeparator()
         r.addAction(self.rfi_dock.toggleViewAction())
         self._act(r, "New RFI…", None, lambda: self.new_rfi("RFI"))
@@ -1791,6 +1823,10 @@ class MainWindow(QMainWindow):
             name = self.ICON_OF.get(key)
             if name and a.icon().isNull():
                 a.setIcon(icons.icon(name))
+            if name and not a.property("qs_icon"):
+                data = a.data()
+                if not (isinstance(data, str) and icons.has(data)):
+                    a.setProperty("qs_icon", name)
         return self._cmd
 
     def command(self, text):
@@ -1845,25 +1881,22 @@ class MainWindow(QMainWindow):
                     continue
                 if icon:
                     a.setIcon(icons.icon(icon))
+                    a.setProperty("qs_icon", icon)
                 if label:
                     a.setIconText(label)
                 g.large(a, label)
-        if settings.get("roof_takeoff", False):
-            rf = self.command("Roof Plan Takeoff")
-            if rf is not None:
-                rf.setIcon(icons.icon("assembly"))
-                rf.setIconText("Roof Plan")
-                self.ribbon.page("Takeoff").group("Roof").large(
-                    rf, "Roof Plan")
+        self._place_roof_tile()
         claims = self.command("ClaimIT (Insurance Claim Estimate)")
         if claims is not None:          # only when ClaimIT is installed
             claims.setIcon(icons.icon("dollar"))
+            claims.setProperty("qs_icon", "dollar")
             claims.setIconText("ClaimIT")
             t_, g_ = quickaccess.fold("Module", "ClaimIT")
             self.ribbon.page(t_).group(g_).large(claims, "ClaimIT")
         ms = self.command("Master Schedule (Sub Updates)")
         if ms is not None:              # the Master Schedule module is on
             ms.setIcon(icons.icon("calendar"))
+            ms.setProperty("qs_icon", "calendar")
             ms.setIconText("Master Schedule")
             t_, g_ = quickaccess.fold("Module", "Schedule")
             self.ribbon.page(t_).group(g_).large(ms, "Master Schedule")
@@ -1871,6 +1904,9 @@ class MainWindow(QMainWindow):
         if up is not None:          # team / Store copy only (review Part F)
             up.setProperty("keywords", "update updater upgrade new version "
                            "download install latest")
+            up.setProperty("qs_icon", "sync")
+            if up.icon().isNull():
+                up.setIcon(icons.icon("sync"))
             self.ribbon.page("Help").group("About").large(up, "Updates")
         if missing:
             log.warning("ribbon: no command named %s", ", ".join(missing))
@@ -1886,9 +1922,15 @@ class MainWindow(QMainWindow):
         self.addToolBar(Qt.TopToolBarArea, holder)
         self._ribbon_bar = holder
         # always open on the Home tab (Jon, 0.13.11), not the last one used
+        self._fill_ai_tab()
+        self._fill_approved_tiles()
         if "Home" in self.ribbon.pages:
             self.ribbon.show_page("Home")
         self.ribbon.set_collapsed(bool(settings.get("ribbon_collapsed")))
+        self.ribbon.page_changed.connect(
+            lambda _n: self._sync_tool_chest(force=True, tab_change=True))
+        self._chest_mode = None
+        self._sync_tool_chest()
         theme.hub.changed.connect(self._retheme)
         QTimer.singleShot(0, self._tidy_dock_tabs)
         # load the modules the first edit needs while the user looks around
@@ -1939,6 +1981,359 @@ class MainWindow(QMainWindow):
         if show:
             dlg.popup(self)
         return dlg
+
+    def _in_takeoff_mode(self):
+        """Takeoff tab, or a measurement / count tool in use."""
+        rb = getattr(self, "ribbon", None)
+        if rb is not None and rb.current() == "Takeoff":
+            return True
+        v = getattr(self, "_view", None)
+        tool = getattr(v, "tool", None) if v is not None else None
+        return tool in TAKEOFF_MODE_TOOLS
+
+    def _sync_tool_chest(self, force=False, tab_change=False):
+        """Show the Tool Chest in takeoff work, hide it otherwise.
+
+        Every tab change closes it unless the new tab is Takeoff - even
+        with a takeoff tool still active (Jon, Nov 6). Picking a takeoff
+        tool on another tab opens it again. A hand-opened chest stays up
+        until the next tab change. Properties is its own dock.
+        """
+        dock = getattr(self, "chest_dock", None)
+        if dock is None:
+            return False
+        mode = self._in_takeoff_mode()
+        if tab_change:
+            rb = getattr(self, "ribbon", None)
+            on = rb is not None and rb.current() == "Takeoff"
+            self._chest_mode = mode          # a tool change shows it again
+            if on:
+                dock.show()
+            else:
+                dock.hide()
+            return on
+        on = mode
+        if not force and on == getattr(self, "_chest_mode", None):
+            return on
+        self._chest_mode = on
+        if on:
+            dock.show()
+        else:
+            dock.hide()
+        return on
+
+    # AI tab: every AI command, in addition to wherever else it already sits.
+    _AI_TAB = (
+        ("Takeoff", (
+            ("AI Takeoff (Whole Set)", "AI Takeoff", "ai_takeoff"),
+            ("Draw a Zone: Only Here", "Only Here", "zone_in"),
+            ("Draw a Zone: Leave Out", "Leave Out", "zone_out"),
+            ("Clear Zones on This Page", "Clear Zones", "close"),
+            ("Auto Takeoff (Review)", "Review Takeoff", "checklist"),
+            ("Check Takeoff", "Check", "audit"),
+            ("Trade Takeoff (Pipe, Duct, Devices, Roof, Rebar, Earthwork)",
+             "Trades", "assembly"),
+            ("Auto Takeoff Rooms on This Sheet", "All Rooms", "auto_rooms"),
+            ("Auto Takeoff Walls & Doors on This Sheet", "Walls & Doors",
+             "walls"),
+            ("Item Names Learned", "Names Learned", "list"),
+        )),
+        ("Schedule", (
+            ("Build Schedule From Plans", "Schedule From Plans", "gantt"),
+        )),
+        ("Review", (
+            ("AI: Find RFIs & Questions", "Find RFIs", "rfi"),
+            ("AI: Summarize", "Summarize", "ai"),
+            ("AI: Spec-Check", "Spec-Check", "checklist"),
+            ("AI: Redline", "Redline", "edit_text"),
+            ("AI: Translate Markups", "Translate", "sign"),
+            ("Spec Book Risk Scanner", "Spec Risk", "shield"),
+            ("Make Searchable (OCR)", "OCR", "ocr"),
+        )),
+        ("Voice", (
+            ("Voice Commands", "Voice", "mic"),
+        )),
+        ("Model", (
+            ("Local AI Models", "Models", "database"),
+        )),
+    )
+
+    def _fill_ai_tab(self):
+        """The AI tab lists every AI command. Folded copies on other tabs
+        stay, so nothing that was already on the ribbon is removed."""
+        from .ribbon import ModelStatus
+        page = self.ribbon.page("AI")
+        missing = []
+        for title, items in self._AI_TAB:
+            g = page.group(title)
+            have = {id(b.defaultAction()) for b in g.buttons
+                    if b.defaultAction() is not None}
+            for text, label, icon in items:
+                a = self.command(text)
+                if a is None:
+                    missing.append(text)
+                    continue
+                if not a.property("qs_icon"):
+                    a.setProperty("qs_icon", icon)
+                if a.icon().isNull() and icons.has(icon):
+                    a.setIcon(icons.icon(icon))
+                if id(a) in have:
+                    continue
+                g.large(a, label)
+                have.add(id(a))
+        if missing:
+            log.warning("AI tab: no command named %s", ", ".join(missing))
+        self._ai_tab_missing = missing
+        page.group("Model").widget(ModelStatus(self))
+        return missing
+
+    def _ribbon_put(self, tab, group, items):
+        """Add tiles that were menu-only. Skips a command already in the
+        group, and a command this build does not have."""
+        from . import quickaccess
+        tab, group = quickaccess.fold(tab, group)
+        g = self.ribbon.page(tab).group(group)
+        have = {id(b.defaultAction()) for b in g.buttons
+                if b.defaultAction() is not None}
+        missing = []
+        for text, label, icon in items:
+            a = self.command(text)
+            if a is None:
+                missing.append(text)
+                continue
+            a.setProperty("qs_icon", icon)
+            if a.icon().isNull() and icons.has(icon):
+                a.setIcon(icons.icon(icon))
+            if id(a) in have:
+                continue
+            g.large(a, label)
+            have.add(id(a))
+        return missing
+
+    def _fill_pdf_tab(self, exp_menu=None):
+        """PDF Management (Jon, Nov 6): the Pages and Document groups and
+        Create PDF / Combine fold in by themselves; this adds Export (to
+        Word, Excel, images...), Compare and Print, and puts the groups in
+        working order. The old Pages and Document tabs (and Tools >
+        Convert) are part of it now; Classic Tabs brings them back."""
+        from PySide6.QtWidgets import QToolButton
+
+        from . import quickaccess
+        tab = quickaccess.PDF_TAB
+        if quickaccess.fold("Pages", "Pages")[0] != tab:
+            return []                       # classic tabs: no PDF tab
+        missing = self._ribbon_put(tab, "Create & Convert", (
+            ("Create PDF From File", "Create PDF", "new"),
+            ("Combine Files", "Combine", "combine"),
+        ))
+        g = self.ribbon.page(tab).group("Create & Convert")
+        if exp_menu is not None:
+            first = next((a for a in exp_menu.actions()
+                          if not a.isSeparator() and a.text()), None)
+            if first is not None:
+                b = g.large(first, "Export PDF", menu=exp_menu)
+                b.setPopupMode(QToolButton.InstantPopup)
+        missing += self._ribbon_put(tab, "Create & Convert", (
+            ("Compare", "Compare", "overlay"),
+            ("Print", "Print", "print"),
+        ))
+        missing += self._edit_pdf_tile(g)
+        self.ribbon.page(tab).arrange_groups(quickaccess.PDF_GROUPS)
+        return missing
+
+    # Edit PDF (Jon, Nov 6): one of the first buttons on PDF Management.
+    # The tile turns on page editing (text and images); its arrow has the
+    # rest of the editing tools.
+    EDIT_PDF_MENU = ("Edit Text", "Add Image", "Search & Redact",
+                     "Organize Pages", "Crop Pages", "Header & Footer",
+                     "Watermark", "Add Text Field", "Add Checkbox",
+                     "Add Dropdown")
+
+    def _edit_pdf_tile(self, group):
+        from PySide6.QtWidgets import QMenu
+
+        from .ribbon import clean
+        base = self.command("Edit Text")
+        if base is None:
+            return ["Edit Text"]
+        a = self.command("Edit PDF")
+        if a is None:
+            a = QAction(icons.icon("edit_text"), "Edit PDF", self)
+            a.setToolTip("Edit PDF: change the text and images on the page "
+                         "(" + (base.shortcut().toString() or "Ctrl+E") +
+                         "). The arrow has the other editing tools.")
+            a.setProperty("qs_icon", "edit_text")
+            a.triggered.connect(lambda _c=False: base.trigger())
+            self.addAction(a)
+            self._cmd[clean(a.text()).lower()] = a
+            # in the Document menu too, so All Tools and Ctrl+K list it
+            mb = self.menuBar()
+            dm = next((x.menu() for x in mb.actions() if x.menu() is not None
+                       and clean(x.text()) == "Document"), None)
+            if dm is not None:
+                first = next(iter(dm.actions()), None)
+                dm.insertAction(first, a)
+        menu = QMenu(self)
+        for name in self.EDIT_PDF_MENU:
+            c = self.command(name)
+            if c is not None:
+                menu.addAction(c)
+        self._edit_pdf_menu = menu
+        b = group.large(a, "Edit PDF", menu=menu)
+        group.place(b, 0)
+        return []
+
+    def _place_roof_tile(self):
+        """Takeoff > Roof. Hidden unless Show Roof Plan Tools is on."""
+        rf = self.command("Roof Plan Takeoff")
+        if rf is None:
+            return None
+        rf.setIcon(icons.icon("assembly"))
+        rf.setProperty("qs_icon", "assembly")
+        rf.setIconText("Roof Plan")
+        rf.setVisible(bool(settings.get("roof_takeoff", False)))
+        g = self.ribbon.page("Takeoff").group("Roof")
+        b = g.large(rf, "Roof Plan")
+
+        def sync(*_a):
+            show = rf.isVisible()
+            b.setVisible(show)
+            g.setVisible(show)
+        rf.changed.connect(sync)
+        sync()
+        return b
+
+    def _fill_approved_tiles(self):
+        """Menu windows approved onto the ribbon (stage 1 placement)."""
+        from PySide6.QtWidgets import QMenu, QToolButton
+        from .ribbon import clean
+        missing = []
+        missing += self._ribbon_put("Home", "File", (
+            ("Generate Set", "Generate Set", "layers"),
+            ("Print Preview", "Print Preview", "print"),
+            ("Save As", "Save As", "save"),
+            ("Recover Unsaved Files", "Recover", "history"),
+        ))
+        missing += self._ribbon_put("Document", "Forms", (
+            ("New From Form Library", "Form Library", "form"),
+        ))
+        missing += self._ribbon_put("Project", "Sets", (
+            ("Open Bid Download (.zip) as a Job", "Bid Download", "package"),
+        ))
+        missing += self._ribbon_put("Document", "Protect", (
+            ("Check / Repair PDF", "Check / Repair", "shield"),
+        ))
+        missing += self._ribbon_put("Document", "Content", (
+            ("Attachments", "Attachments", "attach"),
+            ("Check Scan Quality", "Scan Quality", "audit"),
+            ("Auto Bookmark (Link Details)", "Link Details", "bookmark"),
+        ))
+        missing += self._ribbon_put("Takeoff", "Plan Set", (
+            ("Takeoff Standard", "Standard", "checklist"),
+            ("Coverage Map and Second Check", "Coverage", "overlay"),
+        ))
+        missing += self._ribbon_put("Estimate", "Pricing", (
+            ("Model Estimate", "Model", "estimate"),
+            ("Location Factors", "Location", "flag"),
+            ("Import Your Own Price List", "Price List", "import"),
+            ("Planning Cost Model", "Cost Model", "budget"),
+            ("Estimate Templates", "Templates", "book"),
+            ("Supplier Price List Import", "Supplier Prices", "import"),
+            ("Match Rates & Price a Workbook", "Match Rates", "dollar"),
+            ("Crew Hours by Pay Item", "Crew Hours", "crew"),
+        ))
+        missing += self._ribbon_put("Estimate", "Assemblies", (
+            ("Assembly Rules & Wall-Type Assemblies", "Wall Assemblies",
+             "walls"),
+        ))
+        missing += self._ribbon_put("Estimate", "Bidding", (
+            ("Bid Gate Settings", "Bid Gate", "lock"),
+            ("Award: Budget & Commitments in the Job", "Award", "gavel"),
+            ("Estimate Error Check", "Error Check", "checklist"),
+            ("Bid-Day Quote Comparison", "Bid Day", "compare"),
+            ("Estimate vs Actual", "Vs Actual", "trend"),
+            ("Job Cost Feedback (Bid vs Actual)", "Job Cost", "budget"),
+        ))
+        missing += self._ribbon_put("Estimate", "Output", (
+            ("Material Order List", "Materials", "list"),
+            ("Estimating Dashboard", "Dashboard", "panels"),
+            ("Export to Sage 300 Job Cost (CSV)", "Sage 300", "export"),
+        ))
+        missing += self._ribbon_put("Estimate", "Civil Estimate", (
+            ("Assembly Library (CivilBid codes)", "CivilBid Library",
+             "assembly"),
+            ("Bind Takeoff Group to Assembly", "Bind Group", "link"),
+            ("Insert Assembly Line", "Insert Line", "add_line"),
+            ("Bid Summary (Coded Assemblies)", "Coded Summary", "bidtabs"),
+            ("Revision Change Report", "Code Changes", "compare"),
+        ))
+        missing += self._ribbon_put("Estimate", "Civil Field", (
+            ("Production by Depth", "By Depth", "measure_volume"),
+        ))
+        missing += self._ribbon_put("Pages", "Pages", (
+            ("Booklet / N-up", "Booklet", "panels"),
+            ("Rotate All Pages Right", "Rotate All", "rotate"),
+            ("Remove Sheet Links", "Unlink Sheets", "link"),
+        ))
+        missing += self._ribbon_put("Help", "Learn", (
+            ("Practice Job (10 Minutes)", "Practice Job", "home"),
+        ))
+        missing += self._ribbon_put("Tools", "Settings", (
+            ("Customize Shortcuts", "Shortcuts", "keyboard"),
+            ("Back Up My QuantiSheet Data", "Back Up", "save"),
+            ("Restore QuantiSheet Data From a Backup", "Restore", "history"),
+            ("Time Log", "Time Log", "calendar"),
+        ))
+        missing += self._ribbon_put("Help", "About", (
+            ("Support Bundle for IT", "Support Bundle", "package"),
+            ("Recent Problems (Log)", "Problems", "history"),
+            ("Add the QuantiSheet Printer", "Printer", "print"),
+            ("Enter License Key", "License", "lock"),
+        ))
+        missing += self._ribbon_put("Project", "Manage", (
+            ("Bid Invites Send As", "Bid Invites", "mail"),
+        ))
+        missing += self._ribbon_put("Project", "Schedule", (
+            ("New Schedule", "New Schedule", "gantt"),
+        ))
+        missing += self._ribbon_put("Billing", "Changes", (
+            ("Change Order From Revision", "From Revision", "change_order"),
+        ))
+        # one Dropbox tile, one Export tile (the menus already exist)
+        g = self.ribbon.page("Home").group("File")
+        box = getattr(self, "_dropbox_actions", None) or {}
+        if box:
+            m = QMenu(g)
+            for a in box.values():
+                m.addAction(a)
+            first = next(iter(box.values()))
+            first.setProperty("qs_icon", "cloud")
+            if first.icon().isNull():
+                first.setIcon(icons.icon("cloud"))
+            b = g.large(first, "Dropbox", menu=m)
+            b.setPopupMode(QToolButton.InstantPopup)
+            shown = any(a.isVisible() for a in box.values())
+            b.setVisible(shown)
+        exp_menu = None
+        for a in self._file_menu.actions():
+            if a.menu() is not None and clean(a.text()).lower() == "export to":
+                exp_menu = a.menu()
+                break
+        if exp_menu is not None:
+            first = next((a for a in exp_menu.actions()
+                          if not a.isSeparator() and a.text()), None)
+            if first is not None:
+                first.setProperty("qs_icon", "export")
+                if first.icon().isNull():
+                    first.setIcon(icons.icon("export"))
+                b = g.large(first, "Export", menu=exp_menu)
+                b.setPopupMode(QToolButton.InstantPopup)
+        missing += self._fill_pdf_tab(exp_menu)
+        self._approved_missing = missing
+        if missing:
+            log.warning("ribbon placement: no command named %s",
+                        ", ".join(missing))
+        return missing
 
     # ---- scale presets on the Takeoff ribbon ---------------------------------------
     def _build_scale_box(self, group):
@@ -2605,7 +3000,7 @@ class MainWindow(QMainWindow):
                 "color": list(props["color"])[:3] if props["color"] else None,
                 "fill": list(props["fill"])[:3] if props["fill"] else None,
                 "width": props["width"] if props["width"] > 0 else None,
-                "opacity": round(props["opacity"], 2)
+                "opacity": _c2(props["opacity"])
                 if props["opacity"] < 1 else None,
                 "subject": props["subject"] or name.strip()}
         if found and props["takeoff"]:
@@ -3231,7 +3626,7 @@ class MainWindow(QMainWindow):
         keys = sorted(totals)
         for r, (g, u) in enumerate(keys):
             rule = rs.get(g, {})
-            for c, val in enumerate((g, f"{totals[(g, u)]:,.2f} {u}",
+            for c, val in enumerate((g, f"{_c2(totals[(g, u)]):,.2f} {u}",
                                      f"{rule.get('per', '') or ''}",
                                      rule.get("unit", ""),
                                      f"{rule.get('waste', '') or ''}", "")):
@@ -3726,6 +4121,19 @@ class MainWindow(QMainWindow):
             panel._stale = False
             QTimer.singleShot(0, panel.refresh)
 
+    def scan_quality(self, show=True, languages=None):
+        """Document > Check Scan Quality: which scanned pages will OCR
+        badly (coarse, tilted, blank) before anyone trusts their text."""
+        from . import scan_check_ui
+        return scan_check_ui.open_dialog(self, show=show,
+                                         languages=languages)
+
+    def ai_models(self, show=True, fetch=None):
+        """Review > Local AI Models: what the local AI has installed and
+        the model size that fits this PC. Never downloads."""
+        from .ai import models_ui
+        return models_ui.open_dialog(self, show=show, fetch=fetch)
+
     def billing(self, tab=None):
         """The Contract & Billing window for this document (non-modal)."""
         from .billing_ui import BillingDialog
@@ -3871,6 +4279,10 @@ class MainWindow(QMainWindow):
             if dlg is not None:
                 dlg.close()
             dlg = AdaDialog(doc, self)
+            dlg.checker.blocked = self._collab_blocked
+            if v is not None:
+                dlg.checker.apply = lambda proj, view=v: self._ada_apply(
+                    view, proj)
             if doc is not None:
                 dlg.edited.connect(self._project_edited)
             self._ada_dlg = dlg
@@ -3878,6 +4290,18 @@ class MainWindow(QMainWindow):
         dlg.show()
         dlg.raise_()
         return dlg
+
+    def _ada_apply(self, view, project):
+        """The ADA checker's counts saved as a set_jobdata op: one undo
+        step, sent to everyone in live collaboration (outside review,
+        Nov 7 - H4)."""
+        import json
+        from . import ada_check
+        if getattr(view, "doc", None) is None or view.doc.is_closed:
+            return False
+        return bool(view.apply_marks([(0, "set_jobdata", {
+            "file": ada_check.FILE,
+            "data": json.dumps(project, indent=1)})]))
 
     def quality(self, tab=None):
         """Punch list and three-phase inspections (non-modal)."""
@@ -4001,7 +4425,7 @@ class MainWindow(QMainWindow):
             return None
         p = award.plan(v.doc)
         if ask and QMessageBox.question(
-                self, "Award", f"Put the estimate (${p['total']:,.2f}) into "
+                self, "Award", f"Put the estimate (${_c2(p['total']):,.2f}) into "
                 f"the job \u201c{store.name}\u201d as "
                 f"{len(p['budget'])} budget line(s) and "
                 f"{len(p['commitments'])} draft subcontract(s)?") != \
@@ -4013,7 +4437,7 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "Award", str(e))
             return None
         self._flash(f"Budget made: {len(got['budget'])} line(s), "
-                    f"${got['total']:,.2f}")
+                    f"${_c2(got['total']):,.2f}")
         return got
 
     def price_these(self, show=True):
@@ -4208,22 +4632,118 @@ class MainWindow(QMainWindow):
             QMessageBox.information(self, "Translate Markups",
                                     "No markup comments to translate.")
             return 0
+        from . import bg
         from .ai import review
-        fn = texts_fn or (lambda texts: review.translate_texts(texts,
-                                                               language))
-        QApplication.setOverrideCursor(Qt.WaitCursor)
-        try:
-            out = fn([j[3] for j in jobs])
-        except Exception as ex:
-            QApplication.restoreOverrideCursor()
-            QMessageBox.warning(self, "Translate Markups", str(ex))
-            return 0
-        QApplication.restoreOverrideCursor()
-        marks = [(pg, "set_annot", {**ref, key: new})
-                 for (pg, ref, key, old), new in zip(jobs, out) if new != old]
-        n = v.apply_marks(marks) if marks else 0
-        self._flash(f"Translated {n} markup comment(s) into {language}")
-        return n
+
+        def apply(out):
+            if getattr(v, "doc", None) is None or v.doc.is_closed:
+                return 0                       # the tab closed meanwhile
+            marks = [(pg, "set_annot", {**ref, key: new})
+                     for (pg, ref, key, old), new in zip(jobs, out)
+                     if new != old]
+            n = v.apply_marks(marks) if marks else 0
+            same = len(jobs) - len(marks)
+            msg = f"Translated {n} markup comment(s) into {language}"
+            if same:
+                # said, not hidden (Chief's round 7, Nov 9: 1 of 3 came
+                # back translated and it still read as all done)
+                msg = (f"Translated {n} of {len(jobs)} markup comment(s) "
+                       f"into {language} - {same} came back unchanged "
+                       "(already in that language, or the AI skipped "
+                       "them)")
+            self._flash(msg)
+            return n
+        if texts_fn is not None:               # given directly: run here
+            try:
+                return apply(texts_fn([j[3] for j in jobs]))
+            except Exception as ex:            # noqa: BLE001
+                QMessageBox.warning(self, "Translate Markups", str(ex))
+                return 0
+        # the local model can take minutes: off the window's thread, with a
+        # box that can be hidden or cancelled (Chief's re-test, Nov 7: the
+        # program froze for 6 minutes and Windows said Not Responding)
+        from PySide6.QtWidgets import QProgressDialog
+        texts = [j[3] for j in jobs]
+        busy = QProgressDialog(
+            f"Translating {len(texts)} markup comment(s) into {language} "
+            "with the local AI - this can take a few minutes. You can keep "
+            "working; Cancel throws the result away.", "Cancel", 0, 0, self)
+        busy.setWindowTitle("Translate Markups")
+        busy.setMinimumDuration(0)
+        busy.setAutoClose(False)
+        busy.setAutoReset(False)
+        busy.setModal(False)
+        state = {"cancelled": False, "over": False, "late": False}
+        token = review.Cancel()
+        # the longest it may wait: the AI part limit for each batch of 25
+        limit = self._ai_limit() * max(1, -(-len(texts) // 25))
+
+        def cancel():
+            # closing the box when the work is done emits canceled too;
+            # only a Cancel while it runs counts (Chief's round 4, Nov 7:
+            # every finished translation was thrown away as "cancelled").
+            # The request itself is ended too (round 7)
+            if not state["over"]:
+                state["cancelled"] = True
+                token.cancel_soon()
+        busy.canceled.connect(cancel)
+        busy.show()
+        self._translate_busy = busy
+
+        def too_long():
+            if not state["over"]:
+                state["late"] = True
+                cancel()
+        watch = QTimer(busy)
+        watch.setSingleShot(True)
+        watch.timeout.connect(too_long)
+        watch.start(int(limit * 1000))
+
+        def finish():
+            cancelled = state["cancelled"]
+            state["over"] = True
+            watch.stop()
+            busy.close()
+            return cancelled
+
+        def stopped():
+            if state["late"]:
+                QMessageBox.warning(
+                    self, "Translate Markups",
+                    "The local AI didn't answer in "
+                    f"{self._minutes(limit)}, so the translation was "
+                    "stopped. Nothing changed.")
+            else:
+                self._flash("Translate Markups cancelled - nothing changed")
+
+        def done(out):
+            if finish():
+                stopped()
+                return
+            apply(out)
+
+        def failed(msg):
+            if finish():
+                stopped()
+            else:
+                QMessageBox.warning(self, "Translate Markups", str(msg))
+        bg.run(lambda: review.run_cancellable(
+            token, review.translate_texts, texts, language), done, failed,
+            self)
+        return busy
+
+    @staticmethod
+    def _ai_limit():
+        from .ai import dialogs
+        return dialogs.PART_LIMIT
+
+    @staticmethod
+    def _minutes(seconds):
+        """"5 minutes", "1 minute", "45 seconds" - never "0 minutes"."""
+        if seconds < 90:
+            return f"{seconds:.0f} seconds"
+        m = round(seconds / 60)
+        return f"{m} minute" + ("" if m == 1 else "s")
 
     def link_excel(self, path=None):
         from . import qlink
@@ -4349,6 +4869,9 @@ class MainWindow(QMainWindow):
             jobsafe.drop_lock(lf)
         self.tabs.removeTab(self.tabs.indexOf(tab))
         tab.view.doc.close()
+        if tab.path:              # the drawing process lets go of it too
+            from . import render_worker
+            render_worker.release(tab.path)
         tab.deleteLater()
         return True
 
@@ -5173,8 +5696,8 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(
                 self, "Redaction",
                 "Saved, but words that were redacted can still be found in "
-                f"the file:\n{where}\n\nUse Document > Remove Hidden "
-                "Information, or delete them from the markups or job data, "
+                f"the file:\n{where}\n\nUse PDF Management > Remove "
+                "Hidden Information, or delete them from the markups or job data, "
                 "then save again." + extra + "\n\n(Redaction removes what's "
                 "on the page; it is not a legal-sufficiency review.)")
         elif extra:
@@ -5939,6 +6462,13 @@ class MainWindow(QMainWindow):
         v.reset_page_cache()
         if v.page in pages:
             v._render()
+            # the page changed shape: show all of it, not whatever blank
+            # corner the old scroll position lands on (hands-on pass,
+            # Nov 10: Rotate Right looked like it had emptied the page)
+            try:
+                self.fit_page()
+            except Exception:                             # noqa: BLE001
+                log.debug("fit after rotate", exc_info=True)
         for p in pages:
             self.thumbs.refresh_page(p)
         v.mark_dirty()
@@ -6183,8 +6713,8 @@ class MainWindow(QMainWindow):
                     self._find_rfis_in_specs(plans, ask)
                     return
                 panel.set_findings(items, (note + " " if note else "") +
-                                   f"({len(plans)} pages, "
-                                   f"{time.monotonic() - started:.1f} s)")
+                                   rfi_rules.coverage_text(plans, len(items))
+                                   + f" ({time.monotonic() - started:.1f} s)")
             bg.run(lambda: scan(spec, cache.get("plans")), done,
                    lambda err: panel.set_findings([], f"Scan failed: {err}"),
                    panel)
@@ -6633,7 +7163,7 @@ class MainWindow(QMainWindow):
                     self, "Export to Sage 300",
                     f"{pv['lines']} budget line(s) for job "
                     f"{', '.join(pv['jobs']) or '(none)'}, totalling "
-                    f"${pv['total']:,.2f}." +
+                    f"${_c2(pv['total']):,.2f}." +
                     (f"\n{pv['left_out']} line(s) will be left out (no cost "
                      "code or category)." if pv["left_out"] else "") +
                     "\n\nWrite the import file?") != QMessageBox.Yes:
@@ -6769,7 +7299,7 @@ class MainWindow(QMainWindow):
         k = autotakeoff.scale_ratio(found)
         if autotakeoff.scale_looks_wrong(found):
             lines.insert(0, f"⚠ THE PAGE SCALE LOOKS WRONG: rooms measure "
-                         f"about {k:.2f}× the areas printed in their tags. "
+                         f"about {_c2(k):.2f}× the areas printed in their tags. "
                          "Check Takeoff > Set Scale (an architectural "
                          "plan is usually 1/4\" = 1'-0\" or 1/8\" = "
                          "1'-0\"), then run this again.\n")
@@ -6992,10 +7522,83 @@ class MainWindow(QMainWindow):
         from . import bg
         text, info = review.doc_text_info(self._view.doc)
         note = review.coverage_note(info)
-        self._flash("AI summary: asking the model… " + note)
-        bg.run(lambda: review.summarize_text(text, info["cut"], note),
-               lambda s: QMessageBox.information(self, "AI Summary", s),
-               lambda e: QMessageBox.warning(self, "AI", e), self)
+        in_set = review.set_sheets(self._view.doc)
+        # a busy box while the model works (Chief's estimator test, Nov 7:
+        # nothing showed for a minute, then the answer popped up)
+        from PySide6.QtWidgets import QProgressDialog
+        head = ("Asking the local AI for a summary - this can take a "
+                "minute.")
+        # while it waits nothing has been reviewed yet: "Reading", and the
+        # answer keeps "Reviewed" (hands-on pass, Nov 10)
+        reading = note.replace("Reviewed", "Reading", 1)
+        busy = QProgressDialog(head + "\n" + reading, "Stop", 0, 0, self)
+        busy.setWindowTitle("AI Summary")
+        busy.setMinimumDuration(0)
+        busy.setAutoClose(False)
+        busy.setAutoReset(False)
+        # Stop really ends the request, and one that never answers is
+        # stopped after the AI time limit (Chief's round 7, Nov 9: the
+        # button only hid the box and the request could run 15 minutes)
+        state = {"over": False, "stopped": False, "late": False}
+        token = review.Cancel()
+        limit = self._ai_limit()
+        started = time.monotonic()
+
+        def stop():
+            if not state["over"]:
+                state["stopped"] = True
+                token.cancel_soon()
+        busy.canceled.connect(stop)
+
+        def tick():
+            waited = time.monotonic() - started
+            if waited > limit and not state["over"]:
+                state["late"] = True
+                stop()
+                return
+            busy.setLabelText(f"{head} Waiting {waited:.0f} s.\n{reading}")
+        clock = QTimer(busy)
+        clock.setInterval(1000)
+        clock.timeout.connect(tick)
+        clock.start()
+        busy.show()
+        self._ai_busy = busy
+        self._ai_summary_tick = tick                    # for tests
+
+        def finish():
+            was = state["stopped"]
+            state["over"] = True
+            clock.stop()
+            try:
+                busy.close()
+            except RuntimeError:
+                pass
+            return was
+
+        def stopped():
+            if state["late"]:
+                QMessageBox.warning(
+                    self, "AI Summary",
+                    f"The local AI didn't answer in {self._minutes(limit)}"
+                    ", so the summary was stopped. Nothing was read.")
+            else:
+                self._flash("AI Summary stopped")
+
+        def done(text_out):
+            if finish():
+                stopped()
+            else:
+                QMessageBox.information(self, "AI Summary", text_out)
+
+        def failed(e):
+            if finish():
+                stopped()
+            else:
+                QMessageBox.warning(self, "AI", e)
+        bg.run(lambda: review.run_cancellable(
+            token, review.summarize_text, text, info["cut"], note, in_set),
+            done, failed, self)
+        return busy
 
     def ai_redline(self):
         if not self._view:
@@ -7159,7 +7762,8 @@ class MainWindow(QMainWindow):
             return None
         if jobsafe.local_copy_info(self._path):
             self._flash("This is already your local copy - use File > "
-                        "Copy Back to the Original when you're done")
+                        "Copies & Cloud > Copy Back to the Original when "
+                        "you're done")
             return self._path
         if v.dirty and not self.save_file():
             return None
@@ -7183,8 +7787,8 @@ class MainWindow(QMainWindow):
                     t.view.dirty = False
                     self.close_tab(j)
                     break
-            self._flash("Working on a copy on this PC. File > Copy Back "
-                        "to the Original when you're done.", 12000)
+            self._flash("Working on a copy on this PC. File > Copies "
+                        "& Cloud > Copy Back to the Original when you're done.", 12000)
         return local
 
     def copy_back_original(self, ask=None):
@@ -7197,6 +7801,18 @@ class MainWindow(QMainWindow):
             return None
         if v.dirty and not self.save_file():
             return None
+        # the original open in another tab holds the file on Windows
+        # (WinError 5): close those tabs first, or stop if one has unsaved
+        # work (Chief's estimator test, Nov 7)
+        orig = jobsafe.local_copy_info(self._path).get("original") or ""
+        if orig and not self._release_tabs_of(orig):
+            return None
+        # the drawing process keeps the last few files it drew open, the
+        # original among them - the real cause of "Access denied" on a
+        # plain Copy Back (Chief's re-test, Nov 7)
+        from . import render_worker
+        if orig:
+            render_worker.release(orig, wait=3.0)
         try:
             out = jobsafe.copy_back(self._path)
         except jobsafe.CopyBackError as e:
@@ -7206,12 +7822,57 @@ class MainWindow(QMainWindow):
             if "changed the original" not in str(e) or not ask(
                     f"{e}\n\nSave yours beside it as \"(mine)\" instead, "
                     "so neither is lost?"):
+                self._copy_back_failed()
                 if "changed the original" not in str(e):
                     QMessageBox.warning(self, "Copy Back", str(e))
                 return None
-            out = jobsafe.copy_back(self._path, force=True)
+            try:
+                out = jobsafe.copy_back(self._path, force=True)
+            except jobsafe.CopyBackError as e2:
+                self._copy_back_failed()
+                QMessageBox.warning(self, "Copy Back", str(e2))
+                return None
         self._flash("Copied back: " + out, 10000)
         return out
+
+    def _copy_back_failed(self):
+        """The status bar never says "Saved" after a Copy Back that didn't
+        happen (Chief's re-test, Nov 7)."""
+        msg = "Copy Back didn't happen - the original is unchanged"
+        try:
+            self.statusBar().showMessage(msg, 0)
+            self._flash(msg, 15000)
+        except Exception:                                 # noqa: BLE001
+            pass
+
+    def _release_tabs_of(self, path):
+        """Close every clean tab showing `path`, in this window and any
+        other QuantiSheet window. False (and nothing closed) when one has
+        unsaved changes."""
+        want = os.path.normcase(os.path.abspath(path))
+        wins = [self] + [w for w in QApplication.topLevelWidgets()
+                         if w is not self and isinstance(w, MainWindow)]
+        hits = []
+        for w in wins:
+            for j in range(w.tabs.count()):
+                t = w.tabs.widget(j)
+                p = getattr(t, "path", None)
+                if p and os.path.normcase(os.path.abspath(p)) == want:
+                    hits.append((w, t))
+        for _w, t in hits:
+            if getattr(getattr(t, "view", None), "dirty", False):
+                QMessageBox.warning(
+                    self, "Copy Back",
+                    "The original is open in another tab with unsaved "
+                    "changes. Save or close that tab, then Copy Back.")
+                return False
+        for w, t in hits:
+            j = w.tabs.indexOf(t)
+            if j >= 0:
+                w.close_tab(j)
+        if hits:
+            self._flash("Closed the original's tab so it can be replaced")
+        return True
 
     def attachments(self, pick=None, save_to=None):
         """Document > Attachments: save a file attached to this PDF. It is
@@ -7536,7 +8197,8 @@ class MainWindow(QMainWindow):
                     tmp = safeio.protected_copy(
                         self._view.doc, prot.open_pw if prot else None)
                 try:
-                    after = acrobat.reduce_size(tmp, path, original=before)
+                    after = acrobat.reduce_size(tmp, path, original=before,
+                                                   in_place=True)
                 except acrobat.NotSmaller as e:
                     not_smaller = e
                 finally:

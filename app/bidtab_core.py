@@ -34,6 +34,7 @@ from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
 from typing import Iterable, Sequence
+from .dmoney import c2 as _c2
 
 try:                                  # spreadsheet formula guard (CSV)
     from . import safecell
@@ -432,12 +433,12 @@ def render(items: Sequence[Item], rollup: Sequence[Rollup], fmt: str,
         writer.writerow(["Trade", "Items", "Extended_Base_Median", "Extended_Low",
                          "Extended_Escalated", "Avg_Spread_Pct", "Max_Spread_Pct"])
         for r in rollup:
-            writer.writerow([r.trade, r.items, f"{r.extended_base:.2f}", f"{r.extended_low:.2f}",
-                             f"{r.extended_escalated:.2f}", f"{r.avg_spread:.0f}", f"{r.max_spread:.0f}"])
+            writer.writerow([r.trade, r.items, f"{_c2(r.extended_base):.2f}", f"{_c2(r.extended_low):.2f}",
+                             f"{_c2(r.extended_escalated):.2f}", f"{r.avg_spread:.0f}", f"{r.max_spread:.0f}"])
         writer.writerow(["TOTAL", sum(r.items for r in rollup),
-                         f"{sum(r.extended_base for r in rollup):.2f}",
-                         f"{sum(r.extended_low for r in rollup):.2f}",
-                         f"{sum(r.extended_escalated for r in rollup):.2f}", "", ""])
+                         f"{_c2(sum(r.extended_base for r in rollup)):.2f}",
+                         f"{_c2(sum(r.extended_low for r in rollup)):.2f}",
+                         f"{_c2(sum(r.extended_escalated for r in rollup)):.2f}", "", ""])
         return buf.getvalue()
 
     delimiter = "\t" if fmt == "tsv" else ","
@@ -454,15 +455,15 @@ def render(items: Sequence[Item], rollup: Sequence[Rollup], fmt: str,
         factor = escalation_factor(item.trade, months, rates, fallback)
         escalated = item.stats.median * factor
         if fmt == "lib":
-            writer.writerow([item.trade, item.desc, item.unit, f"{item.stats.median:.2f}",
-                             item.stats.n, f"{item.stats.low:.2f}", f"{item.stats.high:.2f}",
-                             f"{factor:.3f}", f"{escalated:.2f}"])
+            writer.writerow([item.trade, item.desc, item.unit, f"{_c2(item.stats.median):.2f}",
+                             item.stats.n, f"{_c2(item.stats.low):.2f}", f"{_c2(item.stats.high):.2f}",
+                             f"{factor:.3f}", f"{_c2(escalated):.2f}"])
         else:
             writer.writerow([item.trade, item.desc, item.unit, item.stats.n,
-                             f"{item.stats.low:.2f}", f"{item.stats.median:.2f}",
-                             f"{item.stats.mean:.2f}", f"{item.stats.high:.2f}",
+                             f"{_c2(item.stats.low):.2f}", f"{_c2(item.stats.median):.2f}",
+                             f"{_c2(item.stats.mean):.2f}", f"{_c2(item.stats.high):.2f}",
                              f"{item.stats.spread_pct:.0f}", f"{factor:.3f}",
-                             f"{escalated:.2f}", "REVIEW" if item.flagged else ""])
+                             f"{_c2(escalated):.2f}", "REVIEW" if item.flagged else ""])
     return buf.getvalue()
 
 

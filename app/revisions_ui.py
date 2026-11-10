@@ -7,6 +7,7 @@ from PySide6.QtWidgets import (QDialog, QDialogButtonBox, QFileDialog,
                                QTableWidget, QTableWidgetItem, QVBoxLayout)
 
 from . import revisions, theme
+from .dmoney import c2 as _c2
 
 
 def _rname(win, doc):
@@ -141,8 +142,8 @@ class RevisionLogDialog(QDialog):
         d.setRowCount(len(ch["items"]))
         for i, it in enumerate(ch["items"]):
             for c, v in enumerate((it["name"], it["trade"] or "",
-                                   f"{it['qty_before']:,.2f} {it['unit']}",
-                                   f"{it['qty_after']:,.2f} {it['unit']}",
+                                   f"{_c2(it['qty_before']):,.2f} {it['unit']}",
+                                   f"{_c2(it['qty_after']):,.2f} {it['unit']}",
                                    _m(it["before"]), _m(it["after"]),
                                    _m(it["change"], True))):
                 d.setItem(i, c, _it(v, c >= 2))

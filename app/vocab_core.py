@@ -30,6 +30,7 @@ import sys
 from collections import Counter
 from pathlib import Path
 from typing import Iterable, Sequence
+from .dmoney import c2 as _c2
 
 try:                                  # spreadsheet formula guard (CSV)
     from . import safecell
@@ -311,7 +312,7 @@ def cmd_batch(conn, args) -> int:
     else:
         for r in results:
             flag = " " if r["item_id"] else "!"
-            print(f"{flag} {r['score']:.2f} {r['method']:<9} {r['input'][:48]:<50} -> {r['match'] or ''}")
+            print(f"{flag} {_c2(r['score']):.2f} {r['method']:<9} {r['input'][:48]:<50} -> {r['match'] or ''}")
     return 0
 
 

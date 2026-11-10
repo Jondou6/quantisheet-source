@@ -1574,6 +1574,14 @@ class ProjectCenter(QMainWindow):
         self.share_btn.setIcon(icons.icon("people"))
         self.share_btn.clicked.connect(self.share)
         h.addWidget(self.share_btn)
+        # it opens full screen: a Close button, not only the title bar's X
+        # (Chief's estimator test, Nov 7)
+        self.close_btn = QPushButton("Close")
+        self.close_btn.setObjectName("pcClose")
+        self.close_btn.setToolTip("Close Project Center (Ctrl+W)")
+        self.close_btn.clicked.connect(self.close)
+        h.addWidget(self.close_btn)
+        QShortcut(QKeySequence("Ctrl+W"), self, self.close)
         return bar
 
     def _fill_nav(self):
@@ -2170,6 +2178,11 @@ def pick_and_open(parent=None):
         b2.setDefault(True)
         b2.clicked.connect(lambda: open_sel())
         bb.addWidget(b2)
+    cancel = QPushButton("Cancel")      # not only Esc (Chief, Nov 6)
+    cancel.setAutoDefault(False)
+    cancel.clicked.connect(d.reject)
+    bb.addWidget(cancel)
+    d._cancel = cancel
     v.addLayout(bb)
     if d.exec() and chosen.get("f"):
         return open_center(chosen["f"], parent)

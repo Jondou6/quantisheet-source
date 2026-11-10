@@ -8,6 +8,7 @@ health limit), deliver, then the install that consumes them.
 """
 import re
 
+from . import bidset
 from . import rules as rules_mod
 from . import templates as tmpl
 from .calendar import standard_specs
@@ -143,9 +144,14 @@ def _make(code, name, **kw):
 
 
 def _cite(fact):
-    return [{"spec_section": c.get("spec_section") or "",
-             "page": c.get("page"), "source": c.get("source") or ""}
-            for c in (fact.get("citations") or []) if c.get("page")]
+    out = []
+    for c in (fact.get("citations") or []):
+        if c.get("document"):                      # a bid-set document
+            out.append(dict(c))
+        elif c.get("page"):
+            out.append({"spec_section": c.get("spec_section") or "",
+                        "page": c.get("page"), "source": c.get("source") or ""})
+    return out
 
 
 def _slug(text):
@@ -157,7 +163,7 @@ def assemble(facts, ct, ingest, project_type=None, takeoff=None,
              cost_book=None, productivity=None, actuals=None,
              ntp=None, data_date=None, holidays=None, name="Project",
              template_dir=None, area_sf=None, stories=1,
-             weather_months=None):
+             weather_months=None, bid=None):
     text = "\n".join((s.get("text") or "") for s in
                      ingest.get("spec_sections") or [])
     text += "\n" + "\n".join((d.get("text") or "") + " " +
@@ -174,6 +180,10 @@ def assemble(facts, ct, ingest, project_type=None, takeoff=None,
         weather_months = assumptions.get("weather_months") or []
     swppp = bool(re.search(r"\bSWPPP\b|erosion and sediment", text, re.I))
     slots = tmpl.slots_for(library, ptype, divisions, swppp=swppp)
+    if bid:
+        # A bid set says what the field work is; the template keeps only
+        # general conditions and milestones (Nov 5 gold fixture).
+        slots = [s for s in slots if s.get("cls") in _BID_KEEP]
     doc = new_schedule(name, start=ntp, data_date=data_date or ntp)
     doc["calendars"] = standard_specs(holidays or [], weather_months)
     doc["project"]["type"] = ptype
@@ -222,11 +232,16 @@ def assemble(facts, ct, ingest, project_type=None, takeoff=None,
             act["basis"] = "milestone"
         add(act)
 
+    if bid:
+        doc["scope"] = _bid_scope(acts, rels, add, bid, facts, assumptions)
+        doc["caveat"] = bidset.CAVEAT
     _fill_divisions(acts, add, divisions, facts)
     _by_others(acts, add, facts)
     _cure_and_contract(doc, acts, facts, ct)
     _procurement(acts, rels, add, facts, assumptions)
     _inspections(acts, rels, add, facts)
+    if bid:
+        _bid_holds(acts, add)
     _phases(acts, rels, add, facts)
     if ptype == "plumbing_hvac_service" and not any(
             a.get("cls") == "service_repair" for a in acts):
@@ -235,6 +250,11 @@ def assemble(facts, ct, ingest, project_type=None, takeoff=None,
                   template_slot="REP",
                   basis="template default, estimated"))
     rule_rows = rules_mod.load(template_dir)
+    if bid:
+        rule_rows = list(rule_rows) + [
+            {"id": f"{p}_to_{q}_FS", "pred_cls": p, "succ_cls": q,
+             "type": "FS", "lag_days": 0, "note": "bid-set trade logic"}
+            for p, q in bidset.RULES]
     _apply_rules(acts, rels, rule_rows)
     _place_holds(acts, rels)
     _apply_sequences(acts, rels, facts)
@@ -250,6 +270,98 @@ def assemble(facts, ct, ingest, project_type=None, takeoff=None,
                     crew_size=float(assumptions.get("default_crew_size") or 4))
     _roles(doc)
     return doc
+
+
+_BID_KEEP = {"ntp", "mobilization", "temp_facilities", "punch",
+             "substantial", "closeout", "demobilization", "final"}
+
+
+def _short(text, n=60):
+    t = re.sub(r"\(?\bOFOI\b\)?|\bowner[- ]furnished,?\s+owner[- ]installed\s*",
+               "", text or "", flags=re.I).strip()
+    t = re.sub(r"^(?:furnish\s+and\s+install|provide\s+and\s+install|"
+               r"furnish|provide|install)\s+(?:a\s+|an\s+|the\s+|new\s+)*",
+               "", t, flags=re.I)
+    t = re.split(r"[.;(]| per | - ", t)[0].strip()
+    return " ".join((t[:n] or text[:n]).split())
+
+
+def _bid_scope(acts, rels, add, bid, facts, assumptions):
+    """One cited activity per live scope line; long-lead items get the
+    procurement chain, owner-furnished items an owner chain."""
+    deliver = int(assumptions.get("delivery_days") or 3)
+    gaps, unmatched = [], []
+    for line in bid.get("lines") or []:
+        p = bidset.plan_line(line)
+        cites = bidset.cite(line)
+        act = _make(
+            "S_" + _slug(line["key"]), line["text"][:120], days=p["days"],
+            calendar=p["calendar"], cls=p["cls"], division=p["division"],
+            wbs=p["wbs"],
+            roles=("Owner",) if p["owner_installed"] else (p["role"],),
+            citations=cites, duration_kind=p["duration_kind"],
+            basis=p["basis"] + ("; installed by the owner"
+                                if p["owner_installed"] else ""))
+        act["scope_key"] = line["key"]
+        act["quantity_missing"] = p["quantity_missing"]
+        if p["quantity"]:
+            act["quantity"], act["quantity_unit"] = p["quantity"], p["unit"]
+        add(act)
+        if p["quantity_missing"]:
+            gaps.append(f"{line['source']}: " + line["text"][:70].rstrip(" ;,"))
+        if not p["matched"]:
+            unmatched.append(f"{line['source']}: " + line["text"][:70].rstrip(" ;,"))
+        item = _short(line["text"])
+        if p["owner_furnished"]:
+            days = p["lead_days"] or 20
+            fur = add(_make(
+                "OF_" + _slug(line["key"]), f"Owner furnishes {item}",
+                days=days, cls="owner_furnish", division=p["division"],
+                wbs="1.2", roles=("Owner",), citations=cites,
+                duration_kind="computed" if p["lead_days"] else "estimated",
+                basis="stated lead time" if p["lead_days"] else
+                "owner lead time not stated; 20 workdays estimated - "
+                "confirm with the owner"))
+            dlv = add(_make(
+                "OD_" + _slug(line["key"]), f"Owner delivers {item}",
+                days=deliver, cls="owner_delivery", division=p["division"],
+                wbs="1.2", roles=("Owner",), citations=cites,
+                basis="delivery, estimated"))
+            rels.append(_rel(fur["code"], dlv["code"]))
+            rels.append(_rel(dlv["code"], act["code"]))
+        elif p["lead_days"]:
+            # _procurement builds the submit / review / release / fabricate
+            # / deliver chain from this fact; delivery feeds the install.
+            facts.append({"kind": "long_lead", "item": item,
+                          "value": p["lead_days"], "lead_source": "spec",
+                          "division": p["division"], "consumer": p["cls"],
+                          "citations": cites})
+    return {"lines": bid.get("lines") or [], "removed": bid.get("removed") or [],
+            "log": bid.get("log") or [], "skipped": bid.get("skipped") or [],
+            "quantity_gaps": gaps,
+            "unmatched": unmatched}
+
+
+def _bid_holds(acts, add):
+    """Standard holds: a rough-in inspection before close-in when there is
+    rough-in work, and exactly one final inspection before Substantial
+    Completion."""
+    std = [{"document": "Standard hold point", "source": "Standard hold "
+            "point (company template)", "spec_section": "", "page": None}]
+    if any(a.get("cls") in bidset.ROUGH for a in acts) and not any(
+            a.get("cls") == "rough_in_inspection" for a in acts):
+        add(_make("RINSP", "Rough-in inspection (hold before cover-up)",
+                  days=1, cls="rough_in_inspection", division="01",
+                  wbs="1.7", roles=("Inspector",), citations=std,
+                  basis="standard hold point"))
+    finals = [a for a in acts if a.get("cls") == "final_inspection"]
+    for extra in finals[1:]:
+        acts.remove(extra)
+    if not finals:
+        add(_make("FINSP", "Final inspection (hold before Substantial "
+                  "Completion)", days=1, cls="final_inspection",
+                  division="01", wbs="1.8", roles=("Inspector",),
+                  citations=std, basis="standard hold point"))
 
 
 def _fill_divisions(acts, add, divisions, facts):
@@ -456,7 +568,7 @@ def _insert_hold(acts, rels, gate, label, cls):
     text = label.lower()
     if cls == "rough_in_inspection":
         pred_cls, succ_cls = {"plumb_rough", "hvac_rough", "elec_rough",
-                              "fire_rough"}, {"cover"}
+                              "fire_rough", "mep_rough"}, {"cover"}
     elif cls == "footing_inspection":
         pred_cls, succ_cls = {"foundations"}, {"slab", "cure"}
     elif "steel" in text:

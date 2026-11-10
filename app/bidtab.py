@@ -24,6 +24,7 @@ from xml.etree import ElementTree as ET
 
 from . import bidtab_core as core
 from . import pricedb
+from .dmoney import c2 as _c2
 
 RATES_KEY = "bidtab_rates"
 
@@ -351,23 +352,23 @@ def export(items, path, fmt="lib", to=None):
                 base = sum(i["median"] * i["qty"] for i in m)
                 low = sum(i["low"] * i["qty"] for i in m)
                 esc = sum(i["esc_median"] * i["qty"] for i in m)
-                w.writerow([t, len(m), f"{base:.2f}", f"{low:.2f}",
-                            f"{esc:.2f}",
+                w.writerow([t, len(m), f"{_c2(base):.2f}", f"{_c2(low):.2f}",
+                            f"{_c2(esc):.2f}",
                             f"{statistics.fmean(i['spread'] for i in m):.0f}",
                             f"{max(i['spread'] for i in m):.0f}"])
                 tot = [tot[0] + len(m), tot[1] + base, tot[2] + low,
                        tot[3] + esc]
-            w.writerow(["TOTAL", tot[0], f"{tot[1]:.2f}", f"{tot[2]:.2f}",
-                        f"{tot[3]:.2f}", "", ""])
+            w.writerow(["TOTAL", tot[0], f"{_c2(tot[1]):.2f}", f"{_c2(tot[2]):.2f}",
+                        f"{_c2(tot[3]):.2f}", "", ""])
         elif fmt == "lib":
             w.writerow(["Trade", "Item_Description", "Unit", "Unit_Cost",
                         "Bids", "Low", "High", "Escalated_Unit_Cost",
                         "Escalated_To"])
             for i in items:
                 w.writerow([i["trade"], i["desc"], i["unit"],
-                            f"{i['median']:.2f}", i["bids"],
-                            f"{i['low']:.2f}", f"{i['high']:.2f}",
-                            f"{i['esc_median']:.2f}", to or ""])
+                            f"{_c2(i['median']):.2f}", i["bids"],
+                            f"{_c2(i['low']):.2f}", f"{_c2(i['high']):.2f}",
+                            f"{_c2(i['esc_median']):.2f}", to or ""])
         else:
             w.writerow(["Trade", "Item_Description", "Unit", "Bids",
                         "Projects", "Bidders", "Low", "Median", "Mean",
@@ -376,11 +377,11 @@ def export(items, path, fmt="lib", to=None):
                         "First_Bid", "Last_Bid", "Flag"])
             for i in items:
                 w.writerow([i["trade"], i["desc"], i["unit"], i["bids"],
-                            i["projects"], i["bidders"], f"{i['low']:.2f}",
-                            f"{i['median']:.2f}", f"{i['mean']:.2f}",
-                            f"{i['high']:.2f}", f"{i['spread']:.0f}",
-                            f"{i['esc_low']:.2f}", f"{i['esc_median']:.2f}",
-                            f"{i['esc_high']:.2f}", " ".join(i["states"]),
+                            i["projects"], i["bidders"], f"{_c2(i['low']):.2f}",
+                            f"{_c2(i['median']):.2f}", f"{_c2(i['mean']):.2f}",
+                            f"{_c2(i['high']):.2f}", f"{i['spread']:.0f}",
+                            f"{_c2(i['esc_low']):.2f}", f"{_c2(i['esc_median']):.2f}",
+                            f"{_c2(i['esc_high']):.2f}", " ".join(i["states"]),
                             i["first"], i["last"],
                             "REVIEW" if i["flag"] else ""])
     return path
@@ -401,7 +402,7 @@ def to_assembly(item, which="esc_median", to=None):
     measure, expr = _MEASURE.get(item["unit"], ("count", "Count"))
     code = item["trade"].split()[0]
     div = code.split("-")[0] if code[:2].isdigit() else ""
-    price = round(float(item[which]), 2)
+    price = _c2(float(item[which]))
     return {
         "name": f"{item['desc']} (bid tabs)", "measure": measure,
         "unit": item["unit"], "trade": item["trade"],
@@ -410,8 +411,8 @@ def to_assembly(item, which="esc_median", to=None):
         "notes": (f"Median of {item['bids']} bid(s) from {item['projects']} "
                   f"project(s), {item['first']} to {item['last']}"
                   + (f" ({', '.join(item['states'])})" if item["states"]
-                     else "") + f"; low ${item['esc_low']:,.2f}, high "
-                  f"${item['esc_high']:,.2f} escalated to {to or 'today'}. "
+                     else "") + f"; low ${_c2(item['esc_low']):,.2f}, high "
+                  f"${_c2(item['esc_high']):,.2f} escalated to {to or 'today'}. "
                   "Installed price including the bidders' overhead and "
                   "profit."),
         "parts": [{"name": "Installed (bid tab median)",

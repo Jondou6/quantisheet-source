@@ -125,13 +125,25 @@ def _parts(room: m.Room, L: Decimal, W: Decimal):
     return add, per
 
 
+# 6 ft 8 in, the standard door, is 6.67 when typed in feet; worked out
+# exactly so a 3 x 6'8" door is 20.00 SF, not 20.01 (Chief's estimator
+# test, Nov 7: walls 383.99 instead of 384.00)
+_SIX_EIGHT = Decimal(80) / Decimal(12)
+
+
+def _height(o) -> Decimal:
+    h = _d(o.height_ft)
+    return _SIX_EIGHT if h in (Decimal("6.67"), Decimal("6.667"),
+                               Decimal("6.6667")) else h
+
+
 def measure(room: m.Room) -> Measures:
     L, W, H = (_d(room.length_ft), _d(room.width_ft), _d(room.height_ft))
     extra, extra_per = _parts(room, L, W)
     floor = L * W + extra if (L and W) else Decimal(0)
     perim = 2 * (L + W) + extra_per if (L and W) else Decimal(0)
     gross = perim * H
-    opening = sum((_d(o.width_ft) * _d(o.height_ft) for o in room.openings),
+    opening = sum((_d(o.width_ft) * _height(o) for o in room.openings),
                   Decimal(0))
     walls = max(Decimal(0), gross - opening)
     doors = sum((_d(o.width_ft) for o in room.openings if o.kind == "door"),

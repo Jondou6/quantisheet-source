@@ -13,6 +13,7 @@ worked out.
 """
 import math
 import re
+from .dmoney import c2 as _c2
 
 _STUD = re.compile(
     r"(\d+(?:\s*[- ]\s*\d/\d)?|\d/\d)\s*(?:\"|'')?\s*(?:MTL\.?|METAL|STL\.?|STEEL)"
@@ -130,46 +131,46 @@ def lines(code, lf, h, comps, runs=1):
             n = math.ceil(lf / (c["oc_in"] / 12.0)) + runs
             add(f"{_frac(c['size_in'])} metal studs @ {c['oc_in']:g}\" OC",
                 n * h, "LF", f"{n} studs ({lf:,.1f} LF at {c['oc_in']:g}\" "
-                f"OC + 1 per run) x {h:.2f} ft")
+                f"OC + 1 per run) x {_c2(h):.2f} ft")
             add(f"{_frac(c['size_in'])} top & bottom track", 2 * lf, "LF",
                 f"2 x {lf:,.1f} LF")
         elif k == "gwb":
             gwb_sf = face * c["sides"]
             add(f"{_frac(c['thk_in'])} type X gypsum board", gwb_sf, "SF",
-                f"{lf:,.1f} LF x {h:.2f} ft x {c['sides']} side(s)")
+                f"{lf:,.1f} LF x {_c2(h):.2f} ft x {c['sides']} side(s)")
             add("sealant (top and bottom of the board)",
                 2 * lf * c["sides"], "LF",
                 f"2 x {lf:,.1f} LF x {c['sides']} side(s)")
         elif k == "batt":
             add("batt insulation", face, "SF",
-                f"{lf:,.1f} LF x {h:.2f} ft"
+                f"{lf:,.1f} LF x {_c2(h):.2f} ft"
                 + (" (legend: where required for sound - check where)"
                    if c.get("where_required") else ""))
         elif k == "furring":
             add(f"{_frac(c['size_in'])} metal furring channels",
                 math.ceil(lf / 2.0) * h, "LF",
-                f"at 24\" OC over {lf:,.1f} LF x {h:.2f} ft")
+                f"at 24\" OC over {lf:,.1f} LF x {_c2(h):.2f} ft")
         elif k == "rigid":
             add(f"{_frac(c['thk_in'])} rigid insulation", face, "SF",
-                f"{lf:,.1f} LF x {h:.2f} ft")
+                f"{lf:,.1f} LF x {_c2(h):.2f} ft")
         elif k == "sheathing":
             add("glass mat gypsum sheathing", face, "SF",
-                f"{lf:,.1f} LF x {h:.2f} ft")
+                f"{lf:,.1f} LF x {_c2(h):.2f} ft")
         elif k == "vapor barrier":
-            add("vapor barrier", face, "SF", f"{lf:,.1f} LF x {h:.2f} ft")
+            add("vapor barrier", face, "SF", f"{lf:,.1f} LF x {_c2(h):.2f} ft")
         elif k == "cmu":
             why = (" (the legend draws masonry with joint reinforcement and "
                    f"a {c['size_in']}\" dimension but doesn't name CMU - "
                    "confirm the back-up wall)") if c.get("inferred") else ""
             add(f"{c['size_in']}\" CMU wall", face, "SF",
-                f"{lf:,.1f} LF x {h:.2f} ft" + why)
+                f"{lf:,.1f} LF x {_c2(h):.2f} ft" + why)
             add(f"{c['size_in']}\" CMU block", math.ceil(face * CMU_PER_SF),
                 "EA", f"{face:,.0f} SF x {CMU_PER_SF} blocks per SF" + why)
             if c.get("inferred"):
                 out[-1]["review"] = out[-2]["review"] = True
         elif k == "siding":
             add("cement board siding", face, "SF",
-                f"{lf:,.1f} LF x {h:.2f} ft (the full wall face - take off "
+                f"{lf:,.1f} LF x {_c2(h):.2f} ft (the full wall face - take off "
                 "any brick wainscot from the elevations)")
     if gwb_sf:
         add("gypsum board 4'x8' sheets", math.ceil(gwb_sf / SHEET_SF),

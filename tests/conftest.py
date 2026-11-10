@@ -16,7 +16,17 @@ os.environ.setdefault("QUANTISHEET_DRAW_PROCESS", "0")   # see test_draw_process
 # prices.db (GUI user test r42, Oct 29: both changed as a run finished).
 # QS_TESTS_REAL_HOME=1 turns this off.
 if os.environ.get("QS_TESTS_REAL_HOME") != "1":
+    import site
     import tempfile
+    # Child Pythons the tests start look for user-installed packages
+    # (PySide6 on a Linux box) under HOME; HOME changes below, so hand
+    # them this process's user site and source root (Chief, Nov 6).
+    _keep = [p for p in (os.path.dirname(os.path.dirname(
+        os.path.abspath(__file__))), site.getusersitepackages()
+        if site.ENABLE_USER_SITE else "") if p and os.path.isdir(p)]
+    _pp = os.environ.get("PYTHONPATH", "")
+    os.environ["PYTHONPATH"] = os.pathsep.join(
+        _keep + [x for x in _pp.split(os.pathsep) if x and x not in _keep])
     _TEST_HOME = tempfile.mkdtemp(prefix="qs_test_home_")
     os.environ["USERPROFILE"] = _TEST_HOME
     os.environ["HOME"] = _TEST_HOME

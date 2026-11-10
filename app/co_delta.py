@@ -9,6 +9,7 @@ import datetime
 from decimal import ROUND_HALF_UP, Decimal
 
 import fitz
+from .dmoney import c2 as _c2
 
 CENT = Decimal("0.01")
 CLOUD_PAD = 6
@@ -81,7 +82,10 @@ def delta(old_doc, old_page, new_doc, new_page, markup_pct=10):
 
 
 def _money(v):
-    return "" if v is None else (f"-${-v:,.2f}" if v < 0 else f"${v:,.2f}")
+    if v is None:
+        return ""
+    v = _c2(v)                                  # half up, as the totals
+    return f"-${_c2(-v):,.2f}" if v < 0 else f"${_c2(v):,.2f}"
 
 
 def make_pdf(new_doc, new_page, result, path, title="", sheet="",

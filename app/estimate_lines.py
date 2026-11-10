@@ -391,10 +391,14 @@ def price(line, groups=None):
                 qty = Decimal(0)
                 problem = (f"{link['name']} is in {link['unit']!r}, this "
                            f"line is per {ln['unit']!r}: {e}")
+    # a measured quantity is priced as shown, to 2 places; a typed one
+    # exactly as typed (rounding.py, policy 2)
+    from . import rounding
+    money_qty = rounding.money_qty(qty) if link else qty
     ext = {}
     for k in PARTS:
         try:
-            ext[k] = dmoney.cents(qty * up[k])
+            ext[k] = dmoney.cents(money_qty * up[k])
         except InvalidOperation:
             ext[k] = Decimal("0.00")
             problem = problem or "amount out of range"
@@ -644,6 +648,10 @@ def location_lines(base, mat, lab, eqp, region):
     Grand total', or [] when there's no location adjustment to show."""
     adj = location_adjustment(mat, lab, eqp, region)
     if adj is None:
+        return []
+    # no adjustment, no lines: "Location adjustment (+0.0%) $0.00" on a
+    # proposal said nothing (Chief's estimator test, Nov 7)
+    if not dmoney.cents(adj.get("total") or 0):
         return []
     base = dmoney.cents(base)
     own = adj.get("lines")

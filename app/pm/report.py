@@ -9,6 +9,7 @@ import fitz
 from . import schema
 from .widgets import show_date
 from .weather import summary as weather_summary
+from ..dmoney import c2 as _c2
 
 W, H = 612, 792
 M = 42
@@ -26,7 +27,7 @@ def fmt(field, v, store=None):
         return show_date(v)
     if t == "money":
         try:
-            return f"${float(v):,.2f}"
+            return f"${_c2(float(v)):,.2f}"
         except (TypeError, ValueError):
             return str(v)
     if t == "people":

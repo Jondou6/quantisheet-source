@@ -23,6 +23,7 @@ import copy
 from . import cpm
 from .calendar import build_all
 from .model import DERIVED, HARD_CONSTRAINTS, MILESTONES, as_date
+from ...dmoney import c2 as _c2
 
 LIMIT = 44
 CP_ADD = 600
@@ -240,7 +241,7 @@ def _cpli(doc):
     length = max(1, cal.index(finish) - cal.index(start) + 1)
     tf = 0 if not must else cal.index(must) - cal.index(finish)
     ratio = (length + tf) / length
-    return _item("cpli", "CPLI", f"{ratio:.2f}", ">= 0.95", ratio >= 0.95 - 1e-9)
+    return _item("cpli", "CPLI", f"{_c2(ratio):.2f}", ">= 0.95", ratio >= 0.95 - 1e-9)
 
 
 def _bei(doc, tasks):
@@ -252,7 +253,7 @@ def _bei(doc, tasks):
                      note="No baseline finish falls on or before the data date.")
     done = [a for a in due if a.get("status") == "complete"]
     ratio = len(done) / len(due)
-    return _item("bei", "BEI", f"{ratio:.2f}", ">= 0.95", ratio >= 0.95 - 1e-9)
+    return _item("bei", "BEI", f"{_c2(ratio):.2f}", ">= 0.95", ratio >= 0.95 - 1e-9)
 
 
 def _native(store, today):

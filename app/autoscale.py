@@ -23,6 +23,7 @@ import re
 import statistics
 
 from . import annotate, takeoff
+from .dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 
@@ -232,8 +233,8 @@ def detect(doc, pages=None, use_ocr=True, progress=None):
                                "size looks the same)")
             elif agree is False:
                 row["status"] = "check"
-                row["note"] = (f"dimension strings say {dims['ppu']:.2f} pt/ft, "
-                               f"not {sc[1]:.2f} - sheet may be printed to fit")
+                row["note"] = (f"dimension strings say {_c2(dims['ppu']):.2f} pt/ft, "
+                               f"not {_c2(sc[1]):.2f} - sheet may be printed to fit")
             elif src == "ocr" and not agree:
                 row["status"] = "check"
                 row["note"] = "read by OCR - spot-check it (OCR can misread 1/4 vs 1/2)"
@@ -329,7 +330,7 @@ if QDialog is not None:
                         if d.get("agree") is False else f"{d.get('n', 0)} dims")
                 vals = [str(r["page"] + 1), r.get("sheet", ""), r.get("label") or "-",
                         r.get("source") or "-", dims,
-                        (f"(page already {r['existing']:.2f} pt/ft) " if r.get("existing") else "")
+                        (f"(page already {_c2(r['existing']):.2f} pt/ft) " if r.get("existing") else "")
                         + r.get("note", "")]
                 t.setItem(i, 0, use)
                 for c, v in enumerate(vals, 1):

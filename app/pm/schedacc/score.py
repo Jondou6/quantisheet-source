@@ -228,3 +228,70 @@ def run_legacy(spec_pages, drawings, project_type, area_sf=20000):
         return autoschedule.plan(sc), ""
     except Exception as exc:                            # noqa: BLE001
         return [], str(exc)[:300]
+
+
+def score_bid(activities, expected):
+    """Score a schedule for a bid-set job against an answer key.
+
+    `activities` are dicts with name, cls, es, ef, dur_days (a compiled
+    draft's activities, or any other schedule turned into that shape - an
+    older draft has only names and dates). `expected`:
+      activities: [{"label", "match" (regex on the name), "cls"?}]
+      forbid:     [regex] - removed scope that must not be scheduled
+      order:      [[label, label], ...] - the first finishes before the
+                  second starts
+      durations:  {label: [workdays, tolerance fraction]}
+    Returns recall, the misses, the forbidden hits, order and duration
+    results, and weekend starts/finishes."""
+    import datetime as _dt
+    import re as _re
+    acts = list(activities or [])
+
+    def find(e):
+        pat = _re.compile(e["match"], _re.I)
+        for a in acts:
+            if e.get("cls") and a.get("cls") and a.get("cls") != e["cls"]:
+                continue
+            if pat.search(a.get("name") or ""):
+                return a
+        return None
+
+    hits = {}
+    for e in expected.get("activities") or []:
+        a = find(e)
+        if a is not None:
+            hits[e["label"]] = a
+    want = [e["label"] for e in expected.get("activities") or []]
+    missed = [w for w in want if w not in hits]
+    forbidden = []
+    for pat in expected.get("forbid") or []:
+        rx = _re.compile(pat, _re.I)
+        forbidden += [a.get("name") for a in acts if rx.search(a.get("name")
+                                                                 or "")]
+    order_bad = []
+    for first, second in expected.get("order") or []:
+        a, b = hits.get(first), hits.get(second)
+        if not a or not b or not a.get("ef") or not b.get("es"):
+            order_bad.append(f"{first} -> {second}: not both scheduled")
+        elif a["ef"][:10] > b["es"][:10] or (
+                a["ef"][:10] == b["es"][:10] and (a.get("dur_days") or 0) and
+                (b.get("dur_days") or 0)):
+            order_bad.append(f"{first} ({a['ef'][:10]}) -> {second} "
+                             f"({b['es'][:10]})")
+    dur_bad = []
+    for label, (days, tol) in (expected.get("durations") or {}).items():
+        a = hits.get(label)
+        got = a.get("dur_days") if a else None
+        if got is None or abs(float(got) - days) > days * tol:
+            dur_bad.append(f"{label}: {got} workdays, expected about {days}")
+    weekend = []
+    for a in acts:
+        if a.get("calendar") not in (None, "", "5day", "weather"):
+            continue
+        for k in ("es", "ef"):
+            d = a.get(k)
+            if d and _dt.date.fromisoformat(d[:10]).weekday() >= 5:
+                weekend.append(f"{a.get('name')} {k} {d[:10]}")
+    return {"recall": round(len(hits) / len(want), 3) if want else 1.0,
+            "missed": missed, "forbidden": forbidden, "order": order_bad,
+            "durations": dur_bad, "weekend": weekend}

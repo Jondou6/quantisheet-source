@@ -58,5 +58,6 @@ def test_timeout_is_configurable(monkeypatch):
         return _Resp(b'{"response": "ok"}')
     _patch(monkeypatch, urlopen)
     monkeypatch.setattr(review, "TIMEOUT", 7.5)
-    assert review.summarize_text("hello") == "ok"
+    # what was read, the reply, then the "AI draft" reminder (Nov 7)
+    assert "\n\nok\n\n" in review.summarize_text("hello")
     assert seen["t"] == 7.5

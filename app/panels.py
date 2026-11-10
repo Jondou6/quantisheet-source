@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
 
 from . import safecell
 from . import annotate, takeoff
+from .dmoney import c2 as _c2
 
 THUMB_W = 120
 
@@ -287,12 +288,12 @@ class QuantitiesPanel(QWidget):
                                    else it["label"])
             if it.get("cutouts"):
                 n = it["cutouts"]
-                name += (f"  ({it['gross']:,.2f} gross, less {n} "
+                name += (f"  ({_c2(it['gross']):,.2f} gross, less {n} "
                          f"cutout{'s' if n > 1 else ''})")
             if it.get("segments", 0) > 1:     # a run with bends
                 name += (f"  ({it['segments']} segments, "
                          f"{it['corners']} corners)")
-            value = f"{it['value']:,.2f}" if it["type"] != "count" else "1"
+            value = f"{_c2(it['value']):,.2f}" if it["type"] != "count" else "1"
             for col, text in enumerate((str(it["page"] + 1),
                                         it["type"].title(), name, value,
                                         it["unit"])):
@@ -305,7 +306,7 @@ class QuantitiesPanel(QWidget):
             buys = buyqty.summary(self.doc, self.summary())
         except Exception:                                 # noqa: BLE001
             buys = {}
-        lines = [(f"{k[1].title()} {k[0] or ''}: {v:,.2f} {k[2]}" +
+        lines = [(f"{k[1].title()} {k[0] or ''}: {_c2(v):,.2f} {k[2]}" +
                   (f" - buy {buys[k[0]][0]:,} {buys[k[0]][1]}"
                    if k[0] in buys else "")).replace("  ", " ")
                  for k, v in sorted(self.summary().items())]

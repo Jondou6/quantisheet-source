@@ -44,15 +44,33 @@ log = logging.getLogger(__name__)
 # ---- 10. fewer tabs ----------------------------------------------------------------
 
 # (tab, group or None for every group) -> (new tab, new group name)
+PDF_TAB = "PDF Management"
 FOLD = [
     (("Module", None), ("Project", "{g}")),
-    (("Billing", None), ("Project", "{g}")),
+    # Nov 5: Billing is its own tab again, right after Project - with it
+    # folded in, Project held twelve groups and scrolled off the screen
     (("Civil", None), ("Estimate", "Civil {g}")),
     (("AI", "Takeoff"), ("Takeoff", "AI Takeoff")),
-    (("AI", "Schedule"), ("Project", "AI Schedule")),
+    # Nov 5: one Schedule group (Schedule From Plans + Master Schedule) and
+    # the Submittal Log beside the other documents - Project had 12 groups
+    (("AI", "Schedule"), ("Project", "Schedule")),
+    (("Project", "Submittals"), ("Project", "Documents")),
     (("AI", "Voice"), ("Tools", "Voice")),
-    (("AI", "Review"), ("Review", "AI Review")),
+    # (AI > Review stays on the AI tab - Chief's user test, Nov 6: it was
+    # on both the AI and the Review tabs)
+    # Nov 6 (Jon): every PDF tool on one "PDF Management" tab - create,
+    # combine, export, organize pages, edit, forms, sign, protect
+    (("Pages", None), (PDF_TAB, "{g}")),
+    (("Document", None), (PDF_TAB, "{g}")),
+    (("Tools", "Convert"), (PDF_TAB, "Create & Convert")),
 ]
+# left to right on the PDF Management tab
+PDF_GROUPS = ("Create & Convert", "Pages", "Page Marks", "Content", "Forms",
+              "Sign", "E-Sign", "Protect", "Standards")
+# left to right (Nov 5); the classic tabs fit in where they used to be
+TAB_ORDER = ("Home", "PDF Management", "Markup", "Takeoff", "Estimate",
+             "Civil", "Review", "AI", "Project", "Module", "Billing",
+             "Service", "Pages", "Document", "Tools", "Help")
 S_CLASSIC = "classic_tabs"          # all 14 tabs, as before
 S_FOLLOW = "tabs_follow_file"
 S_ROLE = "role"
@@ -100,9 +118,11 @@ ROLES = {
                         "Organize Pages", "Print"]},
 }
 # with no file open, these tabs have nothing to work on
-NO_FILE_HIDE = {"Markup", "Takeoff", "Review", "Pages", "Document"}
+# (Nov 6, Jon: Takeoff stays on the top ribbon, file or not)
+NO_FILE_HIDE = {"Markup", "Review", "Pages", "Document",
+                "Billing"}                 # billing lives in the open PDF
 # a document (letters, specs, contracts - nothing bigger than legal size)
-DOC_HIDE = {"Takeoff"}
+DOC_HIDE = set()                 # Takeoff stays (Jon, Nov 6)
 LEGAL = (8.5 * 72 + 2, 14 * 72 + 2)
 
 
@@ -1128,6 +1148,8 @@ SELECTED = [
 
 SERVICE_LABELS = {"Service Work Order": "Work Order",
                   "Service Agreements": "Agreements",
+                  "Agreement Visit Calendar": "Visit Calendar",
+                  "Maintenance Checklist": "Checklist",
                   "Refrigerant Log": "Refrigerant",
                   "Backflow Test Report": "Backflow",
                   "Flat-Rate Pricebook": "Pricebook",
@@ -1135,7 +1157,31 @@ SERVICE_LABELS = {"Service Work Order": "Work Order",
                   "Tech Recommendations": "Recommend",
                   "T&M Tag": "T&M Tag",
                   "Build-to-Service Handover": "Handover",
-                  "Dispatch Board": "Dispatch"}
+                  "Dispatch Board": "Dispatch",
+                  "Customer History": "History",
+                  "Good / Better / Best Quotes": "GBB Quote",
+                  "Tune-up Planner": "Tune-ups",
+                  "Warranty Registrations": "Warranty",
+                  "Changeout Proposal": "Changeout",
+                  "Load Report": "Load Report"}
+SERVICE_ICONS = {"Service Work Order": "workorder",
+                 "Service Agreements": "contract",
+                 "Agreement Visit Calendar": "calendar",
+                 "Maintenance Checklist": "checklist",
+                 "Refrigerant Log": "refrigerant",
+                 "Backflow Test Report": "valve",
+                 "Flat-Rate Pricebook": "book",
+                 "Truck Stock": "truck",
+                 "Tech Recommendations": "bulb",
+                 "T&M Tag": "tag",
+                 "Build-to-Service Handover": "handover",
+                 "Dispatch Board": "dispatch",
+                 "Customer History": "history",
+                 "Good / Better / Best Quotes": "proposal",
+                 "Tune-up Planner": "gantt",
+                 "Warranty Registrations": "shield",
+                 "Changeout Proposal": "replace",
+                 "Load Report": "attach"}
 
 
 def add_service_commands(win):
@@ -1174,6 +1220,10 @@ def add_service_commands(win):
                 return None
         a = QAction(label.replace("&", "&&"), win)
         a.setIconText(SERVICE_LABELS.get(name, name))
+        from . import icons
+        glyph = SERVICE_ICONS.get(name, "info")
+        a.setProperty("qs_icon", glyph)
+        a.setIcon(icons.icon(glyph))
         a.triggered.connect(run)
         menu.addAction(a)
         from .ribbon import clean
@@ -1246,12 +1296,18 @@ def add_hidden_commands(win):
     made += add_service_commands(win)
     sv = rb.page("Service")
     groups = {"Calls": ["Service Work Order", "Dispatch Board",
-                        "T&M Tag"],
+                        "T&M Tag", "Customer History"],
               "Agreements": ["Service Agreements",
-                             "Build-to-Service Handover"],
-              "Logs & Tests": ["Refrigerant Log", "Backflow Test Report"],
-              "Pricing": ["Flat-Rate Pricebook", "Tech Recommendations",
-                          "Truck Stock"]}
+                             "Agreement Visit Calendar", "Tune-up Planner",
+                             "Build-to-Service Handover",
+                             "Warranty Registrations"],
+              "Logs & Tests": ["Refrigerant Log", "Backflow Test Report",
+                               "Maintenance Checklist"],
+              "Pricing": ["Flat-Rate Pricebook",
+                          "Good / Better / Best Quotes",
+                          "Tech Recommendations", "Truck Stock"],
+              "Replacement": ["Changeout Proposal", "Load Report"],
+              "Settings": ["Service Settings"]}
     for title, names in groups.items():
         g3 = sv.group(title)
         acts3 = [win.command(n) for n in names]
@@ -1266,11 +1322,20 @@ def add_hidden_commands(win):
         for n in names:
             a = win.command(n)
             if a is not None:
+                from . import icons
+                glyph = ("records" if "Service Records" in n else "proposal")
+                a.setProperty("qs_icon", glyph)
+                if a.icon().isNull():
+                    a.setIcon(icons.icon(glyph))
                 g2.large(a, n.split(" With")[0].replace(
                     "Equipment & ", ""))
                 made.append(a)
     bo = win.command("QuantiSheet Back Office")
     if bo is not None:
+        from . import icons
+        bo.setProperty("qs_icon", "dollar")
+        if bo.icon().isNull():
+            bo.setIcon(icons.icon("dollar"))
         rb.page("Project").group("Office").large(bo, "Back Office")
         made.append(bo)
     return made
@@ -1442,6 +1507,11 @@ def install(win):
         add_hidden_commands(win)
     except Exception:                                     # noqa: BLE001
         log.warning("hidden commands not placed", exc_info=True)
+    try:
+        if getattr(win, "ribbon", None) is not None:
+            win.ribbon.arrange(TAB_ORDER)
+    except Exception:                                     # noqa: BLE001
+        log.warning("tabs not put in order", exc_info=True)
     try:
         apply_tips(win)
     except Exception:                                     # noqa: BLE001

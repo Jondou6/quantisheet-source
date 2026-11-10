@@ -45,6 +45,7 @@ from decimal import ROUND_HALF_UP, Decimal
 
 from . import csi, safecell
 from .dmoney import D, bad, cents
+from .dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 
@@ -809,9 +810,9 @@ def attach_time(jobs, data=None):
         for k, (a, b) in per.items():
             if (f and k == f) or (d and k.startswith(d)):
                 take, rev, hit = take + a, rev + b, True
-        j["hours"] = {"takeoff": round(take / 60, 2),
-                      "review": round(rev / 60, 2),
-                      "total": round((take + rev) / 60, 2)} if hit else None
+        j["hours"] = {"takeoff": _c2(take / 60),
+                      "review": _c2(rev / 60),
+                      "total": _c2((take + rev) / 60)} if hit else None
         n += hit
     return n
 
@@ -1551,7 +1552,7 @@ def _m(v):
     if v is None:
         return ""
     c = cents(v)
-    return f"-${abs(c):,.2f}" if c < 0 else f"${c:,.2f}"
+    return f"-${_c2(abs(c)):,.2f}" if c < 0 else f"${_c2(c):,.2f}"
 
 
 def _p(v):

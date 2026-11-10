@@ -21,6 +21,7 @@ import datetime as _dt
 import re
 
 from . import csi
+from .dmoney import c2 as _c2
 
 ENGINE_OF = {"AI takeoff: rooms": "rooms", "AI takeoff: pipe runs": "pipes",
              "AI takeoff: civil": "civil", "AI takeoff: devices": "devices",
@@ -198,7 +199,7 @@ def collect(rows, res):
             ln["notes"].append(ref_sec)
         out.append({"div": div, "ref": "/".join(ln["refs"][:4]),
                     "description": desc,
-                    "qty": round(ln["qty"], 2) if ln["has_qty"] else None,
+                    "qty": _c2(ln["qty"]) if ln["has_qty"] else None,
                     "unit": ln["unit"], "status": ln["status"],
                     "note": "; ".join(ln["notes"])[:400]})
     out.sort(key=lambda l: (l["div"], l["status"] != "taken off",

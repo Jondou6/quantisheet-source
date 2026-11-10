@@ -50,8 +50,14 @@ class RenderWorker:
 
     def start(self):
         import time
-        if self.ok or not ENABLED:
+        if not ENABLED:
             return self.ok
+        # Nov 5: a process killed or crashed is noticed here too, not only
+        # when its pipe reports it - on Windows that report can come late
+        # (another child process can hold the pipe open), and until then
+        # every request was drawn in the window and no new process started
+        if self.ok and self.alive():
+            return True
         if self.failed:
             # it died (or never started): try again after a pause, a few
             # times per session, instead of drawing in the window for the
@@ -155,6 +161,28 @@ class RenderWorker:
         took half a second in the window). `callback` gets
         ("count", rid, "12" | "?")."""
         return self._ask(("count", None, path), callback)
+
+    def release(self, path, wait=0.0):
+        """Have the drawing process close `path`. With `wait` (seconds),
+        return only once it has (True), or when the time is up (False).
+        Without a process there is nothing to release (True)."""
+        if not path or not self.ok or self.conn is None or not self.alive():
+            return True
+        done = []
+        rid = self._ask(("release", None, path), lambda m: done.append(m))
+        if rid is None:
+            return True
+        if wait <= 0:
+            return False
+        import time
+        from PySide6.QtCore import QCoreApplication, QEventLoop
+        end = time.monotonic() + wait
+        while not done and time.monotonic() < end and self.alive():
+            QCoreApplication.processEvents(QEventLoop.AllEvents, 50)
+            time.sleep(0.01)
+        if not done:
+            self.forget(rid)
+        return bool(done) or not self.alive()
 
     def _ask(self, msg, callback):
         if not msg[-1] or not self.start() or not self.alive():
@@ -272,3 +300,16 @@ def get():
 
 def page_sig(doc, pno):
     return render_proc.page_sig(doc, pno)
+
+
+def release(path, wait=0.0):
+    """Close `path` in the drawing process, if there is one running (never
+    starts one). See RenderWorker.release."""
+    if _worker is None:
+        return True
+    try:
+        return _worker.release(path, wait)
+    except Exception:                                     # noqa: BLE001
+        log.warning("drawing process didn't release %s", path,
+                    exc_info=True)
+        return False

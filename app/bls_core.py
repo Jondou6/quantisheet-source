@@ -30,6 +30,7 @@ import urllib.request
 from datetime import date
 from pathlib import Path
 from typing import Sequence
+from .dmoney import c2 as _c2
 
 API = "https://api.bls.gov/publicAPI/v2/timeseries/data/"
 
@@ -294,7 +295,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         if result["warnings"]:
             note = (note + "  " if note else "") + "; ".join(result["warnings"])
         print(f"{sid:<12} {label[:34]:<34} {result['factor']:>8.3f} "
-              f"{result['annual_pct']:>7.2f}  {note}")
+              f"{_c2(result['annual_pct']):>7.2f}  {note}")
         for trade in trades_of(entry):
             collected.setdefault(trade, []).append(result["annual_pct"])
     # every series for a trade counts equally (the old pairwise average
@@ -302,7 +303,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     rates = {t: sum(v) / len(v) for t, v in collected.items()}
 
     if args.emit_rates:
-        rounded = {k: round(v, 2) for k, v in rates.items()}
+        rounded = {k: _c2(v) for k, v in rates.items()}
         args.emit_rates.write_text(json.dumps(rounded, indent=2), encoding="utf-8")
         print(f"\nwrote {args.emit_rates}")
         print("use it with:  python bidtab.py bids/*.csv --rates-file " + str(args.emit_rates))

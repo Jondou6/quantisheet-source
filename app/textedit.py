@@ -27,6 +27,7 @@ from PySide6.QtWidgets import (QColorDialog, QComboBox, QDoubleSpinBox,
                                QPushButton, QTextEdit, QToolButton, QWidget)
 
 from . import annotate, theme
+from .dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 HANDLE = 7                                   # handle size, screen px
@@ -80,7 +81,7 @@ def to_html(document, zoom, family_css):
                 px = fnt.pixelSize() if fnt.pixelSize() > 0 else \
                     fnt.pointSizeF() * 96 / 72
                 size = px / zoom
-                css = [f"font-size:{size:.2f}pt"]
+                css = [f"font-size:{_c2(size):.2f}pt"]
                 fam = family_css.get(fnt.family(), "sans-serif")
                 css.append(f"font-family:{fam}")
                 if fnt.weight() >= QFont.DemiBold:
@@ -840,7 +841,7 @@ class EditController(QObject):
             return 0
         r = fitz.Rect(blk["rect"])
         payload = {"rect": list(r), "text": text, "html": html,
-                   "size": round(blk["size"], 2), "color": blk["color"],
+                   "size": _c2(blk["size"]), "color": blk["color"],
                    "font": blk.get("font", ""), "bold": blk.get("bold"),
                    "italic": blk.get("italic"), "align": blk.get("align"),
                    "line_height": blk.get("line_height"),

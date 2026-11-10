@@ -102,6 +102,12 @@ class HandoverWindow(uiutil.Desk):
         if not result:
             return
         records_api.save(self.records, self.records_path)
+        from . import warranty                 # 1.2 #9: registration clock
+        wst = warranty.load()
+        n_reg = len(warranty.sync_from_records(
+            wst, self.records, ids=set(result["equipment_ids"])))
+        if n_reg:
+            warranty.save(wst)
         self.offer = result["offer"]
         self.reload()
         uiutil.fill(self.table, [[e.get("kind"), e.get("make"), e.get("model"),
@@ -116,7 +122,10 @@ class HandoverWindow(uiutil.Desk):
         else:
             self.offer_lbl.setText("No equipment with a model or serial was found.")
         self.msg.setText(f"{len(result['created'])} unit(s) added to the "
-                         "service records.")
+                         "service records." + (
+                             f" {n_reg} warranty registration(s) now "
+                             "counting down (Service > Warranty)."
+                             if n_reg else ""))
         return result
 
     def accept_clicked(self):

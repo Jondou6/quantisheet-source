@@ -46,6 +46,8 @@ aren't taken out of the wall paint (they are listed). Without a schedule
 only floor SF and base LF come out, codes unknown.
 """
 import re
+from .dmoney import half_up as _hu
+from .dmoney import c2 as _c2
 
 UNKNOWN = "(unknown)"
 
@@ -241,7 +243,7 @@ def room_finishes(rooms, finish_schedule=None, doors=None,
         h = parse_feet(_get(row, _WALL_HT_KEYS)) or \
             parse_feet(_get(row, _CEIL_HT_KEYS))
         if h:
-            hts.append(round(h, 2))
+            hts.append(_hu(h, 2))
     usual = max(set(hts), key=lambda h: (hts.count(h), h)) if hts else None
     out_rooms = []
     tot = {"floor": {}, "base": {}, "ceiling": {}, "walls": {}}
@@ -291,7 +293,7 @@ def room_finishes(rooms, finish_schedule=None, doors=None,
             # no height in the schedule ('VARIES', '-'): the walls run up
             # to the structure, so the paint does (open_height = (ft, why))
             wh = open_height[0]
-            rf.append(f"wall height {wh:.2f} ft to the structure (this "
+            rf.append(f"wall height {_c2(wh):.2f} ft to the structure (this "
                       f"room's reads '{_get(row, _CEIL_HT_KEYS) or 'blank'}'"
                       f") - {open_height[1]}")
         if wh is None and row is not None and usual:

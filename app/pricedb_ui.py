@@ -14,6 +14,7 @@ from PySide6.QtWidgets import (
 
 from . import theme as _theme
 from . import costbook, pricedb
+from .dmoney import c2 as _c2
 
 US_STATES = sorted(costbook.STATES)
 
@@ -266,20 +267,20 @@ class PriceEditor(QDialog):
         out = u["output"]
         out_txt = "" if out is None else (
             f"{out:,.0f} {unit}/day" if out >= 10 else
-            f"{out:,.2f} {unit}/day")
+            f"{_c2(out):,.2f} {unit}/day")
         tot = u["total"]
         q = tot.quantize(Decimal("0.01"))
-        tot_txt = f"{q:,.2f}" if q == tot or tot >= 10 else \
+        tot_txt = f"{_c2(q):,.2f}" if q == tot or tot >= 10 else \
             f"{tot:,.4f}".rstrip("0")
         if u["labor_rate"] is not None:
             lab = (f"labor {u['labor_hours']:g} h x "
-                   f"${u['labor_rate']:,.2f}/h = ${u['labor']:,.2f}")
+                   f"${_c2(u['labor_rate']):,.2f}/h = ${_c2(u['labor']):,.2f}")
         elif u["labor_hours"]:
             lab = "labor hours not costed here (no crew)"
         else:
             lab = "no labor"
-        tip = (f"Material ${u['material']:,.2f} + equipment "
-               f"${u['equipment']:,.2f} + sub ${u['sub']:,.2f} + {lab} "
+        tip = (f"Material ${_c2(u['material']):,.2f} + equipment "
+               f"${_c2(u['equipment']):,.2f} + sub ${_c2(u['sub']):,.2f} + {lab} "
                f"at {self.book.region}")
         if out is not None:
             tip += (f"\nLabor Output: crew of {u['crew_size']:g} x 8 h / "
@@ -316,7 +317,7 @@ class PriceEditor(QDialog):
                                   True))
             for r, trade in enumerate(trades, 1):
                 v = rates.get(reg, {}).get(trade)
-                t.setItem(r, c, _item("" if v is None else f"{v:.2f}", True,
+                t.setItem(r, c, _item("" if v is None else f"{_c2(v):.2f}", True,
                                       True))
         t.blockSignals(False)
         self._regions, self._trades = regions, trades
@@ -433,6 +434,18 @@ class DatabaseDialog(QDialog):
                 "edits that clash with someone else's are refused, and "
                 "every change is in each book's History.")
         self.info.setText(txt)
+        self._fit_info()
+
+    def _fit_info(self):
+        """Tall enough for every wrapped line of the text (Chief's user
+        test, Nov 6: the last sentence was cut off)."""
+        w = max(self.info.width(), self.width() - 40, 560)
+        need = self.info.heightForWidth(w)
+        if need > 0:
+            self.info.setMinimumHeight(need)
+        self.adjustSize()
+        if self.width() < 640:
+            self.resize(640, self.height())
 
     def choose(self, folder=None):
         if folder is None:
@@ -610,7 +623,7 @@ class ImportBidTab(QDialog):
         self.table.setRowCount(len(show))
         for r, b in enumerate(show):
             for c, v in enumerate((b.bidder, b.item_no, b.desc, b.unit,
-                                   f"{b.qty:g}", f"{b.price:,.2f}")):
+                                   f"{b.qty:g}", f"{_c2(b.price):,.2f}")):
                 self.table.setItem(r, c, _item(v, right=c >= 4))
         return rows
 
@@ -785,9 +798,9 @@ class BidTabDialog(QDialog):
             dates = i["first"] if i["first"] == i["last"] else \
                 f"{i['first']} to {i['last']}"
             vals = [i["trade"], i["desc"], i["unit"], i["bids"],
-                    i["projects"], f"{i['low']:,.2f}", f"{i['median']:,.2f}",
-                    f"{i['high']:,.2f}", f"{i['spread']:.0f}",
-                    f"{i['esc_median']:,.2f}", " ".join(i["states"]), dates,
+                    i["projects"], f"{_c2(i['low']):,.2f}", f"{_c2(i['median']):,.2f}",
+                    f"{_c2(i['high']):,.2f}", f"{i['spread']:.0f}",
+                    f"{_c2(i['esc_median']):,.2f}", " ".join(i["states"]), dates,
                     "REVIEW" if i["flag"] else ""]
             for c, val in enumerate(vals):
                 it = _item(val, right=c in range(3, 10))
@@ -942,9 +955,9 @@ class BidTabDialog(QDialog):
         for r, x in enumerate(rows):
             for c, val in enumerate((
                     x["assembly"], f"{x['quantity']:,.1f}", x["unit"],
-                    f"{x['ours']:,.2f}", x["bid_item"],
-                    f"{x['bid_low']:,.2f} - {x['bid_high']:,.2f}",
-                    f"{x['bid_median']:,.2f}", f"{x['ratio'] * 100:.0f}%")):
+                    f"{_c2(x['ours']):,.2f}", x["bid_item"],
+                    f"{_c2(x['bid_low']):,.2f} - {_c2(x['bid_high']):,.2f}",
+                    f"{_c2(x['bid_median']):,.2f}", f"{x['ratio'] * 100:.0f}%")):
                 t.setItem(r, c, _item(val, right=c in (1, 3, 5, 6, 7)))
         lay.addWidget(t)
         bb = QDialogButtonBox(QDialogButtonBox.Close)
@@ -1080,7 +1093,7 @@ class VocabDialog(QDialog):
         t.setRowCount(len(self.queue_rows))
         for r, x in enumerate(self.queue_rows):
             for c, v in enumerate((x["desc"], x["unit"] or "",
-                                   x["match"] or "", f"{x['score']:.2f}",
+                                   x["match"] or "", f"{_c2(x['score']):.2f}",
                                    x["reason"])):
                 t.setItem(r, c, _item(v, right=c == 3))
         if hasattr(self, "left_tabs"):
@@ -1126,7 +1139,7 @@ class VocabDialog(QDialog):
             guess = x["match"] or (f"(closest: {x['best']})" if x.get("best")
                                    else "")
             for c, v in enumerate((x["input"], x["unit"] or "", str(x["lines"]),
-                                   guess, x["method"], f"{x['score']:.2f}")):
+                                   guess, x["method"], f"{_c2(x['score']):.2f}")):
                 t.setItem(r, c, _item(v, right=c in (2, 5)))
         self.status.setText(f"{matched} of {total} bid tab wordings matched "
                             f"to your vocabulary of {len(self.vocab.items())} "

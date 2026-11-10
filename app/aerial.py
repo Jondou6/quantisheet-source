@@ -22,6 +22,7 @@ import math
 import fitz
 
 from . import annotate
+from .dmoney import c2 as _c2
 
 FT_PER_M = 1 / 0.3048
 
@@ -101,7 +102,9 @@ def add_aerial_page_from(doc, png, mpp, lat, lon, name, credit, captured="",
     # site layers on top, each its own PDF layer you can switch off
     legend = []
     for label, data, source in layers:
-        if data:
+        if isinstance(data, LayerProblem):
+            legend.append(str(data))
+        elif data:
             oc = doc.add_ocg(label, on=True)
             page.insert_image(img, stream=data, oc=oc)
             legend.append(f"{label} ({source})")
@@ -203,7 +206,15 @@ def _in_job(fn):
     return run
 
 
-def _get(url, params, timeout=60):
+class TooLarge(RuntimeError):
+    """The server sent more than the request may be (H5)."""
+
+
+MAX_IMAGE_BYTES = 40 * 1024 * 1024        # NAIP / tiles
+MAX_JSON_BYTES = 2 * 1024 * 1024          # geocode and other answers
+
+
+def _get(url, params, timeout=60, max_bytes=None):
     """GET -> (bytes, content type). `timeout` is the whole request's
     wall-clock limit (connecting, waiting and reading), not per socket
     call: a server trickling bytes or never answering used to hold a
@@ -225,8 +236,12 @@ def _get(url, params, timeout=60):
     by_deadline = deadline is not None and deadline - now < limit
     if by_deadline:
         limit = deadline - now
+    if max_bytes is None:      # answers that are only text are small
+        max_bytes = MAX_JSON_BYTES if url == GEOCODE_URL else \
+            MAX_IMAGE_BYTES
+    sep = "&" if "?" in url else "?"                  # L4
     req = urllib.request.Request(
-        url + "?" + urllib.parse.urlencode(params),
+        url + sep + urllib.parse.urlencode(params),
         headers={"User-Agent": UA})
     out, stop, finished = {}, threading.Event(), threading.Event()
 
@@ -235,7 +250,17 @@ def _get(url, params, timeout=60):
             with _open(req, limit + 2, out) as r:
                 out["resp"] = r            # so Cancel can close the socket
                 ctype = r.headers.get("Content-Type", "")
-                parts = []
+                # never more than max_bytes: a server (or something in
+                # between) sending 120 MB for a geocode was accepted
+                # (outside review via Chief, Nov 7 - H5)
+                try:
+                    said = int(r.headers.get("Content-Length") or 0)
+                except (TypeError, ValueError):
+                    said = 0
+                if max_bytes and said > max_bytes:
+                    raise TooLarge(f"The server's answer is too large "
+                                   f"({said:,} bytes).")
+                parts, got = [], 0
                 while True:
                     if stop.is_set() or (cancel is not None and
                                          cancel.is_set()):
@@ -243,6 +268,10 @@ def _get(url, params, timeout=60):
                     b = r.read(CHUNK)
                     if not b:
                         break
+                    got += len(b)
+                    if max_bytes and got > max_bytes:
+                        raise TooLarge(f"The server's answer is too large "
+                                       f"(over {max_bytes:,} bytes).")
                     parts.append(b)
                 out["v"] = (b"".join(parts), ctype)
         except BaseException as e:                        # noqa: BLE001
@@ -351,6 +380,13 @@ def _get_retry(url, params, timeout):
         return _get(url, params, timeout=timeout)
 
 
+def too_large_message(service):
+    """The service, what happened, what to do (outside review N2/N3)."""
+    return (f"The {service} sent more than QuantiSheet accepts for one "
+            "picture. Make the area smaller (fewer feet across) and try "
+            "again.")
+
+
 def timeout_message(seconds):
     return (f"The USGS imagery service didn't answer in {seconds:g} s. It "
             "is often slow; try again in a few minutes.")
@@ -417,7 +453,7 @@ class NAIPSource(ImagerySource):
                             int(round(self.width_ft / self.ft_per_px))))
         h_px = max(150, int(round(w_px * self.height_ft / self.width_ft)))
         bbox = naip_bbox(lat, lon, self.width_ft, self.height_ft)
-        return {"bbox": ",".join(f"{v:.2f}" for v in bbox),
+        return {"bbox": ",".join(f"{_c2(v):.2f}" for v in bbox),
                 "bboxSR": 3857, "imageSR": 3857,
                 "size": f"{w_px},{h_px}", "format": "jpgpng",
                 "interpolation": "RSP_BilinearInterpolation",
@@ -441,6 +477,9 @@ class NAIPSource(ImagerySource):
                                f"request ({e.code} {e.reason}).") from e
         except TimeoutError as e:
             raise RuntimeError(timeout_message(self.TIMEOUT)) from e
+        except TooLarge as e:                    # outside review N3
+            raise RuntimeError(too_large_message("USGS imagery service")) \
+                from e
         except OSError as e:
             raise RuntimeError(
                 "Couldn't reach the USGS imagery service "
@@ -632,8 +671,15 @@ def geocode(address):
             "Couldn't reach the US Census address service "
             f"(geocoding.geo.census.gov): {_reason(e)}. Check the internet "
             "connection or proxy.") from e
-    hits = json.loads(data.decode("utf-8")).get("result", {}).get(
-        "addressMatches") or []
+    try:
+        reply = json.loads(data.decode("utf-8"))
+        hits = (reply.get("result") or {}).get("addressMatches") or []
+    except (ValueError, AttributeError, UnicodeDecodeError) as e:
+        # not "Expecting value: line 1 column 1" (outside review, Nov 7)
+        raise RuntimeError("The US Census address service sent back "
+                           "something unexpected. Try again in a few "
+                           "minutes, or type the site's latitude, "
+                           "longitude.") from e
     if not hits:
         raise LookupError(f"No match for \"{address}\". Check the address, "
                           "or type the site's latitude, longitude.")
@@ -641,23 +687,44 @@ def geocode(address):
     return float(c["y"]), float(c["x"]), hits[0].get("matchedAddress", "")
 
 
-def world_file_pixel(path):
-    """Pixel size from an image's world file (photo.pgw / .jgw / .tfw /
-    .wld beside it), in the file's own units, or None."""
+def world_file_info(path):
+    """(pixel size, reason): the pixel size from an image's world file
+    (photo.pgw / .jgw / .tfw / .wld beside it), in the file's own units,
+    or (None, why not). All six lines are read: a rotated photo (B or D
+    not zero), unequal x and y pixels, or a short file is refused - its
+    first line alone isn't the scale (outside review via Chief, Nov 7 -
+    M14)."""
     import os
     base, ext = os.path.splitext(path)
     cands = [base + w for w in (ext[:2] + ext[-1:] + "w", ext + "w",
                                 ".wld", ".pgw", ".jgw", ".tfw")]
     for c in cands:
         for name in (c, c.upper()):
-            if os.path.isfile(name):
-                try:
-                    with open(name) as f:
-                        a = abs(float(f.readline().strip()))
-                    return a or None
-                except (OSError, ValueError):
-                    return None
-    return None
+            if not os.path.isfile(name):
+                continue
+            try:
+                with open(name) as f:
+                    vals = [float(x) for x in f.read().split()[:6]]
+            except (OSError, ValueError):
+                return None, "The world file can't be read."
+            if len(vals) < 6:
+                return None, "The world file is incomplete (fewer than " \
+                    "6 lines)."
+            a, d, b, e = vals[0], vals[1], vals[2], vals[3]
+            tol = 1e-9 + 1e-6 * max(abs(a), abs(e))
+            if abs(b) > tol or abs(d) > tol:
+                return None, "The photo is rotated in its world file; " \
+                    "enter the scale yourself."
+            if not a or abs(abs(a) - abs(e)) > 1e-6 * max(abs(a), abs(e)):
+                return None, "The world file's pixels aren't square; " \
+                    "enter the scale yourself."
+            return abs(a), ""
+    return None, ""
+
+
+def world_file_pixel(path):
+    """Pixel size from the world file, or None (see world_file_info)."""
+    return world_file_info(path)[0]
 
 
 def aerial_document(source, lat, lon, captured=""):
@@ -699,7 +766,7 @@ def site_layer(key, lat, lon, width_ft, height_ft, w_px, h_px, get=None):
     around lat/lon, or None if the service didn't give one."""
     label, source, url, show = SITE_LAYERS[key]
     get = get or _get
-    params = {"bbox": ",".join(f"{v:.2f}" for v in naip_bbox(
+    params = {"bbox": ",".join(f"{_c2(v):.2f}" for v in naip_bbox(
         lat, lon, width_ft, height_ft)), "bboxSR": 3857, "imageSR": 3857,
         "size": f"{w_px},{h_px}", "format": "png32", "transparent": "true",
         "dpi": 96, "f": "image"}
@@ -707,11 +774,19 @@ def site_layer(key, lat, lon, width_ft, height_ft, w_px, h_px, get=None):
         params["layers"] = show
     try:
         data, ctype = get(url, params, timeout=LAYER_TIMEOUT)
+    except TooLarge:
+        # the real reason in the legend, not "try again later" (N2)
+        return LayerProblem(f"{label}: the {source} answer was too large - "
+                            "make the area smaller")
     except Exception:                                     # noqa: BLE001
         return None
     if "image" not in ctype or not data.startswith(b"\x89PNG"):
         return None
     return data
+
+
+class LayerProblem(str):
+    """Why a site layer is missing, said on the page's legend."""
 
 
 def site_layers(keys, lat, lon, width_ft, height_ft, w_px, h_px, get=None):

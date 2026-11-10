@@ -11,6 +11,7 @@ import math
 import fitz
 
 from . import annotate
+from .dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 
@@ -134,8 +135,8 @@ class SnapIndex:
                 a, b = cut
             if abs(a[0] - b[0]) + abs(a[1] - b[1]) < 0.5:
                 continue                               # dots
-            key = tuple(sorted(((round(a[0], 2), round(a[1], 2)),
-                                (round(b[0], 2), round(b[1], 2)))))
+            key = tuple(sorted(((_c2(a[0]), _c2(a[1])),
+                                (_c2(b[0]), _c2(b[1])))))
             if key in seen:
                 continue                 # drawn twice (fill + outline)
             seen.add(key)
@@ -164,7 +165,7 @@ class SnapIndex:
         on the end of a long line (the tip). Clicking anywhere on one
         should snap to the tip, never to the back of the arrow."""
         def key(p):
-            return (round(p[0], 2), round(p[1], 2))
+            return (_c2(p[0]), _c2(p[1]))
         adj, deg, longs = {}, {}, set()
         for a, b in self.segs:
             ka, kb = key(a), key(b)

@@ -19,6 +19,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout, QWidget)
 
 from . import assemblies, costbook, csi, dmoney, estimate, estimate_lines
+from .dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 
@@ -109,7 +110,7 @@ class CostBookPicker(QDialog):
         super().__init__(parent)
         self.doc = doc
         self.setWindowTitle("Add From Cost Book")
-        self.resize(1000, 620)
+        self.resize(1180, 660)
         self.added_ids = []
         self.checked = set()
         self.book = None
@@ -156,6 +157,9 @@ class CostBookPicker(QDialog):
         hh = self.table.horizontalHeader()
         hh.setSectionResizeMode(QHeaderView.Interactive)
         hh.setSectionResizeMode(2, QHeaderView.Stretch)
+        # the price columns fit what they show ("$77" for $77.09; Nov 10)
+        for c in range(4, len(self.COLS)):
+            hh.setSectionResizeMode(c, QHeaderView.ResizeToContents)
         hh.setDefaultAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         self.table.itemChanged.connect(self._ticked)
         self.table.cellDoubleClicked.connect(self._toggle_row)
@@ -1555,7 +1559,7 @@ class ModelEstimateDialog(QDialog):
             why = r.get("status") or r.get("problem") or ""
             if r.get("ext") is None and r.get("problem"):
                 why = "NO PRICE: " + r["problem"]
-            vals = [r["item"], f"{float(r['qty']):,.2f}", r["unit"],
+            vals = [r["item"], f"{_c2(float(r['qty'])):,.2f}", r["unit"],
                     r["division"], why,
                     dmoney.fmt(r.get("total") or 0) if r.get("ext")
                     is not None else ""]

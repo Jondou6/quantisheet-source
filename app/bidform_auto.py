@@ -12,6 +12,7 @@ import re
 from decimal import ROUND_HALF_UP, Decimal
 
 from . import formlib
+from .dmoney import c2 as _c2
 
 _ONES = ("zero one two three four five six seven eight nine ten eleven "
          "twelve thirteen fourteen fifteen sixteen seventeen eighteen "
@@ -58,7 +59,7 @@ def amount_in_words(amount):
 
 
 def _money(v):
-    return f"${Decimal(str(v)):,.2f}"
+    return f"${_c2(Decimal(str(v))):,.2f}"
 
 
 def base_bid(doc):

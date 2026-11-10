@@ -1401,8 +1401,8 @@ class Hub:
                                        for v in values.values()))
         if a.get("amount") not in (None, "") and not has_form:
             try:
-                row["amount"] = round(float(str(a["amount"]).replace(
-                    "$", "").replace(",", "")), 2)
+                row["amount"] = _c2(float(str(a["amount"]).replace(
+                    "$", "").replace(",", "")))
             except ValueError:
                 raise HubError("The bid amount isn't a number.")
         if a.get("file"):
@@ -1495,8 +1495,13 @@ class Hub:
         return {"opened": n, "at": rec["unsealed"]}
 
     # ============================================================== GET
-    def get(self, path):
-        """(status, content type, body) for GET /hub/..."""
+    def get(self, path, headers=None):
+        """(status, content type, body) for GET /hub/...
+
+        `headers` are the request's headers. A project attachment needs
+        the session key as "Authorization: Bearer <key>"; a key in the
+        address ("?k=") is refused (Nov 6 security fix: it ended up in
+        browser history, proxy logs and Referer)."""
         path, _, query = path.partition("?")
         q = dict(p.split("=", 1) for p in query.split("&") if "=" in p)
         m = re.fullmatch(r"/hub/env/([A-Za-z0-9_-]+)/p(\d+)\.png", path)
@@ -1539,8 +1544,13 @@ class Hub:
                 m = re.fullmatch(r"/hub/att/([^/]+)/([0-9a-f]{64})", path)
                 if m:
                     from urllib.parse import unquote
+                    key = bearer(headers)
+                    if not key:
+                        return 401, "text/plain", (
+                            b"sign in again" if "k" not in q else
+                            b"keys in the address are no longer accepted")
                     slug, _ = self._proj({"project": unquote(m.group(1)),
-                                          "key": unquote(q.get("k", ""))})
+                                          "key": key})
                     p = self._p("projects", slug, "att", m.group(2))
                     if not os.path.isfile(p):
                         return 404, "text/plain", b"not found"
@@ -1554,6 +1564,20 @@ class Hub:
         except HubError:
             return 403, "text/plain", b"forbidden"
         return 404, "text/plain", b"not found"
+
+
+def bearer(headers):
+    """The token in an "Authorization: Bearer ..." header, or ""."""
+    if not headers:
+        return ""
+    try:
+        v = headers.get("Authorization") or headers.get("authorization")
+    except AttributeError:
+        v = None
+    v = str(v or "").strip()
+    if v[:7].lower() != "bearer ":
+        return ""
+    return v[7:].strip()
 
 
 def _yes(v):
@@ -1598,6 +1622,20 @@ def _num(v):
         return None
 
 
+def _c2(v):
+    """A float to the cent, half up - the same rule as app/dmoney.c2
+    (Chief's round 7, Nov 9: round() here made 1.25 x 0.5 into 0.62 while
+    the desktop's bid form total said 0.63). Kept here, not imported: this
+    file runs on its own on a server."""
+    from decimal import ROUND_HALF_UP, Decimal
+    v = float(v)
+    if v != v or abs(v) >= 1e15:
+        return v
+    v = round(v, 8 if abs(v) < 1e6 else 6 if abs(v) < 1e8 else 4)
+    return float(Decimal(repr(v)).quantize(Decimal("0.01"),
+                                           rounding=ROUND_HALF_UP))
+
+
 def bid_totals(lines, values):
     """Base bid, alternates and blank priced lines of a bid form (the same
     sums as app/pm/bidforms.totals - this file runs on its own on a
@@ -1618,7 +1656,7 @@ def bid_totals(lines, values):
                 base += q if q is not None else (v or 0.0)
         elif t == "Alternate" and v is not None:
             alts[ln.get("item") or str(i + 1)] = v
-    return {"base": round(base, 2), "alternates": alts, "missing": missing}
+    return {"base": _c2(base), "alternates": alts, "missing": missing}
 
 
 # wrong passwords / keys per address: 5 a minute, then a minute's lockout

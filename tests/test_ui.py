@@ -12,10 +12,13 @@ from test_gui import ANSWERS, win, qapp                       # noqa: E402,F401
 def test_every_ribbon_command_exists(qapp, win):
     assert win._ribbon_missing == []
     assert set(win.ribbon.pages) >= {"Home", "Markup", "Takeoff", "Estimate",
-                                      "Review", "Project", "Document",
+                                      "Review", "Project", "PDF Management",
                                       "Tools"}
-    # Nov 4, fewer clicks: Billing, Module, Civil and AI fold into these
-    assert not {"Billing", "Module", "Civil", "AI"} & set(win.ribbon.pages)
+    # Module and Civil still fold into Project and Estimate. The AI tab
+    # is its own tab again. Billing is its own tab (Nov 5).
+    assert not {"Module", "Civil"} & set(win.ribbon.pages)
+    assert "AI" in win.ribbon.pages
+    assert "Billing" in win.ribbon.pages
     assert not win.menuBar().isVisible()
     # shortcuts still work with the menu bar hidden
     assert win.command("Command Search").shortcut().toString() == "Ctrl+K"

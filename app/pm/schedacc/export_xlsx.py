@@ -54,12 +54,28 @@ def export_xlsx(doc, path):
             "; ".join(preds.get(a.get("code"), ())),
             "; ".join(succs.get(a.get("code"), ())),
             ", ".join(a.get("roles") or ()),
-            cite.get("spec_section") or "",
+            cite.get("spec_section") or cite.get("source") or "",
             cite.get("page") if cite.get("page") is not None else "",
             a.get("template_slot") or "",
             a.get("why") or "",
         ])
     ws.auto_filter.ref = ws.dimensions
     ws.freeze_panes = "A2"
+    scope = doc.get("scope")
+    if doc.get("caveat") or scope:
+        ns = wb.create_sheet("Notes")
+        if doc.get("caveat"):
+            ns.append([doc["caveat"]])
+            ns["A1"].font = Font(bold=True)
+        if scope:
+            ns.append([])
+            ns.append(["Removed scope", "Removed by", "Was"])
+            for x in scope.get("removed") or []:
+                ns.append([x.get("text"), x.get("removed_by"), x.get("source")])
+            if scope.get("quantity_gaps"):
+                ns.append([])
+                ns.append(["No quantity - duration estimated"])
+                for g in scope["quantity_gaps"]:
+                    ns.append([g])
     wb.save(path)
     return path

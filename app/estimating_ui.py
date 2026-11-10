@@ -11,10 +11,11 @@ from PySide6.QtWidgets import (
 
 from . import assemblies, costbook, labor
 from .assembly_ui import adjust_combos, adjust_value
+from .dmoney import c2 as _c2
 
 
 def _money(v):
-    return f"${v:,.2f}"
+    return f"${_c2(v):,.2f}"
 
 
 def _cell(table, r, c):
@@ -72,12 +73,12 @@ class LaborDialog(QDialog):
         for r, trade in enumerate(sorted(table)):
             a = QTableWidgetItem(trade)
             a.setFlags(a.flags() & ~Qt.ItemIsEditable)
-            b = QTableWidgetItem(f"{table.get(trade, 0):.2f}")
+            b = QTableWidgetItem(f"{_c2(table.get(trade, 0)):.2f}")
             b.setFlags(b.flags() & ~Qt.ItemIsEditable)
             self.rates.setItem(r, 0, a)
             self.rates.setItem(r, 1, b)
             self.rates.setItem(r, 2, QTableWidgetItem(
-                f"{float(mine[trade]):.2f}" if trade in mine else ""))
+                f"{_c2(float(mine[trade])):.2f}" if trade in mine else ""))
         v.addWidget(self.rates)
         b = QPushButton("Loaded Rate Builder…")
         b.setToolTip("Build each trade's true hourly cost from its wage: "
@@ -133,7 +134,7 @@ class LaborDialog(QDialog):
                 a.setFlags(a.flags() & ~Qt.ItemIsEditable)
                 self.rates.setItem(r, 0, a)
                 self.rates.setItem(r, 1, QTableWidgetItem(""))
-            self.rates.setItem(r, 2, QTableWidgetItem(f"{v:.2f}"))
+            self.rates.setItem(r, 2, QTableWidgetItem(f"{_c2(v):.2f}"))
         return got
 
     def job_rates(self):
@@ -426,7 +427,7 @@ class CostBookDialog(QDialog):
                             "Operator", "Mason") if t in rates]
         self.region_info.setText(
             "Labor (burdened $/hr): " + ", ".join(
-                f"{t} ${rates[t]:,.2f}" for t in show) +
+                f"{t} ${_c2(rates[t]):,.2f}" for t in show) +
             f" and {max(0, len(rates) - len(show))} more trades.")
 
     def _make_default(self):

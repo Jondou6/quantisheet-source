@@ -16,6 +16,7 @@ from PySide6.QtWidgets import (QDialog, QDialogButtonBox, QLabel,
                                QVBoxLayout)
 
 from . import annotate, revisions
+from .dmoney import c2 as _c2
 
 
 def _last(doc):
@@ -58,7 +59,7 @@ def pending(doc):
 
 
 def _num(v):
-    return f"{v:,.2f}".rstrip("0").rstrip(".")
+    return f"{_c2(v):,.2f}".rstrip("0").rstrip(".")
 
 
 def qty_text(r):
@@ -66,7 +67,7 @@ def qty_text(r):
 
 
 def price_text(r):
-    return f"${r['before']:,.2f} → ${r['after']:,.2f}"
+    return f"${_c2(r['before']):,.2f} → ${_c2(r['after']):,.2f}"
 
 
 def cell_html(r):
@@ -101,7 +102,7 @@ def apply_all(doc):
 def as_bid_total(doc):
     """The bid total with unapplied revision changes left at old values."""
     now = float(revisions.snapshot(doc).get("total") or 0)
-    return round(now - sum(r["after"] - r["before"] for r in pending(doc)), 2)
+    return _c2(now - sum(r["after"] - r["before"] for r in pending(doc)))
 
 
 class RevisionDeltaDialog(QDialog):
@@ -132,7 +133,7 @@ class RevisionDeltaDialog(QDialog):
         bold.setBold(True)
         for i, r in enumerate(rows):
             vals = [r["name"], qty_text(r), price_text(r),
-                    f"{'+' if r['change'] >= 0 else '-'}${abs(r['change']):,.2f}"]
+                    f"{'+' if r['change'] >= 0 else '-'}${_c2(abs(r['change'])):,.2f}"]
             for j, v in enumerate(vals):
                 it = QTableWidgetItem(v)
                 it.setFlags(it.flags() & ~Qt.ItemIsEditable)
@@ -154,7 +155,7 @@ class RevisionDeltaDialog(QDialog):
         self.info.setText(
             f"{len(rows)} priced row(s) changed since "
             f"{e['label'] if e else 'the last revision'}. Bid as applied: "
-            f"${as_bid_total(self.doc):,.2f}" if rows else
+            f"${_c2(as_bid_total(self.doc)):,.2f}" if rows else
             "No unapplied revision changes.")
 
     def apply(self, names):

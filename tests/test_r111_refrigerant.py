@@ -30,8 +30,10 @@ def test_the_regulation_is_cited_next_to_the_rate():
 
 
 def _unit(store, rec, eq, charge, category, charge_date=""):
+    # 1.2 (Nov 5): an HFC with GWP above 53, class confirmed
     return refrigerant.add_unit(store, rec, eq, "R-410A", charge, category,
-                                charge_date=charge_date)
+                                charge_date=charge_date, ref_class="hfc",
+                                gwp_over_53=True)
 
 
 def test_annualizing_method_and_the_published_limits():
@@ -100,7 +102,8 @@ def test_annualizing_method_and_the_published_limits():
     assert small["rate"] == Decimal("20.00")
     assert small["over"] is True
     assert small["regulatory"] is False
-    assert "under 50 lb" in refrigerant.flag_text(small)
+    # 1.2: an HFC is covered from 15 lb (40 CFR 84.106), not 50
+    assert "under 15 lb" in refrigerant.flag_text(small)
     assert refrigerant.flagged(store5)[0]["unit_id"] == uid
 
 

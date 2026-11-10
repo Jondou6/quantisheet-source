@@ -69,3 +69,35 @@ def test_detailed_draft_gate_and_apply(dlg):
     assert res and res["detailed"]["activities"]
     assert len(st.list("activity")) >= 10
     assert w.undo() and not st.list("activity")       # undo brings it back
+
+
+def test_addenda_make_a_bid_set_draft(dlg, tmp_path):
+    """Nov 5: addenda / Q&A picked in the dialog are applied before the
+    detailed draft is built; removed items stay off (made-up text)."""
+    d, _w, st = dlg
+    bid = fitz.open()
+    pg = bid.new_page()
+    pg.insert_text((72, 72), "SCOPE OF WORK", fontsize=10)
+    pg.insert_text((72, 90), "1. Interior demolition (about 1,200 SF).",
+                   fontsize=9)
+    pg.insert_text((72, 104), "2. Power wash the building exterior.",
+                   fontsize=9)
+    pg.insert_text((72, 118), "3. New flooring and base (about 800 SF).",
+                   fontsize=9)
+    bp = str(tmp_path / "bid.pdf")
+    bid.save(bp)
+    bid.close()
+    ad = tmp_path / "Addendum 1.txt"
+    ad.write_text("ADDENDUM 1\n1. Delete item 2.\n", encoding="utf-8")
+    d.spec.setText(bp)
+    d.add_addenda([str(ad)])
+    assert d.detailed.isChecked()
+    assert "1. Addendum 1.txt" in d.addenda_lbl.text()
+    sc, _ct, ntp = d.inputs()
+    res = d._build_detailed(st, sc, ntp, ask=lambda t: True)
+    doc = res["detailed"]
+    names = " ".join(a["name"].lower() for a in doc["activities"])
+    assert "demolition" in names and "flooring" in names
+    assert "power wash" not in names
+    assert doc["scope"]["removed"][0]["removed_by"] == "Addendum 1 item 1"
+    assert doc["caveat"] in d.last_message

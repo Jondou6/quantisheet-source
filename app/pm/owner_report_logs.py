@@ -36,6 +36,7 @@ import fitz
 
 from . import schema
 from .store import spec_number
+from ..dmoney import c2 as _c2
 
 # page sizes (points)
 PW, PH = 612, 792            # portrait
@@ -1085,19 +1086,18 @@ def _co_totals(store, evs=None):
           for s in ("Open", "Pending", "Approved")}
     appr = sum(_event_price(e) for e in by["Approved"])
     return {"total": len(evs),
-            "original": round(orig, 2), "approved": round(appr, 2),
-            "revised": round(orig + appr, 2),
-            "pending": round(sum(_event_price(e) for e in by["Pending"]), 2),
-            "open_amount": round(sum(_event_price(e) for e in by["Open"]),
-                                 2),
+            "original": _c2(orig), "approved": _c2(appr),
+            "revised": _c2(orig + appr),
+            "pending": _c2(sum(_event_price(e) for e in by["Pending"])),
+            "open_amount": _c2(sum(_event_price(e) for e in by["Open"])),
             "approved_days": sum(_int(e.get("days")) for e in by["Approved"]),
             "pending_days": sum(_int(e.get("days")) for e in by["Pending"]),
             "open": len(by["Open"]) + len(by["Pending"]), "overdue": 0}
 
 
 def _money(v):
-    v = round(float(v or 0), 2)
-    s = f"${abs(v):,.0f}" if v == int(v) else f"${abs(v):,.2f}"
+    v = _c2(float(v or 0))
+    s = f"${abs(v):,.0f}" if v == int(v) else f"${_c2(abs(v)):,.2f}"
     return f"({s})" if v < 0 else s
 
 
@@ -1201,7 +1201,7 @@ def counts(store, today=None, opts=None):
 def _flags(rain, d, threshold_in, workdays):
     """Default (tracked, claimed) for a day: tracked = rain >= threshold;
     claimed = tracked on a workday."""
-    tracked = rain is not None and round(rain, 2) >= round(threshold_in, 2)
+    tracked = rain is not None and _c2(rain) >= _c2(threshold_in)
     return tracked, bool(tracked and d.weekday() in workdays)
 
 
@@ -1223,7 +1223,7 @@ def weather_days(rows, threshold_in=0.5, workdays=WORKDAYS):
         tracked, claimed = _flags(rain, d, thr, workdays)
         out[d.isoformat()] = {"date": d.isoformat(),
                               "rain_in": None if rain is None
-                              else round(rain, 2),
+                              else _c2(rain),
                               "tracked": tracked, "claimed": claimed,
                               "note": ""}
     return [out[k] for k in sorted(out)]
@@ -1257,7 +1257,7 @@ def merge_weather(old_days, new_rows, threshold_in=0.5, workdays=WORKDAYS,
         if o.get("source") == "typed":
             typed = _num(o.get("rain_in"))
             n["download_in"] = n.get("rain_in")
-            n["rain_in"] = None if typed is None else round(typed, 2)
+            n["rain_in"] = None if typed is None else _c2(typed)
             n["source"] = "typed"
             n["tracked"], n["claimed"] = _flags(typed, d,
                                                 float(threshold_in),
@@ -1288,12 +1288,12 @@ def _lost_claim(o, n, mine, d, thr_old, workdays):
     if o.get("source") == "typed" or not mine[1] or n.get("claimed"):
         return ""
     was, now = _num(o.get("rain_in")), _num(n.get("rain_in"))
-    if was is None or (now is not None and round(now, 2) >= round(was, 2)):
+    if was is None or (now is not None and _c2(now) >= _c2(was)):
         return ""
     if _flags(now, d, thr_old, workdays)[1]:
         return ""                           # the threshold moved, not rain
-    now_s = "no data" if now is None else f"{now:.2f} in"
-    return (f"Kept as claimed: re-pulled rain {now_s} (was {was:.2f} in) - "
+    now_s = "no data" if now is None else f"{_c2(now):.2f} in"
+    return (f"Kept as claimed: re-pulled rain {now_s} (was {_c2(was):.2f} in) - "
             "check and untick if not a weather day")
 
 
@@ -1305,10 +1305,10 @@ def typed_rain_notes(weather):
         if d.get("source") != "typed":
             continue
         typed, dl = _num(d.get("rain_in")), _num(d.get("download_in"))
-        if typed is None or dl is None or round(typed, 2) == round(dl, 2):
+        if typed is None or dl is None or _c2(typed) == _c2(dl):
             continue
-        out.append(f"{_mdy(d.get('date'))}: typed {typed:.2f} in "
-                   f"(download {dl:.2f} in)")
+        out.append(f"{_mdy(d.get('date'))}: typed {_c2(typed):.2f} in "
+                   f"(download {_c2(dl):.2f} in)")
     return out
 
 
@@ -1365,8 +1365,7 @@ def weather_totals(weather):
     for d in days:
         dd = _day(d["date"])
         mo = months[(dd.year, dd.month)]
-        mo["rain_in"] = round(mo["rain_in"] + (_num(d.get("rain_in")) or 0),
-                              2)
+        mo["rain_in"] = _c2(mo["rain_in"] + (_num(d.get("rain_in")) or 0))
         t, c = bool(d.get("tracked")), bool(d.get("claimed"))
         mo["claimed"] += c
         mo["tracked"] += t and not c
@@ -1375,7 +1374,7 @@ def weather_totals(weather):
     return {"impacted": sum(m["actual"] for m in ms),
             "claimed": sum(m["claimed"] for m in ms),
             "tracked": sum(m["tracked"] for m in ms),
-            "rain_in": round(sum(m["rain_in"] for m in ms), 2),
+            "rain_in": _c2(sum(m["rain_in"] for m in ms)),
             "project_days": (last - first).days + 1,
             "first": first.isoformat(), "last": last.isoformat(),
             "months": ms}
@@ -1411,7 +1410,7 @@ def weather_gap_line(weather):
         rain = _num(d.get("rain_in"))
         if dd.weekday() not in workdays:
             n1 += 1
-        elif rain is None or round(rain, 2) < round(thr, 2):
+        elif rain is None or _c2(rain) < _c2(thr):
             n2 += 1
         else:
             n3 += 1
@@ -1421,7 +1420,7 @@ def weather_gap_line(weather):
     if not days:
         n3 = imp - cl
     line = (f"{imp} impacted vs {cl} claimed: {n1} fell on non-work days, "
-            f"{n2} were under the {thr:.2f} in. threshold")
+            f"{n2} were under the {_c2(thr):.2f} in. threshold")
     if n3:
         line += f", {n3} other: {'; '.join(notes) or 'see log'}"
     return line + "."
@@ -1462,8 +1461,8 @@ def add_weather_log(doc, head, weather, opts=None):
                   if d.get("source") == "typed" and
                   _num(d.get("download_in")) is not None and
                   _num(d.get("rain_in")) is not None and
-                  round(_num(d["rain_in"]), 2) !=
-                  round(_num(d["download_in"]), 2)}
+                  _c2(_num(d["rain_in"])) !=
+                  _c2(_num(d["download_in"]))}
     chunks = [months[i:i + 6] for i in range(0, len(months), 6)]
     for ci, chunk in enumerate(chunks):
         page = doc.new_page(width=PW, height=PH)
@@ -1511,13 +1510,13 @@ def add_weather_log(doc, head, weather, opts=None):
                      fill=fill)
                 rain = _num(rec.get("rain_in")) if rec else None
                 if rain is not None:
-                    _put(page, x + W_MONTH - 2.2, ry + 9, f"{rain:.2f}", 6.5,
+                    _put(page, x + W_MONTH - 2.2, ry + 9, f"{_c2(rain):.2f}", 6.5,
                          align="right")
                 if rec and rec.get("date") in typed_days:
                     _put(page, x + W_DAY + 2.0, ry + 9, "*", 6.5)
             mo = by_month.get((y, m))
             _put(page, x + W_MONTH - 2.2, 466.5,
-                 f"{mo['rain_in']:.2f}" if mo else "", 6.5, align="right")
+                 f"{_c2(mo['rain_in']):.2f}" if mo else "", 6.5, align="right")
         _box(page, (WX0, W_HEAD[0], x1, W_ROW0 + 31 * W_ROWH), fill=None,
              width=0.75)
         _put(page, WX0 + 4, 466.5, "TOTAL", 6.5, "hebo")
@@ -1549,21 +1548,21 @@ def add_weather_log(doc, head, weather, opts=None):
             mo = by_month.get((y, m)) or {"tracked": 0, "claimed": 0,
                                           "actual": 0}
             srow(r, MONTH_HEAD.get(m, calendar.month_name[m]),
-                 [f"{mo['tracked']:.2f}", f"{mo['claimed']:.2f}",
-                  f"{mo['actual']:.2f}"])
+                 [f"{_c2(mo['tracked']):.2f}", f"{_c2(mo['claimed']):.2f}",
+                  f"{_c2(mo['actual']):.2f}"])
             r += 1
         if is_last:
             label = "Total" if len(chunks) == 1 else "Total (all months)"
-            srow(r, label, [f"{tot['tracked']:.2f}", f"{tot['claimed']:.2f}",
-                            f"{tot['impacted']:.2f}"])
+            srow(r, label, [f"{_c2(tot['tracked']):.2f}", f"{_c2(tot['claimed']):.2f}",
+                            f"{_c2(tot['impacted']):.2f}"])
             srow(r + 1, "TOTAL PROJECT DAYS",
                  ["", "", str(tot["project_days"])])
         else:
             sub = [by_month.get(k) for k in chunk if by_month.get(k)]
             srow(r, "Subtotal",
-                 [f"{sum(s['tracked'] for s in sub):.2f}",
-                  f"{sum(s['claimed'] for s in sub):.2f}",
-                  f"{sum(s['actual'] for s in sub):.2f}"])
+                 [f"{_c2(sum(s['tracked'] for s in sub)):.2f}",
+                  f"{_c2(sum(s['claimed'] for s in sub)):.2f}",
+                  f"{_c2(sum(s['actual'] for s in sub)):.2f}"])
         if not tot["months"]:
             _put(page, WX0, 485, "No rainfall records yet.", 7)
         if is_last and typed:
@@ -1679,7 +1678,7 @@ def add_forecast_page(doc, head, forecast, opts=None):
             work, color = "Holiday", BLACK
         elif d and d.weekday() >= 5:
             work, color = "Weekend", BLACK
-        elif rain is not None and round(rain, 2) >= round(thr, 2):
+        elif rain is not None and _c2(rain) >= _c2(thr):
             work, color = "At risk", RED
             at_risk += 1
         else:
@@ -1687,7 +1686,7 @@ def add_forecast_page(doc, head, forecast, opts=None):
         vals = [f"{d:%a}" if d else "", _mdy(r.get("date")),
                 _clip(r.get("sky") or "", 7.5, "helv", 90), hl,
                 f"{round(chance)}%" if chance is not None else "",
-                f"{rain:.2f}" if rain is not None else "",
+                f"{_c2(rain):.2f}" if rain is not None else "",
                 f"{round(wind)}" if wind is not None else ""]
         for (label, x), v in zip(FC_COLS, vals):
             _put(page, x, y + 13.5, v, 7.5)

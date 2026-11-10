@@ -31,7 +31,16 @@ job record. It never reads or writes the PDF or Project Center files.
                    "production": [{"cost_code", "qty", "unit", "hours"}]}],
  "directory":    [{"name", "company", "email", "phone", "role"}],
  "daily_logs":   [{"id", "date", "status", "manpower": [{"company",
-                   "trade", "workers", "hours"}]}]}       (optional, P2-10)
+                   "trade", "workers", "hours"}]}],      (optional, P2-10)
+ "service_invoices": [{"id", "number", "date", "customer", "site",
+                   "work_order", "lines": [{"description", "qty", "unit",
+                   "price", "amount", "taxable"}], "total",
+                   "reverse", "reason"}]}   (optional, 1.2 - service desk)
+
+service_invoices is additive (Nov 5, interface version stays 1): a
+closed work order's invoice, posted once in Back Office; "reverse": true
+with a reason backs one out as its own entry. An invoice whose lines
+don't add up to its total is rejected, never posted.
 
 All money and quantities are decimal STRINGS: no floats cross the line.
 A bad item is listed as rejected with the reason, never set to 0; an
@@ -284,6 +293,35 @@ def _daily_log(it):
     return c["id"] or c["date"], c
 
 
+def _service_invoice(it):
+    lines = []
+    for ln in _lines(it, "lines"):
+        lines.append({"description": _s(ln, "description"),
+                      "qty": _s(ln, "qty"), "unit": _s(ln, "unit"),
+                      "price": _s(ln, "price"),
+                      "amount": _money(ln, "amount"),
+                      "taxable": bool(ln.get("taxable"))})
+    rev = bool(it.get("reverse"))
+    c = {"id": _s(it, "id", True), "number": _s(it, "number", True),
+         "date": _date(it, "date", True), "customer": _s(it, "customer"),
+         "site": _s(it, "site"), "work_order": _s(it, "work_order"),
+         "lines": lines, "total": _money(it, "total", required=not rev) or "",
+         "reverse": rev,
+         "reason": _s(it, "reason")}
+    if rev:
+        if not c["reason"]:
+            raise _Bad("a reversal needs a reason")
+    else:
+        if not lines:
+            raise _Bad("no lines")
+        if not c["customer"]:
+            raise _Bad("no customer")
+        tot = sum((Decimal(ln["amount"]) for ln in lines), Decimal(0))
+        if tot != Decimal(c["total"]):
+            raise _Bad(f"lines add to {tot}, invoice says {c['total']}")
+    return c["id"] + (":reverse" if rev else ""), c
+
+
 def _member(it):
     c = {k: _s(it, k) for k in ("name", "company", "email", "phone", "role")}
     if not c["name"] and not c["company"]:
@@ -296,7 +334,7 @@ SECTIONS = {"cost_codes": _cost_code, "budget": _budget,
             "changes": _change, "payapps": _payapp,
             "commitments": _commitment, "direct_costs": _direct_cost,
             "timecards": _timecard, "directory": _member,
-            "daily_logs": _daily_log}
+            "daily_logs": _daily_log, "service_invoices": _service_invoice}
 
 
 @dataclass

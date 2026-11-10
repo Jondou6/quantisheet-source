@@ -49,6 +49,12 @@ class _Lane(QListWidget):
             QTimer.singleShot(0, lambda: self.board.assign_to(wo_id, tech))
 
 
+def _hh2_note():
+    return ("hh2 has no published time import format: this is a CSV with "
+            "the columns set in service_hh2_time_columns - set them up "
+            "once with your hh2 administrator.")
+
+
 class DispatchWindow(uiutil.Desk):
     def __init__(self, parent=None):
         super().__init__("Dispatch Board", parent)
@@ -67,7 +73,8 @@ class DispatchWindow(uiutil.Desk):
         top.addWidget(self.tech_name)
         self.root.addLayout(top)
         self.buttons(("Add technician", self.add_tech_clicked),
-                     ("Print day sheet", self.print_clicked))
+                     ("Print day sheet", self.print_clicked),
+                     ("Send week's hours…", self.hours_clicked))
         self.columns = QHBoxLayout()
         self.root.addLayout(self.columns, 1)
         self.lanes = {}
@@ -130,6 +137,70 @@ class DispatchWindow(uiutil.Desk):
             self, "Day sheet", files.path_for("Day sheet.pdf"), "PDF (*.pdf)")
         if path:
             self.print_to(path)
+
+
+    def week(self):
+        """Monday to Sunday around the board's day (ISO dates)."""
+        import datetime as _dt
+        d = _dt.date.fromisoformat(self._day())
+        start = d - _dt.timedelta(days=d.weekday())
+        return start.isoformat(), (start + _dt.timedelta(days=6)).isoformat()
+
+    def hours_clicked(self, _checked=False, ask=None, start=None, path=None):
+        """The week's work-order hours as Back Office time cards (each
+        entry goes in once; timecards.py) - or, when the time route
+        setting is hh2, a mapped CSV for hh2 plus its reverse file."""
+        from PySide6.QtWidgets import QMessageBox
+        from . import timecards
+        since, until = self.week()
+        if timecards.time_route() == "hh2":
+            return self._hours_hh2(since, until, path)
+        snap = timecards.snapshot(workorder.load(self.path), since, until)
+        sm = timecards.summary(snap)
+        if not sm["cards"]:
+            self.msg.setText(f"No hours logged on work orders {since} to "
+                             f"{until}.")
+            return None
+        text = (f"{sm['cards']} time entr(ies), {since} to {until}: " +
+                ", ".join(f"{k} {v} h" for k, v in sm["hours"].items()))
+        if ask is None:
+            ask = lambda t: QMessageBox.question(          # noqa: E731
+                self, "Send hours", t + "\n\nOpen Back Office with these "
+                "hours for the service job? Hours already brought in are "
+                "skipped there.") == QMessageBox.Yes
+        if not ask(text):
+            return None
+        try:
+            from .. import backoffice_hook
+            (start or backoffice_hook.launch_snapshot)(snap)
+        except Exception as e:                            # noqa: BLE001
+            self.msg.setText(f"Back Office didn't start: {e}")
+            return None
+        self.msg.setText("Sent to Back Office: " + text)
+        return snap
+
+
+
+    def _hours_hh2(self, since, until, path=None):
+        from PySide6.QtWidgets import QFileDialog
+        from . import files, timecards
+        orders = workorder.load(self.path)
+        if path is None:
+            path, _ = QFileDialog.getSaveFileName(
+                self, "Hours for hh2",
+                files.path_for(f"Service hours {since} to {until} for hh2.csv"),
+                "CSV (*.csv)")
+        if not path:
+            return None
+        try:
+            out = timecards.hh2_csv(orders, path, since, until)
+        except ValueError as e:
+            self.msg.setText(str(e))
+            return None
+        workorder.save(orders, self.path)
+        self.msg.setText(f"{out['entries']} entr(ies) written to {out['file']} "
+                         f"(reverse file: {out['reverse']}). " + _hh2_note())
+        return out
 
 
 def open_window(parent=None):

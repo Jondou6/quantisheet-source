@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (
     QTableWidgetItem, QVBoxLayout)
 
 from . import ppi, settings
+from .dmoney import c2 as _c2
 
 COLS = ["Series", "What it measures", "Used for", "Latest", "Month",
         "Factor", "% per year", ""]
@@ -127,7 +128,7 @@ class EscalationDialog(QDialog):
                     x["last_month"],
                     "" if x["factor"] is None else f"{x['factor']:.3f}",
                     "" if x["annual_pct"] is None else
-                    f"{x['annual_pct']:+.2f}",
+                    f"{_c2(x['annual_pct']):+.2f}",
                     "; ".join(([f"extends {x['extrapolated']} mo past the "
                                 "data"] if x["extrapolated"] else [])
                               + list(x.get("warnings") or []))]

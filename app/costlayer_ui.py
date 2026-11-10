@@ -25,6 +25,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QDialog,
 
 from . import assembly_codes as ac, cost_rollup, settings
 from .reportname import report_file_name
+from .dmoney import c2 as _c2
 
 KEY = "assembly_codes_library"
 
@@ -153,7 +154,7 @@ def bind_dialog(mw, group=None, code=None, waste=None):
     names = []
     for (g, t, u), q in gs:
         b = binds.get(ac.key_of(g, t, u))
-        names.append(f"{g} ({t}, {q:.2f} {u})"
+        names.append(f"{g} ({t}, {_c2(q):.2f} {u})"
                      + (f"  → {b['code']}" if b else ""))
     if group is None:
         pick, ok = QInputDialog.getItem(mw, "Bind to Assembly",
@@ -306,14 +307,14 @@ class SummaryDialog(QDialog):
         txt = []
         for row in rows[1:]:
             amt = row[5]
-            amt = f"{amt:,.2f}" if hasattr(amt, "quantize") else str(amt)
+            amt = f"{_c2(amt):,.2f}" if hasattr(amt, "quantize") else str(amt)
             txt.append(f"{row[1]:<44} {amt:>16}")
         unpriced = sorted({u for ln in lines for u in ln["unpriced"]})
         if unbound:
             txt.append("")
             txt.append(f"NOT PRICED - {len(unbound)} takeoff group(s) with "
                        "no assembly bound:")
-            txt += [f"  {u['group']} ({u['type']}, {u['qty']:.2f} "
+            txt += [f"  {u['group']} ({u['type']}, {_c2(u['qty']):.2f} "
                     f"{u['unit']})" + (f" - {u['why']}" if u.get('why')
                                        else "") for u in unbound]
         if unpriced:

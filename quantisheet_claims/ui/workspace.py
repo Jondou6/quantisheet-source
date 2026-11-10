@@ -1786,10 +1786,11 @@ class ClaimsWindow(QMainWindow):
                                      p.reference)):
                 self.pay_table.setItem(r, col, QTableWidgetItem(v))
         b = diary.balance(c, s or settle_claim(c))
+        lab, v = diary.open_text(b)
         self.balance_label.setText(
             f"Owed now {fmt(b['owed_now'])} · recoverable later "
             f"{fmt(b['recoverable_later'])} · paid {fmt(b['paid'])} · "
-            f"still open {fmt(b['open_total'])}")
+            f"{lab.lower()} {fmt(v)}")
 
     def add_diary(self, on=None, kind=None, text=None) -> bool:
         try:
@@ -1812,13 +1813,31 @@ class ClaimsWindow(QMainWindow):
         return self._change("remove diary entry",
                             diary=diary.remove_entry(c, c.diary[r].id))
 
-    def add_payment(self, on=None, amount=None, kind=None, reference=None) -> bool:
-        try:
-            p = diary.add_payment(
-                self.claim, on or self.p_date.text(),
+    def add_payment(self, on=None, amount=None, kind=None, reference=None,
+                    confirm=None) -> bool:
+        """`confirm(text) -> bool` is asked before an overpayment is
+        recorded (a Yes / No box when None)."""
+        args = (self.claim, on or self.p_date.text(),
                 amount if amount is not None else self.p_amount.text(),
                 kind or self.p_kind.currentText(),
                 reference if reference is not None else self.p_ref.text())
+        b = diary.balance(self.claim, settle_claim(self.claim))
+        owed = b["owed_now"] + b["recoverable_later"]
+        try:
+            try:
+                p = diary.add_payment(*args, owed_cents=owed)
+            except diary.OverpaymentError as e:
+                if confirm is None:
+                    from PySide6.QtWidgets import QMessageBox
+                    confirm = lambda t: QMessageBox.question(  # noqa: E731
+                        self, "Payment received", t,
+                        QMessageBox.Yes | QMessageBox.No,
+                        QMessageBox.No) == QMessageBox.Yes
+                if not confirm(f"{str(e)[0].upper()}{str(e)[1:]}.\n\n"
+                               "Record it anyway as an overpayment?"):
+                    return self.error("Not recorded: " + str(e))
+                p = diary.add_payment(*args, owed_cents=owed,
+                                      allow_over=True)
         except (diary.DiaryError, MoneyError) as e:
             return self.error(str(e))
         ok = self._change("payment received", payments=p)
@@ -2017,7 +2036,7 @@ class ClaimsWindow(QMainWindow):
                               ("acv", "ACV", s.acv),
                               ("ded", "Deductible", s.deductible),
                               ("now", "Owed now", s.total_indemnity),
-                              ("open", "Still open", b["open_total"])):
+                              ("open",) + diary.open_text(b)):
             self.totals[key].setText(f"{label} <b>{fmt(v)}</b>")
         items = self.checklist_items()
         self.check_btn.setText("Checklist: " + checklist.summary(items))

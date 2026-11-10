@@ -606,6 +606,60 @@ def mark_sent(office, iid, sent_to, sent_on=None) -> None:
         office.audit("sent", "ar_invoice", iid, None, {"to": sent_to})
 
 
+# ---- service desk invoices (QuantiSheet 1.2, Nov 5) -----------------------
+
+SERVICE_PREFIX = "SVC-"
+
+
+def import_service_invoices(office, job_id, post=False, gl_date=None):
+    """Closed service work orders' invoices from the QuantiSheet snapshot
+    (section service_invoices) -> AR invoices, each once: the Back Office
+    number is SVC-<QuantiSheet number>, and one already there adds
+    nothing. post=True approves and posts them (ar.approve). A reversal in the
+    snapshot voids the posted invoice - the ledger keeps the original and
+    a reversing entry, nothing is edited or deleted.
+
+    Returns {"created", "posted", "reversed", "skipped"}; skipped lists
+    (number, why)."""
+    office.require("ar.edit", "ar_invoice", "service")
+    out = {"created": [], "posted": [], "reversed": [], "skipped": []}
+    recs = jobs.section(office, job_id, "service_invoices")
+    for r in [x for x in recs if not x.get("reverse")]:
+        num = SERVICE_PREFIX + r["number"]
+        if invoice_by_number(office, num):
+            out["skipped"].append((num, "already in Back Office"))
+            continue
+        iid = create_other_invoice(
+            office, job_id, r["date"],
+            [{"description": " ".join(p for p in (
+                ln["description"], f"({ln['qty']} {ln['unit']})"
+                if ln.get("qty") else "") if p),
+              "amount": ln["amount"], "kind": "service",
+              "taxable": ln.get("taxable")} for ln in r["lines"]],
+            customer=r["customer"], number=num,
+            note=f"Service work order {r['work_order']} {r['site']}".strip())
+        if cents.to_cents(r["total"]) != invoice(office, iid)["amount"]:
+            raise BillingError(f"{num}: total doesn't match its lines")
+        out["created"].append(iid)
+        if post:
+            approve(office, iid, gl_date=gl_date)
+            out["posted"].append(iid)
+    for r in [x for x in recs if x.get("reverse")]:
+        num = SERVICE_PREFIX + r["number"]
+        inv = invoice_by_number(office, num)
+        if inv is None:
+            out["skipped"].append((num, "reversal for an invoice that "
+                                        "isn't in Back Office"))
+            continue
+        if inv["status"] == "Void":
+            out["skipped"].append((num, "already reversed"))
+            continue
+        void(office, inv["id"], date=r["date"] or None,
+             reason=f"QuantiSheet reversal: {r['reason']}")
+        out["reversed"].append(inv["id"])
+    return out
+
+
 def register(office) -> list[dict]:
     return office.db.rows("SELECT * FROM ar_invoices WHERE deleted = 0 "
                           "ORDER BY number")

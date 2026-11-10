@@ -12,6 +12,7 @@ A legend can also (Nov 2, kept on it as PSLegendOpts):
 import json
 
 from . import annotate
+from .dmoney import c2 as _c2
 
 OPTS_KEY = "PSLegendOpts"
 
@@ -75,7 +76,7 @@ def rows(doc, pno):
             else f"{g['name']} ({g['kind']})"
         qty = f"{g['n']}"
         if g["unit"] and g["total"]:
-            qty += f"  |  {g['total']:,.2f} {g['unit']}"
+            qty += f"  |  {_c2(g['total']):,.2f} {g['unit']}"
         if g["type"] == "count":
             total = g["each"]
         elif g["type"] in ("length", "area"):
@@ -245,7 +246,7 @@ def _merge(rows_lists):
     for m in merged.values():
         qty = f"{m['n']}"
         if m["unit"] and m.get("total") and m["type"] != "count":
-            qty += f"  |  {m['total']:,.2f} {m['unit']}"
+            qty += f"  |  {_c2(m['total']):,.2f} {m['unit']}"
         m["qty"] = qty
         out.append(m)
     return out

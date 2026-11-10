@@ -369,7 +369,7 @@ class AerialDialog(QDialog):
             b = QPushButton(txt)
             b.setToolTip(tip + " a third of the view")
             b.clicked.connect(lambda _c=False, dx=dx, dy=dy:
-                              self.move(dx, dy))
+                              self.pan_by(dx, dy))
             moves.addWidget(b, r, c)
             self.move_btns.append(b)
         zo = QPushButton("− Wider")
@@ -484,7 +484,7 @@ class AerialDialog(QDialog):
         x = max(av.left(), min(g.left(), av.right() - g.width()))
         y = max(av.top(), min(g.top(), av.bottom() - g.height()))
         if (x, y) != (g.left(), g.top()):
-            QDialog.move(self, x, y)       # (self.move pans the photo)
+            self.move(x, y)       # (pan_by pans the photo - L2)
 
     def _doc(self):
         v = getattr(self.parent(), "_view", None)
@@ -797,7 +797,7 @@ class AerialDialog(QDialog):
         self._busy(True)
         bg.run(work, done, failed, self, pool=_pool("preview"))
 
-    def move(self, dx, dy, wait=False):
+    def pan_by(self, dx, dy, wait=False):
         if not self.origin:
             return
         step = self._width() / 3.0
@@ -819,12 +819,14 @@ class AerialDialog(QDialog):
         if not p:
             return
         self.path.setText(p)
-        px = aerial.world_file_pixel(p)
+        px, why = aerial.world_file_info(p)
         if px:
             self.size.setValue(px)
             self.found.setText(f"World file found: {px:g} units per pixel. "
                                "Pick feet or meters to match the map's "
                                "coordinate system (SC State Plane is feet).")
+        elif why:
+            self.found.setText(why)
 
     def layers(self):
         keys = [k for k, cb in self.layer_boxes.items() if cb.isChecked()]

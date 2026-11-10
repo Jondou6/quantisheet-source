@@ -13,6 +13,7 @@ sub paid sooner than the GC is paid, is cash the GC fronts; a shorter
 warranty, a lower umbrella limit or no flow-down clause leave gaps; and
 insurance that has expired or expires within 30 days."""
 import datetime as _dt
+from ..dmoney import c2 as _c2
 
 SETTING = "prime_terms"
 
@@ -160,7 +161,7 @@ def percent_complete(store, before_period=None):
         for ln in a.get("lines") or []:
             done += _num(ln.get("this_period")) or 0
             done += _num(ln.get("stored")) or 0
-    return round(done / total * 100, 2)
+    return _c2(done / total * 100)
 
 
 def retainage_for(store, rec):

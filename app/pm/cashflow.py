@@ -21,6 +21,7 @@ cum_* running totals}.
 import datetime as _dt
 
 from . import cost, schedule
+from ..dmoney import c2 as _c2
 
 
 def _m(d):
@@ -148,18 +149,18 @@ def months(store, today=None):
                                            if k >= now else 0.0)
         for f in cum:
             cum[f] += row[f]
-            row["cum_" + f] = round(cum[f], 2)
-        row["net_cash"] = round(cum["received"] - cum["paid"], 2)
+            row["cum_" + f] = _c2(cum[f])
+        row["net_cash"] = _c2(cum["received"] - cum["paid"])
         for f in ("planned", "actual", "forecast", "billed", "received",
                   "paid"):
-            row[f] = round(row[f], 2)
+            row[f] = _c2(row[f])
         out.append(row)
         if k >= last:
             break
         mo += 1
         if mo > 12:
             y, mo = y + 1, 1
-    return {"rows": out, "unscheduled": round(unscheduled, 2)}
+    return {"rows": out, "unscheduled": _c2(unscheduled)}
 
 
 def label(month):

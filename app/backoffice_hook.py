@@ -329,6 +329,27 @@ def write_snapshot(doc=None, store=None):
     return path
 
 
+def write_given_snapshot(snap):
+    """Write an already-made interface v1 snapshot (e.g. the service
+    department's time cards, app/service/timecards.py)."""
+    cleanup_snapshots()
+    folder = tempfile.mkdtemp(prefix="quantisheet-backoffice-")
+    path = os.path.join(folder, "snapshot.json")
+    with open(path, "w", encoding="utf-8") as fh:
+        json.dump(snap, fh, indent=1, ensure_ascii=False)
+    return path
+
+
+def launch_snapshot(snap, popen=subprocess.Popen):
+    """Start Back Office on a given snapshot."""
+    cmd = launcher()
+    if cmd is None:
+        raise RuntimeError("QuantiSheet Back Office is not installed")
+    args = list(cmd) + ["--snapshot", write_given_snapshot(snap)]
+    log.info("starting QuantiSheet Back Office: %s", args)
+    return popen(args, shell=False, close_fds=True)
+
+
 def launch(doc=None, store=None, popen=subprocess.Popen, extra=()):
     """Start Back Office as its own process (no shell)."""
     cmd = launcher()

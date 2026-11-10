@@ -26,6 +26,7 @@ import os
 import tempfile
 
 from . import settings
+from .dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 
@@ -269,9 +270,9 @@ def try_on(doc, pages=None, names_=None, threshold=0.8, progress=None,
         for p, hs in by_page.items():
             try:
                 ok = plan_filter(doc[p], [h["rect"] for h in hs])
-                ok = {tuple(round(v, 2) for v in r) for r in ok}
+                ok = {tuple(_c2(v) for v in r) for r in ok}
                 inside = [h for h in hs
-                          if tuple(round(v, 2) for v in h["rect"]) in ok]
+                          if tuple(_c2(v) for v in h["rect"]) in ok]
             except Exception:                             # noqa: BLE001
                 inside = hs
             info["left_out"] += len(hs) - len(inside)

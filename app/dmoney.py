@@ -64,3 +64,74 @@ def fmt(v):
     c = cents(v)
     sign = "-" if c < 0 else ""
     return f"{sign}${abs(c):,.2f}"
+
+
+def _dec(v):
+    """The Decimal of a number or of money text as people type it
+    ("$1,000.125", "(1.125)" for a negative). ValueError for anything
+    else, "nan" and "inf" text included - never a silent half-even
+    fallback (Chief's round 7, Nov 9). A float NaN or infinity passes
+    through c2/half_up unchanged, so a broken number shows as itself."""
+    if isinstance(v, float):
+        return Decimal(repr(v))
+    if isinstance(v, (int, Decimal)):
+        return Decimal(v)
+    t = str(v).strip().replace("$", "").replace(",", "").strip()
+    if t.startswith("(") and t.endswith(")"):
+        t = "-" + t[1:-1].strip()
+    try:
+        d = Decimal(t)
+    except (InvalidOperation, ValueError):
+        raise ValueError(f"not a number: {v!r}") from None
+    if not d.is_finite():
+        raise ValueError(f"not a number: {v!r}")
+    return d
+
+
+def c2(v):
+    """A float rounded to the cent, half up - the way an estimator rounds
+    by hand: 1.125 -> 1.13, 0.125 -> 0.13 (Chief's round 5, Nov 9: float
+    round() gave 1.12 and 0.12 - it rounds half to even, and 1.125 is
+    exactly half). Decimal(repr(x)), so 2.675 is 2.68, not 2.67.
+
+    A float is first rounded to 8 places (6 from $1M, 4 from $100M) so the
+    noise of float arithmetic doesn't decide the cent: 1.15 x 10% is
+    0.11499999999999999 in a float and comes out 0.12. That is a choice,
+    not exact half-up: a value within about 5e-9 below a half cent
+    (1.00499999999) rounds up too. Money is never meant to carry that many
+    digits, so for money that is the right side to err on. None and blank
+    are 0.0."""
+    if v is None or v == "":
+        return 0.0
+    if isinstance(v, bool):
+        v = int(v)
+    if isinstance(v, float) and v != v:              # NaN stays NaN
+        return v
+    if isinstance(v, float) and abs(v) < 1e15:
+        # float arithmetic leaves 0.11499999999999999 for 1.15 x 10%;
+        # trimmed to the digits a float really holds, that's 0.115
+        v = round(v, 8 if abs(v) < 1e6 else 6 if abs(v) < 1e8 else 4)
+    d = _dec(v)
+    if not d.is_finite():
+        return float(d)
+    return float(d.quantize(CENT, rounding=ROUND_HALF_UP))
+
+
+def half_up(v, places=2):
+    """round(v, places) the way people round by hand: a 5 rounds up
+    (0.125 -> 0.13 at 2 places, 2.25 -> 2.3 at 1). For quantities, hours
+    and report figures; c2() is the money version (same float pre-trim).
+    None and blank are 0.0."""
+    if v is None or v == "":
+        return 0.0
+    if isinstance(v, bool):
+        v = int(v)
+    if isinstance(v, float):
+        if v != v or abs(v) >= 1e15:
+            return v
+        v = round(v, max(places + 6, 8 if abs(v) < 1e6 else places + 4))
+    d = _dec(v)
+    if not d.is_finite():
+        return float(d)
+    return float(d.quantize(Decimal(1).scaleb(-places),
+                            rounding=ROUND_HALF_UP))

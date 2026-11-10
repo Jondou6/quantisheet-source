@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (
 
 from . import labor
 from . import loaded_rate as eng
+from .dmoney import c2 as _c2
 
 # QuantiSheet trade -> engine preset (trade family the WC class and union
 # fringe ratio come from)
@@ -150,9 +151,9 @@ class LoadedRateDialog(QDialog):
             box.currentTextChanged.connect(
                 lambda _t, row=r: self._preset_changed(row))
             t.setCellWidget(r, 1, box)
-            t.setItem(r, 2, _cell(f"{base:.2f}", True))
-            t.setItem(r, 3, _cell(f"{fr:.2f}", True))
-            t.setItem(r, 4, _cell(f"{p.wc * wc_rel:.2f}", True))
+            t.setItem(r, 2, _cell(f"{_c2(base):.2f}", True))
+            t.setItem(r, 3, _cell(f"{_c2(fr):.2f}", True))
+            t.setItem(r, 4, _cell(f"{_c2(p.wc * wc_rel):.2f}", True))
             for c in (5, 6, 7):
                 t.setItem(r, c, _cell(""))
         t.blockSignals(False)
@@ -161,7 +162,7 @@ class LoadedRateDialog(QDialog):
     def _preset_changed(self, row):
         p = eng.PRESETS[self.table.cellWidget(row, 1).currentText()]
         self.table.item(row, 4).setText(
-            f"{p.wc * STATE_WC.get(self.region, 1.0):.2f}")
+            f"{_c2(p.wc * STATE_WC.get(self.region, 1.0)):.2f}")
 
     def _num(self, r, c):
         try:
@@ -190,10 +191,10 @@ class LoadedRateDialog(QDialog):
             b = self.rate_for(r, conditions=False)
             eff = self.rate_for(r)["effective_rate"]
             now = self.now.get(t.item(r, 0).text(), 0.0)
-            t.item(r, 5).setText(f"{b['loaded_rate']:.2f}" + (
-                f"  ({eff:.2f} with conditions)" if eff != b["loaded_rate"]
+            t.item(r, 5).setText(f"{_c2(b['loaded_rate']):.2f}" + (
+                f"  ({_c2(eff):.2f} with conditions)" if eff != b["loaded_rate"]
                 else ""))
-            t.item(r, 6).setText(f"{now:.2f}")
+            t.item(r, 6).setText(f"{_c2(now):.2f}")
             t.item(r, 7).setText(f"{(b['loaded_rate'] - now) / now * 100:+.0f}%"
                                  if now else "")
             tot_now += now
@@ -201,8 +202,8 @@ class LoadedRateDialog(QDialog):
         t.blockSignals(False)
         if t.rowCount():
             self.summary.setText(
-                f"Average trade rate {tot_new / t.rowCount():.2f} $/hr loaded "
-                f"vs {tot_now / t.rowCount():.2f} now"
+                f"Average trade rate {_c2(tot_new / t.rowCount()):.2f} $/hr loaded "
+                f"vs {_c2(tot_now / t.rowCount()):.2f} now"
                 + (f" ({(tot_new - tot_now) / tot_now * 100:+.0f}%)"
                    if tot_now else "") + ". Conditions "
                 "are shown for reference; in an estimate they're applied to "
@@ -211,7 +212,7 @@ class LoadedRateDialog(QDialog):
 
     def rates(self):
         return {self.table.item(r, 0).text():
-                round(self.rate_for(r, conditions=False)["loaded_rate"], 2)
+                _c2(self.rate_for(r, conditions=False)["loaded_rate"])
                 for r in range(self.table.rowCount())}
 
     def _use(self):

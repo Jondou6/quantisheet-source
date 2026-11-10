@@ -16,6 +16,7 @@ the PM says to go ahead. The fed sub apps are marked
 Billed with the owner app they went into, so the same work is never
 billed to the owner twice."""
 from .cost import _f, code_key, fill_payapp, payapps_in_order, sov_lines
+from ..dmoney import c2 as _c2
 
 
 class SubPayError(RuntimeError):
@@ -55,8 +56,8 @@ def fill(store, rec):
         old = have.get(k, {})
         lines.append({"cost_code": l.get("cost_code") or "",
                       "description": l.get("description") or "",
-                      "scheduled": round(_f(l.get("amount")), 2),
-                      "previous": round(prev.get(k, 0.0), 2),
+                      "scheduled": _c2(_f(l.get("amount"))),
+                      "previous": _c2(prev.get(k, 0.0)),
                       "this_period": old.get("this_period"),
                       "stored": old.get("stored")})
     if not rec.get("retainage") and c.get("retainage") not in (None, ""):
@@ -71,8 +72,8 @@ def problems(rec):
         total = _f(l.get("previous")) + _f(l.get("this_period")) + \
             _f(l.get("stored"))
         if _f(l.get("scheduled")) and total > _f(l.get("scheduled")) + 0.005:
-            out.append(f"{l.get('cost_code')}: billed {total:,.2f} of "
-                       f"{_f(l.get('scheduled')):,.2f}")
+            out.append(f"{l.get('cost_code')}: billed {_c2(total):,.2f} of "
+                       f"{_c2(_f(l.get('scheduled'))):,.2f}")
     return out
 
 
@@ -123,8 +124,8 @@ def roll_up(store, payapp):
             t["work"] += _f(l.get("this_period"))
             t["stored"] += _f(l.get("stored"))
     return {"by_code": by, "subs": ids,
-            "work": round(sum(t["work"] for t in by.values()), 2),
-            "stored": round(sum(t["stored"] for t in by.values()), 2)}
+            "work": _c2(sum(t["work"] for t in by.values())),
+            "stored": _c2(sum(t["stored"] for t in by.values()))}
 
 
 def feed_owner(store, payapp, allow_unmatched=False):
@@ -157,8 +158,8 @@ def feed_owner(store, payapp, allow_unmatched=False):
         if _f(ln.get("this_period")) or _f(ln.get("stored")):
             kept.append(item)
             continue
-        ln["this_period"] = round(t["work"], 2)
-        ln["stored"] = round(t["stored"], 2)
+        ln["this_period"] = _c2(t["work"])
+        ln["stored"] = _c2(t["stored"])
         fed.append(item)
     unmatched = sorted(set(r["by_code"]) - used)
     payapp["sub_billing"] = r["subs"]

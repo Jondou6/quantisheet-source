@@ -11,6 +11,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout, QWidget)
 
 from . import assemblies, csi, labor
+from .dmoney import c2 as _c2
 
 MEASURE_TOOL = {"length": "measure_polylength", "area": "measure_area",
                 "volume": "measure_volume", "count": "count"}
@@ -49,7 +50,7 @@ def adjust_value(combos):
 
 
 def _money(v):
-    return f"${v:,.2f}"
+    return f"${_c2(v):,.2f}"
 
 
 def chest_item(a):
@@ -152,7 +153,7 @@ class AssembliesPanel(QWidget):
                 t.setFlags(Qt.ItemIsEnabled)
                 self.tree.addTopLevelItem(t)
             it = QTreeWidgetItem([
-                r["name"], r.get("csi", ""), f"{r['quantity']:,.2f}",
+                r["name"], r.get("csi", ""), f"{_c2(r['quantity']):,.2f}",
                 r["unit"], "", _money(r["material"]),
                 f"{r['labor_hours']:,.1f}", "", f"{r['crew_days']:,.1f}",
                 _money(r["labor_cost"]), _money(r["total"])])
@@ -168,7 +169,7 @@ class AssembliesPanel(QWidget):
             t.addChild(it)
             for q in r["parts"]:
                 ch = QTreeWidgetItem([
-                    q["name"], q.get("code", ""), f"{q['qty']:,.2f}",
+                    q["name"], q.get("code", ""), f"{_c2(q['qty']):,.2f}",
                     q["unit"], _money(q["cost"]), _money(q["material"]),
                     f"{q['labor_hours']:,.1f}", q.get("crew", ""),
                     f"{q['crew_days']:,.1f}", _money(q["labor_cost"]),
@@ -412,7 +413,7 @@ class LibraryDialog(QDialog):
             self.detail.insertRow(r)
             for c, v in enumerate((p.get("name", ""), p.get("unit", ""),
                                    str(p.get("qty", "")),
-                                   f"{float(p.get('cost') or 0):,.2f}",
+                                   f"{_c2(float(p.get('cost') or 0)):,.2f}",
                                    f"{float(p.get('labor') or 0):g}")):
                 cell = QTableWidgetItem(v)
                 cell.setToolTip(v)
@@ -703,8 +704,10 @@ class AssemblyEditor(QDialog):
                     return float(self._cell(self.parts, r, c) or 0)
                 except ValueError:
                     return 0.0
+            from .assembly_csv import FORMULA_VERSION
             part = {"name": name, "unit": self._cell(self.parts, r, 1),
                     "qty": self._cell(self.parts, r, 2) or "0",
+                    "fv": FORMULA_VERSION,        # written as meant
                     "cost": num(3), "labor": num(4)}
             code = self._cell(self.parts, r, 5)
             if code:
@@ -768,7 +771,7 @@ class AssemblyEditor(QDialog):
         hrs = sum(p["labor_hours"] for p in parts)
         self.result.setText(
             "For this sample: " + ", ".join(
-                f"{p['name']} <b>{p['qty']:,.2f}</b> {p['unit']}"
+                f"{p['name']} <b>{_c2(p['qty']):,.2f}</b> {p['unit']}"
                 for p in parts) +
             f"<br>Material <b>{_money(mat)}</b>, labor <b>{hrs:,.1f} hrs</b>")
         return True

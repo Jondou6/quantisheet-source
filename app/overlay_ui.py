@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout, QWidget)
 
 from . import overlay
+from .dmoney import c2 as _c2
 
 
 def describe(m):
@@ -23,7 +24,7 @@ def describe(m):
     if abs(s - 1) > 0.0005:
         out += f", scale {s:.3f}"
     if abs(rot) >= 0.01:
-        out += f", turned {rot:+.2f}°"
+        out += f", turned {_c2(rot):+.2f}°"
     return out
 
 

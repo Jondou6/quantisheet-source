@@ -220,7 +220,7 @@ def test_preview_then_move_onto_the_site(qapp, win, monkeypatch):
     # one photo 3x the chosen width, at 1 ft per pixel
     assert int(_photo_calls(calls)[0]["size"].split(",")[0]) == 3000
     assert dlg.preview.has_image()
-    dlg.move(1, 0, wait=True)                       # a third of 1,000 ft east
+    dlg.pan_by(1, 0, wait=True)                       # a third of 1,000 ft east
     assert dlg.center[1] > -79.1192
     assert dlg.center[0] == pytest.approx(33.6504, abs=1e-9)
     dlg.zoom(2.0, wait=True)                        # 2,000 ft: leaves it
@@ -247,7 +247,7 @@ def test_arrows_wider_closer_and_ok_download_nothing_more(qapp, win,
     assert len(_photo_calls(calls)) == 1
     for dx, dy in ((0, 1), (1, 0), (0, -1), (-1, 0)):
         t = time.perf_counter()
-        dlg.move(dx, dy, wait=True)
+        dlg.pan_by(dx, dy, wait=True)
         assert time.perf_counter() - t < 0.5
     dlg.zoom(0.5, wait=True)                        # Closer
     dlg.zoom(2.0, wait=True)                        # back to Wider
@@ -260,7 +260,7 @@ def test_arrows_wider_closer_and_ok_download_nothing_more(qapp, win,
     assert doc[0].rect.width / sc["ppu"] == pytest.approx(1000, rel=2e-3)
     # walking off the photo fetches exactly one more
     for _ in range(4):
-        dlg.move(1, 0, wait=True)
+        dlg.pan_by(1, 0, wait=True)
     assert len(_photo_calls(calls)) == 2
 
 
@@ -276,9 +276,9 @@ def test_a_late_answer_never_replaces_a_newer_one(qapp, win, monkeypatch):
     jobs = []
     monkeypatch.setattr(bg, "run", lambda fn, done, failed, owner,
                         pool=None: jobs.append((fn, done)))
-    dlg.move(1, 0)                         # east (inside the photo)
+    dlg.pan_by(1, 0)                         # east (inside the photo)
     dlg._fetch(force=True)                 # request 1
-    dlg.move(0, 1)                         # north
+    dlg.pan_by(0, 1)                         # north
     dlg._fetch(force=True)                 # request 2
     assert len(jobs) == 2 and dlg.cancel_btn.isVisibleTo(dlg)
     second = jobs[1][0]()

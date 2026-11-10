@@ -5,6 +5,7 @@ so the record form can build itself from the schema and auto-save.
 """
 import logging
 import os
+import re
 from datetime import date, datetime
 
 from PySide6.QtCore import QDate, QSize, Qt, QTimer, Signal, QUrl
@@ -20,6 +21,8 @@ from PySide6.QtWidgets import (QAbstractItemView, QCalendarWidget,
 
 from .. import dmoney, icons, theme
 from . import schema
+from ..dmoney import c2 as _c2
+from ..dmoney import _dec
 
 
 # ---------------------------------------------------------------- dates
@@ -142,6 +145,43 @@ class TextEdit(QLineEdit):
         self.setText(self._last)
 
 
+# digits, with commas only as thousands separators; a leading - or (...)
+_NUMBER = re.compile(r"^-?(?:\d+|\d{1,3}(?:,\d{3})+)?(?:\.\d*)?$")
+MAX_NUMBER = 1e12              # a trillion: more is a typing mistake
+NUMBER_HELP = ("Type a number such as 1,250.50 - digits, an optional "
+               "decimal point, commas only between thousands, and no more "
+               "than 1,000,000,000,000.")
+
+
+def read_number(text):
+    """The number typed in a field, or None when it isn't one. Refused
+    rather than guessed at (Chief's round 7, Nov 9): nan, inf and 1e400;
+    more than a trillion; "1.000,50" (it was read as 1.00) and "1,2,3"
+    (it was read as 123)."""
+    t = str(text or "").replace("$", "").strip()
+    if not t:
+        return None
+    if t.startswith("(") and t.endswith(")"):
+        t = "-" + t[1:-1].strip()
+    if not _NUMBER.match(t) or not any(ch.isdigit() for ch in t):
+        return None
+    v = float(t.replace(",", ""))
+    if v != v or abs(v) > MAX_NUMBER:
+        return None
+    return v
+
+
+def number_text(v):
+    """A number for a lines table: thousands separators, no cents on a
+    whole number, two decimals otherwise - more (up to four) only when
+    the number has them, so a row of 0.125 and its total 0.375 agree."""
+    d = _dec(round(float(v), 6))
+    if d == d.to_integral_value():
+        return f"{int(d):,}"
+    places = max(2, min(4, -d.normalize().as_tuple().exponent))
+    return f"{d:,.{places}f}"
+
+
 class NumberEdit(TextEdit):
     def __init__(self, parent=None, money=False):
         super().__init__(parent)
@@ -150,23 +190,16 @@ class NumberEdit(TextEdit):
         self.setPlaceholderText("$0.00" if money else "0")
 
     def value(self):
-        t = self.text().replace("$", "").replace(",", "").strip()
-        if not t:
+        v = read_number(self.text())
+        if v is None:
             return None
-        if t.startswith("(") and t.endswith(")"):
-            t = "-" + t[1:-1]
-        try:
-            v = float(t)
-        except ValueError:
-            return None
-        return round(v, 2) if self.money else (int(v) if v == int(v)
-                                               else v)
+        return _c2(v) if self.money else (int(v) if v == int(v) else v)
 
     def set_value(self, v):
         if v in (None, ""):
             super().set_value("")
         elif self.money:
-            super().set_value(f"{float(v):,.2f}")
+            super().set_value(f"{_c2(float(v)):,.2f}")    # half up
         else:
             super().set_value(f"{v:g}" if isinstance(v, float) else str(v))
 
@@ -174,8 +207,10 @@ class NumberEdit(TextEdit):
         v = self.value()
         if self.text().strip() and v is None:
             self.setStyleSheet(f"border:1px solid {theme.color('danger').name()}")
+            self.setToolTip(NUMBER_HELP)
             return
         self.setStyleSheet("")
+        self.setToolTip("")
         self.set_value(v)
         super()._done()
 
@@ -394,7 +429,7 @@ class LinesEdit(QWidget):
             parts = []
             for label, s, bad in schema.line_totals(self.cols, rows):
                 if s or bad:               # shown, never a silent 0
-                    txt = f"{s:,.2f}".rstrip("0").rstrip(".")
+                    txt = number_text(s)
                     parts.append(f"{label}: {txt}" +
                                  (f" ({bad} can't be read)" if bad else ""))
             self.total.setText("   ".join(parts))
@@ -414,8 +449,8 @@ class LinesEdit(QWidget):
             if c[2] == "date":
                 v = show_date(v)
             elif c[2] == "number" and isinstance(v, (int, float)) and \
-                    abs(v) >= 1000:
-                v = f"{v:,.2f}".rstrip("0").rstrip(".")
+                    not isinstance(v, bool) and abs(v) >= 1000:
+                v = number_text(v)
             self.table.setItem(r, i, QTableWidgetItem("" if v is None
                                                       else str(v)))
         self._loading = False
@@ -733,7 +768,7 @@ class Pill(QWidget):
         self._text = text or ""
         kind = schema.STATUS_COLORS.get(self._text, "muted")
         self._fg = {"good": "ok", "bad": "danger", "warn": "warn",
-                    "accent": "accent", "accent2": "accent2",
+                    "accent": "accent_text", "accent2": "accent_text",
                     "muted": "muted"}[kind]
         f = self.font()
         f.setBold(True)

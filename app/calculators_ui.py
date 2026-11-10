@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (QApplication, QComboBox, QDialog,
                                QTabWidget, QVBoxLayout, QWidget)
 
 from . import calculators as calc
+from .dmoney import c2 as _c2
 
 # which fields each concrete shape asks for: (key, label, suffix, default)
 FIELDS = {
@@ -143,17 +144,17 @@ class ConcreteTab(_Base):
             self.out.setText(str(e))
             return None
         self.out.setText(
-            f"<b>{r['cy_with_waste']:,.2f} cubic yards (CY)</b> with "
-            f"{self.waste.value():g}% waste ({r['cy']:,.2f} CY net, "
-            f"{r['cf']:,.1f} cu ft)<br>Order: <b>{r['order_cy']:,.2f} CY</b>"
+            f"<b>{_c2(r['cy_with_waste']):,.2f} cubic yards (CY)</b> with "
+            f"{self.waste.value():g}% waste ({_c2(r['cy']):,.2f} CY net, "
+            f"{r['cf']:,.1f} cu ft)<br>Order: <b>{_c2(r['order_cy']):,.2f} CY</b>"
             f" - {r['trucks']} truck(s) at {calc.TRUCK_CY:g} CY")
         return r
 
     def text(self):
         r = self.result()
         return (f"Concrete - {NAMES[self.shape.currentData()]} x "
-                f"{self.qty.value()}: {r['cy_with_waste']:.2f} CY with "
-                f"{self.waste.value():g}% waste; order {r['order_cy']:.2f} CY"
+                f"{self.qty.value()}: {_c2(r['cy_with_waste']):.2f} CY with "
+                f"{self.waste.value():g}% waste; order {_c2(r['order_cy']):.2f} CY"
                 f" ({r['trucks']} truck(s))")
 
 
@@ -258,7 +259,7 @@ class MasonryTab(_Base):
         b = (lambda t: f"<b>{t}</b>") if html else (lambda t: t)
         cy = format(g["cy_with_waste"], ",.2f") + " CY"
         return (f"Grout: {b(cy)} with {self.grout_waste.value():g}% waste "
-                f"({g['cy']:,.2f} CY net; order {g['order_cy']:,.2f} CY)")
+                f"({_c2(g['cy']):,.2f} CY net; order {_c2(g['order_cy']):,.2f} CY)")
 
     def update(self, *_):
         try:
@@ -271,7 +272,7 @@ class MasonryTab(_Base):
             f"with {self.waste.value():g}% waste ({r['units']:,.0f} net, "
             f"{r['per_sf']:.3f} per sq ft over {r['net_sf']:,.1f} sq ft)<br>"
             f"Mortar: <b>{r['mortar_bags']:,} bags</b> - Sand: "
-            f"<b>{r['sand_tons']:,.2f} tons</b><br>"
+            f"<b>{_c2(r['sand_tons']):,.2f} tons</b><br>"
             + (self._grout_text(r) + "<br>" if self._grout_text(r) else "")
             + "<span style='color:gray'>Mortar, sand and grout rates are "
             "starting points; use your supplier's.</span>")
@@ -282,7 +283,7 @@ class MasonryTab(_Base):
         return (f"Masonry - {self.unit.currentText()}: "
                 f"{r['units_with_waste']} units with {self.waste.value():g}% "
                 f"waste over {r['net_sf']:.1f} sf; {r['mortar_bags']} mortar "
-                f"bags; {r['sand_tons']:.2f} tons sand"
+                f"bags; {_c2(r['sand_tons']):.2f} tons sand"
                 + (f"; {self._grout_text(r, False)}" if self._grout_text(r)
                    else ""))
 
@@ -400,7 +401,7 @@ class RoofingTab(_Base):
                     filled.append(f)
                 else:
                     shown = (f"{v:,.0f}" if float(v).is_integer()
-                             else f"{v:,.2f}")
+                             else f"{_c2(v):,.2f}")
                     what = (f"{roof_report.NAMES[f]} out of range "
                             f"({shown}{units.get(f, ' ft')})")
                     if f == "pitch":
@@ -462,11 +463,11 @@ class RoofingTab(_Base):
         except ValueError as e:
             self.out.setText(str(e))
             return None
-        lines = [f"<b>{r['squares_with_waste']:,.2f} squares</b> with "
-                 f"{self.waste.value():g}% waste ({r['squares']:,.2f} net, "
+        lines = [f"<b>{_c2(r['squares_with_waste']):,.2f} squares</b> with "
+                 f"{self.waste.value():g}% waste ({_c2(r['squares']):,.2f} net, "
                  f"{r['sloped_sf']:,.0f} sq ft sloped; factor "
                  f"{r['factor']:.3f})",
-                 f"Order: <b>{r['order_squares']:,.2f} squares</b>"]
+                 f"Order: <b>{_c2(r['order_squares']):,.2f} squares</b>"]
         if r["bundles"]:
             lines.append(f"Shingles: <b>{r['bundles']:,} bundles</b>")
         lines.append(f"Underlayment: <b>{r['underlay_rolls']:,} rolls</b>")
@@ -490,9 +491,9 @@ class RoofingTab(_Base):
     def text(self):
         r = self.result()
         parts = [f"Roofing - {self.kind.currentText()}: "
-                 f"{r['squares_with_waste']:.2f} squares with "
+                 f"{_c2(r['squares_with_waste']):.2f} squares with "
                  f"{self.waste.value():g}% waste "
-                 f"(order {r['order_squares']:.2f})"]
+                 f"(order {_c2(r['order_squares']):.2f})"]
         if r["bundles"]:
             parts.append(f"{r['bundles']} bundles")
         parts.append(f"{r['underlay_rolls']} underlayment rolls")

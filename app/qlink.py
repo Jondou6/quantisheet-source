@@ -11,6 +11,7 @@ import logging
 import os
 
 from . import acrobat, annotate, settings
+from .dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 
@@ -61,13 +62,13 @@ def sheets(doc):
                       "Labor Hours", "Labor Cost", "Total"]]
             for r in rows:
                 arows.append([r["name"], r["trade"], round(r["quantity"], 4),
-                              r["unit"], round(r["material"], 2),
-                              round(r["labor_hours"], 2),
-                              round(r["labor_cost"], 2), round(r["total"], 2)])
-            arows.append(["Total", "", "", "", round(totals["material"], 2),
-                          round(totals["labor_hours"], 2),
-                          round(totals["labor_cost"], 2),
-                          round(totals["total"], 2)])
+                              r["unit"], _c2(r["material"]),
+                              _c2(r["labor_hours"]),
+                              _c2(r["labor_cost"]), _c2(r["total"])])
+            arows.append(["Total", "", "", "", _c2(totals["material"]),
+                          _c2(totals["labor_hours"]),
+                          _c2(totals["labor_cost"]),
+                          _c2(totals["total"])])
             out.append(("Assemblies", arows))
     except Exception:
         log.warning("assembly rollup for quantity link", exc_info=True)

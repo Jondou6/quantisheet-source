@@ -21,6 +21,7 @@ lengths. All from typed numbers; nothing aerial (roof.py is the plan
 takeoff).
 """
 import math
+from .dmoney import c2 as _c2
 
 CY = 27.0                          # cu ft in a cubic yard
 
@@ -190,7 +191,7 @@ def masonry(length, height, unit="Modular brick", openings_sf=0.0,
                   grout_cf_per_sf)
     return {"net_sf": net, "per_sf": per, "units": n, "units_with_waste": nw,
             "mortar_bags": math.ceil(nw / 1000 * m) if nw else 0,
-            "sand_tons": round(nw / 1000 * s, 2), "kind": k, "grout": g}
+            "sand_tons": _c2(nw / 1000 * s), "kind": k, "grout": g}
 
 
 # ------------------------------------------------------------- roofing

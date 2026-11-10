@@ -324,3 +324,21 @@ def test_overlapping_cutouts_are_taken_off_once():
     got = _net_cutout(sq, [out], 100.0)
     assert abs(got - 4.0) < 0.3                            # only inside
     assert _net_cutout(None, [a], 100.0) is None
+
+
+def test_our_markups_leave_the_clipboard_at_exit(win, qapp):
+    """Nov 5: data copied with Ctrl+C was still on the system clipboard as
+    Python shut down, and the program crashed on exit. release() (run at
+    exit and on quit) clears only our own clipboard data."""
+    w, _ = win
+    cb = QApplication.clipboard()
+    cb.setText("from another program")
+    assert takeoffclip.release() is False
+    assert cb.text() == "from another program"
+    v = w._view
+    it = _measure(v, "length", [(100, 300), (190, 300)], "Fence")
+    _select(v, it)
+    assert w.copy_text() == 1
+    assert takeoffclip.release() is True
+    md = cb.mimeData()
+    assert md is None or not md.hasFormat(takeoffclip.MIME)

@@ -5,8 +5,9 @@ states, shortcuts and tooltips stay in step everywhere.
 """
 import re
 
-from PySide6.QtCore import QEvent, QSize, Qt, Signal
-from PySide6.QtGui import QAction, QActionGroup, QColor, QKeySequence, QPainter
+from PySide6.QtCore import QEvent, QPoint, QRect, QSize, Qt, Signal
+from PySide6.QtGui import (QAction, QActionGroup, QColor, QFont, QKeySequence,
+                           QLinearGradient, QPainter, QPen)
 from PySide6.QtWidgets import (
     QAbstractItemView, QButtonGroup, QDialog, QFrame, QHBoxLayout, QLabel,
     QLineEdit, QListWidget, QListWidgetItem, QMenu, QScrollArea,
@@ -23,110 +24,536 @@ def clean(text):
 
 
 # ---- ribbon --------------------------------------------------------------------
+# One tile colour: a solid teal-green square, lighter at the top, white
+# glyph. The fill does not change between light and dark mode. Labels sit
+# on the frosted panel (CAPTION_INK / DISABLED_INK).
+
+GREEN_FILL = "#0E6A60"
+GLYPH = "#FFFFFF"
+GLYPH_STROKE = 3.0          # heavier than the 1.7 menu-icon stroke
+# How far the top of the tile lifts toward white. Small enough that a
+# white glyph stays at 4.5:1, including after a light hover.
+GRADIENT_LIFT = 0.06
+HOVER_LIFT = 0.07
+FAMILIES = frozenset({
+    "file", "edit", "tools", "view", "compare", "markup", "measure",
+    "estimate", "civil", "review", "ai", "project", "field", "schedule",
+    "ada", "energy", "billing", "pages", "document", "sign", "protect",
+    "help", "service",
+})
+TAB_FAMILY = {
+    "Home": "file", "Markup": "markup", "Takeoff": "measure",
+    "Estimate": "estimate", "Review": "review", "AI": "ai",
+    "Project": "project", "Billing": "billing", "Pages": "pages",
+    "Document": "document", "Tools": "tools", "Help": "help",
+    "Service": "service", "Module": "project", "Civil": "civil",
+    "PDF Management": "document",
+}
+# group title -> family, when the title means the same thing on every tab
+TITLE_FAMILY = {
+    "File": "file", "Edit": "edit", "View": "view", "Compare": "compare",
+    "Text": "markup", "Shapes": "markup", "Notes": "markup",
+    "Style": "markup", "Organize": "markup",
+    "Scale": "measure", "Measure": "measure", "Count": "measure",
+    "Automatic": "measure", "Site": "measure", "Plan Set": "measure",
+    "Roof": "measure", "Selected": "measure",
+    "Assemblies": "estimate", "Pricing": "estimate",
+    "Calculators": "estimate", "Bidding": "estimate",
+    "Contract": "billing", "Changes": "billing", "Payment": "billing",
+    "Pages": "pages", "Page Marks": "pages",
+    "Content": "document", "Forms": "document", "Standards": "document",
+    "Sign": "sign", "E-Sign": "sign", "Protect": "protect",
+    "Collaborate": "tools", "Convert": "tools", "Settings": "tools",
+    "Learn": "help", "About": "help",
+    "Manage": "project", "Sets": "project", "Documents": "project",
+    "Check": "project", "Office": "project",
+    "Calls": "service", "Agreements": "service", "Logs & Tests": "service",
+    "Records": "service", "Quotes": "service",
+    "Voice": "ai", "Model": "ai",
+}
+# (tab, title) wins over TITLE_FAMILY when one title is two kinds of work
+EXACT_FAMILY = {
+    ("Takeoff", "Output"): "measure",
+    ("Estimate", "Output"): "estimate",
+    ("Review", "Automate"): "review",
+    ("Tools", "Automate"): "tools",
+    ("Review", "AI"): "ai",
+    ("Review", "AI Review"): "ai",
+    ("Review", "RFIs"): "review",
+    ("Takeoff", "AI Takeoff"): "ai",
+    ("Project", "Field"): "field",
+    ("Project", "Schedule"): "schedule",
+    ("Project", "ADA"): "ada",
+    ("Project", "Energy Code"): "energy",
+    ("Tools", "Voice"): "ai",
+    ("Home", "Tools"): "tools",
+    ("AI", "Takeoff"): "ai",
+    ("AI", "Schedule"): "ai",
+    ("AI", "Review"): "ai",
+    ("Service", "Pricing"): "service",
+}
+
+
+def family_for(tab, title):
+    """Colour family for a group's tiles."""
+    if title.startswith("Civil"):
+        return "civil"
+    if tab == "Service":
+        return "service"
+    if tab == "AI" or title.startswith("AI"):
+        return "ai"
+    hit = EXACT_FAMILY.get((tab, title))
+    if hit:
+        return hit
+    if title in TITLE_FAMILY:
+        return TITLE_FAMILY[title]
+    return TAB_FAMILY.get(tab, "tools")
+
+
+# commands whose menu entry has no icon of its own
+GLYPH_OF = {
+    "undo history": "history",
+    "auto scale (check against dimensions)": "auto_scale",
+    "show only this item": "eye",
+    "set typical count": "count",
+    "bulk edit selected": "edit_text",
+    "copy several times": "duplicate",
+    "add more to this count": "count",
+    "show uncounted copies": "find",
+    "add this count to the count library": "book",
+    "convert selected to": "sync",
+    "take off into assembly": "assembly",
+    "add from cost book": "book",
+    "quick $/sf estimate": "dollar",
+    "revision changes (old → new)": "compare",
+    "placeholders & allowances": "budget",
+    "escalation to buy date": "trend",
+    "export my estimate": "export",
+    "estimate from takeoff (all groups)": "estimate",
+    "start from master estimate": "book",
+    "labor burden & wages": "crew",
+    "import prevailing wages (davis-bacon)": "import",
+    "export cash flow": "forecast",
+    "import owner bid schedule": "import",
+    "export priced bid schedule": "export",
+    "save bid version": "save",
+    "read the energy code online": "link",
+    "quantisheet back office": "dollar",
+    "document properties": "settings",
+    "help center & tutorials": "book",
+    "about quantisheet": "info",
+    "report an issue": "flag",
+    "terms of service": "contract",
+    "privacy": "shield",
+    "third-party licenses": "book",
+}
+
+
+def _luminance(color):
+    def chan(c):
+        c = c / 255.0
+        return c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
+    return (0.2126 * chan(color.red()) + 0.7152 * chan(color.green())
+            + 0.0722 * chan(color.blue()))
+
+
+def contrast_ratio(a, b):
+    la, lb = _luminance(a), _luminance(b)
+    return (max(la, lb) + 0.05) / (min(la, lb) + 0.05)
+
+
+def tile_contrast():
+    """White-glyph contrast for the green tile. Same in light and dark.
+
+    Keys: fill, top (lighter end of the gradient), hover, pressed, disabled.
+    """
+    fill = QColor(GREEN_FILL)
+    white = QColor("#FFFFFF")
+    top = _mix(fill, white, GRADIENT_LIFT)
+    hover = _mix(_mix(fill, white, HOVER_LIFT), white, GRADIENT_LIFT)
+    pressed = _mix(fill, QColor("#000000"), 0.16)
+    disabled = _mix(fill, QColor("#9CA3AF"), 0.35)
+    return {
+        "fill": contrast_ratio(white, fill),
+        "top": contrast_ratio(white, top),
+        "hover": contrast_ratio(white, hover),
+        "pressed": contrast_ratio(white, pressed),
+        "disabled": contrast_ratio(white, disabled),
+    }
+
+
+def _mix(a, b, t):
+    return QColor(int(a.red() * (1 - t) + b.red() * t),
+                  int(a.green() * (1 - t) + b.green() * t),
+                  int(a.blue() * (1 - t) + b.blue() * t))
+
+
+# label ink on the frosted panel (checked against the panel fill)
+CAPTION_INK = {"dark": "#c5c8d0", "light": "#3f4550"}
+DISABLED_INK = {"dark": "#a0a6b0", "light": "#5b6472"}
+
+
+def _ink(which):
+    from . import theme
+    key = "dark" if theme.is_dark() else "light"
+    return QColor(which[key])
+
 
 class RibbonButton(QToolButton):
+    """Coloured rounded-square tile, label centred underneath.
+
+    Every command is this size (the old small column sat its text higher
+    than the tiles beside it). Labels wrap to two lines and share the
+    bottom of that two-line slot, so a short name lines up with a long one.
+    """
+
+    TILE = 34
+    STD_W = 78
+    RADIUS = 0.22
+
     def __init__(self, action, large=True, label=None, parent=None):
         super().__init__(parent)
         self.setObjectName("RibbonButton")
-        self.setDefaultAction(action)
-        # "&" in a button's text marks a keyboard accelerator: double it so
-        # "Header & Footer" shows its ampersand
-        # iconText() has the menu's "&&" already turned into "&"
-        self._large = large
+        # setDefaultAction can emit changeEvent before the rest of init
+        self._large = True
+        self._family = "tools"
+        self.preview_state = None       # screenshots force a state
         base = label or (action.iconText() or clean(action.text()))
         self._label = base.replace("…", "").rstrip(". ").replace("&", "&&")
+        self.setAttribute(Qt.WA_Hover, True)
+        self.setFocusPolicy(Qt.StrongFocus)
+        self.setAutoRaise(True)
+        self.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+        self.setDefaultAction(action)
         self.setText(self._label)
-        if large:
-            self.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-            self.setIconSize(QSize(26, 26))
-            self.setFixedHeight(70)
-            self.setMinimumWidth(max(54, self.sizeHint().width()))
-        else:
-            self.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
-            self.setIconSize(QSize(16, 16))
-            self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-            self.setMinimumWidth(self.sizeHint().width())
-        tip = action.toolTip() or self._label
+        tip = action.toolTip() or self._label.replace("&&", "&")
         key = action.shortcut().toString(QKeySequence.NativeText)
         if key and key not in tip:
             tip = f"{tip}  ({key})"
         self.setToolTip(tip)
         action.changed.connect(self._relabel)
+        self._apply_label_weight()
+        self._apply_metrics()
+
+    def _apply_label_weight(self):
+        f = self.font()
+        f.setWeight(QFont.DemiBold)
+        self.setFont(f)
+
+    def set_family(self, name):
+        self._family = name if name in FAMILIES else "tools"
+        self.update()
 
     def _relabel(self):
-        # setDefaultAction copies the action's text back; keep ours
         if self.text() != self._label:
             self.setText(self._label)
 
-    def _full_width(self):
-        """Width that shows the whole label in the button's current font
-        and style (the theme's font, Windows text size): the width taken
-        when the button was made came before the style sheet, so labels
-        were cut to "Dat...ase" (Jon, Oct 22)."""
+    def _plain(self):
+        return self._label.replace("&&", "&")
+
+    def _icon_name(self):
+        a = self.defaultAction()
+        if a is None:
+            return "info"
+        data = a.data()
+        if isinstance(data, str) and icons.has(data):
+            return data
+        key = clean(a.text()).lower()
+        glyph = GLYPH_OF.get(key)
+        if glyph and icons.has(glyph):
+            return glyph
+        named = a.property("qs_icon")
+        if named and icons.has(named):
+            return named
+        return "info"
+
+    def _break(self, text, inner, fm):
+        words = text.split()
+        if not words:
+            return [""]
+        lines, cur = [], ""
+        for word in words:
+            trial = word if not cur else cur + " " + word
+            if cur and fm.horizontalAdvance(trial) > inner:
+                lines.append(cur)
+                cur = word
+            else:
+                cur = trial
+        if cur:
+            lines.append(cur)
+        return lines
+
+    def _layout_width(self):
+        """Standard tile column, grown only until the label fits in two
+        lines (nothing is cut with an ellipsis)."""
         self.ensurePolished()
-        w = super().sizeHint().width()
-        text = self.fontMetrics().horizontalAdvance(self.text().replace(
-            "&&", "&")) + 16
-        if self.toolButtonStyle() == Qt.ToolButtonTextBesideIcon:
-            text += self.iconSize().width() + 8
-        if self.menu() is not None:
-            text += 14
-        return max(54 if self._large else 0, w, text)
+        fm = self.fontMetrics()
+        text = self._plain()
+        pad = 10
+        w = self.STD_W
+        limit = max(w, fm.horizontalAdvance(text) + pad)
+        while True:
+            inner = w - pad
+            lines = self._break(text, inner, fm)
+            if len(lines) <= 2 and all(
+                    fm.horizontalAdvance(line) <= inner for line in lines):
+                return w
+            if w >= limit:
+                return w
+            w = min(limit, w + 8)
+
+    def wrapped_lines(self):
+        """The one or two lines actually drawn."""
+        self.ensurePolished()
+        fm = self.fontMetrics()
+        inner = max(8, self.width() - 10)
+        lines = self._break(self._plain(), inner, fm)
+        if len(lines) <= 2:
+            return lines
+        # a font change between sizing and paint: keep the tail on line 2
+        return [lines[0], " ".join(lines[1:])]
+
+    def label_baseline(self):
+        """Y of the last label line's baseline inside this button.
+
+        A one-line label sits in the bottom line of the two-line slot, so
+        every button in a row shares this baseline."""
+        self.ensurePolished()
+        fm = self.fontMetrics()
+        lh = fm.height()
+        top = self.height() - 2 - lh * 2
+        return top + lh + fm.ascent()
+
+    def box_height(self):
+        fm = self.fontMetrics()
+        label = fm.height() * 2 + 2
+        return max(74, 4 + self.TILE + 3 + label)
+
+    def _apply_metrics(self):
+        self.ensurePolished()
+        h = self.box_height()
+        w = self._layout_width()
+        self.setFixedHeight(h)
+        self.setMinimumWidth(w)
+        self.setMaximumWidth(w)
+        self.updateGeometry()
 
     def _fit(self):
-        """Raise the minimum width to the whole label (never lower it)."""
-        need = self._full_width()
-        if self.minimumWidth() < need:
-            self.setMinimumWidth(need)
+        if not hasattr(self, "_label"):
+            return
+        self._apply_metrics()
 
     def changeEvent(self, e):
         super().changeEvent(e)
-        if e.type() in (QEvent.FontChange, QEvent.StyleChange):
+        if e.type() in (QEvent.FontChange, QEvent.StyleChange,
+                        QEvent.EnabledChange, QEvent.Polish):
             self._fit()
+            self.update()
+
+    def event(self, e):
+        if e.type() == QEvent.Polish and getattr(self, "_label", None):
+            self._fit()
+        return super().event(e)
 
     def showEvent(self, e):
         self._fit()
         super().showEvent(e)
 
+    def enterEvent(self, e):
+        self.update()
+        super().enterEvent(e)
+
+    def leaveEvent(self, e):
+        self.update()
+        super().leaveEvent(e)
+
+    def _states(self):
+        forced = self.preview_state
+        disabled = forced == "disabled" or (
+            forced is None and not self.isEnabled())
+        hover = forced == "hover" or (
+            forced is None and self.underMouse() and not disabled)
+        pressed = forced == "pressed" or (
+            forced is None and self.isDown() and not disabled)
+        focus = forced == "focus" or (forced is None and self.hasFocus())
+        checked = self.isChecked() and not disabled
+        return disabled, hover, pressed, focus, checked
+
+    def _colors(self, disabled, hover, pressed, checked=False):
+        """(tile fill, white glyph, stroke) . Same green in light and dark."""
+        base = QColor(GREEN_FILL)
+        ink = QColor(GLYPH)
+        if disabled:
+            base = _mix(base, QColor("#9CA3AF"), 0.35)
+        elif pressed or checked:
+            base = _mix(base, QColor("#000000"), 0.16)
+        elif hover:
+            base = _mix(base, QColor("#FFFFFF"), HOVER_LIFT)
+        return base, ink, GLYPH_STROKE
+
+    def _paint_tile(self, p, rect, radius, base, dark):
+        """Green fill, lighter at the top, with a thin inner highlight."""
+        top = _mix(base, QColor("#FFFFFF"), GRADIENT_LIFT)
+        bot = _mix(base, QColor("#000000"), 0.06)
+        grad = QLinearGradient(rect.topLeft(), rect.bottomLeft())
+        grad.setColorAt(0, top)
+        grad.setColorAt(1, bot)
+        p.setPen(Qt.NoPen)
+        p.setBrush(grad)
+        p.drawRoundedRect(rect, radius, radius)
+        shine = QColor(255, 255, 255, 110 if not dark else 70)
+        p.setPen(QPen(shine, 1.2))
+        p.drawLine(rect.left() + 6, rect.top() + 2,
+                   rect.right() - 6, rect.top() + 2)
+
+    def paintEvent(self, _ev):
+        from . import theme
+        p = QPainter(self)
+        p.setRenderHint(QPainter.Antialiasing)
+        disabled, hover, pressed, focus, checked = self._states()
+        dark = theme.is_dark()
+        base, ink, stroke = self._colors(disabled, hover, pressed, checked)
+        tile = self.TILE
+        x = max(0, (self.width() - tile) // 2)
+        y = 4
+        if hover and not pressed:
+            y -= 1
+        rect = QRect(x, y, tile, tile)
+        radius = max(4.0, tile * self.RADIUS)
+        if pressed and not disabled:
+            rect = rect.adjusted(1, 1, -1, -1)
+        self._paint_tile(p, rect, radius, base, dark)
+        gaccent = ink.name()
+        if checked:
+            ring = QColor("#ffffff")
+            p.setPen(QPen(ring, 2))
+            p.setBrush(Qt.NoBrush)
+            p.drawRoundedRect(rect.adjusted(2, 2, -2, -2), radius - 1,
+                              radius - 1)
+        if focus:
+            ring = QColor("#f8fafc") if dark else QColor("#0f172a")
+            p.setPen(QPen(ring, 2))
+            p.setBrush(Qt.NoBrush)
+            outer = rect.adjusted(-4, -4, 4, 4)
+            p.drawRoundedRect(outer, radius + 3, radius + 3)
+        side = max(12, tile - 14)
+        pm = icons.pixmap(self._icon_name(), side, ink.name(), gaccent,
+                          stroke)
+        p.drawPixmap(rect.x() + (rect.width() - side) // 2,
+                     rect.y() + (rect.height() - side) // 2, pm)
+        if self.menu() is not None:
+            p.setPen(Qt.NoPen)
+            p.setBrush(ink)
+            cx, cy = rect.right() - 7, rect.bottom() - 6
+            p.drawPolygon([QPoint(cx - 3, cy - 1), QPoint(cx + 3, cy - 1),
+                           QPoint(cx, cy + 2)])
+        fm = self.fontMetrics()
+        lines = self.wrapped_lines()
+        lh = fm.height()
+        slot = lh * 2
+        top = self.height() - 2 - slot
+        p.setPen(_ink(DISABLED_INK) if disabled else theme.color("text"))
+        for i, line in enumerate(lines):
+            # bottom of the two-line slot, so one line sits with the
+            # second line of a wrapped neighbour
+            y0 = top + (2 - len(lines) + i) * lh
+            p.drawText(QRect(0, y0, self.width(), lh),
+                       Qt.AlignHCenter | Qt.AlignVCenter, line)
+        p.end()
+
+    def sizeHint(self):
+        return QSize(self._layout_width(), self.box_height())
+
+    def minimumSizeHint(self):
+        return self.sizeHint()
+
 
 class RibbonGroup(QWidget):
+    """Frosted panel: tiles on one row, caption centred on the bottom edge."""
+
     def __init__(self, title, parent=None):
         super().__init__(parent)
         self.setObjectName("RibbonGroup")
+        self.setAttribute(Qt.WA_StyledBackground, False)
+        self.family = "tools"
+        self._title = title
         v = QVBoxLayout(self)
-        v.setContentsMargins(4, 2, 4, 2)
-        v.setSpacing(2)
+        v.setContentsMargins(8, 6, 8, 4)
+        v.setSpacing(1)
         self.row = QHBoxLayout()
-        self.row.setSpacing(2)
+        self.row.setSpacing(4)
         self.row.setAlignment(Qt.AlignTop)
         v.addLayout(self.row, 1)
-        lab = QLabel(title)
-        lab.setObjectName("RibbonGroupLabel")
-        lab.setAlignment(Qt.AlignHCenter)
-        v.addWidget(lab)
+        self.caption = QLabel(title)
+        self.caption.setObjectName("RibbonGroupLabel")
+        self.caption.setAlignment(Qt.AlignHCenter | Qt.AlignBottom)
+        v.addWidget(self.caption)
         self.buttons = []
+        self.refresh_caption()
 
-    def large(self, action, label=None, menu=None):
+    def set_family(self, name):
+        self.family = name if name in FAMILIES else "tools"
+        for b in self.buttons:
+            b.set_family(self.family)
+        self.update()
+
+    def refresh_caption(self):
+        c = _ink(CAPTION_INK).name()
+        self.caption.setStyleSheet(
+            f"color: {c}; background: transparent; font-size: 8pt; "
+            "font-weight: 600;")
+
+    def paintEvent(self, _ev):
+        from . import theme
+        p = QPainter(self)
+        p.setRenderHint(QPainter.Antialiasing)
+        rect = self.rect().adjusted(1, 1, -2, -2)
+        if theme.is_dark():
+            fill = QColor(255, 255, 255, 18)
+            border = QColor(255, 255, 255, 40)
+            shine = QColor(255, 255, 255, 46)
+        else:
+            fill = QColor(255, 255, 255, 210)
+            border = QColor(15, 23, 42, 32)
+            shine = QColor(255, 255, 255, 255)
+        p.setPen(QPen(border, 1))
+        p.setBrush(fill)
+        p.drawRoundedRect(rect, 12, 12)
+        p.setPen(QPen(shine, 1))
+        p.drawLine(rect.left() + 12, rect.top() + 1,
+                   rect.right() - 12, rect.top() + 1)
+        p.end()
+
+    def _add(self, action, label, menu=None):
         b = RibbonButton(action, True, label)
+        b.set_family(self.family)
         if menu is not None:
             b.setMenu(menu)
             b.setPopupMode(QToolButton.MenuButtonPopup)
-        # every box sits at the top of its group, so all groups line up
-        # (Jon, Oct 20: some groups' buttons sat lower than others)
         self.row.addWidget(b, 0, Qt.AlignTop)
         self.buttons.append(b)
         return b
 
+    def large(self, action, label=None, menu=None):
+        return self._add(action, label, menu)
+
+    def place(self, button, index):
+        """Move one of this group's buttons to `index` (0 = first)."""
+        if button not in self.buttons:
+            return None
+        self.row.removeWidget(button)
+        self.buttons.remove(button)
+        index = max(0, min(index, len(self.buttons)))
+        self.row.insertWidget(index, button, 0, Qt.AlignTop)
+        self.buttons.insert(index, button)
+        return index
+
     def small(self, actions, labels=None):
-        """A column of up to three small buttons."""
-        col = QVBoxLayout()
-        col.setSpacing(1)
+        """Same tiles, same row. A stacked column put some labels higher
+        than the tiles beside them (the Service tab)."""
+        labels = labels or {}
         for i, a in enumerate(actions):
-            b = RibbonButton(a, False, (labels or {}).get(i))
-            col.addWidget(b)
-            self.buttons.append(b)
-        col.addStretch(1)
-        self.row.addLayout(col)
+            self._add(a, labels.get(i))
 
     def widget(self, w):
         self.row.addWidget(w, 0, Qt.AlignTop)
@@ -146,8 +573,8 @@ class RibbonPage(QScrollArea):
         inner = QWidget()
         inner.setObjectName("RibbonBody")
         self.lay = QHBoxLayout(inner)
-        self.lay.setContentsMargins(6, 4, 6, 2)
-        self.lay.setSpacing(4)
+        self.lay.setContentsMargins(8, 4, 8, 2)
+        self.lay.setSpacing(8)
         self.lay.addStretch(1)
         self.setWidget(inner)
         self.groups = {}
@@ -226,15 +653,23 @@ class RibbonPage(QScrollArea):
             return
         super().wheelEvent(ev)
 
+    def arrange_groups(self, order):
+        """Put the groups in this order, left to right (groups not named
+        keep their place after them). Returns the titles in order."""
+        names = [n for n in order if n in self.groups]
+        names += [n for n in self.groups if n not in names]
+        for n in names:
+            self.lay.removeWidget(self.groups[n])
+        for i, n in enumerate(names):
+            self.lay.insertWidget(i, self.groups[n])
+        self.groups = {n: self.groups[n] for n in names}
+        return names
+
     def group(self, title):
         if title in self.groups:
             return self.groups[title]
-        if self.groups:
-            sep = QFrame()
-            sep.setObjectName("RibbonSep")
-            sep.setFixedWidth(1)
-            self.lay.insertWidget(self.lay.count() - 1, sep)
         g = RibbonGroup(title)
+        g.set_family(family_for(getattr(self, "tab_name", ""), title))
         self.lay.insertWidget(self.lay.count() - 1, g)
         self.groups[title] = g
         return g
@@ -280,8 +715,9 @@ class _TabStrip(QScrollArea):
 class Ribbon(QWidget):
     search_requested = Signal()
     theme_picked = Signal(str)
+    page_changed = Signal(str)
 
-    HEIGHT = 114
+    HEIGHT = 132
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -367,13 +803,18 @@ class Ribbon(QWidget):
                                              else "sun"))
         for k, a in self.theme_actions.items():
             a.setChecked(theme.mode() == k)
-        # icons draw in the theme colours of the moment: the style sheet
-        # change repaints every button, nothing to reset here
+        for p in self.pages.values():
+            for g in p.groups.values():
+                g.refresh_caption()
+                g.update()
+                for b in g.buttons:
+                    b.update()
 
     def page(self, name):
         if name in self.pages:
             return self.pages[name]
         p = RibbonPage()
+        p.tab_name = name
         self.stack.addWidget(p)
         self.pages[name] = p
         b = QToolButton()
@@ -389,6 +830,22 @@ class Ribbon(QWidget):
             b.setChecked(True)
         return p
 
+    def arrange(self, order):
+        """Put the tabs in this order (names not in it keep their place
+        after the ones that are). Pages are made where their first command
+        is listed, so a folded group (AI Schedule -> Project) could pull a
+        tab ahead of its neighbours (Nov 5)."""
+        names = [n for n in order if n in self.pages]
+        names += [n for n in self.pages if n not in names]
+        slots = sorted(self.tab_row.indexOf(self.pages[n].tab_button)
+                       for n in names)
+        for n in names:
+            self.tab_row.removeWidget(self.pages[n].tab_button)
+        for i, n in zip(slots, names):
+            self.tab_row.insertWidget(i, self.pages[n].tab_button)
+        self.pages = {n: self.pages[n] for n in names}
+        return names
+
     def eventFilter(self, obj, ev):
         if ev.type() == QEvent.MouseButtonDblClick:
             self.set_collapsed(not self.collapsed)
@@ -403,6 +860,7 @@ class Ribbon(QWidget):
         if self.collapsed:
             self.set_collapsed(False)
         settings.set("ribbon_tab", name)
+        self.page_changed.emit(name)
 
     def current(self):
         w = self.stack.currentWidget()
@@ -413,6 +871,115 @@ class Ribbon(QWidget):
         self.stack.setVisible(not on)
         self.collapse.setText("⌄" if on else "⌃")
         settings.set("ribbon_collapsed", self.collapsed)
+
+
+class ModelStatus(QFrame):
+    """Local-model status on the AI tab. Uses the same check the Generate
+    Set window already runs. Click opens Local AI Models."""
+
+    def __init__(self, win, parent=None):
+        super().__init__(parent)
+        self.win = win
+        self.setObjectName("ModelStatus")
+        self.setCursor(Qt.PointingHandCursor)
+        self.setMinimumWidth(168)
+        self.setFixedHeight(74)
+        self._state = "check"
+        self._text = "Checking the local AI…"
+        self._fit()
+        self.setToolTip("Local model status. Click to open Local AI Models.")
+        from PySide6.QtCore import QTimer
+        QTimer.singleShot(0, self.refresh)
+
+    def refresh(self):
+        from . import bg
+
+        def work():
+            from . import policy
+            if not policy.allowed("ai"):
+                return ("off", "Local AI: turned off")
+            try:
+                from .genset import brief
+                up = brief.ai_up(timeout=0.6)
+            except Exception:                             # noqa: BLE001
+                up = False
+            if not up:
+                return ("down", "Local AI: not running")
+            try:
+                from .genset import brief
+                model = brief.ai_model() or ""
+            except Exception:                             # noqa: BLE001
+                model = ""
+            extra = f" · {model}" if model else ""
+            return ("up", "Local AI: running" + extra)
+
+        def done(pair):
+            self._state, self._text = pair
+            self._fit()
+            self.update()
+
+        bg.run(work, done, lambda _m: done(("down", "Local AI: not running")),
+               self)
+
+    def _lines(self, width=None):
+        """The text as one line, or split after the colon onto two."""
+        fm = self.fontMetrics()
+        width = self.width() if width is None else width
+        if fm.horizontalAdvance(self._text) <= width - 28:
+            return [self._text]
+        cut = self._text.find(":")
+        if cut > 0:
+            return [self._text[:cut], self._text[cut + 1:].strip()]
+        return [self._text]
+
+    def _fit(self):
+        """Wide enough for the longest line, so nothing is cut off at the
+        ribbon's edge (Chief's user test, Nov 6)."""
+        fm = self.fontMetrics()
+        cut = self._text.find(":")
+        parts = ([self._text[:cut], self._text[cut + 1:].strip()]
+                 if cut > 0 else [self._text])
+        need = max(fm.horizontalAdvance(x) for x in parts) + 34
+        self.setMinimumWidth(max(168, need))
+        self.updateGeometry()
+
+    def sizeHint(self):
+        from PySide6.QtCore import QSize
+        return QSize(max(self.minimumWidth(), 168), 74)
+
+    def mouseReleaseEvent(self, e):
+        if e.button() == Qt.LeftButton:
+            fn = getattr(self.win, "ai_models", None)
+            if fn is not None:
+                fn()
+        super().mouseReleaseEvent(e)
+
+    def paintEvent(self, _ev):
+        from . import theme
+        p = QPainter(self)
+        p.setRenderHint(QPainter.Antialiasing)
+        dark = theme.is_dark()
+        p.setPen(theme.color("text") if self._state != "check"
+                 else _ink(DISABLED_INK))
+        dot = {"up": "#12865a" if not dark else "#3fb27f",
+               "down": "#b54708" if not dark else "#e3a008",
+               "off": "#6b7280",
+               "check": "#6b7280"}.get(self._state, "#6b7280")
+        p.setPen(Qt.NoPen)
+        p.setBrush(QColor(dot))
+        p.drawEllipse(8, self.height() // 2 - 5, 10, 10)
+        p.setPen(theme.color("text"))
+        # two lines, bottom-aligned in the same slot as ribbon labels
+        fm = p.fontMetrics()
+        # split on the colon so the state name stays on line 2 if needed
+        lines = self._lines()
+        lh = fm.height()
+        slot_top = self.height() - 8 - lh * 2
+        top = slot_top + (2 - len(lines)) * lh
+        for i, line in enumerate(lines[:2]):
+            p.drawText(QRect(24, top + i * lh, self.width() - 30, lh),
+                       Qt.AlignLeft | Qt.AlignVCenter, line)
+        p.end()
 
 
 # ---- command search ---------------------------------------------------------------

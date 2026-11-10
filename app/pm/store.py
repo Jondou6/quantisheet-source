@@ -103,6 +103,24 @@ import atexit  # noqa: E402
 atexit.register(flush_all)
 
 
+def _fsync_dir(path):
+    """Ask the system to make the rename durable where a folder can be
+    fsynced (not on Windows, which can't open a folder for that; on macOS
+    this is the plain fsync, weaker than F_FULLFSYNC)."""
+    if os.name == "nt":
+        return
+    try:
+        fd = os.open(path, os.O_RDONLY)
+    except OSError:
+        return
+    try:
+        os.fsync(fd)
+    except OSError:
+        pass
+    finally:
+        os.close(fd)
+
+
 class ProjectStore:
     def __init__(self, folder):
         self.folder = os.path.abspath(folder)
@@ -173,12 +191,58 @@ class ProjectStore:
                 self._write()
 
     def _write(self):
+        """The whole file from one complete snapshot. The delayed save runs
+        on a timer thread while the window may still be changing the
+        records, so the text is made first (tried again if a record
+        changed mid-way - "dictionary changed size during iteration" in
+        the Nov 7 test run) and only then written, never a half-dumped
+        file. When it can't get a still moment, the save is put off.
+        (A value changed in place mid-walk - a list appended to - isn't
+        detected; the next save, which that change schedules, writes it.)"""
         with self.lock:
+            text = None
+            for _ in range(20):
+                try:
+                    text = json.dumps(self.data, indent=0)
+                    break
+                except RuntimeError:              # changed while reading
+                    time.sleep(0.01)
+            if text is None:
+                log.warning("project %s kept changing; saving later",
+                            self.path)
+                with _DIRTY_LOCK:
+                    _DIRTY[self.path] = self
+                if self._timer is not None:       # one pending save only
+                    self._timer.cancel()
+                self._timer = threading.Timer(SAVE_DELAY, self.flush)
+                self._timer.daemon = True
+                self._timer.start()
+                return
             os.makedirs(os.path.dirname(self.path), exist_ok=True)
-            tmp = self.path + ".tmp"
-            with open(tmp, "w", encoding="utf-8") as f:
-                json.dump(self.data, f, indent=0)
-            os.replace(tmp, self.path)
+            # the whole write is under self.lock (an RLock that save(),
+            # flush() and this share), so two flushes can't overlap; the
+            # temp name is still unique to the call, belt and braces
+            # (Venice, Nov 9 - N11)
+            # a counter per store too: two stores for one folder in one
+            # thread don't share a lock (Venice, Nov 9 - P4-8)
+            self._seq = getattr(self, "_seq", 0) + 1
+            # (the lock already covers threads within one store, so no
+            # thread id - shorter, for paths near MAX_PATH; F5-13)
+            tmp = f"{self.path}.{os.getpid()}.{id(self):x}." \
+                f"{self._seq}.tmp"
+            try:
+                with open(tmp, "w", encoding="utf-8") as f:
+                    f.write(text)
+                    f.flush()
+                    os.fsync(f.fileno())
+                os.replace(tmp, self.path)
+            except BaseException:
+                try:
+                    os.remove(tmp)            # never a stray temp file
+                except OSError:
+                    pass
+                raise
+            _fsync_dir(os.path.dirname(self.path))
 
     @classmethod
     def exists(cls, folder):

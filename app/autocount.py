@@ -1,6 +1,7 @@
 import logging
 
 import fitz
+from .dmoney import c2 as _c2
 
 try:
     import numpy as np
@@ -466,7 +467,7 @@ if QDialog is not None:
             self.list.setIconSize(pixsize := self.list.iconSize() * 3)
             self.list.setResizeMode(QListWidget.Adjust)
             for h in self.hits:
-                it = QListWidgetItem(self._thumb(h), f"p{h['page'] + 1} {h['score']:.2f}")
+                it = QListWidgetItem(self._thumb(h), f"p{h['page'] + 1} {_c2(h['score']):.2f}")
                 it.setFlags(it.flags() | Qt.ItemIsUserCheckable)
                 it.setCheckState(Qt.Checked if h["band"] == "high" else Qt.Unchecked)
                 if h["band"] != "high":

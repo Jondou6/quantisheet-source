@@ -23,6 +23,7 @@ from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import (QButtonGroup, QHBoxLayout, QLabel,
                                QPushButton, QSizePolicy, QVBoxLayout,
                                QWidget)
+from ..dmoney import c2 as _c2
 
 # colours from the design's tokens
 INK = QColor("#1d1d1d")
@@ -90,7 +91,7 @@ def lanes(items, days):
 
 def _hours(h) -> str:
     v = (h or 0) / 100
-    return f"{v:.2f}".rstrip("0").rstrip(".") + " h"
+    return f"{_c2(v):.2f}".rstrip("0").rstrip(".") + " h"
 
 
 class _Grid(QWidget):

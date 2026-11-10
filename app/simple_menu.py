@@ -218,7 +218,13 @@ class SimpleMenus:
                                       "(off goes back to the layout you "
                                       "had before)")
         self.toggle_action.triggered.connect(lambda c=False: self.set_on(c))
-        win._file_menu.addAction(self.toggle_action)
+        from .ribbon import clean
+        exit_a = next((a for a in win._file_menu.actions()
+                       if clean(a.text()).lower() == "exit"), None)
+        if exit_a is not None:           # Exit stays at the bottom of File
+            win._file_menu.insertAction(exit_a, self.toggle_action)
+        else:
+            win._file_menu.addAction(self.toggle_action)
         self.holder = QToolBar("Simple Ribbon")
         self.holder.setObjectName("simple_ribbon_bar")
         self.holder.setMovable(False)

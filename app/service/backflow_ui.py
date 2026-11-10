@@ -10,7 +10,7 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QFileDialog, QFormLayout,
 
 from .. import proposal
 from ..estimating import service as records_api
-from . import backflow, files, uiutil
+from . import backflow, files, testers, uiutil
 
 
 class BackflowWindow(uiutil.Desk):
@@ -55,6 +55,7 @@ class BackflowWindow(uiutil.Desk):
         form.addRow("Next test due", self.next_due)
         self.boxes = {}
         self.psis = {}
+        self.repairs = {}
         grid = QGridLayout()
         grid.addWidget(QLabel(""), 0, 0)
         for c, (_phase, label) in enumerate(backflow.PHASES, start=1):
@@ -65,6 +66,18 @@ class BackflowWindow(uiutil.Desk):
                 cell = QWidget()
                 lay = QHBoxLayout(cell)
                 lay.setContentsMargins(0, 0, 0, 0)
+                if phase == "repair":
+                    # what was repaired or replaced on this part - not a
+                    # pass / fail; fills the district form's Repairs box
+                    # for it (Chief's estimator test, Nov 7)
+                    note = QLineEdit()
+                    note.setPlaceholderText("repaired / replaced")
+                    note.setMaxLength(120)
+                    note.setAccessibleName(f"{label}: repairs and materials")
+                    self.repairs[pid] = note
+                    lay.addWidget(note)
+                    grid.addWidget(cell, r, c)
+                    continue
                 if kind != "psi":
                     leaked = QCheckBox("Leaked")
                     tight = QCheckBox("Closed tight")
@@ -94,9 +107,19 @@ class BackflowWindow(uiutil.Desk):
         self.kit.addItems(list(backflow.KITS))
         self.signature = QLineEdit()
         self.comments = QPlainTextEdit()
-        self.comments.setFixedHeight(48)
+        self.comments.setMinimumHeight(72)
         form.addRow("Repairs and materials", self.materials)
+        self.so1_type, self.so2_type = QComboBox(), QComboBox()
+        for box, lab in ((self.so1_type, "Shutoff valve 1 is a"),
+                         (self.so2_type, "Shutoff valve 2 is a")):
+            box.addItems(list(backflow.VALVE_TYPES))
+            box.setAccessibleName(lab)
+            form.addRow(lab, box)
         form.addRow("Tester", self.tester)
+        self.gauge = QComboBox()
+        self.gauge.setEditable(True)
+        self.gauge.setAccessibleName("Gauge serial")
+        form.addRow("Gauge (serial)", self.gauge)
         form.addRow("Certification no.", self.cert_no)
         form.addRow("Company", self.company)
         form.addRow("Phone", self.phone)
@@ -111,10 +134,26 @@ class BackflowWindow(uiutil.Desk):
                      ("Save report", self.save_clicked),
                      ("Print PDF", self.print_clicked),
                      ("Data for District Form…", self.district_clicked))
+        # 1.2 phase 4 (Nov 5): the district's own form as an overlay, the
+        # tester / gauge checks and the submission record
+        self.buttons(("Fill the District Form…", self.overlay_clicked),
+                     ("Map the form…", self.map_clicked),
+                     ("Testers && gauges…", self.testers_clicked),
+                     ("Mark submitted", self.submitted_clicked))
+        self.submit = QLabel(testers.submit_line({}))
+        self.submit.setWordWrap(True)
+        self.root.addWidget(self.submit)
         self.finish()
         self.reload()
 
     def reload(self):
+        self.testers = testers.load()
+        cur = self.gauge.currentText() if hasattr(self, "gauge") else ""
+        self.gauge.clear()
+        self.gauge.addItem("")
+        for g in self.testers["gauges"]:
+            self.gauge.addItem(g["serial"])
+        self.gauge.setCurrentText(cur)
         self.store = backflow.load(self.path)
         self.records = records_api.load()
         self.site.blockSignals(True)
@@ -174,9 +213,14 @@ class BackflowWindow(uiutil.Desk):
             "method": self.method.currentText(), "kit": self.kit.currentText(),
             "signature": self.signature.text(),
             "comments": self.comments.toPlainText(),
+            "gauge_serial": self.gauge.currentText().strip(),
+            "so1_type": self.so1_type.currentText(),
+            "so2_type": self.so2_type.currentText(),
         })
         for (pid, phase, which), box in self.boxes.items():
             data[f"{pid}_{phase}_{which}"] = box.isChecked()
+        for pid, edit in self.repairs.items():
+            data[f"{pid}_repair_note"] = edit.text()
         for (pid, phase), edit in self.psis.items():
             data[f"{pid}_{phase}_psi"] = edit.text()
         return data
@@ -199,12 +243,86 @@ class BackflowWindow(uiutil.Desk):
             self.msg.setText(f"Saved {out}")
         return out
 
-    def print_clicked(self):
-        path, _ = QFileDialog.getSaveFileName(
-            self, "Backflow report", files.path_for("Backflow report.pdf"),
-            "PDF (*.pdf)")
+    def checks_ok(self, report, ask=None):
+        """Tester certificate, gauge calibration and retest-after-repair
+        warnings before anything prints. True to go ahead."""
+        from PySide6.QtWidgets import QMessageBox
+        warns = testers.check(report, self.testers)
+        if not warns:
+            return True
+        text = "\n".join(("STOP: " if k == "stop" else "") + t
+                          for k, t in warns)
+        if ask is None:
+            ask = lambda t: QMessageBox.warning(                # noqa: E731
+                self, "Before printing", t + "\n\nPrint anyway?",
+                QMessageBox.Yes | QMessageBox.No) == QMessageBox.Yes
+        ok = ask(text)
+        if not ok:
+            self.msg.setText("Not printed: " + text)
+        return ok
+
+    def print_clicked(self, _checked=False, path=None, ask=None):
+        if not self.checks_ok(self.report(), ask):
+            return None
+        if path is None:
+            path, _ = QFileDialog.getSaveFileName(
+                self, "Backflow report", files.path_for(
+                    "Backflow report.pdf"), "PDF (*.pdf)")
         if path:
-            self.print_to(path)
+            return self.print_to(path)
+        return None
+
+    def overlay_clicked(self, _checked=False, path=None, ask=None):
+        """The district's own form with this report laid on it."""
+        from . import district_form
+        rep = self.report()
+        if not self.checks_ok(rep, ask):
+            return None
+        if path is None:
+            path, _ = QFileDialog.getSaveFileName(
+                self, "Filled district form", files.path_for(
+                    f"Backflow test {rep.get('dev_serial') or ''}.pdf"),
+                "PDF (*.pdf)")
+        if not path:
+            return None
+        out = self.guard(lambda: district_form.fill(rep, path))
+        if not out:
+            return None
+        notes = []
+        if out["overflow"]:
+            notes.append("too long for their box (on an extra page): " +
+                         ", ".join(out["overflow"]))
+        if out["scaled"]:
+            notes.append("the form page isn't the size it was mapped on - "
+                         "check the calibration print")
+        self.msg.setText(f"Saved {out['file']}. " + testers.submit_line(rep)
+                         + (" Note: " + "; ".join(notes) if notes else ""))
+        return out
+
+    def map_clicked(self, _checked=False):
+        from . import district_form_ui
+        self._map = district_form_ui.open_window(self)
+        return self._map
+
+    def testers_clicked(self, _checked=False):
+        self._testers = TestersWindow(self)
+        self._testers.finished.connect(lambda *_: self.reload())
+        uiutil.show(self._testers)
+        return self._testers
+
+    def submitted_clicked(self, _checked=False, how="", when=None):
+        """Record that the last saved report went to the district."""
+        if not self.store["reports"]:
+            self.msg.setText("Save the report first.")
+            return None
+        rep = self.store["reports"][-1]
+        got = self.guard(lambda: testers.mark_submitted(rep, how, when))
+        if got is None:
+            return None
+        backflow.save(self.store, self.path)
+        self.msg.setText(f"{rep['number']} recorded as submitted by "
+                         f"{got['how']} on {got['on']}.")
+        return got
 
 
     def district_clicked(self, _checked=False, path=None):
@@ -222,6 +340,68 @@ class BackflowWindow(uiutil.Desk):
         if out:
             self.msg.setText(f"Saved {out}")
         return out
+
+
+class TestersWindow(uiutil.Desk):
+    """Tester certificates and gauge calibrations (QW3)."""
+
+    def __init__(self, parent=None):
+        super().__init__("Backflow Testers & Gauges", parent)
+        self.store = testers.load()
+        r1 = QHBoxLayout()
+        self.t_name, self.t_cert, self.t_exp = (QLineEdit(), QLineEdit(),
+                                                QLineEdit())
+        for w, hint in ((self.t_name, "Tester name"),
+                        (self.t_cert, "Certificate no."),
+                        (self.t_exp, "Certificate expires YYYY-MM-DD")):
+            w.setPlaceholderText(hint)
+            r1.addWidget(w)
+        self.root.addLayout(r1)
+        self.buttons(("Save tester", self.tester_clicked))
+        r2 = QHBoxLayout()
+        self.g_serial, self.g_cal, self.g_make = (QLineEdit(), QLineEdit(),
+                                                  QLineEdit())
+        for w, hint in ((self.g_serial, "Gauge serial"),
+                        (self.g_cal, "Last calibration YYYY-MM-DD"),
+                        (self.g_make, "Make / model")):
+            w.setPlaceholderText(hint)
+            r2.addWidget(w)
+        self.root.addLayout(r2)
+        self.buttons(("Save gauge", self.gauge_clicked))
+        self.table = uiutil.table(["Tester / gauge", "Number", "Date",
+                                   "Detail"])
+        self.table.setAccessibleName("Testers and gauges")
+        self.root.addWidget(self.table, 1)
+        note = QLabel(testers.rule_note() + " (Setting "
+                      "service_gauge_calibration_months.)")
+        note.setWordWrap(True)
+        self.root.addWidget(note)
+        self.finish()
+        self.fill()
+
+    def fill(self):
+        rows = [[t["name"], t["cert_no"], t["cert_expires"],
+                 "certificate expires"] for t in self.store["testers"]]
+        rows += [[g["serial"], g.get("make", ""), g["calibrated"],
+                  "last calibration; " + g.get("accuracy", "")]
+                 for g in self.store["gauges"]]
+        uiutil.fill(self.table, rows)
+
+    def tester_clicked(self):
+        if self.guard(lambda: testers.set_tester(
+                self.store, self.t_name.text(), self.t_cert.text(),
+                self.t_exp.text())):
+            testers.save(self.store)
+            self.fill()
+            self.msg.setText("Tester saved.")
+
+    def gauge_clicked(self):
+        if self.guard(lambda: testers.set_gauge(
+                self.store, self.g_serial.text(), self.g_cal.text(),
+                self.g_make.text())):
+            testers.save(self.store)
+            self.fill()
+            self.msg.setText("Gauge saved.")
 
 
 def open_window(parent=None):

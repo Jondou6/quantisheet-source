@@ -12,6 +12,7 @@ import os
 
 from . import practice
 from . import settings
+from .dmoney import c2 as _c2
 
 SANDBOX_NAME = "practice-job"
 PLAN_NAME = "practice-plan.pdf"
@@ -57,7 +58,7 @@ def line_total(price=None):
     p = price if price is not None else sample_estimate()["price"]
     qty = (float(p["quantity"]) * (1 + float(p["waste"]) / 100.0)
            * float(p["multiplier"]))
-    return round(qty * float(p["unit_cost"]), 2)
+    return _c2(qty * float(p["unit_cost"]))
 
 
 def sample_estimate():

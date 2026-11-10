@@ -22,6 +22,7 @@ summary(old) total with the same cascade and tax.
 from decimal import Decimal
 
 from . import annotate, assembly_codes as ac, cost_rollup
+from .dmoney import c2 as _c2
 
 TOL = 6.0          # points
 Z = Decimal("0.00")
@@ -140,7 +141,7 @@ def _line(r):
     if "cost" in r and r["cost"] is None:
         c = "  (not priced - no assembly bound)"
     else:
-        c = "" if r.get("cost") is None else f"  {r['cost']:.2f}"
+        c = "" if r.get("cost") is None else f"  {_c2(r['cost']):.2f}"
     s = f" {r['sheet']}" if r.get("sheet") else f" p{r['page'] + 1}"
     return f"  {r['group']} ({r['type']}) {r['qty']} {r['unit']}{s}{c}"
 
@@ -152,6 +153,6 @@ def text(res):
         out += [_line(r) for r in res[k]]
     out.append(f"ORPHANED ({len(res['orphans'])})")
     out += [_line(r) + f"  - {r['why']}" for r in res["orphans"]]
-    out.append(f"Net direct change: {res['net_direct']:.2f}")
-    out.append(f"Net change with markups: {res['net_with_markups']:.2f}")
+    out.append(f"Net direct change: {_c2(res['net_direct']):.2f}")
+    out.append(f"Net change with markups: {_c2(res['net_with_markups']):.2f}")
     return "\n".join(out)

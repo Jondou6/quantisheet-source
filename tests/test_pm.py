@@ -161,9 +161,11 @@ def test_phone_access_is_limited(env):
     att = H.call("att.put", {"project": "Job", "key": key, "name": "d.png",
                              "data": base64.b64encode(png).decode()}, {},
                  authed=False)
-    st, ctype, body = H.get(f"/hub/att/Job/{att['sha256']}?k={key}")
+    url = f"/hub/att/Job/{att['sha256']}"
+    st, ctype, body = H.get(url, {"Authorization": f"Bearer {key}"})
     assert (st, ctype, body) == (200, "image/png", png)
-    assert H.get(f"/hub/att/Job/{att['sha256']}?k=wrong")[0] == 403
+    assert H.get(url, {"Authorization": "Bearer wrong"})[0] == 403
+    assert H.get(f"{url}?k={key}")[0] == 401          # not in the address
 
 
 def test_workflows_send_mail(env):
@@ -430,9 +432,9 @@ def test_hub_over_the_hosted_relay(tmp_path, monkeypatch):
         img.write_bytes(fitz.Pixmap(fitz.csRGB, fitz.IRect(0, 0, 4, 4),
                                     0).tobytes("png"))
         ref = s.attach(str(img))
-        body = urllib.request.urlopen(
-            f"http://127.0.0.1:{port}/hub/att/Wire%20Job/{ref['sha256']}"
-            f"?k={h['key']}").read()
+        body = urllib.request.urlopen(urllib.request.Request(
+            f"http://127.0.0.1:{port}/hub/att/Wire%20Job/{ref['sha256']}",
+            headers={"Authorization": f"Bearer {h['key']}"})).read()
         assert body == img.read_bytes()
     finally:
         stop["loop"].call_soon_threadsafe(stop["fut"].set_result, None)

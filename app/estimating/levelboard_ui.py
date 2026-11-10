@@ -7,6 +7,7 @@ from PySide6.QtWidgets import (QComboBox, QDialog, QFileDialog, QHBoxLayout,
                                QTableWidgetItem, QVBoxLayout)
 
 from . import bidday, levelboard as LB
+from ..dmoney import c2 as _c2
 
 COLORS = {LB.GREEN: QColor(214, 241, 222), LB.YELLOW: QColor(255, 241, 189),
           LB.RED: QColor(250, 214, 210)}
@@ -82,20 +83,20 @@ class LevelBoard(QDialog):
         self.table.setRowCount(len(d["rows"]))
         for r, row in enumerate(d["rows"]):
             vals = [row["desc"], row["qty"], row["unit"],
-                    f"${row['plug']:,.2f}" if row["plug"] is not None else ""]
+                    f"${_c2(row['plug']):,.2f}" if row["plug"] is not None else ""]
             for c, v in enumerate(vals):
                 self.table.setItem(r, c, QTableWidgetItem(v))
             for k, n in enumerate(names):
                 cell = row["cells"][n]
                 a = cell["amount"]
-                t = ("" if a is None else f"${a:,.2f}") + \
+                t = ("" if a is None else f"${_c2(a):,.2f}") + \
                     (" (plug)" if cell["plugged"] and a is not None else
                      " NO PLUG" if cell["plugged"] else "")
                 it = QTableWidgetItem(t)
                 it.setBackground(COLORS[cell["status"]])
                 it.setData(Qt.UserRole, (n, row["id"]))
                 self.table.setItem(r, len(FIXED) + k, it)
-        parts = [f"<b>{b['name']}</b>: ${b['total']:,.2f} "
+        parts = [f"<b>{b['name']}</b>: ${_c2(b['total']):,.2f} "
                  f"({b['gaps']} gap(s), {b['unclear']} unclear)"
                  for b in d["bidders"]]
         self.summary.setText(" &nbsp; ".join(parts) + (
@@ -122,7 +123,7 @@ class LevelBoard(QDialog):
                                            1e12, 2)
             if not ok:
                 return None
-            amount = f"{v:.2f}"
+            amount = f"{_c2(v):.2f}"
         LB.set_status(self.doc, self.package(), bidder, rid, status, amount)
         self._changed()
         return self.refresh()
@@ -217,5 +218,5 @@ class LevelBoard(QDialog):
         self._changed()
         self.refresh()
         self.summary.setText(self.summary.text() + f"<br>In the estimate: "
-                             f"<b>{got['bidder']}</b> ${got['total']:,.2f}")
+                             f"<b>{got['bidder']}</b> ${_c2(got['total']):,.2f}")
         return got

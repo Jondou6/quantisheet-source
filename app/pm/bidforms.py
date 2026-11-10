@@ -21,6 +21,7 @@ import datetime as _dt
 import json
 import os
 import re
+from ..dmoney import c2 as _c2
 
 TYPES = ["Lump sum", "Unit price", "Allowance", "Alternate", "Yes / No",
          "Text"]
@@ -280,7 +281,7 @@ def from_takeoff(doc):
     out = []
     for i, ((g, unit), q) in enumerate(sorted(groups.items()), 1):
         out.append({"item": str(i), "description": g, "type": "Unit price",
-                    "qty": round(q, 2), "unit": unit, "note": ""})
+                    "qty": _c2(q), "unit": unit, "note": ""})
     return out
 
 
@@ -346,7 +347,7 @@ def totals(lines, values):
             base += line_total(ln, v)
         elif t == "Alternate" and num(v) is not None:
             alts[ln.get("item") or str(i + 1)] = num(v)
-    return {"base": round(base, 2), "alternates": alts, "missing": missing}
+    return {"base": _c2(base), "alternates": alts, "missing": missing}
 
 
 def to_leveling(rec):

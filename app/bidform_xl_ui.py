@@ -8,6 +8,7 @@ from PySide6.QtWidgets import (QDialog, QDialogButtonBox, QFileDialog,
                                QPlainTextEdit, QPushButton, QVBoxLayout)
 
 from . import bidform_xl as BX
+from .dmoney import c2 as _c2
 
 
 class BidFormWorkbook(QDialog):
@@ -133,7 +134,7 @@ class BidFormWorkbook(QDialog):
                         self.project)
         miss = f" Still blank: item(s) {', '.join(t['missing'][:10])}." \
             if t["missing"] else ""
-        self._say(f"Bid form filled: base bid ${t['base']:,.2f}. Saved as "
+        self._say(f"Bid form filled: base bid ${_c2(t['base']):,.2f}. Saved as "
                   f"{os.path.basename(out)}.{miss}")
         if self.open_result:
             self.open_result(out)
@@ -216,7 +217,7 @@ class BuildersRiskRequest(QDialog):
                            ("amount", "Estimated amount ($)"),
                            ("start", "Estimated start"),
                            ("finish", "Estimated completion")):
-            e = QLineEdit(f"{v[key]:,.2f}" if key == "amount" and v[key]
+            e = QLineEdit(f"{_c2(v[key]):,.2f}" if key == "amount" and v[key]
                           else str(v.get(key) or ""))
             f.addRow(label + ":", e)
             self.ed[key] = e

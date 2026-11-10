@@ -137,14 +137,16 @@ def test_rollup_uses_crew_rates_and_adjustment_factors():
     assert not errors
     door = _by(rows)[DOOR]
     assert door["labor_hours"] == pytest.approx(door_hrs * 1.12 * 1.05)
-    assert door["labor_cost"] == pytest.approx(door["labor_hours"] * 46)
+    # labor cost is each part's hours x rate to the cent (Nov 7)
+    assert door["labor_cost"] == pytest.approx(door["labor_hours"] * 46,
+                                               abs=0.01)
     assert door["crew_days"] == pytest.approx(door["labor_hours"] / 16)
     # the wall only gets the job-wide factor, at the job labor rate
     wall = _by(rows)[WALL]
     assert wall["labor_hours"] == pytest.approx(
         _by(base)[WALL]["labor_hours"] * 1.05)
     assert wall["labor_cost"] == pytest.approx(wall["labor_hours"] *
-                                               totals["labor_rate"])
+                                               totals["labor_rate"], abs=0.01)
 
 
 # ---- cost books -----------------------------------------------------------------

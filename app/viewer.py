@@ -27,6 +27,7 @@ from . import annotate, settings, snap, takeoff
 from .collab.oplog import _plain
 from .history import History
 from .macros import Recorder
+from .dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 # GUI user test r42 F07: Enter makes a new line in these boxes
@@ -980,6 +981,7 @@ class PdfView(QWidget):
         return super().event(e)
 
     def _changed(self):
+        annotate.bump_edits(self.doc)
         if self.on_change:
             self.on_change()
 
@@ -1041,6 +1043,18 @@ class PdfView(QWidget):
             ctl.deactivate()
         self.update()
         self._changed()
+        win = self.window()
+        sync = getattr(win, "_sync_tool_chest", None)
+        if sync is not None and win is not self:
+            sync()
+        # Properties names the tool at once, whoever picked it (Chief's
+        # user test, Nov 6: it said "Tool: Select" with Length active)
+        props = getattr(win, "properties", None) if win is not self else None
+        if props is not None and getattr(props, "view", None) is self:
+            try:
+                props.refresh()
+            except Exception:                             # noqa: BLE001
+                log.warning("properties refresh failed", exc_info=True)
 
     def set_mode(self, mode):            # older name
         self.set_tool(mode)
@@ -1631,7 +1645,7 @@ class PdfView(QWidget):
         elif self.tool in ("measure_area", "measure_cutout",
                            "measure_volume"):
             v = takeoff.polygon_area(ppts) / scale["ppu"] ** 2
-            text = f"{v:,.2f} sq {scale['unit']}"
+            text = f"{_c2(v):,.2f} sq {scale['unit']}"
         elif self.tool in ("measure_radius", "measure_diameter"):
             v = takeoff.path_length(ppts) / scale["ppu"]
             text = ("R " if self.tool == "measure_radius" else "\u2300 ") + \
@@ -2146,7 +2160,7 @@ class PdfView(QWidget):
         for (mtype, unit), (n, t) in sorted(tot.items()):
             name = "Cutouts" if mtype == annotate.CUTOUT else \
                 mtype.title()
-            bits.append(f"{name}: {t:,.2f} {unit}" if mtype != "count"
+            bits.append(f"{name}: {_c2(t):,.2f} {unit}" if mtype != "count"
                         else f"Count: {n:g}")
         if others:
             bits.append(f"{others} other markup(s)")
@@ -3489,13 +3503,13 @@ class PdfView(QWidget):
         color = list(parent.colors.get("stroke") or self._color("add_polygon"))
         payload = {"pts": [[q.x, q.y] for q in ppts], "color": color,
                    "fill": [1, 1, 1], "dashes": True, "width": 1.2,
-                   "label": f"Cutout -{value:,.2f} {unit}",
+                   "label": f"Cutout -{_c2(value):,.2f} {unit}",
                    "measure": {"type": annotate.CUTOUT,
                                "value": round(value, 4), "unit": unit,
                                "group": group, "parent": tag}}
         n = self.apply_marks([(self.page, "add_polygon", payload)])
         if n:
-            self.status.emit(f"Cutout {value:,.2f} {unit} taken off "
+            self.status.emit(f"Cutout {_c2(value):,.2f} {unit} taken off "
                              f"{group or 'the area'}")
         return n
 
@@ -3859,7 +3873,7 @@ class PdfView(QWidget):
         color = list(self._color("add_polygon"))
         group = self.style.get("subject") or room["name"] or ""
         value, unit = room["value"], room["unit"]
-        label = f"{value:,.2f} {unit}"
+        label = f"{_c2(value):,.2f} {unit}"
         if room.get("per_tag"):
             label += f" (per tag; traced {room['traced_value']:,.0f})"
         if room.get("detail_scale"):
@@ -4000,7 +4014,7 @@ class PdfView(QWidget):
                                self._room_payload(room))])
         if n:
             msg = f"{room['name'] or 'Auto Area'}: " \
-                  f"{room['value']:,.2f} {room['unit']}"
+                  f"{_c2(room['value']):,.2f} {room['unit']}"
             if room["tag_sf"]:
                 msg += f" (tag says {room['tag_sf']:,.0f} SF)"
             self.status.emit(msg)
@@ -4346,7 +4360,7 @@ class PdfView(QWidget):
                     return 0
             return self.apply_marks([(self.page, "replace_block", {
                 "rect": blk["rect"], "text": new_text,
-                "size": round(blk["size"], 2), "color": blk["color"],
+                "size": _c2(blk["size"]), "color": blk["color"],
                 "font": blk["font"], "bold": blk["bold"],
                 "italic": blk["italic"], "align": blk["align"],
                 "line_height": blk["line_height"]})])
@@ -4363,7 +4377,7 @@ class PdfView(QWidget):
                 return 0
         return self.apply_marks([(self.page, "replace_span", {
             "rect": list(annotate.to_page(self.pg, r)), "text": new_text,
-            "size": round(size, 2), "color": rgb})])
+            "size": _c2(size), "color": rgb})])
 
     def _selected_op(self, **changes):
         if not self.selected:

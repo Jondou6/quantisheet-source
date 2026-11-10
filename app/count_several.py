@@ -13,6 +13,7 @@
 The pure parts (resolve_overlaps, plan_marks, parse_pages) have no Qt.
 """
 import logging
+from .dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 
@@ -388,7 +389,7 @@ if QDialog is not None:
                 for h in hs:
                     it = QListWidgetItem(
                         _thumb(doc, h["page"], h["rect"]),
-                        f"p{h['page'] + 1} {float(h.get('score') or 0):.2f}")
+                        f"p{h['page'] + 1} {_c2(float(h.get('score') or 0)):.2f}")
                     it.setFlags(it.flags() | Qt.ItemIsUserCheckable)
                     sure = h.get("band", "high") == "high"
                     it.setCheckState(Qt.Checked if sure else Qt.Unchecked)

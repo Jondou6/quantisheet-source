@@ -199,12 +199,24 @@ _P = {
     "event": '<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
     "gavel": '<path d="m14 13-7.5 7.5a2 2 0 0 1-3-3L11 10"/><path A d="m16 16 6-6M8 8l6-6M9 7l8 8"/>',
     "keyboard": '<rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.5M10 10h.5M14 10h.5M18 10h.5"/><path A d="M7 14h10"/>',
+    # service desk and AI zones (drawn here, same 24px stroke set)
+    "workorder": '<rect x="6" y="3" width="12" height="18" rx="2"/><path d="M9 3.5h6V6H9z"/><path A d="M9 10h6M9 13h6M9 16h4"/>',
+    "dispatch": '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14h18"/><circle A cx="7" cy="6.5" r="1"/><circle A cx="7" cy="11.5" r="1"/><circle A cx="7" cy="16.5" r="1"/>',
+    "tag": '<path d="M12 3H4v8l8 10 8-8z"/><circle A cx="8.5" cy="8.5" r="1.4"/>',
+    "refrigerant": '<path d="M9 3h6v3H9z"/><rect x="7" y="6" width="10" height="14" rx="2"/><path A d="M10 12h4M12 10v4"/>',
+    "valve": '<path d="M3 12h5l3-6 3 12 3-6h4"/><circle A cx="12" cy="12" r="1.5"/>',
+    "bulb": '<path A d="M9 15a5 5 0 1 1 6 0c-.6.8-1 1.6-1 2.5H10c0-.9-.4-1.7-1-2.5z"/><path d="M10 18h4M10.5 20.5h3"/>',
+    "handover": '<rect x="2" y="6" width="8" height="12" rx="1.5"/><path A d="M10 11h4M12 9l2 2-2 2"/><rect A x="14" y="6" width="8" height="12" rx="1.5"/>',
+    "records": '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 8h18M8 3v5"/><path A d="M8 12h8M8 16h5"/>',
+    "zone_in": '<rect x="3" y="3" width="18" height="18" rx="2"/><rect A x="7" y="7" width="10" height="10" rx="1"/>',
+    "zone_out": '<rect x="3" y="3" width="18" height="18" rx="2"/><path A d="M8 8l8 8M16 8l-8 8"/>',
+    "translate": '<path d="M4 6h8M8 6c0 5-2.5 7-5 8"/><path A d="M14 20l2.2-6h.1L18.5 20M15 17.2h2.6"/><path d="M13 8h7"/>',
 }
 
 _cache = {}
 
 
-def _svg(name, ink, accent):
+def _svg(name, ink, accent, stroke=1.7):
     body = _P.get(name) or _P["info"]
     body = (body.replace("<path AF", f'<path fill="{accent}" fill-opacity="0.22" stroke="{accent}"')
                 .replace("<rect AF", f'<rect fill="{accent}" fill-opacity="0.22" stroke="{accent}"')
@@ -215,7 +227,7 @@ def _svg(name, ink, accent):
                 .replace("<ellipse A ", f'<ellipse stroke="{accent}" ')
                 .replace("<circle F ", f'<circle fill="{ink}" stroke="none" '))
     return ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" '
-            f'fill="none" stroke="{ink}" stroke-width="1.7" '
+            f'fill="none" stroke="{ink}" stroke-width="{stroke}" '
             'stroke-linecap="round" stroke-linejoin="round">' + body +
             '</svg>').encode()
 
@@ -224,20 +236,20 @@ def _colors():
     try:
         from . import theme
         t = theme.tokens()
-        return t["text"], t["accent"], t["faint"]
+        return t["text"], t.get("accent_text", t["accent"]), t["faint"]
     except Exception:
-        return "#2d2d32", "#2563eb", "#9aa0ab"
+        return "#2d2d32", "#0e6a60", "#9aa0ab"
 
 
 _renderers = {}
 
 
-def _renderer(name, ink, accent):
-    key = (name, ink, accent)
+def _renderer(name, ink, accent, stroke=1.7):
+    key = (name, ink, accent, stroke)
     r = _renderers.get(key)
     if r is None:
-        r = _renderers[key] = QSvgRenderer(QByteArray(_svg(name, ink,
-                                                           accent)))
+        r = _renderers[key] = QSvgRenderer(QByteArray(
+            _svg(name, ink, accent, stroke)))
     return r
 
 
@@ -281,6 +293,22 @@ class _Engine(QIconEngine):
 
 def icon(name):
     return QIcon(_Engine(name))
+
+
+def pixmap(name, size, ink="#ffffff", accent=None, stroke=1.7):
+    """A pixmap of `name` in the given colours (ribbon tiles draw white
+    glyphs on a coloured square; menus keep the theme-coloured icon()).
+    `stroke` is the SVG stroke width; 1.7 is the normal weight."""
+    accent = accent or ink
+    side = max(1, int(size))
+    pm = QPixmap(side, side)
+    pm.fill(Qt.transparent)
+    p = QPainter(pm)
+    p.setRenderHint(QPainter.Antialiasing)
+    r = _renderer(name if name in _P else "info", ink, accent, stroke)
+    r.render(p, QRectF(0, 0, side, side))
+    p.end()
+    return pm
 
 
 def names():

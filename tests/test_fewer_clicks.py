@@ -118,6 +118,25 @@ def test_claim_is_true_off_windows_or_first(monkeypatch):
         assert singleinstance.claim() is True
 
 
+def test_second_claim_sees_the_first(tmp_path):
+    """Nov 5 (Jon: a second PDF opened a second QuantiSheet): the start-up
+    lock must notice one already held. Run in a fresh process with a
+    lock name of its own."""
+    if os.name != "nt":
+        pytest.skip("Windows lock")
+    import subprocess
+    import sys
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    code = ("import sys; sys.path.insert(0, %r);"
+            "from app import singleinstance as s;"
+            "a = s.claim(); b = s.claim(); print(a, b)" % root)
+    out = subprocess.run(
+        [sys.executable, "-c", code], capture_output=True, text=True,
+        timeout=60, env=dict(os.environ, QUANTISHEET_PIPE=f"QS-claim-test-"
+                             f"{os.getpid()}")).stdout.strip()
+    assert out.endswith("True False"), out
+
+
 def test_new_window_command(win):
     import sys
     w, _ = win
@@ -133,13 +152,30 @@ def test_new_window_command(win):
 def test_tabs_fold_into_their_parents(win):
     w, _ = win
     tabs = list(w.ribbon.pages)
-    for gone in ("Module", "Billing", "Civil", "AI"):
+    for gone in ("Module", "Civil"):
         assert gone not in tabs
-    assert len(tabs) <= 11                 # 10 + Service
+    assert "AI" in tabs
+    assert len(tabs) <= 13                 # folded tabs + Service, Billing, AI
     assert w._ribbon_missing == []
-    assert QA.fold("Billing", "Contract") == ("Project", "Contract")
+    # Nov 5: Billing split back out of Project, and sits right after it
+    assert QA.fold("Billing", "Contract") == ("Billing", "Contract")
+    assert tabs.index("Billing") == tabs.index("Project") + 1
+    # left to right as listed (an AI group folded into Project no longer
+    # pulls Project ahead of Markup), and the buttons show that order
+    known = [t for t in QA.TAB_ORDER if t in tabs]
+    assert tabs[:len(known)] == known
+    row = w.ribbon.tab_row
+    xs = [row.indexOf(w.ribbon.pages[t].tab_button) for t in tabs]
+    assert xs == sorted(xs)
+    proj = w.ribbon.page("Project")
+    assert len(proj.groups) <= 10, list(proj.groups)
+    assert "Billing" not in " ".join(proj.groups)
+    docs = [b.defaultAction() for b in proj.groups["Documents"].buttons]
+    assert w.command("Submittal Log") in docs
+    assert "Submittals" not in proj.groups
     assert QA.fold("Civil", "Takeoff") == ("Estimate", "Civil Takeoff")
-    assert QA.fold("AI", "Review") == ("Review", "AI Review")
+    # AI review tools live on the AI tab only (Nov 6)
+    assert QA.fold("AI", "Review") == ("AI", "Review")
     assert QA.fold("Takeoff", "Measure") == ("Takeoff", "Measure")
     for name in ("ADA Checker", "Change Orders", "Haul Calculator",
                  "AI Takeoff (Whole Set)", "Contract & Billing"):
@@ -149,14 +185,17 @@ def test_tabs_fold_into_their_parents(win):
 def test_classic_tabs_setting(cfg):
     settings.set(QA.S_CLASSIC, True)
     assert QA.fold("Billing", "Contract") == ("Billing", "Contract")
+    assert QA.fold("Module", "ADA") == ("Module", "ADA")
 
 
 def test_tabs_follow_the_open_file(win):
     w, tmp = win
     w.show()
     hide = QA.update_tabs(w)
-    assert {"Takeoff", "Markup"} <= hide                     # nothing open
-    assert not w.ribbon.pages["Takeoff"].tab_button.isVisible()
+    assert {"Markup", "Billing"} <= hide                    # nothing open
+    # Nov 6 (Jon): Takeoff stays on the top ribbon, file or not
+    assert "Takeoff" not in hide
+    assert w.ribbon.pages["Takeoff"].tab_button.isVisible()
     assert w.open_path(_plan(str(tmp / "plans.pdf")))
     assert "Takeoff" not in QA.update_tabs(w)
     assert w.ribbon.pages["Takeoff"].tab_button.isVisible()
@@ -164,7 +203,7 @@ def test_tabs_follow_the_open_file(win):
     spec.new_page(width=612, height=792).insert_text((72, 72), "SECTION 01")
     spec.save(str(tmp / "spec.pdf"))
     assert w.open_path(str(tmp / "spec.pdf"))
-    assert "Takeoff" in QA.update_tabs(w)                   # a document
+    assert "Takeoff" not in QA.update_tabs(w)               # a document too
     settings.set(QA.S_SHOW_ALL, True)
     assert QA.update_tabs(w) == set()
 
@@ -627,7 +666,11 @@ def test_service_tab_has_the_service_desk(win):
     for name in ("Service Work Order", "Service Agreements",
                  "Refrigerant Log", "Backflow Test Report",
                  "Flat-Rate Pricebook", "Truck Stock", "Tech Recommendations",
-                 "T&M Tag", "Build-to-Service Handover", "Dispatch Board"):
+                 "T&M Tag", "Build-to-Service Handover", "Dispatch Board",
+                 "Customer History", "Agreement Visit Calendar",
+                 "Maintenance Checklist", "Good / Better / Best Quotes",
+                 "Tune-up Planner", "Warranty Registrations",
+                 "Changeout Proposal", "Load Report"):
         a = w.command(name)
         assert a is not None, name
         assert QA.where_is(w, a)[1] == "Service", name
@@ -738,12 +781,12 @@ def test_tabs_follow_never_hide_the_tab_you_are_on(win):
     w.show()
     assert w.open_path(_plan(str(tmp / "plans.pdf")))
     QA.update_tabs(w)
-    w.ribbon.show_page("Takeoff")
+    w.ribbon.show_page("Markup")     # (Takeoff stays shown now - Nov 6)
     w.close_tab(w.tabs.currentIndex())         # nothing open now
     hide = QA.update_tabs(w)
-    assert "Takeoff" in hide                    # would hide...
-    assert w.ribbon.current() == "Takeoff"      # ...but not while you're on it
-    assert w.ribbon.pages["Takeoff"].tab_button.isVisible()
+    assert "Markup" in hide                     # would hide...
+    assert w.ribbon.current() == "Markup"       # ...but not while you're on it
+    assert w.ribbon.pages["Markup"].tab_button.isVisible()
 
 
 def test_ctrl_k_finds_punch_items_and_changes(win):

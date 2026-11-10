@@ -23,6 +23,7 @@ from decimal import Decimal
 
 from . import csi
 from .assembly_codes import cents, dec
+from .dmoney import c2 as _c2
 
 HEADERS = ["Job", "Extra", "Cost Code", "Category", "Description",
            "Units", "Unit of Measure", "Amount"]
@@ -202,7 +203,7 @@ def job_cost_rows(lines, job="", phase_from="csi", code_format=CODE_FORMAT,
 def _cell(h, v):
     if isinstance(v, Decimal):
         if h == "Amount":
-            return f"{v:.2f}"
+            return f"{_c2(v):.2f}"
         t = f"{v:f}"
         return t.rstrip("0").rstrip(".") if "." in t else t
     return _no_formula("" if v is None else str(v))

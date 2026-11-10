@@ -141,6 +141,9 @@ class _Filter(QObject):
                 _buttons(obj)
             elif t == QEvent.Show and not obj.property(DONE):
                 obj.setProperty(DONE, True)
+                # a Close button where the dialog has none (Chief, Nov 7)
+                from . import closebutton
+                closebutton.ensure(obj)
                 fit(obj)
         except Exception:                                # noqa: BLE001
             log.debug("dialog fit failed", exc_info=True)

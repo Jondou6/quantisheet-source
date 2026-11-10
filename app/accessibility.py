@@ -143,7 +143,8 @@ def fix(doc, rules=None, title=None, lang="en-US"):
                         "field(s)")
     if "title" in todo:
         md = dict(doc.metadata or {})
-        if not (md.get("title") or "").strip():
+        new_title = not (md.get("title") or "").strip()
+        if new_title:
             md["title"] = title or os.path.splitext(
                 os.path.basename(doc.name or "Document"))[0]
             doc.set_metadata(md)
@@ -152,9 +153,17 @@ def fix(doc, rules=None, title=None, lang="en-US"):
             x = int(vp[1].split()[0])
             doc.xref_set_key(x, "DisplayDocTitle", "true")
         else:
-            doc.xref_set_key(cat, "ViewerPreferences",
-                             "<</DisplayDocTitle true>>")
-        done.append(f"Title set to \"{doc.metadata.get('title')}\"")
+            # merge into the dictionary that's there (or make one): the
+            # file's print scaling, duplex and toolbar settings stay
+            # (outside review via Chief, Nov 7 - H2)
+            doc.xref_set_key(cat, "ViewerPreferences/DisplayDocTitle",
+                             "true")
+        # say what was done: a title the file already had wasn't "set"
+        # (outside review, Nov 7)
+        done.append(f"Title set to \"{doc.metadata.get('title')}\""
+                    if new_title else
+                    f"Title \"{doc.metadata.get('title')}\" shown in the "
+                    "viewer's title bar")
     if "language" in todo:
         doc.xref_set_key(cat, "Lang", fitz.get_pdf_str(lang))
         done.append(f"Language set to {lang}")

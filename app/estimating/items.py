@@ -29,6 +29,7 @@ from decimal import Decimal
 
 from .. import dmoney
 from . import safedb
+from ..dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 
@@ -147,7 +148,7 @@ def _assemblies(doc):
                    r["name"], r.get("unit", ""),
                    dmoney.D(round(r.get("quantity") or 0, 4)), mat + lab,
                    _parts(mat=mat, lab=lab), materials=mats,
-                   hours=dmoney.D(round(r.get("labor_hours") or 0, 2)),
+                   hours=dmoney.D(_c2(r.get("labor_hours") or 0)),
                    source="assembly", waste_pct=wp, waste_basis=wb)
         out.append(it)
     return out

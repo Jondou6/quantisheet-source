@@ -1,5 +1,6 @@
 """Service agreements window. open_window(parent) shows it."""
-from PySide6.QtWidgets import QFileDialog, QHBoxLayout, QLabel, QLineEdit
+from PySide6.QtWidgets import (QCheckBox, QFileDialog, QHBoxLayout, QLabel,
+                               QLineEdit)
 
 from .. import dmoney
 from ..estimating import service as records_api
@@ -25,12 +26,30 @@ class AgreementsWindow(uiutil.Desk):
                   self.renewal):
             row.addWidget(w)
         self.root.addLayout(row)
+        # Jon's settled terms: 2 visits a year, a 10% member discount on
+        # repairs, renew every year (Chief's re-test, Nov 7: neither the
+        # discount nor auto-renew could be set here)
+        terms = QHBoxLayout()
+        d = agreements.defaults()
+        terms.addWidget(QLabel("Member discount on repairs %"))
+        self.discount = QLineEdit(str(d["discount_pct"]))
+        self.discount.setAccessibleName("Member discount on repairs, percent")
+        self.discount.setMaximumWidth(70)
+        terms.addWidget(self.discount)
+        self.auto_renew = QCheckBox("Renew automatically every year")
+        self.auto_renew.setChecked(bool(d["auto_renew"]))
+        terms.addWidget(self.auto_renew)
+        terms.addStretch(1)
+        self.root.addLayout(terms)
         self.buttons(("Add agreement", self.add_clicked),
                      ("Create due visits", self.due_clicked),
+                     ("Visit calendar", self.calendar_clicked),
+                     ("Set discount / auto-renew", self.terms_clicked),
                      ("Print summary", self.print_clicked))
         self.table = uiutil.table(
             ["Number", "Customer", "Site", "Price", "Visits / year",
-             "Renewal", "Warning", "Profit"])
+             "Renewal", "Member discount", "Auto-renew", "Warning",
+             "Profit"])
         self.root.addWidget(self.table, 1)
         self.warn = QLabel("")
         self.warn.setWordWrap(True)
@@ -40,6 +59,9 @@ class AgreementsWindow(uiutil.Desk):
 
     def reload(self):
         self.store = agreements.load(self.path)
+        renewed = agreements.renew_due(self.store)    # auto-renew (1.2)
+        if renewed:
+            agreements.save(self.store, self.path)
         self.orders = workorder.load(self.orders_path)
         today_warnings = {w["id"]: w for w in agreements.renewal_warnings(
             self.store)}
@@ -53,7 +75,9 @@ class AgreementsWindow(uiutil.Desk):
                         else f"{warn['band']} days")
             rows.append([agr["number"], agr["customer"], agr["site"],
                          dmoney.fmt(agr["price"]), agr["visits_per_year"],
-                         agr["renewal"], band, dmoney.fmt(got["profit"])])
+                         agr["renewal"], agreements.discount_of(agr) + "%",
+                         "Yes" if agr.get("auto_renew", True) else "No",
+                         band, dmoney.fmt(got["profit"])])
             ids.append(agr["id"])
         uiutil.fill(self.table, rows, ids)
         lines = []
@@ -63,6 +87,9 @@ class AgreementsWindow(uiutil.Desk):
             else:
                 lines.append(f"{w['number']} {w['customer']} renews in "
                              f"{w['days_left']} days ({w['band']}-day warning)")
+        if renewed:
+            lines.insert(0, "Renewed automatically for another year: " +
+                         ", ".join(renewed))
         self.warn.setText("\n".join(lines) or "No renewal inside 90 days.")
 
     def add_clicked(self):
@@ -70,11 +97,26 @@ class AgreementsWindow(uiutil.Desk):
             return agreements.add(
                 self.store, self.customer.text(), self.price.text(),
                 self.visits.text(), self.renewal.text(),
-                site=self.site.text(), records=records_api.load())
+                site=self.site.text(), records=records_api.load(),
+                auto_renew=self.auto_renew.isChecked(),
+                discount_pct=self.discount.text())
         if self.guard(go):
             agreements.save(self.store, self.path)
             self.reload()
             self.msg.setText("Agreement saved.")
+
+    def terms_clicked(self, _checked=False):
+        """The selected agreement takes the discount and auto-renew shown."""
+        aid = uiutil.selected_id(self.table)
+        if not aid:
+            self.msg.setText("Pick an agreement first.")
+            return
+        if self.guard(lambda: agreements.set_terms(
+                self.store, aid, self.discount.text(),
+                self.auto_renew.isChecked())):
+            agreements.save(self.store, self.path)
+            self.reload()
+            self.msg.setText("Discount and auto-renew saved.")
 
     def due_clicked(self):
         def go():
@@ -86,6 +128,11 @@ class AgreementsWindow(uiutil.Desk):
         workorder.save(self.orders, self.orders_path)
         self.reload()
         self.msg.setText(f"{len(ids)} planned visit(s) opened.")
+
+    def calendar_clicked(self, _checked=False):
+        from . import visit_calendar_ui
+        self._calendar = visit_calendar_ui.open_window(self)
+        return self._calendar
 
     def print_to(self, path):
         out = self.guard(lambda: agreements.summary_pdf(

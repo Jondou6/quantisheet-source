@@ -219,14 +219,75 @@ def check_local(host):
     return _rebuild(parsed.scheme, name, port)
 
 
+def it_host():
+    """The AI server your IT department named (policy AIHost), as a plain
+    http(s) host with no trailing slash, or "" when none is set. The AI
+    review uses that same server, so the model list follows it (outside
+    review, Nov 7 - N1: the review worked and this window said it only
+    reads the AI on this PC)."""
+    try:
+        from .. import policy
+        v = policy.get("AIHost")
+    except Exception:                                     # noqa: BLE001
+        return ""
+    if not v:
+        return ""
+    import re
+    v = str(v).strip()
+    # a base path is fine (an AI server behind a reverse proxy:
+    # http://ai.example.test/ollama); a user name or query isn't
+    if not re.match(r"^https?://[^/\s@?#]+(?:/[^\s@?#]*)?$", v):
+        raise NotLocalError("The AI server your IT department named isn't "
+                            "a plain http(s) address.")
+    return v.rstrip("/")
+
+
+def _origin(url):
+    """(scheme, host, port) of a URL, port filled in for http/https - the
+    policy host may carry a base path the caller didn't repeat (Venice
+    N7). User info is left out of the comparison: the policy host can't
+    carry any (it_host refuses it), and a caller's URL with user info
+    matches the same host without it (F5-6). http and https are different origins on purpose: a policy
+    that says https is never quietly reached over plain http (P4-6)."""
+    from urllib.parse import urlsplit
+    p = urlsplit(str(url or ""))
+    scheme = (p.scheme or "").lower()
+    try:
+        port = p.port
+    except ValueError:
+        port = None
+    if port is None:                     # not "or": port 0 stays 0 (F5-5)
+        port = {"http": 80, "https": 443}.get(scheme)
+    return (scheme, (p.hostname or "").lower(), port)
+
+
 def list_installed(host=DEFAULT_HOST, timeout=TAGS_TIMEOUT):
     """Models Ollama has installed on this PC, in the order it listed them.
 
     Each item is an InstalledModel. The size is what Ollama reported.
     Raises NotLocalError for a host that is not this PC (no connection is
     opened) and OllamaError when Ollama does not answer. Never downloads.
+    Two different cases (Venice, Nov 9 - F5-2):
+    - an AIHost policy value that isn't a plain http(s) address (mistyped)
+      makes every call fail with OllamaError, this PC's included, until IT
+      fixes it - on purpose: with a policy set, a silent fallback could
+      list a different AI than the review uses (P4-9);
+    - a valid policy, and a host that is neither it nor this PC: that is
+      NotLocalError, as without a policy ("not local, don't retry").
     """
-    base = check_local(host)
+    # the host asked for, checked: this PC, or exactly the AI server your
+    # IT department named (Venice, Nov 9 - F3: the argument was ignored
+    # whenever a policy host was set)
+    try:
+        pol = it_host()
+    except NotLocalError as e:
+        # a mistyped policy value is a message, from every caller
+        # (Venice, Nov 9 - N7)
+        raise OllamaError(str(e) + " Ask your IT department to check the "
+                          "AIHost setting.") from e
+    h = str(host or "").strip().rstrip("/")
+    base = pol if pol and (h in ("", pol) or
+                           _origin(h) == _origin(pol)) else check_local(host)
     if isinstance(timeout, bool) or not isinstance(timeout, (int, float)):
         raise ValueError("timeout must be a number of seconds.")
     if timeout <= 0:

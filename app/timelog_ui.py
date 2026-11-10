@@ -4,6 +4,7 @@ from PySide6.QtWidgets import (QCheckBox, QDialog, QDialogButtonBox,
                                QTableWidget, QTableWidgetItem, QVBoxLayout)
 
 from . import timelog
+from .dmoney import c2 as _c2
 
 
 class TimeLogDialog(QDialog):
@@ -30,9 +31,9 @@ class TimeLogDialog(QDialog):
                                              "Review / estimating (h)",
                                              "Total (h)"])
         for i, (name, t) in enumerate(sorted(tot.items())):
-            for c, v in enumerate((name, f"{t['takeoff_min'] / 60:.2f}",
-                                   f"{t['review_min'] / 60:.2f}",
-                                   f"{t['total_min'] / 60:.2f}")):
+            for c, v in enumerate((name, f"{_c2(t['takeoff_min'] / 60):.2f}",
+                                   f"{_c2(t['review_min'] / 60):.2f}",
+                                   f"{_c2(t['total_min'] / 60):.2f}")):
                 self.jobs.setItem(i, c, QTableWidgetItem(v))
         self.jobs.verticalHeader().hide()
         self.jobs.horizontalHeader().setSectionResizeMode(

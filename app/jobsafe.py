@@ -436,8 +436,8 @@ def drop_lock(path):
 
 SYNCED_WARNING = ("This file is in a synced folder (OneDrive, SharePoint, "
                   "Dropbox...). Locks there aren't reliable and conflict "
-                  "copies are likely - use File > Work on a Local Copy, then "
-                  "Copy Back to the Original when you are done.")
+                  "copies are likely - use File > Copies & Cloud > Work on a Local "
+                  "Copy, then Copy Back to the Original when you are done.")
 
 
 _SYNCED = ("onedrive", "sharepoint", "dropbox", "\\box\\", "google drive",
@@ -529,6 +529,20 @@ def local_copy_info(local):
         return None
 
 
+def _replace_retrying(src, dst, tries=6, pause=0.25):
+    """os.replace, tried again for a moment when Windows says the file is
+    in use: a sync client or a virus scanner often holds it for a blink
+    right after a save."""
+    import time
+    for i in range(tries):
+        try:
+            return os.replace(src, dst)
+        except PermissionError:
+            if i == tries - 1:
+                raise
+            time.sleep(pause)
+
+
 def copy_back(local, force=False):
     """Put the local copy back over the original. Refused (CopyBackError)
     when the original changed since the copy was made, unless force - the
@@ -554,8 +568,23 @@ def copy_back(local, force=False):
     else:
         target = orig
     tmp = target + ".qscopy"
-    shutil.copy2(local, tmp)
-    os.replace(tmp, target)
+    try:
+        shutil.copy2(local, tmp)
+        _replace_retrying(tmp, target)
+    except OSError as e:
+        # Windows refuses (WinError 5/32) while the original is open in a
+        # tab or another program; take the half-written copy away again
+        # and say so plainly (Chief's estimator test, Nov 7)
+        try:
+            if os.path.exists(tmp):
+                os.remove(tmp)
+        except OSError:
+            log.warning("couldn't remove %s", tmp, exc_info=True)
+        raise CopyBackError(
+            f"The original couldn't be replaced - it's open somewhere "
+            f"(another tab, another program or another person). Close it "
+            f"and try Copy Back again. Your local copy is unchanged.\n\n"
+            f"({e.strerror or e})") from e
     if target == orig:
         info["seen"] = list(fingerprint(orig) or ())
         info["copied_back"] = datetime.datetime.now().isoformat(

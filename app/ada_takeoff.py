@@ -203,6 +203,7 @@ def counts(doc, items=None):
     from . import annotate
     flat, rooms, areas = {}, {}, {}
     lots = {}
+    marks = {}                  # page -> {"total"|"accessible"|"van": rects}
     for it in items if items is not None else annotate.takeoff_items(doc):
         if it.get("type") != "count":
             continue
@@ -227,6 +228,9 @@ def counts(doc, items=None):
                    "van": "van"}[field]
             lot = lots.setdefault(page, {})
             lot[key] = lot.get(key, 0) + n
+            if n == 1 and it.get("rect"):
+                marks.setdefault(page, {}).setdefault(key, []).append(
+                    it["rect"])
         else:
             flat[field] = flat.get(field, 0) + n
     out = {k: int(v) for k, v in flat.items()}
@@ -247,9 +251,14 @@ def counts(doc, items=None):
         rows = []
         for page, lot in sorted(lots.items()):
             lot = {k: int(v) for k, v in lot.items()}
-            # accessible and van stalls are parking spaces too
+            # accessible and van stalls are parking spaces too - but a
+            # stall marked both "Parking" and "Accessible Parking" is one
+            # stall, not two (outside review, Nov 7 - M11)
+            twice = _same_stalls(marks.get(page, {}))
             lot["total"] = lot.get("total", 0) + lot.get("accessible", 0) + \
-                lot.get("van", 0)
+                lot.get("van", 0) - twice
+            if twice:
+                lot["counted_once"] = twice
             lot["accessible"] = lot.get("accessible", 0) + lot.get("van", 0)
             lot["name"] = f"Parking, sheet {page + 1}"
             rows.append(lot)
@@ -261,6 +270,30 @@ def counts(doc, items=None):
         out["public_entrances"] = out.get("public_entrances", 0) + \
             out["accessible_entrances"]
     return out
+
+
+def _same_stalls(marks):
+    """How many accessible or van marks sit on a "Parking" mark (the same
+    stall counted in both groups). Each Parking mark matches once. Only
+    single-stall marks are compared, on purpose: one mark counting 3
+    stalls doesn't say which of them an accessible mark is on, so those
+    add up as counted (Venice, Nov 9 - F8)."""
+    def centre(r):
+        return ((r[0] + r[2]) / 2, (r[1] + r[3]) / 2)
+
+    def near(r, c, pad=6):
+        return r[0] - pad <= c[0] <= r[2] + pad and \
+            r[1] - pad <= c[1] <= r[3] + pad
+    free = list(marks.get("total", []))
+    n = 0
+    for key in ("accessible", "van"):
+        for r in marks.get(key, []):
+            c = centre(r)
+            hit = next((i for i, p in enumerate(free) if near(p, c)), None)
+            if hit is not None:
+                free.pop(hit)
+                n += 1
+    return n
 
 
 def markup(doc, findings, author=""):

@@ -22,6 +22,7 @@ import re
 from decimal import Decimal
 
 from . import bidday
+from ..dmoney import c2 as _c2
 
 GREEN, YELLOW, RED = "confirmed", "unclear", "gap"
 MATCH = 0.80                # description match this close: a price
@@ -255,7 +256,7 @@ def import_quote(doc, package, path=None, parsed=None):
         if best is None or score < LOOSE:
             unmatched.append(ln["desc"])
             continue
-        prices[best["id"]] = f"{Decimal(str(ln['amount'])):.2f}"
+        prices[best["id"]] = f"{_c2(Decimal(str(ln['amount']))):.2f}"
         (matched if score >= MATCH else unclear).append(best["id"])
     excluded = []
     for ex in p.get("exclusions") or []:
@@ -306,7 +307,7 @@ def use_low(doc, package, bidder=None):
     plugs = {r["id"]: r["plug"] for r in b["rows"] if r["plug"] is not None}
     for s in sheet["scope"]:
         if s["id"] in plugs:
-            s["plug"] = f"{plugs[s['id']]:.2f}"
+            s["plug"] = f"{_c2(plugs[s['id']]):.2f}"
     bidday.save(doc, bidday.new_sheet(package, sheet["scope"],
                                       sheet["bidders"]))
     return bidday.apply_quote(doc, package, bidder or b["low"] or None)

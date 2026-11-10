@@ -55,12 +55,21 @@ def claim():
         return True
     try:
         import ctypes
-        k32 = ctypes.windll.kernel32
+        # Nov 5: GetLastError through ctypes.windll can read a value that
+        # ctypes itself overwrote, so "already running" was missed and a
+        # second QuantiSheet opened. use_last_error keeps the real one.
+        k32 = ctypes.WinDLL("kernel32", use_last_error=True)
         k32.CreateMutexW.restype = ctypes.c_void_p
+        k32.CreateMutexW.argtypes = (ctypes.c_void_p, ctypes.c_int,
+                                     ctypes.c_wchar_p)
+        ctypes.set_last_error(0)
         h = k32.CreateMutexW(None, False, "Local\\" + name() + "-start")
-        already = k32.GetLastError() == 183          # ERROR_ALREADY_EXISTS
+        already = ctypes.get_last_error() == 183     # ERROR_ALREADY_EXISTS
         if h:
-            _lock = h
+            if _lock is None:
+                _lock = h
+            else:                   # a second claim in this same program
+                k32.CloseHandle(ctypes.c_void_p(h))
         return not already
     except Exception:                                     # noqa: BLE001
         return True
@@ -85,7 +94,7 @@ def bring_forward(paths=(), wait_s=20.0, sleep=None, hand=None):
         sleep(0.25)
 
 
-def hand_over(paths, timeout_ms=700):
+def hand_over(paths, timeout_ms=3000):
     """Give the files to a running QuantiSheet. True when one took them."""
     from PySide6.QtNetwork import QLocalSocket
     try:                     # let the running window come to the front

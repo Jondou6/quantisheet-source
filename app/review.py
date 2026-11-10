@@ -25,6 +25,7 @@ import json
 import os
 import re
 import time
+from .dmoney import c2 as _c2
 
 REASONS = ("missed", "not there", "wrong shape", "misidentified")
 FEEDBACK_FILE = "ai_feedback.jsonl"
@@ -163,7 +164,7 @@ def accept(res, item, qty=None, who="reviewer", reason=None,
         pass
     fixed = qty is not None and qty != item.get("qty")
     line = {"engine": item.get("engine") or "review",
-            "name": item.get("name"), "qty": round(float(q), 2),
+            "name": item.get("name"), "qty": _c2(float(q)),
             "unit": item.get("unit") or "EA", "status": "taken off",
             "page": item.get("page"), "sheet": item.get("sheet"),
             "csi": item.get("csi") or "", "reviewed": True,

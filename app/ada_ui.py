@@ -276,6 +276,23 @@ FIELDS = [
 ]
 
 
+# how the parking total is made (outside review via Chief, Nov 7 - M11)
+PARKING_RULE = ("\n\nParking: a stall marked both \"Parking\" and "
+                "\"Accessible Parking\" (or \"Van Parking\") counts once.")
+
+
+def _revision(doc):
+    """Changes whenever the drawing changes: the viewer's edit counter
+    (cheap - no walk over the pages) and the page count (outside review,
+    Nov 7 - N5: the old key walked every page and changed on every call
+    once the drawing had been edited)."""
+    try:
+        from . import annotate
+        return (doc.page_count, annotate.edit_count(doc))
+    except Exception:                                     # noqa: BLE001
+        return None
+
+
 class CheckerTab(QWidget):
     edited = Signal()
 
@@ -349,6 +366,7 @@ class CheckerTab(QWidget):
             lists.addWidget(w)
         lay.addLayout(lists)
         self.summary = QLabel("")
+        self.summary.setTextFormat(Qt.RichText)   # always rich (it has <b>)
         lay.addWidget(self.summary)
         self.found = QTableWidget(0, 5)
         self.found.setHorizontalHeaderLabels(
@@ -411,12 +429,30 @@ class CheckerTab(QWidget):
                 p[k] = v
         return p
 
+    # set by the main window: True (and says why) while live collaboration
+    # is on - the checker's saved counts aren't in the shared op log, so
+    # writing them would put this copy out of step (outside review via
+    # Chief, Nov 7 - H4)
+    blocked = None
+    # set by the main window: write the project through the drawing's op
+    # log (undo, live collaboration) - apply(project) -> bool (H4)
+    apply = None
+
+    def _elements(self):
+        """The measured ADA items, scanned once per drawing revision - not
+        again on every Refresh (outside review via Chief, Nov 7 - M12)."""
+        key = (id(self.doc), _revision(self.doc))
+        if getattr(self, "_el_key", None) != key:
+            self._el = ada_takeoff.elements(self.doc)
+            self._el_key = key
+        return list(self._el)
+
     def run(self, save=True):
         p = self.project()
         self.findings = ada_check.check(p)
         if self.doc is not None:        # measured sizes on the drawings
             try:
-                self.findings += ada_takeoff.elements(self.doc)
+                self.findings += self._elements()
             except Exception:                             # noqa: BLE001
                 log.warning("ADA measured elements not read", exc_info=True)
         self.found.setRowCount(0)
@@ -438,6 +474,24 @@ class CheckerTab(QWidget):
                              f"{s['to_check']} to check on the drawings")
         if save and self.doc is not None:
             try:
+                # nothing changed: no write, no unsaved mark, no undo step
+                # (outside review via Chief, Nov 7 - M16)
+                if p == ada_check.read(self.doc):
+                    return
+                if self.apply is not None:
+                    # an op: undoable, and shared in live collaboration
+                    # only an explicit False is a refusal; a hook that
+                    # returns nothing isn't (Venice, Nov 9 - N10). The
+                    # summary is rebuilt above on every run, so the line
+                    # appears once, never piling up.
+                    if self.apply(p) is False:
+                        self.summary.setText(
+                            self.summary.text() + "<br><span style='color:"
+                            "#b00'>Not saved to the drawing: it may be "
+                            "closed, view-only, or the data too large.</span>")
+                    return
+                if self.blocked is not None and self.blocked("ADA Check"):
+                    return
                 ada_check.write(self.doc, p)
                 self.edited.emit()
             except Exception:                             # noqa: BLE001
@@ -455,7 +509,7 @@ class CheckerTab(QWidget):
                 "\"Accessible Parking\", \"Van Parking\", \"WC - Men\", "
                 "\"Urinal - Men\", \"Lavatory - Men\", \"Seat\", "
                 "\"Entrance\", \"Drinking Fountain\", \"Guest Room\" or "
-                "\"Dwelling Unit\".")
+                "\"Dwelling Unit\"." + PARKING_RULE)
             return
         filled = []
         for k, v in got.items():
@@ -471,10 +525,13 @@ class CheckerTab(QWidget):
         self.run()
         QMessageBox.information(self, "Fill From Drawings",
                                 "Filled from the drawings: " +
-                                ", ".join(filled) + ".")
+                                ", ".join(filled) + "." +
+                                (PARKING_RULE if "parking" in got else ""))
 
     def mark_up(self):
         if self.doc is None:
+            return
+        if self.blocked is not None and self.blocked("ADA Mark Up"):
             return
         from . import settings
         n = ada_takeoff.markup(self.doc, self.findings, settings.author())

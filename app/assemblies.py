@@ -38,6 +38,7 @@ import os
 
 from . import annotate, costbook, csi, labor, settings, takeoff, units
 from . import embfiles
+from .dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 
@@ -189,9 +190,10 @@ def compute(assembly, meas):
         except (TypeError, ValueError):
             raise FormulaError(f"property {k!r} must be a number")
     out = []
+    from .assembly_csv import qty_for
     for part in assembly.get("parts") or []:
         try:
-            q = evaluate(part.get("qty"), names)
+            q = evaluate(qty_for(assembly, part), names)
         except FormulaError as e:
             raise FormulaError(f"{part.get('name', '?')}: {e}") from e
         names[var_name(part.get("name", ""))] = q
@@ -314,6 +316,18 @@ for _a, _code in zip(BUILT_IN, ("09 21 16", "09 21 16", "04 22 00",
     _a["csi"] = _code
 
 
+def _migrate_all(items):
+    """Formulas saved by the bad catalog parse, put right as they're read
+    (assembly_csv.migrate); saved that way the next time the job or
+    library is written."""
+    try:
+        from . import assembly_csv
+        for a in items:
+            assembly_csv.migrate(a)
+    except Exception:                                     # noqa: BLE001
+        log.warning("assembly formulas not checked", exc_info=True)
+
+
 def library():
     """Built-in assemblies, the catalog shipped with QuantiSheet
     (data/assembly_catalog.csv) and your own (which override by name)."""
@@ -328,6 +342,7 @@ def library():
             for a in json.load(f):
                 if isinstance(a, dict) and a.get("name"):
                     items[a["name"]] = a
+                    _migrate_all([a])
     except FileNotFoundError:
         pass
     except (OSError, ValueError):
@@ -376,6 +391,7 @@ def read_job(doc):
             if isinstance(data, dict):
                 data.setdefault("assemblies", {})
                 data.setdefault("labor_rate", DEFAULT_LABOR_RATE)
+                _migrate_all(data["assemblies"].values())
                 return data
     except Exception:
         log.warning("could not read job assemblies", exc_info=True)
@@ -397,6 +413,38 @@ def set_labor_rate(doc, rate):
     job = read_job(doc)
     job["labor_rate"] = float(rate)
     write_job(doc, job)
+
+
+def any_known(doc, names):
+    """Whether any of these takeoff groups has an assembly - checked
+    without opening (or making) the price database when there isn't one
+    yet (the practice job keeps everything in its sandbox)."""
+    names = [n for n in names if n]
+    if not names:
+        return False
+    job = read_job(doc)
+    if any(n in job["assemblies"] for n in names):
+        return True
+    from . import pricedb
+    if os.path.isfile(pricedb.path()):
+        lib = library()
+    else:
+        lib = {a["name"]: a for a in BUILT_IN}
+        try:
+            from . import assembly_csv
+            for f in assembly_csv.catalog_files():
+                got, _p = assembly_csv.parse(f)
+                lib.update({a["name"]: a for a in got})
+        except Exception:                                 # noqa: BLE001
+            log.warning("assembly catalog unavailable", exc_info=True)
+        try:
+            with open(LIBRARY_PATH, encoding="utf-8") as fh:
+                for a in json.load(fh):
+                    if isinstance(a, dict) and a.get("name"):
+                        lib[a["name"]] = a
+        except (OSError, ValueError):
+            pass
+    return any(n in lib for n in names)
 
 
 def find(doc, name, job=None, lib=None):
@@ -745,14 +793,26 @@ def rollup(doc, page=None, book=False, region=None, as_of=None, refs=None,
         if value is not None:
             r["quantity"] += value
         r["items"] += 1
+        # copies of a typical (x3 typical): each copy is priced to the
+        # cent, as the estimator checks it by hand - four 100-ton chillers,
+        # not one 400-ton one (Chief's re-test, Nov 7: a penny high)
+        try:
+            copies = float(it.get("multiplier") or 1)
+        except (TypeError, ValueError):
+            copies = 1.0
+        copies = int(copies) if copies >= 1 and copies == int(copies) \
+            else 1
         for p in parts:
             q = r["parts"].setdefault(p["name"], {
                 "name": p["name"], "unit": p["unit"], "qty": 0.0,
                 "cost": p["cost"], "material": 0.0, "labor_hours": 0.0,
-                "crew": p.get("crew", ""), "code": p.get("code", "")})
+                "crew": p.get("crew", ""), "code": p.get("code", ""),
+                "_each": []})
             q["qty"] += p["qty"]
             q["material"] += p["material"]
-            q["labor_hours"] += p["labor_hours"] * r["adjust"]
+            hrs = p["labor_hours"] * r["adjust"]
+            q["labor_hours"] += hrs
+            q["_each"].append((p["material"], hrs, copies))
     out = []
     for name in sorted(rows, key=lambda n: (rows[n]["trade"], n)):
         r = rows[name]
@@ -760,7 +820,16 @@ def rollup(doc, page=None, book=False, region=None, as_of=None, refs=None,
         for q in r["parts"]:
             cr = labor.crew_rate(q["crew"], job_rates) if q["crew"] else None
             q["labor_rate"] = cr if cr is not None else rate
-            q["labor_cost"] = q["labor_hours"] * q["labor_rate"]
+            # each part's material and labor to the cent, then added up -
+            # the way an estimator checks it by hand (Chief's re-test,
+            # Nov 7: the chiller row came out a penny high when the
+            # unrounded amounts were added first)
+            each = q.pop("_each", None) or [(q["material"],
+                                             q["labor_hours"], 1)]
+            q["material"] = _c2(sum(_cent(m / n) * n
+                                      for m, _h, n in each))
+            q["labor_cost"] = _c2(sum(_cent(h / n * q["labor_rate"]) * n
+                                        for _m, h, n in each))
             q["crew_days"] = labor.crew_days(q["labor_hours"], q["crew"]) \
                 if q["crew"] and cr is not None else q["labor_hours"] / 8.0
             q["total"] = q["material"] + q["labor_cost"]
@@ -777,6 +846,14 @@ def rollup(doc, page=None, book=False, region=None, as_of=None, refs=None,
             log.warning("added estimate lines left out", exc_info=True)
             errors.append("The lines added in the Estimate panel couldn't "
                           "be read")
+        try:
+            from . import estimate
+            out.extend(estimate.rollup_rows(
+                doc, taken=[r["name"] for r in out]))
+        except Exception:                                 # noqa: BLE001
+            log.warning("priced takeoff lines left out", exc_info=True)
+            errors.append("The prices typed on takeoff lines couldn't be "
+                          "read")
     totals = {k: sum(r[k] for r in out)
               for k in ("material", "labor_hours", "labor_cost", "crew_days",
                         "total")}
@@ -784,6 +861,13 @@ def rollup(doc, page=None, book=False, region=None, as_of=None, refs=None,
     totals["costbook"] = book.name if book else ""
     totals["region"] = (region or book.region) if book else ""
     return out, totals, errors
+
+
+def _cent(x):
+    """A float amount to the cent, half-up (as a float)."""
+    from decimal import Decimal, ROUND_HALF_UP
+    return float(Decimal(repr(float(x or 0))).quantize(
+        Decimal("0.01"), rounding=ROUND_HALF_UP))
 
 
 def reprice(doc, book, region=None, as_of=None):
@@ -815,22 +899,22 @@ def export_xlsx(doc, path, page=None):
                "Total $"]]
     for r in rows:
         summary.append([r["csi"], r["trade"], r["name"],
-                        round(r["quantity"], 2),
-                        r["unit"], r["items"], round(r["material"], 2),
-                        round(r["labor_hours"], 2), round(r["labor_cost"], 2),
-                        round(r["crew_days"], 2), round(r["total"], 2)])
+                        _c2(r["quantity"]),
+                        r["unit"], r["items"], _c2(r["material"]),
+                        _c2(r["labor_hours"]), _c2(r["labor_cost"]),
+                        _c2(r["crew_days"]), _c2(r["total"])])
         for q in r["parts"]:
             detail.append([r["csi"], r["trade"], r["name"], q["name"],
                            q.get("code", ""), q.get("crew", ""),
-                           round(q["qty"], 2), q["unit"], round(q["cost"], 2),
-                           round(q["material"], 2), round(q["labor_hours"], 2),
-                           round(q["labor_cost"], 2), round(q["total"], 2)])
-    summary += [[], ["", "", "Total", "", "", "", round(totals["material"], 2),
-                     round(totals["labor_hours"], 2),
-                     round(totals["labor_cost"], 2),
-                     round(totals["crew_days"], 2),
-                     round(totals["total"], 2)],
-                ["", "", f"Labor rate ${totals['labor_rate']:,.2f}/hr"
+                           _c2(q["qty"]), q["unit"], _c2(q["cost"]),
+                           _c2(q["material"]), _c2(q["labor_hours"]),
+                           _c2(q["labor_cost"]), _c2(q["total"])])
+    summary += [[], ["", "", "Total", "", "", "", _c2(totals["material"]),
+                     _c2(totals["labor_hours"]),
+                     _c2(totals["labor_cost"]),
+                     _c2(totals["crew_days"]),
+                     _c2(totals["total"])],
+                ["", "", f"Labor rate ${_c2(totals['labor_rate']):,.2f}/hr"
                  " (parts with a crew use the crew's rate)" +
                  (f"; priced from "
                   f"{_costbook_shown(totals['costbook'])}"

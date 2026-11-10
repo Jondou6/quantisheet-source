@@ -21,6 +21,7 @@ change orders twice and invented 10% progress when none was entered.)
 """
 from . import safeio
 import copy
+import decimal
 import datetime as _dt
 import json
 import logging
@@ -31,6 +32,7 @@ import fitz
 
 from . import settings
 from . import embfiles
+from .dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 
@@ -185,8 +187,8 @@ def set_sov(doc, lines):
         used.add(item)
         code = str(ln.get("csi") or "").strip()
         new.append({"item": item, "csi": csi.parse_code(code) or code,
-                    "desc": desc, "scheduled": round(_amount(
-                        ln.get("scheduled"), f"Line {item}"), 2), "co": ""})
+                    "desc": desc, "scheduled": _c2(_amount(
+                        ln.get("scheduled"), f"Line {item}")), "co": ""})
     if certified:
         keep = {l["item"]: l for l in new}
         for item, l in old.items():
@@ -233,7 +235,7 @@ def from_estimate(doc, by="trade", front_load=0.0, months=12):
     out = [groups[k] for k in sorted(groups)] if by == "csi" else \
         list(groups.values())
     for g in out:
-        g["scheduled"] = round(g["scheduled"], 2)
+        g["scheduled"] = _c2(g["scheduled"])
     if front_load and out:
         from . import bidbuild
         fl = bidbuild.front_load([g["scheduled"] for g in out], front_load,
@@ -292,8 +294,8 @@ def price_markups(doc, refs, markup_pct=0.0):
     their assemblies; price adds overhead & profit `markup_pct`."""
     from . import assemblies
     rows, totals, problems = assemblies.rollup(doc, refs=list(refs))
-    cost = round(totals["total"], 2)
-    return cost, round(cost * (1 + float(markup_pct or 0) / 100), 2), \
+    cost = _c2(totals["total"])
+    return cost, _c2(cost * (1 + float(markup_pct or 0) / 100)), \
         problems
 
 
@@ -305,10 +307,10 @@ def new_change(doc, title, amount=0.0, days=0, reason="", refs=(), rfi="",
     data = read(doc)
     cid = _next(data, "PCO")
     c = {"id": cid, "title": str(title).strip(), "stage": "pco",
-         "amount": round(_amount(amount, "Amount"), 2),
+         "amount": _c2(_amount(amount, "Amount")),
          "days": int(days or 0),
          "reason": reason, "refs": [dict(r) for r in refs], "rfi": rfi,
-         "cost": None if cost is None else round(_amount(cost, "Cost"), 2),
+         "cost": None if cost is None else _c2(_amount(cost, "Cost")),
          "markup_pct": None if markup_pct is None else float(markup_pct),
          "raised": _today(), "cor_no": "", "co_no": "", "submitted": "",
          "executed": "", "approved_amount": 0.0, "approved_days": 0,
@@ -330,12 +332,12 @@ def update_change(doc, cid, **fields):
         if k in fields:
             c[k] = str(fields[k] or "")
     if "amount" in fields:
-        c["amount"] = round(_amount(fields["amount"], "Amount"), 2)
+        c["amount"] = _c2(_amount(fields["amount"], "Amount"))
     if "days" in fields:
         c["days"] = int(fields["days"] or 0)
     if "cost" in fields:
         c["cost"] = None if fields["cost"] is None else \
-            round(_amount(fields["cost"], "Cost"), 2)
+            _c2(_amount(fields["cost"], "Cost"))
     if "markup_pct" in fields:
         c["markup_pct"] = None if fields["markup_pct"] is None else \
             float(fields["markup_pct"])
@@ -368,8 +370,8 @@ def execute(doc, cid, amount=None, days=None, date=None, note="", by=None):
     if c["stage"] not in ("pco", "cor"):
         raise BillingError(f"{c['id']} is {STAGE_LABEL[c['stage']]} and "
                            f"can't be executed.")
-    c["approved_amount"] = round(_amount(c["amount"] if amount is None
-                                         else amount, "Amount"), 2)
+    c["approved_amount"] = _c2(_amount(c["amount"] if amount is None
+                                         else amount, "Amount"))
     c["approved_days"] = int(c["days"] if days is None else days)
     c["stage"] = "co"
     c["co_no"] = _next(data, "CO")
@@ -377,7 +379,7 @@ def execute(doc, cid, amount=None, days=None, date=None, note="", by=None):
     data["sov"].append({"item": c["co_no"], "csi": "",
                         "desc": f"{c['co_no']} {c['title']}",
                         "scheduled": c["approved_amount"], "co": c["id"]})
-    _log(c, f"executed as {c['co_no']} for ${c['approved_amount']:,.2f}",
+    _log(c, f"executed as {c['co_no']} for ${_c2(c['approved_amount']):,.2f}",
          note, by)
     write(doc, data)
     return c
@@ -490,11 +492,11 @@ def set_progress(doc, no, item, work=None, stored=None, percent=None):
     ln = a["lines"].setdefault(str(item), {"work": 0.0, "stored": 0.0})
     if percent is not None:
         prev = _previous_work(data, a["no"]).get(str(item), 0.0)
-        work = round(line["scheduled"] * float(percent) / 100 - prev, 2)
+        work = _c2(line["scheduled"] * float(percent) / 100 - prev)
     if work is not None:
-        ln["work"] = round(_amount(work, f"Line {item} work"), 2)
+        ln["work"] = _c2(_amount(work, f"Line {item} work"))
     if stored is not None:
-        ln["stored"] = round(_amount(stored, f"Line {item} stored"), 2)
+        ln["stored"] = _c2(_amount(stored, f"Line {item} stored"))
     write(doc, data)
     return ln
 
@@ -578,12 +580,20 @@ def compute(doc, no, data=None):
         if done < -0.005 and l["scheduled"] >= 0:
             warnings.append(f"Line {l['item']} is below zero.")
         rows.append(row)
-    tot = {k: round(sum(r[k] for r in rows), 2)
+    tot = {k: _c2(sum(r[k] for r in rows))
            for k in ("scheduled", "previous", "this", "stored", "completed",
                      "balance", "retainage")}
     work_done = tot["previous"] + tot["this"]
-    ret_work = round(work_done * rw, 2)
-    ret_stored = round(tot["stored"] * rs, 2)
+    ret_work = _c2(work_done * rw)
+    ret_stored = _c2(tot["stored"] * rs)
+    # each line's retainage in whole cents that add up to the retainage
+    # the G702 holds (Chief's re-test, Nov 7: 500 lines of 21.01 showed
+    # 10,505.00 under a 10,506.00 total)
+    held = _allocate_cents([r["retainage"] for r in rows],
+                           ret_work + ret_stored)
+    for r, c in zip(rows, held):
+        r["retainage"] = c / 100
+    tot["retainage"] = _c2(sum(held) / 100)
     prev_app = None
     for x in data["payapps"]:
         if int(x["no"]) < int(no) and \
@@ -593,16 +603,16 @@ def compute(doc, no, data=None):
         if prev_app else 0.0
     pa, pd, ta, td = change_summary(
         data, prev_app["period_to"] if prev_app else None, a["period_to"])
-    orig = round(original_contract(data), 2)
-    net = round(pa - pd + ta - td, 2)
-    line3 = round(orig + net, 2)
+    orig = _c2(original_contract(data))
+    net = _c2(pa - pd + ta - td)
+    line3 = _c2(orig + net)
     line4 = tot["completed"]
-    line5 = round(ret_work + ret_stored, 2)
-    line6 = round(line4 - line5, 2)
+    line5 = _c2(ret_work + ret_stored)
+    line6 = _c2(line4 - line5)
     g = {"1": orig, "2": net, "3": line3, "4": line4,
          "5a": ret_work, "5b": ret_stored, "5": line5, "6": line6,
-         "7": round(previous_cert, 2), "8": round(line6 - previous_cert, 2),
-         "9": round(line3 - line6, 2)}
+         "7": _c2(previous_cert), "8": _c2(line6 - previous_cert),
+         "9": _c2(line3 - line6)}
     return {"no": int(no), "period_to": a["period_to"], "date": a["date"],
             "status": a.get("status", "draft"),
             "retainage_work": rw * 100, "retainage_stored": rs * 100,
@@ -658,7 +668,8 @@ def _para(page, rect, text, fontsize=9, color=(0, 0, 0)):
 
 
 def _m(v):
-    return f"${v:,.2f}" if v >= 0 else f"(${-v:,.2f})"
+    v = _c2(v)                          # half up, as the totals round
+    return f"${_c2(v):,.2f}" if v >= 0 else f"(${_c2(-v):,.2f})"
 
 
 class _Page:
@@ -813,13 +824,45 @@ def _g703(out, v):
         desc = (f"{r['csi']}  " if r["csi"] else "") + r["desc"]
         row([r["item"], desc[:70], _m(r["scheduled"]), _m(r["previous"]),
              _m(r["this"]), _m(r["stored"]), _m(r["completed"]),
-             f"{r['percent']:.0f}%", _m(r["balance"]), _m(r["retainage"])])
+             _pct(r["percent"]), _m(r["balance"]), _m(r["retainage"])])
     t = v["totals"]
     row(["", "GRAND TOTALS", _m(t["scheduled"]), _m(t["previous"]),
          _m(t["this"]), _m(t["stored"]), _m(t["completed"]),
-         f"{t['completed'] / t['scheduled'] * 100:.0f}%"
+         _pct(t["completed"] / t["scheduled"] * 100)
          if t["scheduled"] else "", _m(t["balance"]), _m(t["retainage"])],
         True)
+
+
+def _allocate_cents(amounts, total):
+    """Whole cents for each amount adding up to round(total, 2) exactly:
+    rounded down, then the cents left go to the largest remainders (ties
+    to the earliest). Decimal, never float rounding."""
+    D = decimal.Decimal
+    if not amounts:
+        return []
+    want = int((D(repr(float(total))) * 100).quantize(
+        D(1), rounding=decimal.ROUND_HALF_UP))
+    raw = [D(repr(float(a))) * 100 for a in amounts]
+    base = [int(x.quantize(D(1), rounding=decimal.ROUND_FLOOR)) for x in raw]
+    left = want - sum(base)
+    order = sorted(range(len(raw)), key=lambda i: (-(raw[i] - base[i]), i))
+    step = 1 if left >= 0 else -1
+    if left < 0:
+        order = order[::-1]
+    for k in range(abs(left)):
+        base[order[k % len(order)]] += step
+    return base
+
+
+def _pct(x):
+    """Percent complete as printed: a little work never shows as "0%"
+    (Chief's estimator test, Nov 7) - one decimal under 10%."""
+    x = float(x or 0)
+    if x == 0:
+        return "0%"
+    if abs(x) < 10:
+        return f"{x:.1f}%"
+    return f"{x:.0f}%"
 
 
 def pay_app_pdf(doc, no, path):
@@ -842,20 +885,31 @@ def pay_app_xlsx(doc, no, path):
     g = v["g702"]
     summary = [["Application", v["no"]], ["Period to", v["period_to"]],
                ["Status", v["status"]], []]
+    def c2(x):
+        """Money to the cent - never 3516.3500000000004 in a cell
+        (Chief's estimator test, Nov 7)."""
+        try:                 # Decimal, half-up - never float round()
+            return float(decimal.Decimal(repr(float(x))).quantize(
+                decimal.Decimal("0.01"), rounding=decimal.ROUND_HALF_UP))
+        except (TypeError, ValueError, decimal.InvalidOperation):
+            return x
+
     for key, label in G702_LINES:
-        summary.append([key, label, g[key]])
+        summary.append([key, label, c2(g[key])])
     detail = [["Item", "CSI", "Description", "Scheduled", "Previous",
                "This period", "Stored", "Completed & stored", "%",
                "Balance", "Retainage"]]
     for r in v["rows"]:
-        detail.append([r["item"], r["csi"], r["desc"], r["scheduled"],
-                       r["previous"], r["this"], r["stored"], r["completed"],
-                       round(r["percent"], 1), r["balance"],
-                       round(r["retainage"], 2)])
+        detail.append([r["item"], r["csi"], r["desc"], c2(r["scheduled"]),
+                       c2(r["previous"]), c2(r["this"]), c2(r["stored"]),
+                       c2(r["completed"]), round(r["percent"], 1),
+                       c2(r["balance"]), c2(r["retainage"])])
     t = v["totals"]
-    detail.append(["", "", "Totals", t["scheduled"], t["previous"],
-                   t["this"], t["stored"], t["completed"], "", t["balance"],
-                   t["retainage"]])
+    detail.append(["", "", "Totals", c2(t["scheduled"]), c2(t["previous"]),
+                   c2(t["this"]), c2(t["stored"]), c2(t["completed"]),
+                   round(t["completed"] / t["scheduled"] * 100, 1)
+                   if t["scheduled"] else "", c2(t["balance"]),
+                   c2(t["retainage"])])
     acrobat.write_xlsx(path, [("Summary", summary), ("Detail", detail)])
     return path
 
@@ -989,10 +1043,10 @@ def waiver(doc, kind, through, amount, claimant="", payer="", disputed=0.0,
                            f"{', '.join(WAIVER_KINDS)}")
     data = read(doc)
     rec = {"kind": kind, "through": through,
-           "amount": round(_amount(amount, "Waiver amount"), 2),
+           "amount": _c2(_amount(amount, "Waiver amount")),
            "claimant": claimant or data["info"].get("contractor", ""),
            "payer": payer or data["info"].get("owner", ""),
-           "disputed": round(_amount(disputed, "Disputed amount"), 2),
+           "disputed": _c2(_amount(disputed, "Disputed amount")),
            "app_no": app_no,
            "issued": _today()}
     data["waivers"].append(rec)

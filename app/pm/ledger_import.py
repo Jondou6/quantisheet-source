@@ -6,6 +6,7 @@ preview() says what would come in; run() brings it in - only into a job
 that has no contract lines and no pay apps yet (nothing is merged or
 overwritten). The PDF's own ledger is left as it was (read-only use)."""
 from .. import money
+from ..dmoney import c2 as _c2
 
 
 class LedgerImportError(RuntimeError):
@@ -56,7 +57,7 @@ def run(doc, store):
         store.save_record("contract", {
             "item": str(s.get("item") or ""),
             "description": s.get("desc") or "",
-            "scheduled": round(_f(s.get("scheduled")), 2),
+            "scheduled": _c2(_f(s.get("scheduled"))),
             "cost_code": s.get("csi") or ""})
     for c in d["changes"]:
         if c.get("stage") != "co":
@@ -67,13 +68,12 @@ def run(doc, store):
             "approved": c.get("executed") or "",
             "days": int(c.get("approved_days") or 0),
             "lines": [{"description": c.get("title") or "",
-                       "price": round(_f(c.get("approved_amount")), 2)}],
+                       "price": _c2(_f(c.get("approved_amount")))}],
             "notes": "Brought in from the drawing's Contract & Billing "
                      "ledger."})
     for a in d["payapps"]:
-        lines = [{"item": str(item), "this_period": round(_f(v.get("work")),
-                                                          2),
-                  "stored": round(_f(v.get("stored")), 2)}
+        lines = [{"item": str(item), "this_period": _c2(_f(v.get("work"))),
+                  "stored": _c2(_f(v.get("stored")))}
                  for item, v in (a.get("lines") or {}).items()]
         rec = store.save_record("payapp", {
             "period_to": a.get("period_to") or "",

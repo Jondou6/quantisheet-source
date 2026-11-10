@@ -17,6 +17,7 @@ import logging
 import fitz
 
 from . import annotate
+from .dmoney import c2 as _c2
 
 TYPES = {"rooms": "Rooms (floor area)", "walls": "Walls (LF by type)",
          "doors": "Doors (count by width)", "paint": "Wall paint (SF)"}
@@ -274,8 +275,8 @@ if QDialog is not None:
             self.combos = []
             for i, c in enumerate(self.items):
                 vals = [self.MARK[c["state"]], c["type"], None,
-                        f"{c['value']:,.2f}" if c["type"] != "doors" else "1",
-                        c["unit"], f"{c['conf']:.2f}"]
+                        f"{_c2(c['value']):,.2f}" if c["type"] != "doors" else "1",
+                        c["unit"], f"{_c2(c['conf']):.2f}"]
                 for col, v in enumerate(vals):
                     if v is not None:
                         t.setItem(i, col, QTableWidgetItem(v))

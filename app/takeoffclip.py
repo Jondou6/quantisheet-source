@@ -75,9 +75,45 @@ def copy(v, clipboard=None):
         md.setText(f"{len(items)} QuantiSheet markup(s)")
         md.setData(MIME, json.dumps({"n": len(items)}).encode("utf-8"))
         (clipboard or QApplication.clipboard()).setMimeData(md)
+        _release_at_exit()
     except Exception:                                     # noqa: BLE001
         log.debug("markup clipboard", exc_info=True)
     return len(items)
+
+
+_RELEASE = {"on": False}
+
+
+def release():
+    """Take our markups off the system clipboard. Run when the program
+    ends (Nov 5): Qt data left on the clipboard as Python shuts down was
+    freed twice - an access violation on exit after a copy. Only our own
+    data is cleared; anything copied from another program is left."""
+    try:
+        from PySide6.QtWidgets import QApplication
+        if QApplication.instance() is None:
+            return False
+        cb = QApplication.clipboard()
+        md = cb.mimeData()
+        if md is not None and md.hasFormat(MIME):
+            cb.clear()
+            return True
+    except Exception:                                     # noqa: BLE001
+        log.debug("markup clipboard release", exc_info=True)
+    return False
+
+
+def _release_at_exit():
+    if _RELEASE["on"]:
+        return
+    _RELEASE["on"] = True
+    import atexit
+    atexit.register(release)
+    try:
+        from PySide6.QtWidgets import QApplication
+        QApplication.instance().aboutToQuit.connect(release)
+    except Exception:                                     # noqa: BLE001
+        pass
 
 
 def ready(clipboard=None):

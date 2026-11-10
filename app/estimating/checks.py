@@ -57,6 +57,7 @@ import statistics
 from decimal import Decimal
 
 from . import _io, safedb
+from ..dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 
@@ -232,8 +233,8 @@ def _line_checks(doc, history, outlier_pct):
                     if pct > Decimal(outlier_pct):
                         out.append(_f(
                             "outlier", name,
-                            f"${r['unit_cost']:.2f} per {r['unit_label']} "
-                            f"vs your history median ${med:.2f} "
+                            f"${_c2(r['unit_cost']):.2f} per {r['unit_label']} "
+                            f"vs your history median ${_c2(med):.2f} "
                             f"({len(past)} past jobs, "
                             f"{pct.quantize(Decimal('1'))}% off)"))
     for key, names in seen.items():
@@ -314,13 +315,13 @@ def _group_checks(doc, linked, job):
         also = by[k]
         if g.get("unit_cost") and also:
             out.append(_f("double_priced", g["name"],
-                          f"has its own unit cost ${g['unit_cost']:,.2f} per "
+                          f"has its own unit cost ${_c2(g['unit_cost']):,.2f} per "
                           f"{g['unit']} and is also priced by "
                           + " and ".join(also)))
         if also or g.get("unit_cost") or accounted.get(k):
             continue
         out.append(_f("unpriced_takeoff", g["name"],
-                      f"{g['quantity']:,.2f} {g['unit']} on page(s) "
+                      f"{_c2(g['quantity']):,.2f} {g['unit']} on page(s) "
                       f"{g.get('pages', '')} has no price, line, assembly "
                       "or activity"))
     return out
@@ -444,7 +445,7 @@ def _pending_checks(doc):
     return [_f("ai_pending", g,
                f"{n} AI measurement(s) still in review, "
                f"{v:,.0f} {u} not in the totals - accept or fix them in "
-               "AI Takeoff > Review Queue", count=n, quantity=round(v, 2),
+               "AI Takeoff > Review Queue", count=n, quantity=_c2(v),
                unit=u)
             for (g, u), (n, v) in sorted(by.items())]
 
@@ -530,7 +531,7 @@ def _peer_rates(lib, job):
 
 
 def _g(x):
-    return f"{x:,.2f}".rstrip("0").rstrip(".")
+    return f"{_c2(x):,.2f}".rstrip("0").rstrip(".")
 
 
 def _crew_checks(job, lib):

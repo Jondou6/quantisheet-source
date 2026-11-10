@@ -7,6 +7,7 @@ from PySide6.QtWidgets import (
     QSpinBox, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget)
 
 from . import bidbuild, proposal
+from .dmoney import c2 as _c2
 
 BOND = [("none", "No bond"), ("auto", "Surety schedule (graduated)"),
         ("fixed", "Flat rate")]
@@ -187,14 +188,14 @@ class BidBuildDialog(QDialog):
         self.head.setText(
             f"Direct cost <b>{_m(p['direct'])}</b> &nbsp; → &nbsp; Bid "
             f"<b>{_m(p['total'])}</b> &nbsp; (markup "
-            f"{(p['total'] - p['direct']) / p['direct'] * 100 if p['direct'] else 0:.2f}"
+            f"{_c2((p['total'] - p['direct']) / p['direct'] * 100 if p['direct'] else 0):.2f}"
             f"% of direct)")
         st = p["steps"]
         self.steps.setRowCount(len(st) + 2)
         self.steps.setItem(0, 0, _it("Direct cost", False))
         self.steps.setItem(0, 3, _it(_m(p["direct"])))
         for r, s in enumerate(st, 1):
-            for c, v in enumerate((s["label"], f"{s['rate']:.2f}%",
+            for c, v in enumerate((s["label"], f"{_c2(s['rate']):.2f}%",
                                    _m(s["amount"]), _m(s["running"]))):
                 self.steps.setItem(r, c, _it(v, c > 0))
         self.steps.setItem(len(st) + 1, 0, _it("BID", False))
@@ -217,7 +218,7 @@ class BidBuildDialog(QDialog):
             self.fl_text.setText(
                 f"Cash flow value {_m(fl['base_npv'])} → "
                 f"{_m(fl['loaded_npv'])}: <b>{_m(fl['improvement'])} "
-                f"({fl['improvement_pct']:.2f}%)</b> better. Total bid "
+                f"({_c2(fl['improvement_pct']):.2f}%)</b> better. Total bid "
                 f"unchanged; lines move up to {fl['max_change_pct']:.1f}%."
                 + warn)
         else:

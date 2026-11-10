@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog,
 
 from . import annotate, audit, settings, theme
 from .reportname import report_file_name
+from .dmoney import c2 as _c2
 
 
 def _it(v, right=False):
@@ -138,7 +139,7 @@ class AuditDialog(QDialog):
             conf = "" if r["confidence"] is None else \
                 f"{r['confidence'] * 100:.0f}%"
             vals = (r["sheet"] or f"p. {r['page'] + 1}", r["group"],
-                    f"{r['value']:,.2f} {r['unit']}", r["author"],
+                    f"{_c2(r['value']):,.2f} {r['unit']}", r["author"],
                     r["taken"].replace("T", " ")[:16],
                     audit.METHODS.get(r["method"], r["method"]), conf,
                     r["scale"], r["revision"], r["status"])
@@ -211,7 +212,7 @@ class AuditDialog(QDialog):
         t.setRowCount(len(self.found))
         for i, r in enumerate(self.found):
             for c, val in enumerate((r["job"], r["sheet"], r["group"],
-                                     f"{r['value']:,.2f} {r['unit']}",
+                                     f"{_c2(r['value']):,.2f} {r['unit']}",
                                      r["author"],
                                      (r["taken"] or "")[:10],
                                      audit.METHODS.get(r["method"],

@@ -16,7 +16,16 @@ class Desk(QDialog):
         self.msg.setWordWrap(True)
 
     def finish(self):
-        self.root.addWidget(self.msg)
+        """Message line, then a Close button on the right - every service
+        window can be closed with the mouse, not only Esc (Chief, Nov 6)."""
+        row = QHBoxLayout()
+        row.addWidget(self.msg, 1)
+        self.close_button = QPushButton("Close")
+        self.close_button.setAutoDefault(False)
+        self.close_button.setDefault(False)
+        self.close_button.clicked.connect(self.close)
+        row.addWidget(self.close_button, 0, Qt.AlignBottom)
+        self.root.addLayout(row)
 
     def buttons(self, *pairs):
         row = QHBoxLayout()
@@ -32,6 +41,12 @@ class Desk(QDialog):
             result = fn()
         except ValueError as e:
             self.msg.setText(str(e))
+            return None
+        except ArithmeticError:
+            # decimal.InvalidOperation, Overflow...: never a Python error
+            # in a window (Chief's re-test, Nov 7)
+            self.msg.setText("A number there is too large to work with - "
+                             "check what was typed.")
             return None
         return result
 

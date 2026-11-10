@@ -24,6 +24,7 @@ from collections import Counter, defaultdict
 import fitz
 
 from . import tradetakeoff as tt
+from .dmoney import half_up as _hu
 
 _FT_PER = {"ft": 1.0, "m": 3.28084}
 
@@ -97,7 +98,7 @@ def plant_schedule(page):
                      r.x1 < r2.x0 < qr.x0 - 2 * h], key=lambda x: x[0].x0))
                 qq = q * k
                 rows.append({"key": t, "qty": int(qq) if qq == int(qq)
-                             else round(qq, 1), "unit": unit,
+                             else _hu(qq, 1), "unit": unit,
                              "desc": desc[:80]})
             if len(rows) >= 2 and (best is None or len(rows) > len(best)):
                 best = rows
@@ -289,7 +290,7 @@ def shaded_regions(page, max_area, min_area=0.0):
                 continue
             geom = g if geom is None else geom.symmetric_difference(g)
         if geom is not None and geom.area > 0:
-            by_fill.setdefault(tuple(round(v, 2) for v in f), []).append(geom)
+            by_fill.setdefault(tuple(_hu(v, 2) for v in f), []).append(geom)
     for gs in by_fill.values():
         u = unary_union([g.buffer(FILL_JOIN_PT, join_style=2) for g in gs])
         u = u.buffer(-FILL_JOIN_PT, join_style=2)

@@ -18,9 +18,9 @@ def test_room_measurements():
     assert ms.floor == Decimal("168.00") and ms.ceiling == ms.floor
     assert ms.perimeter == Decimal("52.00")
     assert ms.walls_gross == Decimal("416.00")
-    assert ms.openings == Decimal("32.01")            # 3x6.67 + 3x4
-    assert ms.walls == Decimal("383.99")
-    assert ms.walls_ceiling == Decimal("551.99")
+    assert ms.openings == Decimal("32.00")    # 3 x 6'8" (20.00) + 3x4
+    assert ms.walls == Decimal("384.00")
+    assert ms.walls_ceiling == Decimal("552.00")
     assert ms.floor_sy == Decimal("18.67")
     assert rooms.qty_q4(r, "perimeter") == 520_000
     assert rooms.qty_q4(r, "each") == 10_000

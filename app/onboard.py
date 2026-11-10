@@ -53,12 +53,19 @@ def _tidy(email):
     e = (email or "").strip().strip("<>").strip()
     if e.lower().startswith("mailto:"):
         e = e[7:]
-    return e.rstrip(".,;: ").replace(" ", "")
+    return e.rstrip(".,;: ")
 
 
 def accepted(email):
-    """True if `email` is a well-formed address the program accepts."""
-    m = _MAIL.match(_tidy(email))
+    """True if `email` is a well-formed address the program accepts. A
+    space inside, a name over 64 characters or an address over 254 is
+    never well-formed (Chief's re-test, Nov 7)."""
+    e = _tidy(email)
+    if len(e) > 254 or any(c.isspace() for c in e):
+        return False
+    if len(e.split("@", 1)[0]) > 64:
+        return False
+    m = _MAIL.match(e)
     if not m:
         return False
     import hmac

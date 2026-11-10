@@ -29,6 +29,7 @@ import os
 
 from . import safecell
 from .civiltakeoff import band_of, band_name
+from .dmoney import half_up as _hu
 
 DEFAULT_DEPTH = 8.0
 SLOPES = {"box": 0.0, "A": 0.75, "B": 1.0, "C": 1.5}
@@ -74,18 +75,18 @@ def trench_volumes(result, soil="box", extra=BOTTOM_EXTRA_FT):
             s = section(p.get("size") or 8, depth, soil, extra)
             row = {"pipe": p["name"], "system": p.get("system", ""),
                    "size": p.get("size"), "band": band_name(b),
-                   "length": round(length, 2), "depth": round(depth, 2),
+                   "length": _hu(length, 2), "depth": _hu(depth, 2),
                    "assumed": not known, "soil": soil}
             for k in ("excavation", "bedding", "initial", "final", "spoil"):
-                row[f"{k}_cy"] = round(length * s[k] / 27.0, 2)
+                row[f"{k}_cy"] = _hu(length * s[k] / 27.0, 2)
             rows.append(row)
     return rows
 
 
 def totals(rows):
-    out = {"length": round(sum(r["length"] for r in rows), 2)}
+    out = {"length": _hu(sum(r["length"] for r in rows), 2)}
     for k in ("excavation", "bedding", "initial", "final", "spoil"):
-        out[f"{k}_cy"] = round(sum(r[f"{k}_cy"] for r in rows), 2)
+        out[f"{k}_cy"] = _hu(sum(r[f"{k}_cy"] for r in rows), 2)
     return out
 
 
@@ -140,7 +141,7 @@ def heavybid_csv(path, result, soil="box", cut_fill=None, job="", step=10):
     if cut_fill:
         for k in ("cut", "fill"):
             if cut_fill.get(k):
-                v = round(float(cut_fill[k]), 1)
+                v = _hu(float(cut_fill[k]), 1)
                 item(f"Earthwork - {k}", v, "CY",
                      [(f"Earthwork {k}", v, "CY")])
     with open(path, "w", newline="", encoding="utf-8") as f:
@@ -154,7 +155,7 @@ def _num(v):
     """Clean number for Excel: no $, commas or spaces; int when whole."""
     if isinstance(v, str):
         v = v.replace("$", "").replace(",", "").strip() or 0
-    v = round(float(v), 2)
+    v = _hu(float(v), 2)
     return int(v) if v == int(v) else v
 
 

@@ -48,13 +48,15 @@ class SheetSetupDialog(QDialog):
                     "a scale that isn't a standard drawing scale (marked "
                     "⚠). It was not set - check those sheets and pick or "
                     "calibrate the scale yourself.</b>")
-        lay.addWidget(QLabel(
+        self.intro = QLabel(
             f"Read {len(rows)} page(s): found a sheet name on {found_b} and a "
             f"scale on {found_s}. Check and edit below, then OK.{warn}<br>"
             "<small>"
             "Where a sheet shows several scales, the plan's (smallest) one is "
             "picked; choose another from the list. Pages printed at reduced "
-            "size (half-size sets) need Calibrate instead.</small>"))
+            "size (half-size sets) need Calibrate instead.</small>")
+        self.intro.setWordWrap(True)        # was cut off (Chief, Nov 7)
+        lay.addWidget(self.intro)
         self.table = QTableWidget(len(rows), 3)
         self.table.setHorizontalHeaderLabels(["Page", "Bookmark", "Scale"])
         self.table.horizontalHeader().setSectionResizeMode(

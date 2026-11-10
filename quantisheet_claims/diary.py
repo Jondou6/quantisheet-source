@@ -12,6 +12,16 @@ class DiaryError(ValueError):
     pass
 
 
+class OverpaymentError(DiaryError):
+    """The payment takes the total paid past what the estimate says is
+    owed. Recorded only when the user confirms (allow_over=True)."""
+
+
+# one payment over this is a typing slip, not a claim payment (Chief's
+# estimator test, Nov 7: $99,999,999,999 was accepted)
+MAX_PAYMENT_CENTS = 100_000_000_00
+
+
 def _date(text: str) -> str:
     t = (text or "").strip()
     try:
@@ -37,12 +47,28 @@ def remove_entry(claim: m.Claim, entry_id: str) -> tuple:
 
 
 def add_payment(claim: m.Claim, on: str, amount: str, kind: str,
-                reference: str = "") -> tuple:
+                reference: str = "", owed_cents=None,
+                allow_over: bool = False) -> tuple:
+    """`owed_cents`: the estimate's total owed (now plus later). A payment
+    that takes the total paid past it raises OverpaymentError unless
+    allow_over."""
     if kind not in m.PAYMENT_KINDS:
         raise DiaryError(f"kind must be one of {', '.join(m.PAYMENT_KINDS)}")
     cents = parse_money(amount)
     if cents <= 0:
         raise DiaryError("a payment is more than $0.00")
+    if cents > MAX_PAYMENT_CENTS:
+        raise DiaryError("check the amount - one payment can't be more "
+                         "than $100,000,000.00")
+    # no estimate yet (nothing owed): an advance is recorded as it comes
+    if owed_cents is not None and int(owed_cents) > 0 and not allow_over:
+        after = claim.paid_cents() + cents
+        if after > int(owed_cents):
+            from .cents import fmt
+            raise OverpaymentError(
+                f"this payment makes {fmt(after)} paid, "
+                f"{fmt(after - int(owed_cents))} more than the "
+                f"{fmt(int(owed_cents))} the estimate says is owed")
     p = m.Payment(id=m.new_id(), on=_date(on), amount_cents=cents, kind=kind,
                   reference=(reference or "").strip()[:60])
     return tuple(sorted(claim.payments + (p,), key=lambda x: x.on))
@@ -59,7 +85,16 @@ def balance(claim: m.Claim, settlement) -> dict:
     now = settlement.total_indemnity
     later = settlement.holdback_total
     return {"owed_now": now, "recoverable_later": later, "paid": paid,
-            "open_now": now - paid, "open_total": now + later - paid}
+            "open_now": now - paid, "open_total": now + later - paid,
+            "overpaid": max(0, paid - now - later)}
+
+
+def open_text(b: dict) -> tuple:
+    """("Still open", cents) or ("Overpaid", cents) - never a negative
+    "still open"."""
+    if b["open_total"] < 0:
+        return "Overpaid", -b["open_total"]
+    return "Still open", b["open_total"]
 
 
 def text(claim: m.Claim) -> str:

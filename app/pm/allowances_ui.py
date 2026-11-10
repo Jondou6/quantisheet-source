@@ -5,6 +5,7 @@ from PySide6.QtWidgets import (QDialog, QDialogButtonBox, QHBoxLayout,
                                QTableWidgetItem, QVBoxLayout)
 
 from . import allowances as al
+from ..dmoney import c2 as _c2
 
 
 class AllowancesDialog(QDialog):
@@ -39,8 +40,8 @@ class AllowancesDialog(QDialog):
         bb.rejected.connect(self.reject)
         lay.addWidget(bb)
         for a in al.read(store):
-            self.add_row(a["name"], f"{a['amount']:,.2f}",
-                         f"{a['spent']:,.2f}")
+            self.add_row(a["name"], f"{_c2(a['amount']):,.2f}",
+                         f"{_c2(a['spent']):,.2f}")
 
     def add_row(self, name="", amount="", spent=""):
         r = self.table.rowCount()
@@ -59,7 +60,7 @@ class AllowancesDialog(QDialog):
         try:
             a = al._money(self.table.item(r, 1).text())
             s = al._money(self.table.item(r, 2).text())
-            self.table.item(r, 3).setText(f"{a - s:,.2f}")
+            self.table.item(r, 3).setText(f"{_c2(a - s):,.2f}")
         except al.AllowanceError:
             self.table.item(r, 3).setText("?")
 

@@ -203,7 +203,9 @@ def test_billing_window(qapp, win, tmp_path, monkeypatch):
     dlg.app.item(0, 7).setText("50")              # 50% complete
     qapp.processEvents()
     val = money.compute(v.doc, 1)
-    assert val["rows"][0]["percent"] == pytest.approx(50)
+    # 50% of an odd-cent line is rounded to the cent (proposal prices are
+    # whole cents per part since Nov 7), so within a hundredth of a percent
+    assert val["rows"][0]["percent"] == pytest.approx(50, abs=0.01)
     assert "Current payment due" in dlg.g702.text()
     dlg._app_certify(confirm=False)
     assert money.pay_apps(v.doc)[0]["status"] == "certified"

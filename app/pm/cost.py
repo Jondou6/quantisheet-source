@@ -14,6 +14,8 @@ Numbers follow Procore / StratusVue conventions:
 import logging
 from . import schema
 from .store import spec_number
+from ..dmoney import c2 as _c2
+from ..dmoney import half_up as _hu
 
 
 def _f(v):
@@ -28,7 +30,7 @@ def code_key(code):
 
 
 def event_cost(e):
-    return round(sum(_f(l.get("cost")) for l in e.get("lines") or []), 2)
+    return _c2(sum(_f(l.get("cost")) for l in e.get("lines") or []))
 
 
 def event_price(e):
@@ -38,7 +40,7 @@ def event_price(e):
         if p in (None, ""):
             p = _f(l.get("cost")) * (1 + _f(l.get("markup")) / 100)
         tot += _f(p)
-    return round(tot, 2)
+    return _c2(tot)
 
 
 _SUFFIX = {"llc", "l l c", "inc", "incorporated", "co", "company", "corp",
@@ -107,10 +109,10 @@ def commitment_numbers(store, c):
             if x.get("status") == "Paid" or x.get("paid"):
                 paid += _f(x.get("amount")) - _f(x.get("retainage"))
     revised = orig + approved
-    return {"original": round(orig, 2), "approved": round(approved, 2),
-            "pending": round(pending, 2), "revised": round(revised, 2),
-            "invoiced": round(inv, 2), "retained": round(ret, 2),
-            "paid": round(paid, 2), "remaining": round(revised - inv, 2)}
+    return {"original": _c2(orig), "approved": _c2(approved),
+            "pending": _c2(pending), "revised": _c2(revised),
+            "invoiced": _c2(inv), "retained": _c2(ret),
+            "paid": _c2(paid), "remaining": _c2(revised - inv)}
 
 
 def compliance(store, rec, kind="cost", today=None):
@@ -239,7 +241,7 @@ def _by_code(store):
         for k in ("original", "approved", "pending", "committed", "actual",
                   "etc", "risk", "revised", "fac", "fac_risk", "variance",
                   "unassigned"):
-            r[k] = round(r[k], 2)
+            r[k] = _c2(r[k])
     return dict(sorted(rows.items()))
 
 
@@ -249,9 +251,9 @@ def contract_numbers(store):
                if e.get("status") == "Approved")
     pend = sum(event_price(e) for e in store.list("event")
                if e.get("status") in ("Open", "Pending"))
-    return {"original": round(orig, 2), "approved": round(appr, 2),
-            "pending": round(pend, 2), "revised": round(orig + appr, 2),
-            "with_pending": round(orig + appr + pend, 2)}
+    return {"original": _c2(orig), "approved": _c2(appr),
+            "pending": _c2(pend), "revised": _c2(orig + appr),
+            "with_pending": _c2(orig + appr + pend)}
 
 
 def summary(store):
@@ -263,7 +265,7 @@ def summary(store):
         c = r["category"] if r["category"] in cats else "Other"
         for k in cats[c]:
             cats[c][k] += r[k]
-    tot = {k: round(sum(c[k] for c in cats.values()), 2)
+    tot = {k: _c2(sum(c[k] for c in cats.values()))
            for k in ("original", "approved", "revised", "committed",
                      "actual", "etc", "fac")}
     con = contract_numbers(store)
@@ -281,15 +283,15 @@ def summary(store):
     proj_margin = con["revised"] - tot["fac"]
     return {
         "contract": con, "categories": cats, "totals": tot,
-        "margin": round(margin, 2),
+        "margin": _c2(margin),
         "margin_pct": margin / con["revised"] * 100 if con["revised"]
         else 0.0,
-        "projected_margin": round(proj_margin, 2),
+        "projected_margin": _c2(proj_margin),
         "projected_margin_pct": proj_margin / con["revised"] * 100
         if con["revised"] else 0.0,
-        "billed": round(billed, 2), "retained": round(retained, 2),
-        "received": round(received, 2),
-        "ar": round(billed - retained - received, 2),
+        "billed": _c2(billed), "retained": _c2(retained),
+        "received": _c2(received),
+        "ar": _c2(billed - retained - received),
         "pct_complete": tot["actual"] / tot["fac"] * 100 if tot["fac"]
         else 0.0,
         "bought_out": tot["committed"] / tot["revised"] * 100
@@ -313,7 +315,7 @@ def sov_lines(store):
                     "csi": code_key(c.get("cost_code")) if
                     c.get("cost_code") else "",
                     "desc": c.get("description", ""),
-                    "scheduled": round(_f(c.get("scheduled")), 2)})
+                    "scheduled": _c2(_f(c.get("scheduled")))})
     for e in sorted([e for e in store.list("event")
                      if e.get("status") == "Approved"],
                     key=lambda e: (e.get("approved") or "",
@@ -427,7 +429,7 @@ def fill_payapp(store, rec):
         old = have.get(s["item"], {})
         lines.append({"item": s["item"], "description": s["desc"],
                       "scheduled": s["scheduled"],
-                      "previous": round(prev.get(s["item"], 0.0), 2),
+                      "previous": _c2(prev.get(s["item"], 0.0)),
                       "this_period": old.get("this_period"),
                       "stored": old.get("stored")})
     # the owner contract's retainage rule (10% -> 5% at 50% ...) - P1
@@ -456,7 +458,7 @@ def payapp_pdf(store, rec, path):
 
 
 def money_fmt(v):
-    v = _f(v)
+    v = _hu(_f(v), 0)                     # whole dollars, $2.50 -> $3
     return f"(${-v:,.0f})" if v < 0 else f"${v:,.0f}"
 
 
@@ -522,12 +524,12 @@ def sage_csv(store, path):
         for r in by_code(store).values():
             w.writerow(["Budget", job, r["code"],
                         cat_code.get(r["category"], "O"), r["description"],
-                        f"{r['revised']:.2f}", "", ""])
+                        f"{_c2(r['revised']):.2f}", "", ""])
         for c in store.list("commitment"):
             for l in c.get("lines") or []:
                 w.writerow(["Commitment", job, code_key(l.get("cost_code")),
                             "S" if c.get("type") == "Subcontract" else "M",
                             l.get("description", ""),
-                            f"{_f(l.get('amount')):.2f}",
+                            f"{_c2(_f(l.get('amount'))):.2f}",
                             c.get("vendor", ""), c.get("_no", "")])
     return path

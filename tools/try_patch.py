@@ -20,9 +20,9 @@ import sys
 import tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-TRUTH = {"109": 129.8, "104": 135.3, "103": 170.6, "108": 153.1,
+TRUTH = {"109": 133.2, "104": 135.3, "103": 170.6, "108": 160.8,
          "105": 159.7, "106": 139.5, "110": 145.4, "111": 199.1,
-         "112": 248.0}
+         "112": 270.3}             # 108 / 109 / 112 re-measured Nov 5 (Jon)
 TESTS = ["tests/test_room_bench_passage.py", "tests/test_resolve_overlaps.py",
          "tests/test_autotakeoff.py", "tests/test_rooms_real.py",
          "tests/test_autotakeoff_sideways_rooms.py",

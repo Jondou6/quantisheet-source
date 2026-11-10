@@ -27,6 +27,7 @@ import re
 import statistics
 
 import fitz
+from .dmoney import c2 as _c2
 
 UNITS = r"LF|EA|CY|SY|SF|LS|TON|TONS|HR|HRS|GAL|AC|VF|VLF|DAY|DAYS|MO|WK|LB|CF"
 _MONEY = r"\$?\s?([\d,]+(?:\.\d{1,2})?)"
@@ -172,12 +173,12 @@ def parse(path, lines=None):
 
 
 def check(p):
-    s = round(sum(r["amount"] for r in p["lines"]), 2)
+    s = _c2(sum(r["amount"] for r in p["lines"]))
     msgs = []
     if p.get("total") is not None and p["lines"] and \
             abs(s - p["total"]) > 1.0:
-        msgs.append(f"Lines add up to ${s:,.2f}; the total says "
-                    f"${p['total']:,.2f} - they differ.")
+        msgs.append(f"Lines add up to ${_c2(s):,.2f}; the total says "
+                    f"${_c2(p['total']):,.2f} - they differ.")
     if p.get("unread"):
         msgs.append(f"{len(p['unread'])} line(s) with prices weren't read - "
                     "check them by hand.")
@@ -229,8 +230,8 @@ def suggest_plugs(res, library=None):
             else:
                 continue
             out.append({"bidder": bidder, "item": it.desc, "unit": it.unit,
-                        "qty": qty, "unit_price": round(up, 2),
-                        "amount": round(up * qty, 2), "source": src})
+                        "qty": qty, "unit_price": _c2(up),
+                        "amount": _c2(up * qty), "source": src})
     return out
 
 

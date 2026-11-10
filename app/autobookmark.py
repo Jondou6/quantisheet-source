@@ -18,6 +18,7 @@ import re
 import fitz
 
 from . import sheets
+from .dmoney import c2 as _c2
 
 PRECHECK = 0.7
 DETAIL_NO = re.compile(r"^[A-Z]?\d{1,3}[A-Z]?$")
@@ -195,7 +196,7 @@ if QDialog is not None:
                         f"{l['detail']}/{l['sheet']}" if l["detail"] else l["sheet"],
                         f"page {l['dst_page'] + 1}",
                         "the detail" if l["dst_found"] else "the page",
-                        f"{l['confidence']:.2f}"]
+                        f"{_c2(l['confidence']):.2f}"]
                 for c, v in enumerate(vals, 1):
                     t.setItem(i, c, QTableWidgetItem(v))
                 if l["confidence"] < PRECHECK:

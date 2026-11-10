@@ -11,13 +11,14 @@ is a setting (0 = no step limit; the memory cap still applies).
   train them as a second symbol (so they stop showing up as this one).
 """
 from . import annotate, autocount
+from .dmoney import c2 as _c2
 
 ACCEPT, REJECT = 0.92, 0.60
 SIMILAR_MIN = 3
 
 
 def why(h):
-    parts = [f"match {h.get('score', 0):.2f}"]
+    parts = [f"match {_c2(h.get('score', 0)):.2f}"]
     a = h.get("angle_hint")
     if a:
         parts.append(f"rotated {int(a)}\u00b0")
@@ -26,7 +27,7 @@ def why(h):
     if "tag_ok" in h:
         parts.append("tag found" if h["tag_ok"] else "no tag")
     if h.get("scale") and abs(h["scale"] - 1) > 0.02:
-        parts.append(f"size x{h['scale']:.2f}")
+        parts.append(f"size x{_c2(h['scale']):.2f}")
     parts.append(f"p{h.get('page', 0) + 1}")
     return " \u00b7 ".join(parts)
 
@@ -251,8 +252,8 @@ def attach(dlg, accept=None, reject=None):
         p = t.progress()
         tip = t.second_symbol_suggestion()
         dlg.triage_info.setText(
-            f"Auto-accepted at {t.accept:.2f}+, auto-rejected under "
-            f"{t.reject:.2f}. {p['remaining']} left to look at - Y / N "
+            f"Auto-accepted at {_c2(t.accept):.2f}+, auto-rejected under "
+            f"{_c2(t.reject):.2f}. {p['remaining']} left to look at - Y / N "
             "on the selected one." + (f"  {tip['text']}" if tip else ""))
         dlg._count()
 

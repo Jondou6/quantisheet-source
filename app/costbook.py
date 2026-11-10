@@ -35,6 +35,7 @@ import re
 from decimal import Decimal
 
 from . import csi, settings
+from .dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 
@@ -200,7 +201,7 @@ class Book:
             return {}
         esc = self.factor("national", as_of) / float(
             self.index.get("national", 1.0) or 1.0)
-        return {t: round(v * esc, 2) for t, v in table.items()}
+        return {t: _c2(v * esc) for t, v in table.items()}
 
     def factor(self, region=None, as_of=None, code=None):
         """Region index x escalation from the book's date to `as_of` (at

@@ -58,9 +58,17 @@ class AccessibilityDialog(QDialog):
         return self.results
 
     def fix(self):
-        done = self.win._page_change(
-            lambda: accessibility.fix(self.view.doc),
-            "Fixed accessibility settings")
+        """Each rule is its own undo step (outside review, Nov 7 - M13):
+        undoing the tags doesn't also take back the title and language."""
+        done = []
+        for x in [r for r in accessibility.check(self.view.doc) if r["fix"]]:
+            got = self.win._page_change(
+                lambda rule=x["rule"]: accessibility.fix(self.view.doc,
+                                                         rules=[rule]),
+                f"Accessibility: {x['name']}")
+            if got is None:                 # it failed: stop there
+                break
+            done.extend(got)
         self.refresh()
         return done
 

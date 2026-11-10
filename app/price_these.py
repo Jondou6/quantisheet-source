@@ -10,6 +10,7 @@ types a cost. Saved through estimate.set_price, so the Estimate panel,
 the exports and the proposal all pick it up."""
 import logging
 import re
+from .dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 
@@ -130,11 +131,11 @@ if QDialog is not None:
             self.sugg = {}
             for i, g in enumerate(self.lines):
                 q = g.get("adjusted", g.get("quantity")) or 0
-                vals = [g["name"], f"{q:,.2f}", g.get("unit") or "", "", ""]
+                vals = [g["name"], f"{_c2(q):,.2f}", g.get("unit") or "", "", ""]
                 s = suggest(g, books)
                 if s:
                     self.sugg[i] = s[0]
-                    vals[4] = f"${s[0]:,.2f}  ({s[1][:60]})"
+                    vals[4] = f"${_c2(s[0]):,.2f}  ({s[1][:60]})"
                 for c, v in enumerate(vals):
                     it = QTableWidgetItem(v)
                     if c != 3:
@@ -153,7 +154,7 @@ if QDialog is not None:
 
         def _use_suggestion(self, row, col):
             if col == 4 and row in self.sugg:
-                self.table.item(row, 3).setText(f"{self.sugg[row]:.2f}")
+                self.table.item(row, 3).setText(f"{_c2(self.sugg[row]):.2f}")
 
         def prices(self):
             out = {}

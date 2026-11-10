@@ -24,6 +24,8 @@ from datetime import date, timedelta
 
 from . import owner_report as orp
 from .owner_report import DAY, _day, _num, mdy
+from ..dmoney import c2 as _c2
+from ..dmoney import half_up as _hu
 
 THR_DEFAULT = 0.5
 STOP = {"and", "the", "for", "of", "to", "a", "an", "data", "product",
@@ -40,7 +42,7 @@ def md(d):
 
 
 def money(v):
-    v = round(_num(v))
+    v = _hu(_num(v), 0)                   # whole dollars, $2.50 -> $3
     return f"(${-v:,.0f})" if v < 0 else f"${v:,.0f}"
 
 
@@ -467,7 +469,7 @@ def _f_dailies(store, rep, F):
                    "observations_open": len(obs), "observations": obs,
                    "toolbox_week": tb(week),
                    "toolbox_jtd": tb(logs), "near_misses": nm,
-                   "trir": round(rec * 200000 / mhj, 2) if mhj else 0.0}
+                   "trir": _c2(rec * 200000 / mhj) if mhj else 0.0}
     insp, equip, deliv, vis = [], [], [], []
     for d in week:
         no = orp._log_no(d)
@@ -556,7 +558,7 @@ def _f_weather(store, rep, F):
                    "trades": "", "typed": bool(td),
                    "src": "typed in the report" if td else "no log"}
         work = cal.is_work(d)
-        adverse = bool(work and (round(row["rain"], 2) >= round(thr, 2) or
+        adverse = bool(work and (_c2(row["rain"]) >= _c2(thr) or
                                  row["lost"] >= orp.ADVERSE_HOURS))
         if td.get("edited") and "tracked" in td:
             adverse = bool(td["tracked"]) and work
@@ -590,8 +592,8 @@ def _f_weather(store, rep, F):
     month_key = RD.strftime("%Y-%m")
     F["weather"] = {
         "threshold": thr, "rows": rows,
-        "rain_week": round(sum(r["rain"] for r in wk), 2),
-        "rain_jtd": round(sum(r["rain"] for r in rows), 2),
+        "rain_week": _c2(sum(r["rain"] for r in wk)),
+        "rain_jtd": _c2(sum(r["rain"] for r in rows)),
         "lost_week": sum(r["lost"] for r in wk),
         "lost_jtd": sum(r["lost"] for r in rows),
         "adverse_week": sum(1 for r in wk if r["adverse"]),
@@ -865,11 +867,11 @@ def _f_rag(store, rep, F):
                  f"Contract {money(ch['revised'])}"
                  f"{' unchanged' if not ch['approved'] else ''}. "
                  f"{len(ch['pcos'])} potential change(s): {money(exp)} "
-                 f"({exp / C * 100:.2f}% of contract).")
+                 f"({_c2(exp / C * 100):.2f}% of contract).")
     G["Safety"] = ("G" if s["recordables"] == 0 else "R",
                    f"{s['recordables']} recordable(s). "
                    f"{F['manpower']['manhours_jtd']:,.0f} man-hours to date. "
-                   f"TRIR {s['trir']:.2f}.")
+                   f"TRIR {_c2(s['trir']):.2f}.")
     fl = F["failed"]
     G["Quality"] = ("Y" if fl else "G",
                     (f"{fl[0]['note']} ({md(fl[0]['date'])})" if fl else
@@ -1299,7 +1301,7 @@ def _wx_rows(F, rows):
     for w in rows:
         cells = [w["date"].strftime("%a %m/%d"),
                  f"{w['high']}/{w['low']}" if w["high"] else "-",
-                 f"{w['rain']:.2f}", w["sky"] or "-",
+                 f"{_c2(w['rain']):.2f}", w["sky"] or "-",
                  ("Yes" if w["lost"] else "No") if w["workday"] else "-",
                  f"{w['lost']:g}", w["trades"] or "-",
                  C("YES", bold=True, color="red") if w["adverse"] else "no",
@@ -1369,7 +1371,7 @@ def pack(store, rep, F=None):
            f"{money(b['billed'])}", f"next pay app {money(b['next_gross'])}"
            if b["next"] else ""],
           ["Potential change exposure", money(ch["exposure"]),
-           f"{ch['exposure'] / CON * 100:.2f}% of contract",
+           f"{_c2(ch['exposure'] / CON * 100):.2f}% of contract",
            "amber" if ch["exposure"] else None],
           ["Open RFIs / submittals due", f"{F['rfis_open']} / "
            f"{F['subs_due_not_sent']}", "submittals due, not yet submitted"],
@@ -1380,7 +1382,7 @@ def pack(store, rep, F=None):
           ["Man-hours week / to date", f"{mp['manhours_week']:,.0f} / "
            f"{mp['manhours_jtd']:,.0f}", "from the Daily Logs"],
           ["Recordable injuries / TRIR", f"{s['recordables']} / "
-           f"{s['trir']:.2f}", f"{s['toolbox_week']} toolbox talks this week",
+           f"{_c2(s['trir']):.2f}", f"{s['toolbox_week']} toolbox talks this week",
            "green" if not s["recordables"] else "red"],
           ["Owner actions due in 10 days", str(F["owner_actions_due_10d"]),
            f"first by {mdy(first_due)}" if first_due else "",
@@ -1391,18 +1393,18 @@ def pack(store, rep, F=None):
     cum, bill = 0, [[str(NTP), 0]]
     for c in b["cash"]:
         cum += c["gross"]
-        bill.append([str(c["period"]), round(cum / CON * 100, 2)])
+        bill.append([str(c["period"]), _c2(cum / CON * 100)])
     chart = {"t": "chart", "height": 172, "x0": str(NTP), "x1": str(sc_c),
              "title": "PLANNED VS ACTUAL - cumulative % of contract value "
                       "(S-curve)",
              "ticks": [str(m) for m in e["months"]],
              "series": [
                  {"label": "Planned (baseline)", "color": "blue",
-                  "points": [[str(NTP), 0]] + [[str(m), round(p, 2)]
+                  "points": [[str(NTP), 0]] + [[str(m), _c2(p)]
                                                for m, p, f in e["curve"]]},
                  {"label": "Forecast (current CPM)", "color": "red",
                   "width": 1.1,
-                  "points": [[str(NTP), 0]] + [[str(m), round(f, 2)]
+                  "points": [[str(NTP), 0]] + [[str(m), _c2(f)]
                                                for m, p, f in e["curve"]]},
                  {"label": "Projected billing (next pay apps)",
                   "color": "black", "dash": True, "width": 1.2,
@@ -1565,8 +1567,8 @@ def pack(store, rep, F=None):
     wk_rows = [r for r in w["rows"] if r["week"]]
     sums = T([["", 200], ["This week", 80, "center"],
               ["Job to date", 80, "center"]],
-             [["Rain total (in.)", f"{w['rain_week']:.2f}",
-               f"{w['rain_jtd']:.2f}"],
+             [["Rain total (in.)", f"{_c2(w['rain_week']):.2f}",
+               f"{_c2(w['rain_jtd']):.2f}"],
               ["Adverse weather workdays", str(w["adverse_week"]),
                str(w["adverse_jtd"])],
               ["Hours lost to weather", f"{w['lost_week']:g}",
@@ -1595,7 +1597,7 @@ def pack(store, rep, F=None):
         eff += " Adverse with no notice (not claimed): " + ", ".join(
             md(r["date"]) for r in unc) + "."
     blocks = [NOTE(f"Rule: a workday is an adverse weather day when rain is "
-                   f"{w['threshold']:.2f} in. or more, or "
+                   f"{_c2(w['threshold']):.2f} in. or more, or "
                    f"{orp.ADVERSE_HOURS:g} or more hours are lost to weather "
                    "on the Daily Log. Weekend rain is shown but not counted. "
                    "A day is claimed only when a weather delay notice on the "
@@ -1625,8 +1627,8 @@ def pack(store, rep, F=None):
     secs.append(_sec("weather_week", "WEATHER THIS WEEK - RAIN DAYS AND HOURS "
                      "LOST", "weekly", [
                          T(WXC, _wx_rows(F, wk_rows), size=7.0),
-                         P(f"rain {w['rain_week']:.2f} in. this week "
-                           f"({w['rain_jtd']:.2f} in. to date); hours lost "
+                         P(f"rain {_c2(w['rain_week']):.2f} in. this week "
+                           f"({_c2(w['rain_jtd']):.2f} in. to date); hours lost "
                            f"{w['lost_week']:g} ({w['lost_jtd']:g} to date); "
                            f"adverse workdays {w['adverse_week']} this week, "
                            f"{w['adverse_month']} this month"
@@ -1692,7 +1694,7 @@ def _outlook(rep, F, short=False):
             elif _num(r.get("rain_in")) >= thr or \
                     _num(r.get("rain_chance")) >= 50:
                 bits.append(f"{d:%a} {md(d)} {r.get('sky') or 'rain'} "
-                            f"{_num(r.get('rain_in')):.2f} in.")
+                            f"{_c2(_num(r.get('rain_in'))):.2f} in.")
         txt = "; ".join(bits) or "no rain days forecast"
         out = [P(txt + ".", lead="Outlook:", size=7.6)]
     else:
@@ -1700,7 +1702,7 @@ def _outlook(rep, F, short=False):
                                 for r in rows]
         fc = [C("Forecast", bold=True)] + [
             f"{r.get('sky') or ''} {r.get('high', '')}/{r.get('low', '')}"
-            + (f", {_num(r.get('rain_in')):.2f} in." if _num(r.get("rain_in"))
+            + (f", {_c2(_num(r.get('rain_in'))):.2f} in." if _num(r.get("rain_in"))
                else "") for r in rows]
         plan = [C("Work plan", bold=True)]
         for r in rows:
@@ -1899,7 +1901,7 @@ def _pack2(store, rep, F, secs):
                                 prow or [["", "", "None", "", "", "", "", ""]],
                                 title="POTENTIAL CHANGE ORDERS (EXPOSURE)"),
                       NOTE(f"Exposure {money(ch['exposure'])} = "
-                           f"{ch['exposure'] / CON * 100:.2f}% of the "
+                           f"{_c2(ch['exposure'] / CON * 100):.2f}% of the "
                            "contract. A PCO is a change event tied to an RFI "
                            "sent by the report date and not yet approved.")],
                      [FULL, MON]))
@@ -1992,7 +1994,7 @@ def _pack3(store, rep, F, secs):
            ["Open safety observations (as of the report date)", "",
             str(s["observations_open"])],
            ["TRIR (recordables x 200,000 / man-hours)", "",
-            f"{s['trir']:.2f}"],
+            f"{_c2(s['trir']):.2f}"],
            ["Toolbox talks", str(s["toolbox_week"]), str(s["toolbox_jtd"])],
            ["Near misses logged", "", str(s["near_misses"])]]),
         NOTE("From the Daily Logs' safety notes.")], [FULL, MON],
@@ -2071,7 +2073,7 @@ def _pack3(store, rep, F, secs):
              + ") spread evenly from NTP to the contract date. Procurement "
              "activities carry no value.",
              f"Weather: adverse day = a workday with rain of "
-             f"{F['weather']['threshold']:.2f} in. or more or "
+             f"{_c2(F['weather']['threshold']):.2f} in. or more or "
              f"{orp.ADVERSE_HOURS:g} or more hours lost on the Daily Log; "
              "claimed = covered by a weather delay notice given by the "
              "report date; the contract finish moves only by granted days.",

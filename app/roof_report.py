@@ -12,6 +12,7 @@ report the user supplies.
 """
 import os
 import re
+from .dmoney import half_up as _hu
 
 # a text report larger than this is refused; a PDF is read up to MAX_PAGES
 MAX_TEXT_BYTES = 50 * 1024 * 1024
@@ -87,7 +88,7 @@ def _first_value(field, p, text):
             if inches > 11:                     # "72 ft 18 in" is not a size
                 continue
             v += inches / 12.0
-        return round(v, 2)
+        return _hu(v, 2)
     return None
 
 

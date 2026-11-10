@@ -140,10 +140,16 @@ def test_diary_payments_and_totals_bar(qapp):
     assert win.add_diary("2026-10-02", "inspection", "Example: met adjuster")
     assert win.diary_table.rowCount() == 2
     assert win.add_diary("02/10/2026", "note", "x") is False
-    assert win.add_payment("2026-10-05", "500.00", "acv", "CHK 1")
+    # more than the practice claim's $340.00: says so and asks (Nov 7)
+    asked = []
+    assert win.add_payment("2026-10-05", "500.00", "acv", "CHK 1",
+                           confirm=lambda t: asked.append(t) or True)
+    assert asked
     assert win.claim.paid_cents() == 50_000
     assert "paid $500.00" in win.balance_label.text()
-    assert "Still open" in win.totals["open"].text()
+    # $500 against $340 owed: "Overpaid $160.00", never "Still open -$160"
+    assert "Overpaid" in win.totals["open"].text()
+    assert "-$" not in win.totals["open"].text()
     assert win.add_payment("2026-10-05", "abc", "acv") is False
     win.pay_table.selectRow(0)
     assert win.remove_payment() and win.claim.payments == ()

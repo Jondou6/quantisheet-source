@@ -1,4 +1,13 @@
-__version__ = "1.1.1"
+__version__ = "1.1.2"
+
+
+# Money rounds half up everywhere, the way an estimator rounds by hand:
+# Decimal's default is half-even, which made 1.125 into 1.12 wherever a
+# quantize() forgot rounding= (Chief's round 5, Nov 9). DefaultContext is
+# what new threads copy; getcontext() is this one.
+import decimal as _decimal
+_decimal.DefaultContext.rounding = _decimal.ROUND_HALF_UP
+_decimal.getcontext().rounding = _decimal.ROUND_HALF_UP
 
 # PyMuPDF's old "fitz" name prints a deprecation warning on import; point
 # it at the real module (pymupdf) so `import fitz` everywhere stays quiet
@@ -10,6 +19,9 @@ try:
     _sys.modules.setdefault("fitz", _pymupdf)
 except ImportError:                      # very old PyMuPDF: only "fitz"
     pass
+
+
+import logging as _logging
 
 
 def _more_open_files():
@@ -25,8 +37,12 @@ def _more_open_files():
         crt = ctypes.cdll.ucrtbase
         if crt._getmaxstdio() < 8192:
             crt._setmaxstdio(8192)
-        return crt._getmaxstdio()
+        n = crt._getmaxstdio()
+        _logging.getLogger(__name__).debug("open-file limit %s", n)   # L1
+        return n
     except Exception:
+        _logging.getLogger(__name__).debug("open-file limit unchanged",
+                                           exc_info=True)
         return None
 
 

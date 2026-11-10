@@ -17,6 +17,7 @@ it out again the same way.
 """
 import json
 import re
+from .dmoney import c2 as _c2
 
 KEY = "PSMeasureX"
 FIELDS = ("rise", "height", "openings", "show", "to")
@@ -178,7 +179,7 @@ def label_text(mtype, value, unit, group, extra, fmt_length=None):
     """The markup's label, saying how the quantity was made."""
     extra = extra or {}
     if mtype == "length":
-        text = fmt_length(value, unit) if fmt_length else f"{value:,.2f} {unit}"
+        text = fmt_length(value, unit) if fmt_length else f"{_c2(value):,.2f} {unit}"
         if extra.get("rise"):
             r = abs(extra["rise"])
             rt = fmt_length(r, unit) if fmt_length else f"{r:g} {unit}"
@@ -187,12 +188,12 @@ def label_text(mtype, value, unit, group, extra, fmt_length=None):
         u = base_unit(unit)
         h = extra["height"]
         ht = fmt_length(h, u) if fmt_length else f"{h:g} {u}"
-        text = f"{value:,.2f} {unit} wall ({ht} high"
+        text = f"{_c2(value):,.2f} {unit} wall ({ht} high"
         if extra.get("openings"):
             text += f", less {extra['openings']:,.1f} {unit} openings"
         text += ")"
     else:
-        text = f"{value:,.2f} {unit}"
+        text = f"{_c2(value):,.2f} {unit}"
     return join(group, text)
 
 

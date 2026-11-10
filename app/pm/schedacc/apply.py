@@ -14,6 +14,7 @@ import datetime as _dt
 from .. import schedule
 from .calendar import build_all, workdays_between
 from .model import as_date
+from ...dmoney import c2 as _c2
 
 
 def apply_to_store(store, doc, replace=False):
@@ -79,6 +80,9 @@ def apply_to_store(store, doc, replace=False):
             "CALENDAR: " + (act.get("calendar") or ""),
             "DURATION: " + (act.get("duration_kind") or ""),
             "SLOT: " + (act.get("template_slot") or ""),
+            "SOURCE: " + "; ".join(c.get("source") or "" for c in
+                                   act.get("citations") or []
+                                   if c.get("document")),
         ) if x and not x.endswith(": "))
         rec = store.save_record("activity", {
             "name": act.get("name") or act.get("code"),
@@ -117,10 +121,12 @@ def apply_to_store(store, doc, replace=False):
                 continue
             lag_days = float(rel.get("lag_hours") or 0) / 8.0
             lines.append({"id": pred["_no"], "type": rel.get("type") or "FS",
-                          "lag": round(lag_days, 2)})
+                          "lag": _c2(lag_days)})
         if lines:
             rec = store.get("activity", rec["_id"])
             rec["preds"] = lines
             store.save_record("activity", rec)
+    if doc.get("caveat"):
+        store.set_setting("schedule_caveat", doc["caveat"])
     native = schedule.compute(store, as_date(doc["project"].get("data_date")))
     return {"activities": n, "native": native}

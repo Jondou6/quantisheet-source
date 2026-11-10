@@ -72,6 +72,35 @@ def test_floor_beside_a_bench_is_filled():
     assert m[:, :x0 - ft(8 / 12)].sum() == 0 and m[y1 + ft(1):, :].sum() == 0
 
 
+def test_a_bench_drawn_with_detail_lines_is_floor():
+    """HMB A101 (Nov 5): the bench's seat edge and lip are drawn as two
+    more lines inside its outline, under a foot apart - read as one block
+    of wall, the bench was left out and the passage beside it shut."""
+    wl, (x0, y0, x1, y1), (bx0, by0, bx1, by1) = _stall_with_bench()
+    for fx in (0.8, 1.15):                         # the detail lines
+        cv2.line(wl, (x0 + ft(fx), by0), (x0 + ft(fx), by1), 1, 1)
+    tr = np.zeros_like(wl)
+    tr[y0 + 2:y1 - 2, x0 + 2:x1 - 2] = 1
+    tr[by0 - ft(0.3):by1 + ft(0.3), x0:bx1 + ft(0.6)] = 0
+    c2, add = at.Plan._fill_to_faces(_plan_like(wl), _contour(tr))
+    m = np.zeros_like(wl)
+    cv2.drawContours(m, [c2], -1, 1, -1)
+    assert m[by0 + 3:by1 - 2, bx0 + 3:bx1 - 2].mean() > 0.95
+    strip = 0.6 * (2.6 + 0.6)
+    assert add >= 0.8 * (strip + 1.25 * 2.6), add
+    assert m[:, :x0 - ft(8 / 12)].sum() == 0 and m[y1 + ft(1):, :].sum() == 0
+
+
+def test_a_door_leaf_or_grab_bar_is_not_a_bench():
+    # a 3' door leaf (2" thick) and a grab bar against the wall stay ink
+    wl = np.zeros((ft(10), ft(10)), np.uint8)
+    wl[ft(1) - ft(8 / 12):ft(1), :] = 1                    # a solid wall
+    cv2.rectangle(wl, (ft(2), ft(1)), (ft(2) + ft(1 / 6), ft(4)), 1, 1)
+    cv2.rectangle(wl, (ft(5), ft(1)), (ft(7), ft(1) + ft(0.15)), 1, 1)
+    ink = cv2.dilate((wl > 0).astype(np.uint8), np.ones((3, 3), np.uint8))
+    assert not at._bench_footprints(ink, PPF).any()
+
+
 def test_a_tub_or_big_casework_outline_is_not_a_bench():
     # the same stall with a 2'-6" x 5' outline (a tub) against the wall
     wl, (x0, y0, x1, y1), _b = _stall_with_bench()
@@ -119,9 +148,12 @@ PLAN = next((p for p in (
                  "harbor_springs_hmb_bid_drawings.pdf"))
     if os.path.exists(p)), "")
 PLAN = os.environ.get("QS_HMB_PLAN", PLAN)
-HMB_TRUTH = {"109": (129.8, 8), "104": (135.3, 8), "103": (170.6, 8),
-             "108": (153.1, 8), "105": (159.7, 8), "106": (139.5, 8),
-             "110": (145.4, 5), "111": (199.1, 8), "112": (248.0, 8)}
+# Nov 5 (Jon): 109 counts the floor under its benches (133.2, measured
+# face to face on A101); 108 and 112 re-measured face to face (160.8;
+# 270.3 with the D01 entry, which is part of 112)
+HMB_TRUTH = {"109": (133.2, 8), "104": (135.3, 8), "103": (170.6, 8),
+             "108": (160.8, 8), "105": (159.7, 8), "106": (139.5, 8),
+             "110": (145.4, 5), "111": (199.1, 8), "112": (270.3, 8)}
 
 
 def _hmb_a101_rooms():

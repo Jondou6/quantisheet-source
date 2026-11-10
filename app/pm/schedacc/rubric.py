@@ -124,6 +124,11 @@ def evaluate(doc):
 
     classes = {a.get("cls") for a in acts}
     need = list(_REQUIRED.get(ptype, _REQUIRED["ground_up_commercial"]))
+    if doc.get("scope"):
+        # bid-set job: commissioning / temporary utilities only when the
+        # scope has the equipment or the temporary service in it
+        need = [c for c in need if c not in ("commissioning",
+                                             "temp_utilities")]
     blob = " ".join(f.get("item") or "" for f in doc.get("facts") or [])
     if ptype != "ground_up_commercial" and (
             "31" in divisions or "SWPPP" in blob.upper()):
@@ -185,6 +190,8 @@ def evaluate(doc):
     bad_cites = []
     for a in acts:
         for c in a.get("citations") or []:
+            if c.get("document"):
+                continue                       # a bid document, not the spec
             sec = c.get("spec_section") or ""
             page = c.get("page")
             if not sec and page is None:
@@ -197,6 +204,9 @@ def evaluate(doc):
     add("citations", not bad_cites,
         "; ".join(bad_cites[:6]) if bad_cites else "Citations point at the spec.")
 
+    if doc.get("scope"):
+        _bid_checks(doc, acts, add)
+
     passed = sum(1 for c in checks if c["passed"])
     score = round(100.0 * passed / len(checks), 1) if checks else 0
     result = {"checks": checks, "gaps": gaps, "passed": not gaps,
@@ -204,6 +214,76 @@ def evaluate(doc):
     doc["rubric"] = result
     doc["status"] = "finished" if result["passed"] else "incomplete"
     return result
+
+
+_FIELD_OK = {"ntp", "substantial", "final", "mobilization",
+             "demobilization", "temp_facilities", "punch", "closeout",
+             "margin", "training"}
+
+
+def _bid_checks(doc, acts, add):
+    """Two-way scope check, removed scope, holds and workdays (bid set)."""
+    import datetime as _dt
+    from . import bidset
+    scope = doc["scope"]
+    keys = {a.get("scope_key") for a in acts if a.get("scope_key")}
+    lost = [f"{x['source']}: {x['text'][:60]}" for x in scope["lines"]
+            if x["key"] not in keys]
+    add("scope_to_activity", not lost,
+        "Live scope with no activity: " + "; ".join(lost[:8]) if lost
+        else f"All {len(scope['lines'])} live scope lines have an activity.")
+    bare = [f"{a['code']} {a.get('name')}" for a in acts
+            if a.get("type") not in ("loe", "wbs_summary")
+            and a.get("cls") not in _FIELD_OK and not a.get("chain_id")
+            and not a.get("citations")]
+    add("activity_to_source", not bare,
+        "Activities with no source: " + "; ".join(bare[:8]) if bare
+        else "Every activity cites a bid document, a stated rule or the "
+             "company template.")
+    gone = {x["key"] for x in scope["removed"]}
+    back = [f"{a['code']} {a.get('name')}" for a in acts
+            if a.get("scope_key") in gone]
+    add("removed_scope", not back,
+        "Removed scope still scheduled: " + "; ".join(back) if back
+        else f"{len(gone)} removed item(s) kept off the schedule.")
+    finals = [a for a in acts if a.get("cls") == "final_inspection"]
+    subst = next((a for a in acts if a.get("cls") == "substantial"), None)
+    hold = []
+    if len(finals) != 1:
+        hold.append(f"{len(finals)} final inspections (one expected)")
+    elif subst and finals[0].get("ef") and subst.get("es") and \
+            finals[0]["ef"] > subst["es"]:
+        hold.append("final inspection is after Substantial Completion")
+    rough = [a for a in acts if a.get("cls") in bidset.ROUGH]
+    rinsp = [a for a in acts if a.get("cls") == "rough_in_inspection"]
+    cover = [a for a in acts if a.get("cls") == "cover"]
+    if rough and not rinsp:
+        hold.append("rough-in work with no rough-in inspection")
+    elif rinsp and cover:
+        last = max((a.get("ef") or "") for a in rinsp)
+        early = [c["code"] for c in cover if (c.get("es") or "") <= last]
+        if early:
+            hold.append("close-in starts before the rough-in inspection: "
+                        + ", ".join(early))
+    add("hold_points", not hold, "; ".join(hold) if hold else
+        "Rough-in inspection before close-in; one final inspection before "
+        "Substantial Completion.")
+    hol = set(((doc.get("calendars") or {}).get("5day") or {})
+              .get("holidays") or [])
+    bad = []
+    for a in acts:
+        if a.get("calendar") not in ("5day", "weather"):
+            continue
+        for k in ("es", "ef"):
+            d = a.get(k)
+            if not d:
+                continue
+            day = _dt.date.fromisoformat(d[:10])
+            if day.weekday() >= 5 or d[:10] in hol:
+                bad.append(f"{a['code']} {k} {d[:10]}")
+    add("workdays", not bad, "Work starts or finishes on a weekend or "
+        "holiday: " + ", ".join(bad[:8]) if bad else
+        "No field work starts or finishes on a weekend or holiday.")
 
 
 def acknowledge_negative_float(doc, note):

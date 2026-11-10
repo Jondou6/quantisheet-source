@@ -813,11 +813,15 @@ except Exception:                                         # noqa: BLE001
 
 @pytest.mark.skipif(not HAVE_GUI, reason="needs PySide6 and PyMuPDF")
 def test_main_window_has_the_dropbox_commands(win):  # noqa: F811
-    texts = [a.text() for a in win._file_menu.actions()]
+    # File > Copies & Cloud (one-column File menu, Nov 6)
+    sub = next(a.menu() for a in win._file_menu.actions()
+               if a.menu() is not None and a.text() == "Copies && Cloud")
+    texts = [a.text() for a in sub.actions()]
     for t in ("Open from Dropbox…", "Save to Dropbox",
               "Save to Dropbox As…", "Dropbox Settings…"):
         assert t in texts, t
-    assert texts.index("Save to Dropbox") > texts.index("Save As…")
+    assert texts.index("Save to Dropbox") > texts.index(
+        "Copy Back to the Original")
     acts = win._dropbox_actions
     assert all(a.isVisible() for a in acts.values())
     assert acts["Save to Dropbox"] in win._doc_actions

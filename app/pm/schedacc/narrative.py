@@ -9,6 +9,8 @@ completeness and health results. Nothing is filled in by a model.
 def render(doc):
     p = doc.get("project") or {}
     lines = []
+    if doc.get("caveat"):
+        lines.append(doc["caveat"])
     state = "finished" if doc.get("status") == "finished" else "not finished"
     lines.append(
         f"Basis of schedule for {p.get('name') or 'the project'}. "
@@ -21,6 +23,8 @@ def render(doc):
         f"Early finish {p.get('early_finish') or 'not set'}.")
     if p.get("must_finish"):
         lines.append(f"Contract finish date used for float: {p['must_finish']}.")
+    if doc.get("scope"):
+        lines.append(_scope(doc["scope"]))
     lines.append(_calendars(doc))
     lines.append(_durations(doc))
     lines.append(_long_lead(doc))
@@ -41,6 +45,32 @@ def render(doc):
     text = "\n\n".join(lines)
     doc["narrative"] = text
     return text
+
+
+def _scope(scope):
+    live = scope.get("lines") or []
+    out = [f"Bid set: {len(live)} live scope line(s), each scheduled and "
+           "cited to its document. Addenda and bidder answers were applied "
+           "in the order issued; a later document wins."]
+    gone = scope.get("removed") or []
+    if gone:
+        out.append("Removed from the scope and not scheduled: " + "; ".join(
+            f"{x.get('text')} ({x.get('source')}, removed by "
+            f"{x.get('removed_by')})" for x in gone) + ".")
+    if scope.get("quantity_gaps"):
+        out.append("No quantity stated, duration estimated: " + "; ".join(
+            scope["quantity_gaps"]) + ".")
+    if scope.get("skipped"):
+        out.append(f"{len(scope['skipped'])} plan note(s) are general notes, "
+                   "not work, and were not scheduled: " + "; ".join(
+                       f"{x['source']}" for x in scope["skipped"][:12]) + ".")
+    if scope.get("unmatched"):
+        out.append("No trade rule matched, check the logic: " + "; ".join(
+            scope["unmatched"]) + ".")
+    out.append("Exterior coating, sealant, stucco and paint work is on the "
+               "weather calendar; set the months off in the company "
+               "assumptions (weather_months).")
+    return " ".join(out)
 
 
 def _calendars(doc):

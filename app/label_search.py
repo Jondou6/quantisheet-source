@@ -19,6 +19,7 @@ import fitz
 
 from . import autocount
 from . import ocr as ocr_mod
+from .dmoney import c2 as _c2
 
 WILD = set("*?#")
 
@@ -115,11 +116,11 @@ def search(doc, text, pages=None, plan_area_only=True, use_ocr=True,
         if plan_area_only:
             try:
                 kept = autocount._in_plan_area(page, [r for _t, r in found])
-                keep = {tuple(round(v, 2) for v in r) for r in kept}
+                keep = {tuple(_c2(v) for v in r) for r in kept}
             except Exception:                             # noqa: BLE001
                 keep = None
         for t, r in found:
-            inp = keep is None or tuple(round(v, 2) for v in r) in keep
+            inp = keep is None or tuple(_c2(v) for v in r) in keep
             out.append({"page": pno, "rect": list(r), "text": t,
                         "in_plan": inp})
     return out

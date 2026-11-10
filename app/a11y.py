@@ -5,6 +5,8 @@
   label; anything else with only an object name gets that, tidied.
 - audit(root): the controls still without a name, and ones the keyboard
   can't reach (for the tests and tools/a11y_audit).
+- keyboard_audit(root): controls Tab never reaches (tools/keyboard_audit
+  walks the main dialogs with it).
 - install(app): names each window and dialog the first time it shows,
   so dialogs built later are covered too.
 - high_contrast(): Windows High Contrast is on - the theme then leaves
@@ -159,6 +161,62 @@ def audit(root):
                     not isinstance(w, QToolButton) and not _focusable(w):
                 out.append((type(w).__name__, w.objectName(),
                             "can't be reached with Tab"))
+        except RuntimeError:
+            continue
+    return out
+
+
+def tab_chain(root):
+    """The widgets Tab moves through inside `root`, in order."""
+    from PySide6.QtCore import Qt
+    out, seen = [], set()
+    w = root.nextInFocusChain()
+    while w is not None and w is not root and id(w) not in seen \
+            and len(out) < 5000:
+        seen.add(id(w))
+        try:
+            if (w.focusPolicy() & Qt.FocusPolicy.TabFocus) and \
+                    w.isEnabled() and w.isVisibleTo(root) and \
+                    (w is root or root.isAncestorOf(w)):
+                out.append(w)
+        except RuntimeError:
+            pass
+        w = w.nextInFocusChain()
+    return out
+
+
+def _reached_inside(w, chain):
+    """A spin box or combo box takes focus through its own line edit."""
+    for c in chain:
+        # Python already reads this as A or B or (C and D); the brackets
+        # only make that plain to a reader (outside review, Nov 7)
+        if c is w or w.isAncestorOf(c) or \
+                (c.isAncestorOf(w) and c.focusProxy() is w):
+            return True
+        if c.focusProxy() is w or w.focusProxy() is c:
+            return True
+    return False
+
+
+def keyboard_audit(root):
+    """Keyboard-only check (Nov 5): [(class, name, problem)] for controls
+    that show and work with a mouse but that Tab never reaches. Tab bars
+    are left out (Ctrl+Tab moves between tabs) and so are scroll bars and
+    headers; only what shows on the current tab is checked."""
+    from PySide6.QtWidgets import QTabBar
+    chain = tab_chain(root)
+    out = []
+    for w in _controls(root):
+        try:
+            if isinstance(w, QTabBar) or not w.isVisibleTo(root) or \
+                    not w.isEnabled():
+                continue
+            if _reached_inside(w, chain):
+                continue
+            label = w.accessibleName() or _clean(getattr(w, "text",
+                                                         lambda: "")()) \
+                or w.objectName()
+            out.append((type(w).__name__, label, "Tab never reaches it"))
         except RuntimeError:
             continue
     return out

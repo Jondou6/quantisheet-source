@@ -32,6 +32,7 @@ How sure each type is:
 import logging
 
 from .. import wall_assembly as WA
+from ..dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 
@@ -140,7 +141,7 @@ def build(legend, heights=None, general_height=None, plate=None):
             why.append(f"height {h:g} ft from the legend")
         elif plate:
             h, status = plate, "INFERRED"
-            why.append(f"height {h:.2f} ft from the top-of-wall mark on the "
+            why.append(f"height {_c2(h):.2f} ft from the top-of-wall mark on the "
                        "elevations")
         elif general_height:
             h, status = general_height, "INFERRED"

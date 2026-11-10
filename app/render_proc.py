@@ -16,10 +16,13 @@ quickly. Talks over a multiprocessing Pipe:
   <- ("segs", rid, sig, count, bytes)         array('d'): x0 y0 x1 y1 ...
   -> ("count", rid, path)                     page count of a file
   <- ("count", rid, "12" | "?")
+  -> ("release", rid, path)                   close the file (tab closed,
+  <- ("released", rid, "n")                   Copy Back about to replace it)
   -> ("stop",)
 """
 import os
 from collections import OrderedDict, deque
+from .dmoney import c2 as _c2
 
 
 def page_sig(doc, pno):
@@ -31,7 +34,7 @@ def page_sig(doc, pno):
     for x in pg.get_contents():
         parts.append((x, len(doc.xref_stream_raw(x) or b"")))
     r = pg.rect
-    return (pg.xref, pg.rotation, round(r.width, 2), round(r.height, 2),
+    return (pg.xref, pg.rotation, _c2(r.width), _c2(r.height),
             tuple(parts))
 
 
@@ -89,6 +92,27 @@ def _serve(conn):                                   # runs in the child
             continue
         if not msg or msg[0] == "stop":
             return
+        if msg[0] == "release":
+            # let go of the file: Windows won't replace a file another
+            # process has open (Chief's re-test, Nov 7: Copy Back got
+            # "Access denied" with nothing else holding the original)
+            _, rid, path = msg
+            want = os.path.normcase(os.path.abspath(path))
+            n = 0
+            for p in [p for p in docs
+                      if os.path.normcase(os.path.abspath(p)) == want]:
+                try:
+                    docs.pop(p)[0].close()
+                except Exception:                       # noqa: BLE001
+                    pass
+                n += 1
+                for k in [k for k in lists if k[0] == p]:
+                    del lists[k]
+            try:
+                conn.send(("released", rid, str(n)))
+            except Exception:                           # noqa: BLE001
+                return
+            continue
         if msg[0] == "count":
             _, rid, path = msg
             try:

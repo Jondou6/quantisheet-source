@@ -20,6 +20,7 @@ APPLICATIONS = ("", "Domestic", "Fire Line", "Irrigation", "Other")
 CATEGORIES = ("", "General", "Limited", "Inspector")
 METHODS = ("", "Direction of flow", "Differential")
 KITS = ("", "Vertical tube", "Differential gauge")
+VALVE_TYPES = ("", "Gate", "Ball")        # the shutoff valves (Jon, Nov 5)
 
 # point id, label, "pair" (leaked / tight / psi), "valve" (leaked / tight)
 # or "psi" (opened-at psi only)
@@ -74,6 +75,7 @@ def empty_report():
         "tester": "", "cert_no": "", "cert_company": "", "cert_phone": "",
         "category": "", "method": "", "kit": "", "signature": "",
         "comments": "", "property_id": "", "equipment_id": "",
+        "gauge_serial": "", "so1_type": "", "so2_type": "",
     }
     for pid, _label, kind in POINTS:
         data[f"{pid}_repair_note"] = ""      # what was repaired / replaced
@@ -141,14 +143,20 @@ def _clean(report):
                 "dev_name", "dev_model", "dev_serial", "dev_size",
                 "dev_location", "repair_materials", "tester", "cert_no",
                 "cert_company", "cert_phone", "signature", "comments",
-                "property_id", "equipment_id"):
-        out[key] = files.txt(src.get(key), 400 if "address" in key or
-                             key in ("comments", "repair_materials") else 120)
+                "property_id", "equipment_id", "gauge_serial"):
+        # comments and repairs keep up to 2,000 characters: they were cut
+        # off at 400 without a word (Chief's estimator test, Nov 7)
+        out[key] = files.txt(src.get(key), 2000 if key in (
+            "comments", "repair_materials") else
+            400 if "address" in key else 120)
     out["dev_application"] = _choice(src.get("dev_application"), APPLICATIONS,
                                      "Application")
     out["category"] = _choice(src.get("category"), CATEGORIES, "Category")
     out["method"] = _choice(src.get("method"), METHODS, "Method")
     out["kit"] = _choice(src.get("kit"), KITS, "Test kit")
+    for v in ("so1_type", "so2_type"):
+        out[v] = _choice(src.get(v), VALVE_TYPES,
+                         "Shutoff valve " + v[2] + " type")
     try:
         out["test_date"] = files.iso_date(src.get("test_date"), "Test date")
     except files.FileError as e:
@@ -192,6 +200,28 @@ def get(store, rid):
 
 def _on(value):
     return bool(value) and str(value).lower() not in ("0", "false", "off", "")
+
+
+def _box_height(text, width, least, size=8.0):
+    """Height for a multi-line field so all of `text` shows at `size`
+    (Chief's estimator test, Nov 7: long comments were cut off)."""
+    import fitz
+    text = str(text or "")
+    if not text.strip():
+        return least
+    lines = 0
+    usable = max(20.0, width - 6)
+    for para in text.splitlines() or [""]:
+        cur, n = "", 1
+        for word in para.split():
+            t = f"{cur} {word}".strip()
+            if fitz.get_text_length(t, "helv", size) > usable and cur:
+                n += 1
+                cur = word
+            else:
+                cur = t
+        lines += n
+    return max(least, min(lines * size * 1.25 + 6, 400))
 
 
 def write_pdf(report, path, comp=None):
@@ -283,12 +313,14 @@ def write_pdf(report, path, comp=None):
                     data.get(f"{pid}_{phase}_psi") or "")
                 sheet.text(x + 75, sheet.y + 18, "psi", 6.5)
         sheet.y += row_h
-    sheet.need(36)
+    rh = _box_height(data.get("repair_materials"), RIGHT - LEFT, 24)
+    sheet.need(rh + 12)
     sheet.y += 8
     sheet.label(LEFT, sheet.y, "Repairs and materials")
-    sheet.text_field("repair_materials", (LEFT, sheet.y + 4, RIGHT, sheet.y + 28),
+    sheet.text_field("repair_materials",
+                     (LEFT, sheet.y + 4, RIGHT, sheet.y + 4 + rh),
                      data.get("repair_materials") or "", multiline=True)
-    sheet.y += 40
+    sheet.y += rh + 16
     sheet.section("04", "Certification")
     y = sheet.y + 2
     cert = (
@@ -316,10 +348,12 @@ def write_pdf(report, path, comp=None):
     sheet.label(356, y, "Test kit")
     sheet.combo("kit", (356, y + 2, RIGHT, y + 16), KITS, data["kit"])
     sheet.y = y + 28
+    ch = _box_height(data.get("comments"), RIGHT - LEFT, 28)
+    sheet.need(ch + 30)
     sheet.label(LEFT, sheet.y, "Comments")
-    sheet.text_field("comments", (LEFT, sheet.y + 4, RIGHT, sheet.y + 32),
+    sheet.text_field("comments", (LEFT, sheet.y + 4, RIGHT, sheet.y + 4 + ch),
                      data.get("comments") or "", multiline=True)
-    sheet.y += 44
+    sheet.y += ch + 16
     sheet.label(LEFT, sheet.y, "Next test due")
     sheet.text_field("next_due", (LEFT + 80, sheet.y - 8, LEFT + 180, sheet.y + 6),
                      data.get("next_due") or "", readonly=True)
@@ -374,6 +408,33 @@ def data_sheet_lines(report):
     return out
 
 
+def _wrap(text, width, size, font="helv"):
+    """Lines of `text` no wider than `width` points (long words are cut)."""
+    import fitz
+    out = []
+    for para in text.splitlines() or [""]:
+        cur = ""
+        for word in para.split(" "):
+            while fitz.get_text_length(word, font, size) > width:
+                k = len(word)
+                while k > 1 and fitz.get_text_length(word[:k], font,
+                                                      size) > width:
+                    k -= 1
+                if cur:
+                    out.append(cur)
+                    cur = ""
+                out.append(word[:k])
+                word = word[k:]
+            t = f"{cur} {word}" if cur else word
+            if fitz.get_text_length(t, font, size) > width and cur:
+                out.append(cur)
+                cur = word
+            else:
+                cur = t
+        out.append(cur)
+    return out or [""]
+
+
 def write_data_sheet(report, path):
     """One page: every value above, labelled, to copy onto the district's
     form. Not a test report form itself."""
@@ -399,9 +460,17 @@ def write_data_sheet(report, path):
                            color=(0.55, 0.35, 0.2))
             y += 14
             last = sec
+        # values wrap inside the page, line by line, onto new pages when
+        # needed - a long comment ran off the page (Chief's re-test, Nov 7)
+        lines = _wrap(str(value or "-"), 562 - 250, 10)
         pg.insert_text((60, y), f"{label}:", fontsize=10)
-        pg.insert_text((250, y), value or "-", fontsize=10)
-        y += 15
+        for k, line in enumerate(lines):
+            if k and y > 750:
+                pg = d.new_page(width=612, height=792)
+                y = 60
+            pg.insert_text((250, y), line, fontsize=10)
+            y += 13
+        y += 2
     d.save(path)
     d.close()
     return path

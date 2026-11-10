@@ -17,6 +17,7 @@ from decimal import Decimal
 
 from . import safecell
 from .assembly_codes import cents, dec
+from .dmoney import c2 as _c2
 
 DEFAULT_CASCADE = [("gc", "0"), ("overhead", "0"), ("profit", "0"),
                    ("bond", "0"), ("insurance", "0"), ("contingency", "0"),
@@ -96,7 +97,7 @@ def export(path, r):
         with open(path, "w", newline="", encoding="utf-8") as f:
             w = safecell.writer(f, lineterminator="\r\n")
             for row in rows:
-                w.writerow([f"{v:.2f}" if isinstance(v, Decimal) and
+                w.writerow([f"{_c2(v):.2f}" if isinstance(v, Decimal) and
                             v == v.quantize(Decimal("0.01")) else v
                             for v in row])
     return path

@@ -31,6 +31,7 @@ import re
 
 from . import schedules as sch
 from . import tradetakeoff as tt
+from .dmoney import c2 as _c2
 
 _FTIN = re.compile(r"(\d{1,3})\s*'\s*-?\s*(?:(\d{1,2}(?:\.\d+)?)"
                    r"(?:\s*-?\s*(\d)/(\d{1,2}))?\s*(?:\"|''))?")
@@ -447,8 +448,7 @@ def footings(lines, tables):
                           re.search(r"REINF|REBAR|BARS?", kk, re.I)), "")
             rb = footing_rebar(reinf, L, W)
             if rb:
-                rec["rebar"] = dict(rb, lb=round(rb["lb_each"] * ln["qty"],
-                                                 2))
+                rec["rebar"] = dict(rb, lb=_c2(rb["lb_each"] * ln["qty"]))
         out.append(rec)
     return out
 

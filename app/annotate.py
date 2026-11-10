@@ -17,9 +17,11 @@ import base64
 import json as _json
 import logging
 import uuid
+import weakref as _weakref
 
 import fitz
 from . import embfiles
+from .dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 
@@ -37,13 +39,19 @@ POINT_KINDS = {"add_count", "add_text", "add_note"}
 POINTS_KINDS = {"add_line", "add_polyline", "add_polygon"}
 OTHER_KINDS = {"add_ink", "delete_annot", "set_annot", "set_vertices",
                "set_measure", "set_captions", "set_field",
-               "set_scale", "add_legend", "import_annots"}
+               "set_scale", "add_legend", "import_annots", "set_jobdata"}
 KINDS = RECT_KINDS | POINT_KINDS | POINTS_KINDS | OTHER_KINDS
 # ops that change the page itself rather than adding an annotation
 CONTENT_KINDS = {"add_redact", "replace_span", "replace_block", "add_image",
                  "move_image", "delete_image", "replace_image"}
 # ops that undo must snapshot the whole document for
-FULL_UNDO_KINDS = CONTENT_KINDS | {"add_field", "set_scale"}
+FULL_UNDO_KINDS = CONTENT_KINDS | {"add_field", "set_scale", "set_jobdata"}
+
+# job data files an op may write (name -> (description, most bytes)).
+# A peer in live collaboration can only send these (outside review, Nov 7
+# - H4: the ADA checker's data went around the op log).
+JOBDATA_FILES = {"quantisheet_ada.json": ("QuantiSheet ADA check",
+                                          1_000_000)}
 
 DEFAULT_COLORS = {
     "add_highlight": (1, 1, 0), "add_underline": (1, 0, 0),
@@ -833,7 +841,21 @@ def apply_op(doc, op, fresh=False):
     """Apply one op to `doc`. Returns True if the document changed.
     `fresh`: the op was just made here, so it can't have been applied
     before (skips the already-applied scan, which is slow on pages with
-    thousands of markups)."""
+    thousands of markups).
+    When it changed, the edit counter moves too, whoever sent the op
+    (Venice, Nov 9 - F10: a peer's change didn't refresh the ADA
+    checker)."""
+    changed = _apply_op(doc, op, fresh)
+    if changed:
+        try:
+            bump_edits(doc)
+        except Exception:                                 # noqa: BLE001
+            log.warning("edit counter not moved", exc_info=True)  # N5
+    return changed
+
+
+def _apply_op(doc, op, fresh=False):
+    """apply_op() without the edit counter."""
     kind = op.get("kind")
     p = op.get("payload") or {}
     pno = op.get("page")
@@ -860,6 +882,8 @@ def apply_op(doc, op, fresh=False):
             return _set_field(page, p)
         if kind == "set_scale":
             return _set_scale(doc, pno, p)
+        if kind == "set_jobdata":
+            return _set_jobdata(doc, p)
         if not fresh and is_applied(page, oid):
             return False
         if kind in CONTENT_KINDS:
@@ -1746,7 +1770,7 @@ def _relabel_shape(page, shape, mtype, value, unit, group):
     from . import measure_extra
     extra = measure_extra.read(doc, shape)
     if mtype == CUTOUT:
-        text = f"Cutout -{value:,.2f} {unit}"
+        text = f"Cutout -{_c2(value):,.2f} {unit}"
     else:
         text = measure_extra.label_text(mtype, value, unit, group, extra,
                                         takeoff.fmt)
@@ -1973,6 +1997,35 @@ def scale_at(doc, pno, pts=None, scales=None, viewports=None):
     return scales.get(pno)
 
 
+def _set_jobdata(doc, p):
+    """Write one listed job data file (JSON text). False when it is not on
+    the list, too big, not JSON, or already the same."""
+    import json
+    name = str(p.get("file") or "")
+    if name not in JOBDATA_FILES:
+        log.warning("job data %r is not one an op may write", name)
+        return False
+    desc, most = JOBDATA_FILES[name]
+    data = p.get("data")
+    if not isinstance(data, str) or len(data.encode("utf-8")) > most:
+        return False
+    try:
+        parsed = json.loads(data)
+    except ValueError:
+        return False
+    if not isinstance(parsed, dict):       # never "5", [] or null (Venice F)
+        return False
+    raw = data.encode("utf-8")
+    try:
+        if name in embfiles.names(doc) and \
+                bytes(embfiles.get(doc, name)) == raw:
+            return False
+    except Exception:                                     # noqa: BLE001
+        pass
+    embfiles.put(doc, name, raw, desc)
+    return True
+
+
 def _set_scale(doc, pno, p):
     import json
     scales, damaged = _read_all_scales(doc)
@@ -1996,7 +2049,7 @@ def _set_scale(doc, pno, p):
                 return False
             name = str(vp.get("name") or f"Viewport {len(vps) + 1}")[:40]
             vps = [v for v in vps if v.get("name") != name]
-            vps.append({"name": name, "rect": [round(x, 2) for x in r],
+            vps.append({"name": name, "rect": [_c2(x) for x in r],
                         "ppu": ppu, "unit": str(vp.get("unit", "ft"))[:12],
                         "label": str(vp.get("label", ""))[:40]})
         entry["viewports"] = vps
@@ -2438,14 +2491,14 @@ def area_label_text(item):
         text = measure_extra.label_text("area", per, item["unit"], "",
                                         item["extra"], takeoff.fmt)
         if m != 1:
-            text += f" x {m:g} typical = {item['value']:,.2f}"
+            text += f" x {m:g} typical = {_c2(item['value']):,.2f}"
         return measure_extra.join(item.get("group"), text)
-    text = f"{per:,.2f} {item['unit']}"
+    text = f"{_c2(per):,.2f} {item['unit']}"
     if item.get("cutouts"):
         n = item["cutouts"]
         text += f" net ({n} cutout{'s' if n > 1 else ''})"
     if m != 1:
-        text += f" x {m:g} typical = {item['value']:,.2f}"
+        text += f" x {m:g} typical = {_c2(item['value']):,.2f}"
     from . import measure_extra
     return measure_extra.join(item.get("group"), text)
 
@@ -2544,14 +2597,14 @@ def _markup_items(doc, pages=None):
                 subj = group or mtype.title()
                 try:
                     mvalue = float(value)
-                    measure = (f"{float(value):,.2f} {unit}"
+                    measure = (f"{_c2(float(value)):,.2f} {unit}"
                                if mtype != "count" else "1 ea")
                     if mtype == CUTOUT:
                         measure = "-" + measure
                         mvalue = -mvalue
                     net = nets.get((pno, tag_of(a)))
                     if net:
-                        measure = f"{net['value']:,.2f} {unit} net"
+                        measure = f"{_c2(net['value']):,.2f} {unit} net"
                         mvalue = net["value"]
                 except ValueError:
                     measure = ""
@@ -2935,3 +2988,31 @@ def import_ops(doc, src, layer=None):
                 payload["layer"] = layer
             marks.append((pno, "import_annots", payload))
     return marks
+
+
+# ---- a cheap edit counter per open document --------------------------------
+# Bumped by the viewer on every change, so a cache can tell "nothing
+# changed" without walking the pages (outside review, Nov 7 - N5).
+# per open document, gone with it (Venice, Nov 9: a dict keyed by id()
+# grew forever and a recycled id could hand a new document an old count).
+# Compare only (equal or not), never arithmetic: an increment lost to two
+# threads at once, or the viewer bumping after apply_op already did,
+# doesn't matter, so it is not a count of edits (Venice N4).
+_EDITS = _weakref.WeakKeyDictionary()
+_EDITS_BY_ID = {}                     # documents that can't be weakly held
+
+
+def bump_edits(doc):
+    if doc is None:
+        return
+    try:
+        _EDITS[doc] = _EDITS.get(doc, 0) + 1
+    except TypeError:
+        _EDITS_BY_ID[id(doc)] = _EDITS_BY_ID.get(id(doc), 0) + 1
+
+
+def edit_count(doc):
+    try:
+        return _EDITS.get(doc, 0)
+    except TypeError:
+        return _EDITS_BY_ID.get(id(doc), 0)

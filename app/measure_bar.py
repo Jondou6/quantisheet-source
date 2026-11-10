@@ -14,6 +14,7 @@ import re
 import fitz
 
 from . import annotate, takeoff
+from .dmoney import c2 as _c2
 
 _FT_BARE_IN = re.compile(
     r"^\s*(\d+(?:\.\d+)?)\s*'\s*-?\s*(\d+(?:\.\d+)?)(?:\s+(\d+)\s*/\s*(\d+))?\s*$")
@@ -114,7 +115,7 @@ def fmt_value(mode, v, unit):
         if inch == 12:
             ft, inch = ft + 1, 0
         return f"{ft:,}'-{inch}\""
-    return f"{v:,.2f} {unit}"
+    return f"{_c2(v):,.2f} {unit}"
 
 
 try:

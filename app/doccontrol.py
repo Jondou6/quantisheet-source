@@ -18,6 +18,7 @@ import re
 
 from . import forms, settings
 from . import embfiles
+from .dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 
@@ -352,7 +353,7 @@ def price_addendum(doc, aid, priced=True, cost="", line_id="", note="",
                 except InvalidOperation:
                     raise DocControlError(f"Cost impact {cost!r} isn't a "
                                           "number.")
-                a["cost"] = f"{c:.2f}"
+                a["cost"] = f"{_c2(c):.2f}"
             a["priced"] = bool(priced)
             a["priced_on"] = _today() if priced else ""
             if line_id is not None:

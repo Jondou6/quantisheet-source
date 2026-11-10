@@ -20,6 +20,8 @@ from . import annotate
 from . import dmoney
 from . import embfiles
 from . import rounding
+from .dmoney import c2 as _c2
+from .dmoney import half_up as _hu
 
 _Z = decimal.Decimal(0)
 log = logging.getLogger(__name__)
@@ -271,13 +273,62 @@ def lines(doc, page=None):
         # exact cents, not float drift (review 3 #16); a quantity no money
         # can hold (a crafted markup) totals 0 instead of stopping the panel
         try:
-            g["total"] = float(dmoney.cents(adj * dmoney.D(g["unit_cost"])))
+            g["total"] = float(dmoney.cents(
+                rounding.money_qty(adj) * dmoney.D(g["unit_cost"])))
         except (decimal.InvalidOperation, OverflowError, ValueError):
             log.warning("estimate line %r: total out of range", g["name"])
             g["total"] = 0.0
         g["pages"] = ", ".join(str(n) for n in sorted(g["pages"]))
         out.append(g)
     return out
+
+
+# where a takeoff line's typed price goes, by its cost type (as
+# estimate_lines.TYPE_PART; no type: material)
+_TYPE_PART = {"Material": "mat", "Labor": "lab", "Equipment": "eqp",
+              "Subcontract": "sub", "Allowance": "sub", "Other": "sub"}
+
+
+def rollup_rows(doc, taken=()):
+    """Takeoff lines that carry a typed unit cost, as assembly-rollup rows
+    (assemblies.rollup), so the proposal, the bid build-up, the exports
+    and the schedule of values include them - they were in the Estimate
+    panel's total but in none of those (hands-on pass, Nov 10; Jon: include
+    them). Same shape as estimate_lines.rollup_rows."""
+    from . import csi
+    rows, names = [], set(taken)
+    for g in lines(doc):
+        if not g["total"]:
+            continue
+        name = base = g["name"] or "Takeoff line"
+        n = 2
+        while name in names:
+            name = f"{base} ({n})"
+            n += 1
+        names.add(name)
+        code = csi.parse_code(g.get("code") or "") or ""
+        trade = csi.DIVISIONS.get(code[:2], "") if code else ""
+        trade = trade[:1].upper() + trade[1:] if trade else "General"
+        part_key = _TYPE_PART.get(g.get("cost_type") or "", "mat")
+        total = float(g["total"])
+        mat = total if part_key == "mat" else 0.0
+        lab = total if part_key == "lab" else 0.0
+        eqp = total if part_key == "eqp" else 0.0
+        sub = total if part_key == "sub" else 0.0
+        qty = float(rounding.money_qty(dmoney.D(g["adjusted"])))
+        part = {"name": name, "unit": g["unit"], "qty": qty,
+                "cost": float(g["unit_cost"]),
+                "material": mat + eqp + sub, "material_only": mat,
+                "equipment": eqp, "sub": sub, "labor_hours": 0.0,
+                "labor_cost": lab, "labor_rate": 0.0, "crew_days": 0.0,
+                "crew": "", "code": code, "total": total, "line_id": ""}
+        rows.append({"name": name, "trade": trade, "csi": code,
+                     "measure": "line", "quantity": qty, "unit": g["unit"],
+                     "items": g["count"], "parts": [part], "adjust": 1.0,
+                     "material": mat + eqp + sub, "labor_hours": 0.0,
+                     "labor_cost": lab, "crew_days": 0.0, "total": total,
+                     "added": True, "takeoff": True, "line_id": ""})
+    return rows
 
 
 def _text(v, limit):
@@ -308,19 +359,67 @@ def _qty_text(q):
     return t.rstrip("0").rstrip(".") if "." in t else t
 
 
+def _assembly_rows(doc, page=None, names=None):
+    """The assembly-priced rows (Material + Labor in cents, as the
+    estimate summary counts them). Nothing is rolled up (no cost book is
+    opened) when no takeoff group in `names` has an assembly."""
+    from . import assemblies
+    if names is not None:
+        try:
+            if not assemblies.any_known(doc, names):
+                return []
+        except Exception:                                 # noqa: BLE001
+            return []
+    try:
+        rows, _t, _e = assemblies.rollup(doc, page=page, added=False)
+    except Exception:                                     # noqa: BLE001
+        logging.getLogger(__name__).warning("assembly estimate left out",
+                                            exc_info=True)
+        return []
+    out = []
+    for r in rows:
+        mat, lab = dmoney.cents(r["material"]), dmoney.cents(r["labor_cost"])
+        if mat or lab:
+            out.append(dict(r, _mat=mat, _lab=lab, _total=mat + lab))
+    return out
+
+
 def export_csv(doc, path, page=None):
     rows = lines(doc, page)
+    # takeoffs priced by an assembly carry that price, not 0 (Chief's
+    # estimator test, Nov 7: a $393,567.92 job exported Grand Total 0.0)
+    asm = _assembly_rows(doc, page, [g["name"] for g in rows])
+    from . import estimate_export
+    by_asm = estimate_export.priced_by_assembly(
+        doc, [g["name"] for g in rows], {r["name"] for r in asm})
     with open(path, "w", newline="", encoding="utf-8-sig") as f:
         w = safecell.writer(f)
         w.writerow(["Item", "Type", "Count", "Quantity", "Unit", "Waste %",
                     "Multiplier", "Adjusted Qty", "Unit Cost", "Total",
-                    "Pages"])
+                    "Pages", "Priced By"])
         for g in rows:
+            via = by_asm.get(g["name"]) if not dmoney.cents(g["total"]) \
+                else None
             w.writerow([g["name"], g["type"], g["count"],
-                        round(g["quantity"], 3), g["unit"], g["waste"],
-                        g["multiplier"], round(g["adjusted"], 3),
-                        round(g["unit_cost"], 2), round(g["total"], 2),
-                        g["pages"]])
+                        _hu(g["quantity"], 3), g["unit"], g["waste"],
+                        g["multiplier"], _hu(g["adjusted"], 3),
+                        "" if via else _c2(g["unit_cost"]),
+                        "" if via else _c2(g["total"]),
+                        g["pages"],
+                        f"Assembly: {via}" if via else
+                        ("Unit cost" if dmoney.cents(g["total"]) else "")])
+        if asm:
+            w.writerow([])
+            w.writerow(["Assembly Lines"])
+            w.writerow(["Assembly", "Trade", "CSI", "Quantity", "Unit",
+                        "Items", "Material", "Labor Hours", "Labor",
+                        "Total"])
+            for r in asm:
+                w.writerow([r["name"], r.get("trade", ""), r.get("csi", ""),
+                            _hu(r["quantity"], 3), r["unit"],
+                            r.get("items", ""), str(r["_mat"]),
+                            _c2(r.get("labor_hours") or 0),
+                            str(r["_lab"]), str(r["_total"])])
         # lines added in the Estimate panel (typed, from a cost book, or
         # linked to a takeoff group)
         from . import estimate_lines
@@ -341,7 +440,8 @@ def export_csv(doc, path, page=None):
                             (a.get("link") or {}).get("name", "")])
         w.writerow([])
         grand = sum((dmoney.cents(g["total"]) for g in rows),
-                    decimal.Decimal("0.00")) + estimate_lines.total(added)
+                    decimal.Decimal("0.00")) + estimate_lines.total(added) \
+            + sum((r["_total"] for r in asm), decimal.Decimal("0.00"))
         w.writerow(["Grand Total", "", "", "", "", "", "", "", "",
                     float(grand)])
         w.writerow([])
@@ -353,12 +453,12 @@ def export_csv(doc, path, page=None):
         for it in annotate.totals_items(doc):
             if page is None or it["page"] == page:
                 w.writerow([it["page"] + 1, it["group"] or it["type"].title(),
-                            it["type"], round(it["value"], 3), it["unit"],
+                            it["type"], _hu(it["value"], 3), it["unit"],
                             org.get(it.get("origin"), "manual")])
         for it in set_items(doc):
             if page is None or it["page"] == page:
                 w.writerow([it["page"] + 1, it["item"], "set",
-                            round(it["quantity"], 3), it["unit"], "manual"])
+                            _hu(it["quantity"], 3), it["unit"], "manual"])
         pend = [it for it in annotate.takeoff_items(doc)
                 if it.get("pending") and (page is None or
                                           it["page"] == page)]
@@ -370,7 +470,7 @@ def export_csv(doc, path, page=None):
             for it in pend:
                 w.writerow([it["page"] + 1, it["group"] or
                             it["type"].title(), it["type"],
-                            round(it["value"], 3), it["unit"],
+                            _hu(it["value"], 3), it["unit"],
                             org["ai-pending"]])
         w.writerow([])                  # Venice #16: how the numbers round
         for r in rounding.csv_rows():

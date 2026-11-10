@@ -13,10 +13,12 @@ from PySide6.QtWidgets import (QComboBox, QDialog, QDialogButtonBox,
                                QDoubleSpinBox, QFileDialog, QFormLayout,
                                QHBoxLayout, QLabel, QLineEdit, QListWidget,
                                QListWidgetItem, QMessageBox, QPlainTextEdit,
-                               QPushButton, QTableWidget, QTableWidgetItem,
+                               QPushButton, QSizePolicy, QTableWidget,
+                               QTableWidgetItem,
                                QStackedWidget, QVBoxLayout, QWidget)
 
 from .. import dmoney
+from ..dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 
@@ -89,6 +91,16 @@ def _ask(parent, text):
 def _say(parent, text, error=False):
     (QMessageBox.warning if error else QMessageBox.information)(
         parent, "Estimating Tools", text)
+
+
+def wrap_long_labels(root, longest=50):
+    """Sentences in a QLabel wrap instead of running off the window
+    (Chief's estimator test, Nov 7: clipped messages and intros)."""
+    for lab in root.findChildren(QLabel):
+        if not lab.wordWrap() and len(lab.text()) > longest and \
+                lab.buddy() is None:
+            lab.setWordWrap(True)
+    return root
 
 
 class Page(QWidget):
@@ -934,7 +946,7 @@ class BidDayPage(Page):
         lay = QVBoxLayout(dlg)
         lst = QListWidget()
         for g in estimate.lines(self.doc):
-            it = QListWidgetItem(f"{g['name']}  ({g['quantity']:,.2f} "
+            it = QListWidgetItem(f"{g['name']}  ({_c2(g['quantity']):,.2f} "
                                  f"{g['unit']})")
             it.setData(Qt.UserRole, (g["name"], g["type"], g["unit"]))
             it.setCheckState(Qt.Unchecked)
@@ -1420,7 +1432,8 @@ class PlanningPage(Page):
         form.addRow("Design values:", self.design)
         form.addRow("Contingency %:", self.cont)
         form.addRow("Engineering %:", self.eng)
-        form.addRow("O&M years (optional):", self.years)
+        # "&&": a single & made the M a shortcut and hid it (Nov 7)
+        form.addRow("O&&M years (optional):", self.years)
         form.addRow("Discount rate %:", self.rate)
         self.lay.addLayout(form)
         self.table = QTableWidget(0, len(PLAN_COLS))
@@ -1894,6 +1907,11 @@ class EstimatingTools(QDialog):
         self.picker.setFocusPolicy(Qt.StrongFocus)
         self.picker.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         lab.setBuddy(self.picker)
+        # never squeezed by the wide drop-down (Chief's estimator test,
+        # Nov 7: "Page:" was cut off)
+        lab.setMinimumWidth(lab.fontMetrics().horizontalAdvance("Page:")
+                            + 12)
+        lab.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
         top.addWidget(lab)
         top.addWidget(self.picker)
         top.addStretch(1)
@@ -1903,6 +1921,7 @@ class EstimatingTools(QDialog):
         self.pages = {}
         for key, label in PAGES:
             p = PAGE_CLASSES[key](self)
+            wrap_long_labels(p)
             self.pages[key] = p
             self.stack.addWidget(p)
             self.picker.addItem(label.replace("…", "").replace("&&", "&"),

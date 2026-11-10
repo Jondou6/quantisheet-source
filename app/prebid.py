@@ -24,6 +24,7 @@ import fitz
 
 from . import annotate, embfiles
 from .dmoney import text as money_text
+from .dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 
@@ -514,7 +515,7 @@ def print_pdf(doc, path, report=None, title=""):
     y += 8
     if lk:
         pg.insert_text((M, y), f"Locked {lk['at'].replace('T', ' ')} by "
-                       f"{lk['by']} at ${float(lk['total']):,.2f}" +
+                       f"{lk['by']} at ${_c2(float(lk['total'])):,.2f}" +
                        (" - TAKEOFF CHANGED SINCE" if lk["stale"] else ""),
                        fontsize=10, fontname="hebo")
         y += 18

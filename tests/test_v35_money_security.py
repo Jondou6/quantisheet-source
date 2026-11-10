@@ -39,7 +39,8 @@ def test_hub_get_ignores_stale_op(tmp_path):
                              "data": base64.b64encode(png).decode()},
                  {}, True)
     H._op = "user.add"                      # left over from another call
-    st, _ct, body = H.get(f"/hub/att/Job/{att['sha256']}?k={key}")
+    st, _ct, body = H.get(f"/hub/att/Job/{att['sha256']}",
+                          {"Authorization": f"Bearer {key}"})
     assert (st, body) == (200, png)
     assert H._op == "att.get"
 

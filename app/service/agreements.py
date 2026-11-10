@@ -61,8 +61,55 @@ def interval(visits):
     return max(int(round(365 / visits)), 1), "days"
 
 
+def defaults():
+    """Starting values (Jon, Nov 5), all settings: 2 visits a year, a 10%
+    member discount on repairs, renew automatically every year."""
+    from .. import settings
+    def num(key, d):
+        try:
+            v = settings.get(key)
+            return d if v in (None, "") else int(v)
+        except (TypeError, ValueError):
+            return d
+    ar = settings.get("service_agreement_auto_renew")
+    dp = settings.get("service_member_discount_pct")
+    try:                     # a percent may have a decimal place (12.5)
+        disc = 10 if dp in (None, "") else dmoney.D(str(dp)).normalize()
+        disc = int(disc) if disc == int(disc) else disc
+    except Exception:                                     # noqa: BLE001
+        disc = 10
+    return {"visits": num("service_agreement_visits", 2),
+            "discount_pct": disc,
+            "auto_renew": True if ar is None else bool(ar)}
+
+
+def renew_due(store, today=None):
+    """Roll every active agreement set to renew automatically past its
+    renewal date on by a year (as many years as it takes). Returns the
+    agreement numbers renewed; each renewal is noted on the agreement."""
+    today = today or dt.date.today()
+    if isinstance(today, str):
+        today = dt.date.fromisoformat(today)
+    done = []
+    for agr in store["agreements"]:
+        if agr.get("status") != "active" or not agr.get("auto_renew", True):
+            continue
+        while dt.date.fromisoformat(agr["renewal"]) <= today:
+            old = agr["renewal"]
+            agr["start"] = old
+            agr["renewal"] = records_api.add_interval(
+                dt.date.fromisoformat(old), 1, "years").isoformat()
+            agr.setdefault("renewals", []).append(
+                {"from": old, "to": agr["renewal"],
+                 "on": today.isoformat()})
+            if agr["number"] not in done:
+                done.append(agr["number"])
+    return done
+
+
 def add(store, customer, price, visits_per_year, renewal, property_id="",
-        site="", start="", notes="", records=None, status="active"):
+        site="", start="", notes="", records=None, status="active",
+        auto_renew=None, discount_pct=None):
     try:
         visits = int(str(visits_per_year).strip())
     except (TypeError, ValueError):
@@ -81,6 +128,18 @@ def add(store, customer, price, visits_per_year, renewal, property_id="",
         _err(e)
     if dt.date.fromisoformat(start_s) >= dt.date.fromisoformat(renewal_s):
         raise AgreementError("The renewal date must be after the start.")
+    # the member discount on repairs (Jon's settled terms: 10%, a setting)
+    if discount_pct in (None, ""):
+        disc = defaults()["discount_pct"]
+    else:
+        try:
+            disc = dmoney.D(str(discount_pct).strip().rstrip("%"))
+        except Exception:                                 # noqa: BLE001
+            raise AgreementError("The member discount is a percent, "
+                                 "such as 10.")
+        if disc < 0 or disc > 50:
+            raise AgreementError("The member discount is from 0% to 50%.")
+    disc = f"{dmoney.D(disc).normalize():f}"
     if property_id:
         prop = records_api.find(records, property_id) if records else None
         if not prop or "customer" not in prop:
@@ -99,9 +158,33 @@ def add(store, customer, price, visits_per_year, renewal, property_id="",
            "customer": customer, "site": site, "property_id": property_id or "",
            "price": price_s, "visits_per_year": visits, "start": start_s,
            "renewal": renewal_s, "notes": files.txt(notes, 1000),
-           "status": "cancelled" if status == "cancelled" else "active"}
+           "status": "cancelled" if status == "cancelled" else "active",
+           "auto_renew": defaults()["auto_renew"] if auto_renew is None
+           else bool(auto_renew), "discount_pct": disc}
     store["agreements"].append(agr)
     return agr["id"]
+
+
+def set_terms(store, aid, discount_pct=None, auto_renew=None):
+    """Change an agreement's member discount or auto-renew."""
+    agr = get(store, aid)
+    if discount_pct is not None:
+        try:
+            d = dmoney.D(str(discount_pct).strip().rstrip("%"))
+        except Exception:                                 # noqa: BLE001
+            raise AgreementError("The member discount is a percent, "
+                                 "such as 10.")
+        if d < 0 or d > 50:
+            raise AgreementError("The member discount is from 0% to 50%.")
+        agr["discount_pct"] = f"{d.normalize():f}"
+    if auto_renew is not None:
+        agr["auto_renew"] = bool(auto_renew)
+    return agr
+
+
+def discount_of(agr):
+    v = agr.get("discount_pct")
+    return str(defaults()["discount_pct"]) if v in (None, "") else str(v)
 
 
 def cancel(store, aid):
@@ -155,6 +238,54 @@ def create_due_work_orders(agreements, orders, records=None, today=None):
             have.add(key)
             created.append(wo_id)
     return created
+
+
+STATES = ("done", "open", "due", "upcoming")
+STATE_TEXT = {"done": "Done", "open": "Work order open",
+              "due": "Due - no work order yet", "upcoming": "Upcoming"}
+
+
+def visit_calendar(store, orders, since, until, today=None):
+    """Every planned visit between since and until (ISO dates, inclusive)
+    across the active agreements, for the visit calendar (Nov 5).
+
+    Each visit: date (the work order's scheduled date when it has one,
+    else the planned date), planned, agreement id / number, customer,
+    site, state, work order id and number. state is "done" (its work order
+    is closed), "open" (a work order is open), "due" (no work order and the
+    date has come) or "upcoming"."""
+    today = today or dt.date.today()
+    if isinstance(today, str):
+        today = dt.date.fromisoformat(today)
+    by_visit = {(wo.get("agreement_id"), wo.get("pm_visit")): wo
+                for wo in orders.get("orders") or [] if wo.get("pm_visit")}
+    out = []
+    for agr in store.get("agreements", []):
+        if agr.get("status") == "cancelled":
+            continue
+        for d in visit_dates(agr):
+            wo = by_visit.get((agr["id"], d.isoformat()))
+            when = str((wo or {}).get("scheduled") or d.isoformat())[:10]
+            if when < since or when > until:
+                continue
+            if wo is not None:
+                state = "done" if wo.get("status") == "closed" else "open"
+            else:
+                state = "due" if d <= today else "upcoming"
+            out.append({"date": when, "planned": d.isoformat(),
+                        "agreement_id": agr["id"], "number": agr["number"],
+                        "customer": agr["customer"], "site": agr["site"],
+                        "state": state,
+                        "work_order_id": (wo or {}).get("id", ""),
+                        "work_order": (wo or {}).get("number", "")})
+    out.sort(key=lambda v: (v["date"], v["customer"].lower(), v["number"]))
+    return out
+
+
+def month_range(year, month):
+    first = dt.date(int(year), int(month), 1)
+    nxt = dt.date(first.year + (first.month == 12), first.month % 12 + 1, 1)
+    return first.isoformat(), (nxt - dt.timedelta(days=1)).isoformat()
 
 
 def renewal_warnings(store, today=None):

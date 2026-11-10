@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QDialog,
                                QTabWidget, QVBoxLayout, QWidget)
 
 from . import locfactors, pricedb
+from .dmoney import c2 as _c2
 
 COLS = ["Region", "State", "Cities", "ZIP prefixes / ZIPs", "Materials",
         "Labor", "Equipment", "Source note", "From"]
@@ -113,7 +114,7 @@ class LocationFactorsWidget(QWidget):
                 if k in locfactors.KINDS:
                     try:
                         f = float(val)
-                        val = f"{f:.2f}" if abs(round(f, 2) - f) < 1e-9 \
+                        val = f"{_c2(f):.2f}" if abs(_c2(f) - f) < 1e-9 \
                             else f"{f:.4f}".rstrip("0")
                     except (TypeError, ValueError):
                         val = ""

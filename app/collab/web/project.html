@@ -83,11 +83,11 @@ const COLORS = {"Closed":"good","Approved":"good","Submitted":"good","Ready for 
   "Open":"acc","Initiated":"acc","Work Required":"warn","Not Accepted":"bad","Draft":"mut"};
 function toast(t){const e=$("#toast");e.textContent=t;e.style.display="block";clearTimeout(e._t);e._t=setTimeout(()=>e.style.display="none",3500);}
 function wsUrl(){
-  const p = new URLSearchParams(location.search);
-  if (p.get("ws")) return p.get("ws");
-  const sec = location.protocol === "https:";
+  // Nov 6 security fix: the socket address comes only from the page's own
+  // host. A "ws" value in the link is ignored - it could send logins,
+  // signatures or bids to someone else's server.
   if (location.port === "8766") return `ws://${location.hostname}:8765`;
-  return `${sec ? "wss" : "ws"}://${location.host}/`;
+  return `${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/`;
 }
 function connect(){
   return new Promise((ok, bad) => {
@@ -129,7 +129,30 @@ async function put(coll, rec, base){
 function list(coll){ return Object.values(DB.records[coll] || {}).filter(r => !r._deleted).sort((a,b) => (b._n||0)-(a._n||0)); }
 function isMe(who){ return S.user && who && who.toLowerCase().includes(S.user.toLowerCase().split(" ")[0]); }
 function pill(st){ return st ? `<span class="pill ${COLORS[st]||"mut"}">${esc(st)}</span>` : ""; }
-function photoUrl(ref){ return `/hub/att/${encodeURIComponent(S.project)}/${ref.sha256}?k=${encodeURIComponent(S.key)}`; }
+// Attachments: the session key goes in an Authorization header, never in
+// the address (it would land in history, logs and Referer). Images and
+// links are filled in from blob: URLs after the page is drawn.
+const ATT = {};
+function photoPath(ref){ return `/hub/att/${encodeURIComponent(S.project)}/${ref.sha256}`; }
+function photoAttr(ref){ return `data-att="${esc(ref.sha256)}"`; }
+async function attBlob(sha){
+  if (!/^[0-9a-f]{64}$/.test(sha)) throw new Error("bad attachment");
+  if (!ATT[sha]) ATT[sha] = fetch(photoPath({sha256: sha}), {
+      headers: {"Authorization": "Bearer " + S.key}, cache: "no-store",
+      credentials: "omit", referrerPolicy: "no-referrer"})
+    .then(r => { if (!r.ok) throw new Error("not allowed"); return r.blob(); })
+    .then(b => URL.createObjectURL(b))
+    .catch(e => { delete ATT[sha]; throw e; });
+  return ATT[sha];
+}
+function fillAtt(root){
+  (root || document).querySelectorAll("[data-att]").forEach(el => {
+    const sha = el.getAttribute("data-att");
+    attBlob(sha).then(u => { if (el.tagName === "A") el.href = u; else el.src = u; })
+      .catch(() => { el.title = "Couldn't load this photo"; });
+  });
+}
+function dropAtt(){ for (const k in ATT) { Promise.resolve(ATT[k]).then(u => URL.revokeObjectURL(u)).catch(() => {}); delete ATT[k]; } }
 function fmtDate(d){ if(!d) return ""; const x=new Date(d+"T12:00"); return x.toLocaleDateString(undefined,{month:"short",day:"numeric"}); }
 async function shrink(file){
   const img = await createImageBitmap(file); const max = 1600;
@@ -175,7 +198,7 @@ function login(err){
     } catch (e) { login(e.message); }
   };
 }
-function logout(){ try { navigator.serviceWorker && navigator.serviceWorker.controller && navigator.serviceWorker.controller.postMessage({type: "logout"}); } catch (e) {} delete S.key; localStorage.setItem("quantisheet.field", JSON.stringify(S)); login("Please sign in again."); }
+function logout(){ dropAtt(); try { navigator.serviceWorker && navigator.serviceWorker.controller && navigator.serviceWorker.controller.postMessage({type: "logout"}); } catch (e) {} delete S.key; localStorage.setItem("quantisheet.field", JSON.stringify(S)); login("Please sign in again."); }
 async function start(){
   $("#title").textContent = S.project; $("#nav").style.display = "flex";
   Object.assign(DB, JSON.parse(localStorage.getItem("quantisheet.cache."+S.project) || '{"records":{},"seq":0}'));
@@ -227,10 +250,11 @@ document.querySelectorAll("nav button").forEach(b => b.classList.toggle("on", b.
   const chips = ["Open","Mine","Closed","All"].map(c => `<button class="chip ${c===filter?"on":""}" data-f="${c}">${c}</button>`).join("");
   $("#main").innerHTML = `<div class="chips">${chips}</div>` + (recs.length ? recs.map(r => {
       const ph = (r.photos||[])[0];
-      return `<div class="card item" data-id="${r._id}">${ph ? `<img class="thumb" loading="lazy" src="${photoUrl(ph)}">` : ""}
+      return `<div class="card item" data-id="${r._id}">${ph ? `<img class="thumb" alt="" ${photoAttr(ph)}>` : ""}
       <div class="t"><b>${esc(r[t.title])}</b><small>${esc(r._no)} · ${esc(r.location || r.to || "")}${r.due ? " · due "+fmtDate(r.due) : ""}</small></div>${pill(r.status)}</div>`;
     }).join("") : `<div class="empty">Nothing here. Tap + to add one.</div>`) +
     `<button class="fab" id="add">+</button>`;
+  fillAtt($("#main"));
   document.querySelectorAll(".chip").forEach(b => b.onclick = () => { filter = b.dataset.f; show(); });
   document.querySelectorAll(".item").forEach(e => e.onclick = () => detail(tab, e.dataset.id));
   $("#add").onclick = () => edit(tab);
@@ -252,7 +276,7 @@ function edit(coll, rec){
     <label>Photos</label><div class="photos" id="ph"></div>
     <button class="ghost" id="cam">📷 Take or add photos</button><input type="file" id="file" accept="image/*" capture="environment" multiple hidden>
     <button class="big" id="save">${rec._id ? "Save" : "Add"}</button></div>`;
-  const drawPh = () => $("#ph").innerHTML = photos.map(p => `<img src="${photoUrl(p)}">`).join("");
+  const drawPh = () => { $("#ph").innerHTML = photos.map(p => `<img alt="" ${photoAttr(p)}>`).join(""); fillAtt($("#ph")); };
   drawPh();
   $("#bk").onclick = () => rec._id ? detail(coll, rec._id) : show();
   $("#cam").onclick = () => $("#file").click();
@@ -288,12 +312,13 @@ function detail(coll, id){
     ${r.question ? `<div style="margin-top:8px"><span class="meta">Question</span><br>${esc(r.question)}</div>` : ""}
     ${r.answer ? `<div style="margin-top:8px"><span class="meta">Answer</span><br><b>${esc(r.answer)}</b></div>` : ""}
     ${r.description ? `<div style="margin-top:8px">${esc(r.description)}</div>` : ""}
-    <div class="photos">${(r.photos||[]).map(p => `<a href="${photoUrl(p)}" target="_blank"><img src="${photoUrl(p)}"></a>`).join("")}</div>
+    <div class="photos">${(r.photos||[]).map(p => `<a ${photoAttr(p)} target="_blank" rel="noopener noreferrer"><img alt="" ${photoAttr(p)}></a>`).join("")}</div>
    </div>
    ${acts.map(a => `<button class="big" data-st="${a[0]}">${a[1]}</button>`).join("")}
    <button class="ghost" id="ed">Edit / add photos</button>
    <label>Comments</label>${hist || '<p class="meta">No comments yet.</p>'}
    <div class="row" style="margin-top:8px"><input id="cm" placeholder="Add a comment"><button class="chip" id="post" style="flex:0 0 auto">Post</button></div></div>`;
+  fillAtt($("#main"));
   $("#bk").onclick = show; $("#ed").onclick = () => edit(coll, r);
   document.querySelectorAll("[data-st]").forEach(b => b.onclick = async () => {
     try { await put(coll, {_id: r._id, status: b.dataset.st}, r._rev); toast("Updated"); detail(coll, r._id); } catch (x) { toast(x.message); } });
@@ -318,7 +343,7 @@ function daily(){
    <label>Photos</label><div class="photos" id="ph"></div>
    <button class="ghost" id="cam">📷 Add photos</button><input type="file" id="file" accept="image/*" capture="environment" multiple hidden>
    <button class="big" id="save">Save log</button></div>`;
-  const drawPh = () => $("#ph").innerHTML = photos.map(p => `<img src="${photoUrl(p)}">`).join(""); drawPh();
+  const drawPh = () => { $("#ph").innerHTML = photos.map(p => `<img alt="" ${photoAttr(p)}>`).join(""); fillAtt($("#ph")); }; drawPh();
   $("#addrow").onclick = () => { $("#mp").insertAdjacentHTML("beforeend", `<div class="row" style="margin-top:6px"><input class="mc" placeholder="Company"><input class="mw" type="number" inputmode="numeric" placeholder="Crew" style="flex:0 0 90px"><input class="mh" type="number" inputmode="decimal" placeholder="Hrs" style="flex:0 0 70px"></div>`); };
   $("#cam").onclick = () => $("#file").click();
   $("#file").onchange = async e => { try { photos = photos.concat(await uploadPhotos(e.target)); drawPh(); } catch (x) { toast(x.message); } };

@@ -8,6 +8,7 @@ from PySide6.QtWidgets import (
 )
 
 from . import acrobat2
+from .dmoney import c2 as _c2
 
 
 class PropertiesDialog(QDialog):
@@ -22,7 +23,7 @@ class PropertiesDialog(QDialog):
             self.edits[k] = e
             form.addRow(k.title(), e)
         info = (f"Pages: {doc.page_count}    Size of page 1: "
-                f"{doc[0].rect.width / 72:.2f} × {doc[0].rect.height / 72:.2f}"
+                f"{_c2(doc[0].rect.width / 72):.2f} × {_c2(doc[0].rect.height / 72):.2f}"
                 f" in    Encrypted: {'yes' if meta.get('encryption') else 'no'}"
                 f"    Format: {meta.get('format', '')}")
         form.addRow(QLabel(f"<small>{info}</small>"))

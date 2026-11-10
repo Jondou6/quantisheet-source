@@ -9,6 +9,7 @@ same scale to more of the set.
 
 Nothing here changes the drawing; the caller shows the warning."""
 import re
+from .dmoney import c2 as _c2
 
 # sheet sizes in inches (short side, long side)
 SHEETS = {
@@ -35,7 +36,7 @@ def size_in(page):
     """(short, long) side of the page in inches."""
     r = page.rect
     a, b = sorted((r.width / 72.0, r.height / 72.0))
-    return round(a, 2), round(b, 2)
+    return _c2(a), _c2(b)
 
 
 def sheet_name(page):

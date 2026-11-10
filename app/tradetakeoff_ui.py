@@ -22,6 +22,7 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog,
                                QWidget)
 
 from . import annotate, tradetakeoff as tt
+from .dmoney import c2 as _c2
 
 
 def _num(v, d=1):
@@ -577,7 +578,7 @@ class RoofTab(_Tab):
                 "opacity": 0.25,
                 "label": f"{_num(d['sloped'], 0)} {unit} sloped "
                          f"({d['pitch']:g}:12)",
-                "measure": {"type": "area", "value": round(d["sloped"], 2),
+                "measure": {"type": "area", "value": _c2(d["sloped"]),
                             "unit": unit, "group": grp,
                             "method": "roof pitch"}}))
             marks.append((self.view.page, "delete_annot", dict(it["ref"])))
@@ -798,7 +799,7 @@ class EarthTab(_Tab):
                 "pts": [list(p) for p in self.bnd], "color": list(col),
                 "fill": list(col), "opacity": 0.12,
                 "label": f"{grp}: {_num(val)} CY",
-                "measure": {"type": "volume", "value": round(val, 2),
+                "measure": {"type": "volume", "value": _c2(val),
                             "unit": "cu yd", "group": grp,
                             "method": "cut fill"}}))
         return self.apply(marks, "earthwork")
@@ -919,7 +920,7 @@ class CheckTakeoffDialog(QDialog):
         conf = f" · confidence {r['confidence']:.0%}" \
             if isinstance(r.get("confidence"), (int, float)) else ""
         self.title.setText(f"{r['group'] or 'Measurement'}: "
-                           f"{r['value']:,.2f} {r['unit']}")
+                           f"{_c2(r['value']):,.2f} {r['unit']}")
         self.detail.setText(f"Sheet {r['sheet'] or r['page'] + 1} · "
                             f"{r['method']}{conf} · {r['author']}")
         self._zoom(r)

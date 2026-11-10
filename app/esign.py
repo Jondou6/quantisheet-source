@@ -27,6 +27,7 @@ import os
 import fitz
 
 from . import annotate, settings
+from .dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 SUBJECT = "Sign Here"
@@ -74,7 +75,7 @@ def fields(doc):
             bw = ((a.border or {}).get("width") or 0) / 2
             r = fitz.Rect(a.rect) + (bw, bw, -bw, -bw)   # the drawn box
             out.append({"id": f"f{len(out) + 1}", "page": pno,
-                        "rect": [round(v, 2) for v in r],
+                        "rect": [_c2(v) for v in r],
                         "kind": kind, "signer": signer, "required": req,
                         "label": a.info.get("content") or "",
                         "xref": a.xref})

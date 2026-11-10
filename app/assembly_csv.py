@@ -82,6 +82,81 @@ def _sub(expr, var, repl):
     return re.sub(rf"(?<![\w.]){re.escape(var)}(?![\w(])", repl, expr)
 
 
+_SQUARED = re.compile(r"\(\s*Count\s*\*\s*\(\s*Count\s*\*\s*"
+                      r"([A-Za-z_]\w*)\s*\)\s*\)", re.I)
+
+
+# parts written by this parse (or by the assembly editor) carry "fv": 2;
+# a catalog part without it was saved by the version that put the driver
+# in twice, and only those are repaired (Chief's re-test, Nov 7: a custom
+# (Count*(Count*T)) written on purpose was being rewritten)
+FORMULA_VERSION = 2
+
+
+def qty_for(assembly, part):
+    """The quantity formula to evaluate for `part` - as stored. Old saved
+    formulas are put right once, by migrate(), when they're read."""
+    return part.get("qty")
+
+
+_BAD = {}
+
+
+def _bad_map():
+    """{(assembly, part): (what the bad parse saved, the right formula)}
+    for every catalog part the bad parse got wrong."""
+    if "map" not in _BAD:
+        out = {}
+        try:
+            good, _p = parse(CATALOG)
+            bad, _p = parse(CATALOG, _buggy=True)
+            gq = {(a["name"], p["name"]): p["qty"] for a in good
+                  for p in a["parts"]}
+            for a in bad:
+                for p in a["parts"]:
+                    k = (a["name"], p["name"])
+                    if k in gq and gq[k] != p["qty"]:
+                        out[k] = (p["qty"], gq[k])
+        except Exception:                                 # noqa: BLE001
+            pass
+        _BAD["map"] = out
+    return _BAD["map"]
+
+
+def migrate(assembly):
+    """Once, when a saved assembly is read: a catalog part with no formula
+    version whose formula is exactly what the bad parse saved for that
+    part gets the right formula; every unversioned part is then marked
+    version 2 so it is never touched again - a formula written that way on
+    purpose, which the bad parse never produced, stays as written
+    (Chief's re-tests, Nov 7). Returns how many formulas were put right."""
+    if not isinstance(assembly, dict) or assembly.get("source") != "catalog":
+        return 0
+    fixed = 0
+    bad = None
+    for p in assembly.get("parts") or []:
+        if "fv" in p:
+            continue
+        if bad is None:
+            bad = _bad_map()
+        hit = bad.get((assembly.get("name"), p.get("name")))
+        if hit and p.get("qty") == hit[0]:
+            p["qty"] = hit[1]
+            fixed += 1
+        p["fv"] = FORMULA_VERSION
+    return fixed
+
+
+def repair_qty(expr):
+    """A formula saved before the Nov 7 fix with the driver substituted
+    twice - (Count*(Count*T)) - back to (Count*T). Anything else is
+    returned unchanged. Use qty_for(), which applies it only to the
+    catalog parts saved by that version."""
+    if not isinstance(expr, str) or "count" not in expr.lower():
+        return expr
+    return _SQUARED.sub(lambda m: f"(Count*{m.group(1)})", expr)
+
+
 def _num(v, default=0.0):
     try:
         return float(str(v).replace("%", "").strip() or default)
@@ -89,9 +164,10 @@ def _num(v, default=0.0):
         return default
 
 
-def parse(path_or_rows):
+def parse(path_or_rows, _buggy=False):
     """Assemblies from a CSV file (or a list of row dicts). Returns
-    (assemblies, problems)."""
+    (assemblies, problems). `_buggy` reproduces the parse that put a
+    counted driver in twice - only to recognise what it saved."""
     from . import assemblies as asm_mod, csi, safecell
     if isinstance(path_or_rows, str):
         from .textio import open_csv
@@ -156,10 +232,12 @@ def parse(path_or_rows):
             desc = r.get("Item_Description") or "Item"
             calc = r.get("Calculation") or "0"
             if (r.get("Calc_Method") or "Factor").lower().startswith("form"):
-                expr = calc
-                for v in [var] + list(props):
-                    if v == var:
-                        expr = _sub(expr, v, drv)
+                # once: a counted driver (T, K, W...) is also a property,
+                # and a second pass put Count in twice - Count*(Count*T)
+                # (Chief's estimator test, Nov 7)
+                expr = _sub(calc, var, drv)
+                if _buggy and var in props:
+                    expr = _sub(expr, var, drv)
             else:
                 f = _num(calc, 0.0)
                 expr = drv if f == 1 else f"{drv}*{f:g}"
@@ -169,7 +247,7 @@ def parse(path_or_rows):
             ctype = (r.get("Cost_Type") or "Material").strip()
             iunit = (r.get("Item_Unit") or "ea").strip()
             part = {"name": desc, "unit": iunit.lower(), "qty": expr,
-                    "cost": 0.0,
+                    "fv": FORMULA_VERSION, "cost": 0.0,
                     "labor": 1.0 if ctype.lower() == "labor" and
                     iunit.upper() in ("HR", "HRS", "MH") else 0.0,
                     "code": f"{aid}.{r.get('Item_Seq') or len(a['parts']) + 1}",

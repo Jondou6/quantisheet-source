@@ -20,6 +20,8 @@ def test_every_window_is_listed_once():
     assert labels == [
         "Service Work Order…",
         "Service Agreements…",
+        "Maintenance Checklist…",
+        "Agreement Visit Calendar…",
         "Refrigerant Log…",
         "Backflow Test Report…",
         "Flat-Rate Pricebook…",
@@ -28,6 +30,13 @@ def test_every_window_is_listed_once():
         "T&M Tag…",
         "Build-to-Service Handover…",
         "Dispatch Board…",
+        "Customer History…",
+        "Good / Better / Best Quotes…",
+        "Tune-up Planner…",
+        "Warranty Registrations…",
+        "Changeout Proposal…",
+        "Load Report…",
+        "Service Settings…",
     ]
     assert len(labels) == len(set(labels))
     for entry in ENTRIES:

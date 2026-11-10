@@ -75,7 +75,9 @@ def add_task(store, name, customer_price, member_price, code="", hours="0",
             "id": files.new_id(), "code": files.txt(code, 40), "name": name,
             "description": files.txt(description, 1000),
             "customer_price": files.money(customer_price, "Customer price"),
-            "member_price": files.money(member_price, "Member price"),
+            "member_price": files.money(member_price, "Member price")
+            if str(member_price or "").strip() else _member_default(
+                customer_price),
             "hours": hours_s,
             "labor_cost": files.money(labor_cost, "Labor cost per hour"),
             "parts": _parts(parts), "tier": tier,
@@ -84,6 +86,15 @@ def add_task(store, name, customer_price, member_price, code="", hours="0",
         raise PriceError(str(e)) from e
     store["tasks"].append(row)
     return row["id"]
+
+
+def _member_default(customer_price):
+    """No member price given: the customer price less the member discount
+    (service_member_discount_pct, 10% to start - Jon, Nov 5)."""
+    from . import agreements
+    pct = dmoney.D(agreements.defaults()["discount_pct"])
+    return dmoney.text(dmoney.cents(dmoney.D(files.money(
+        customer_price, "Customer price")) * (100 - pct) / 100))
 
 
 def task_cost(task):

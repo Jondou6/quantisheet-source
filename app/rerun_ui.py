@@ -9,6 +9,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (QDialog, QDialogButtonBox, QHBoxLayout,
                                QLabel, QListWidget, QListWidgetItem,
                                QPushButton, QVBoxLayout)
+from .dmoney import c2 as _c2
 
 STATUS = {"accepted": "accepted", "pending": "AI, not checked",
           "manual": "measured by hand"}
@@ -18,7 +19,7 @@ def _line(mark):
     p, kind, pl = mark
     m = pl.get("measure") or {}
     v = m.get("value")
-    q = f"{v:,.2f}".rstrip("0").rstrip(".") if isinstance(
+    q = f"{_c2(v):,.2f}".rstrip("0").rstrip(".") if isinstance(
         v, (int, float)) else ""
     return (f"p{p + 1} · {m.get('group') or kind} · {q} "
             f"{m.get('unit') or ''}").strip()

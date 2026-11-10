@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (
 
 from . import theme as _theme
 from . import leveling
+from .dmoney import c2 as _c2
 
 COLORS = {"omit": QColor(255, 205, 205), "incl": QColor(225, 235, 255),
           "carry": QColor(255, 225, 170), "buyin": QColor(200, 230, 255),
@@ -238,7 +239,7 @@ class LevelingDialog(QDialog):
             return []
         if accept is None:
             lines = [f"{x['bidder']}: {x['item']} {x['qty']:g} {x['unit']} "
-                     f"x ${x['unit_price']:,.2f} = ${x['amount']:,.2f} "
+                     f"x ${_c2(x['unit_price']):,.2f} = ${_c2(x['amount']):,.2f} "
                      f"({x['source']})" for x in sug[:25]]
             accept = QMessageBox.question(
                 self, "Suggest Plugs", f"Add these {len(sug)} plug(s)?\n\n"
@@ -299,7 +300,7 @@ class LevelingDialog(QDialog):
         m.setRowCount(len(res["items"]))
         for r, it in enumerate(res["items"]):
             for c, v in enumerate((it.desc, it.unit, f"{it.qty:g}",
-                                   f"{it.median:,.2f}", f"{it.spread:.0f}")):
+                                   f"{_c2(it.median):,.2f}", f"{it.spread:.0f}")):
                 m.setItem(r, c, _it(v, c >= 2))
             for k, bd in enumerate(b):
                 text, mark = leveling.cell(res, it, bd)
@@ -314,7 +315,7 @@ class LevelingDialog(QDialog):
         for r, it in enumerate(res["gaps"]):
             om = [x for x in b if x not in it.prices and x not in it.included]
             for c, v in enumerate((it.desc, it.unit, f"{it.qty:g}",
-                                   f"{it.median:,.2f}", ", ".join(om),
+                                   f"{_c2(it.median):,.2f}", ", ".join(om),
                                    f"${it.median * it.qty:,.0f}")):
                 g.setItem(r, c, _it(v, c in (2, 3, 5)))
 
@@ -324,7 +325,7 @@ class LevelingDialog(QDialog):
             amt = leveling._num(p.get("amount"))
             for c, v in enumerate((p.get("bidder", ""), p.get("item", ""),
                                    p.get("kind", ""),
-                                   "" if amt is None else f"{amt:,.2f}",
+                                   "" if amt is None else f"{_c2(amt):,.2f}",
                                    p.get("note", ""))):
                 pt.setItem(r, c, _it(v, c == 3))
 

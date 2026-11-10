@@ -123,8 +123,19 @@ def job3(office):
 
 @pytest.fixture
 def qapp():
+    """The app, and after the test every window it opened is closed and
+    deleted while the office it shows is still open (Nov 5: pages left
+    alive until interpreter exit crashed the run on Windows)."""
+    from PySide6.QtCore import QCoreApplication, QEvent
     from PySide6.QtWidgets import QApplication
-    return QApplication.instance() or QApplication([])
+    app = QApplication.instance() or QApplication([])
+    before = {id(w) for w in app.topLevelWidgets()}
+    yield app
+    for w in app.topLevelWidgets():
+        if id(w) not in before:
+            w.close()
+            w.deleteLater()
+    QCoreApplication.sendPostedEvents(None, QEvent.DeferredDelete)
 
 
 @pytest.fixture

@@ -150,28 +150,32 @@ def ocr_page_words(page, dpi=None, language="eng", workers=None,
     ov = TILE_OVERLAP / zoom
     R = page.rect
     jobs = []
-    tmpdir = tempfile.mkdtemp(prefix="pdfs_ocr_")
-    y = R.y0
-    k = 0
-    while y < R.y1 - 1:
-        x = R.x0
-        while x < R.x1 - 1:
-            core = fitz.Rect(x, y, min(x + tile, R.x1), min(y + tile, R.y1))
-            clip = fitz.Rect(core.x0 - ov, core.y0 - ov, core.x1 + ov,
-                             core.y1 + ov) & R
-            pix = page.get_pixmap(matrix=fitz.Matrix(zoom, zoom), clip=clip,
-                                  colorspace=fitz.csGRAY, alpha=False,
-                                  annots=False)
-            png = os.path.join(tmpdir, f"t{k}.png")
-            pix.save(png)
-            del pix
-            jobs.append((png, clip, core))
-            k += 1
-            x += tile
-        y += tile
-    workers = workers or max(1, min(4, (os.cpu_count() or 2)))
     out = []
+    tmpdir = tempfile.mkdtemp(prefix="pdfs_ocr_")
+    # the tiles are drawn inside the try, so a failure part-way through
+    # never leaves pictures and the folder behind in TEMP (outside review
+    # via Chief, Nov 7 - M9)
     try:
+        y = R.y0
+        k = 0
+        while y < R.y1 - 1:
+            x = R.x0
+            while x < R.x1 - 1:
+                core = fitz.Rect(x, y, min(x + tile, R.x1),
+                                 min(y + tile, R.y1))
+                clip = fitz.Rect(core.x0 - ov, core.y0 - ov, core.x1 + ov,
+                                 core.y1 + ov) & R
+                pix = page.get_pixmap(matrix=fitz.Matrix(zoom, zoom),
+                                      clip=clip, colorspace=fitz.csGRAY,
+                                      alpha=False, annots=False)
+                png = os.path.join(tmpdir, f"t{k}.png")
+                pix.save(png)
+                del pix
+                jobs.append((png, clip, core))
+                k += 1
+                x += tile
+            y += tile
+        workers = workers or max(1, min(4, (os.cpu_count() or 2)))
         with ThreadPoolExecutor(workers) as ex:
             results = list(ex.map(lambda j: _tess_tile(exe, j[0], language,
                                                        tess), jobs))
@@ -185,15 +189,8 @@ def ocr_page_words(page, dpi=None, language="eng", workers=None,
                 if core.contains(c):            # overlap: keep once
                     out.append((r, text))
     finally:
-        for png, _, _ in jobs:
-            try:
-                os.remove(png)
-            except OSError:
-                pass
-        try:
-            os.rmdir(tmpdir)
-        except OSError:
-            pass
+        import shutil
+        shutil.rmtree(tmpdir, ignore_errors=True)
     return out
 
 
@@ -461,8 +458,13 @@ def _xlsx_sheet(rows):
         for c, value in enumerate(row):
             ref = f"{_col(c)}{r}"
             v = str(value or "").strip()
+            if len(v) > 32767:     # Excel's cell limit (L5)
+                v = v[:32700] + " … (cut: Excel holds 32,767 characters)"
             num = v.replace(",", "").replace("$", "")
-            if re.fullmatch(r"-?\d+(\.\d+)?", num):
+            # 00101, 081113: codes, not numbers - the leading zeros stay
+            # (outside review via Chief, Nov 7 - M8)
+            if re.fullmatch(r"-?\d+(\.\d+)?", num) and \
+                    not re.match(r"^-?0\d", num):
                 xml.append(f'<c r="{ref}"><v>{num}</v></c>')
             elif v:
                 xml.append(f'<c r="{ref}" t="inlineStr"><is><t xml:space='
@@ -548,8 +550,17 @@ IMAGE_EXT = (".png", ".jpg", ".jpeg", ".bmp", ".gif", ".tif", ".tiff")
 
 def combine(paths, bookmarks=True):
     """A new document made of the given PDFs and images, in order, with a
-    bookmark for each file."""
+    bookmark for each file. On any failure the half-made document is
+    closed too (outside review, Nov 7)."""
     out = fitz.open()
+    try:
+        return _combine_into(out, paths, bookmarks)
+    except BaseException:
+        out.close()
+        raise
+
+
+def _combine_into(out, paths, bookmarks):
     toc = []
     for path in paths:
         start = out.page_count
@@ -561,15 +572,16 @@ def combine(paths, bookmarks=True):
             page.insert_image(page.rect, filename=path)
         else:
             src = fitz.open(path)
-            if src.needs_pass:
+            try:                   # closed even when a step fails (H6)
+                if src.needs_pass:
+                    raise ValueError(f"{os.path.basename(path)} is "
+                                     "password-protected.")
+                out.insert_pdf(src)
+                from . import jobdata         # scales, prices, assemblies
+                jobdata.copy_job(src, out, {k: start + k
+                                            for k in range(src.page_count)})
+            finally:
                 src.close()
-                raise ValueError(f"{os.path.basename(path)} is "
-                                 "password-protected.")
-            out.insert_pdf(src)
-            from . import jobdata             # scales, prices, assemblies
-            jobdata.copy_job(src, out, {k: start + k
-                                        for k in range(src.page_count)})
-            src.close()
         if bookmarks and out.page_count > start:
             toc.append([1, os.path.splitext(os.path.basename(path))[0],
                         start + 1])
@@ -661,9 +673,26 @@ PATTERNS = {
 }
 
 
+def luhn_ok(text):
+    """The card-number check digit (Luhn): 4111 1111 1111 1111 passes,
+    12 34 56 78 90 12 34 doesn't (outside review via Chief, Nov 7 - M10)."""
+    digits = [int(c) for c in str(text) if c.isdigit()]
+    if not 13 <= len(digits) <= 19:
+        return False
+    total = 0
+    for i, d in enumerate(reversed(digits)):
+        if i % 2:
+            d *= 2
+            if d > 9:
+                d -= 9
+        total += d
+    return total % 10 == 0
+
+
 def find_for_redaction(doc, text=None, pattern=None, whole_word=False,
                        case=False):
-    """[(page, op rect)] for every match of plain text or a regex."""
+    """[(page, op rect)] for every match of plain text or a regex. The
+    card-number pattern keeps only numbers that pass the check digit."""
     from . import rules
     hits = []
     if pattern is None and text:
@@ -674,8 +703,9 @@ def find_for_redaction(doc, text=None, pattern=None, whole_word=False,
         return hits
     flags = 0 if case else re.IGNORECASE
     rx = re.compile(pattern, flags)
+    keep = luhn_ok if pattern == PATTERNS["Credit card numbers"] else None
     for pno, page in enumerate(doc):
-        for r in rules.search_regex(page, rx):
+        for r in rules.search_regex(page, rx, keep):
             hits.append((pno, annotate.to_page(page, r)))
     return hits
 
@@ -788,18 +818,81 @@ def baseline_size(doc, path=None, edited=False):
     return len(doc.tobytes(garbage=1, deflate=True))
 
 
-def reduce_size(doc, path, image_dpi=150, original=None, min_gain=MIN_GAIN):
+def reduce_size(doc, path, image_dpi=150, original=None, min_gain=MIN_GAIN,
+                in_place=False, password=None):
     """Save a smaller copy: downsample big images, compress, clean up.
 
     The copy is written to a temporary file first and kept only when it
     is smaller than `original` bytes (by `min_gain`); otherwise the
     temporary file is deleted, nothing is written at `path` and NotSmaller
     is raised. `original` None: the size of the file `doc` was opened from
-    (no check for a document that has no file). Returns the new size."""
+    (no check for a document that has no file). Returns the new size.
+
+    The result always goes to `path`. `in_place` says where the work is
+    done: True - in `doc` itself (its images are downsampled), for a
+    caller that hands over a throwaway copy, as the main window does;
+    False (the default) - in a temporary copy, so `doc` is never changed.
+    A password-protected document's copy keeps its passwords and
+    permissions and is unlocked with `password` when it has an open
+    password. When that copy can't be made or unlocked, nothing is
+    written and safeio.UnprotectedCopyError says why - the document is
+    never saved in place (Chief's round 4, Nov 7; Venice, Nov 9 - F1).
+    In the app, nothing passes `password` today: a file with an open
+    password can't be opened in a batch without it, and the main window
+    reduces its own throwaway copy. A protected file whose copy can't be
+    made is therefore left out of a batch (it used to come out compressed
+    but with its images untouched)."""
     if original is None:
         name = getattr(doc, "name", "") or ""
         if name and os.path.isfile(name) and not doc.is_dirty:
             original = os.path.getsize(name)
+    if in_place:
+        return _reduce(doc, path, image_dpi, original, min_gain)
+    import tempfile
+    caller = doc
+    work = None
+    copy = None
+    try:
+        # through a temp file, not an in-memory copy: a 687-page book
+        # held twice in memory was rough on a small laptop (N4)
+        fd, work = tempfile.mkstemp(suffix=".pdf", prefix="qs-reduce-")
+        os.close(fd)
+        # a failure to write the copy (disk full, no permission) is
+        # reported as itself; only reopening the protected copy is
+        # translated (Venice, Nov 9 - N8)
+        if safeio.is_encrypted(caller):
+            caller.save(work, garbage=0, encryption=safeio._keep())
+        else:
+            caller.save(work, garbage=0)
+        try:
+            copy = fitz.open(work)
+        except (RuntimeError, ValueError) as e:
+            if not safeio.is_encrypted(caller):
+                raise
+            raise safeio.UnprotectedCopyError(
+                "This password-protected PDF couldn't be copied to reduce "
+                f"it ({e}), so nothing was written and the original is "
+                "unchanged.") from e
+        if copy.needs_pass and not (password and
+                                    copy.authenticate(password)):
+            raise safeio.UnprotectedCopyError(
+                "This PDF has an open password, so it can't be reduced "
+                "without it. Nothing was written and the original is "
+                "unchanged.")
+        return _reduce(copy, path, image_dpi, original, min_gain)
+    finally:
+        if copy is not None:
+            copy.close()
+        if work is not None:
+            try:
+                os.remove(work)
+            except OSError:
+                import logging
+                logging.getLogger(__name__).warning(
+                    "could not remove the temp file %s", work)
+
+
+def _reduce(doc, path, image_dpi, original, min_gain):
     try:
         doc.rewrite_images(dpi_threshold=image_dpi + 50, dpi_target=image_dpi,
                            quality=80, lossy=True, lossless=True, bitonal=True,

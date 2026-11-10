@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (QComboBox, QDialog, QDialogButtonBox,
                                QWidget, QAbstractItemView)
 
 from . import annotate, estimate, roof, settings
+from .dmoney import c2 as _c2
 
 WASTE = {"Simple": 10, "Moderate": 12, "Complex": 15}
 
@@ -188,9 +189,9 @@ class TagTab(QWidget):
             plan = it.get("plan_value", it["value"])
             true = "" if not r else (
                 roof.CHECK if it.get("check") else
-                f"{it['value']:,.2f} {it['unit']}")
+                f"{_c2(it['value']):,.2f} {it['unit']}")
             cells = [it["group"] or it["label"] or it["type"].title(),
-                     it["type"].title(), f"{plan:,.2f} {it['unit']}",
+                     it["type"].title(), f"{_c2(plan):,.2f} {it['unit']}",
                      roof.NAMES.get(r.get("type"), "") if r else "",
                      roof.pitch_text(r) if r else "", true]
             n = self.table.rowCount()
@@ -308,7 +309,7 @@ class SummaryTab(QWidget):
             for c, x in enumerate(r):
                 if isinstance(x, float):
                     x = f"{x:,.4f}" if roof.HEADERS[c] == "Factor" \
-                        else f"{x:,.2f}"
+                        else f"{_c2(x):,.2f}"
                 self.table.setItem(n, c, QTableWidgetItem(
                     "" if x is None else str(x)))
         return self.rows

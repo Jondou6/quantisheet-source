@@ -24,8 +24,18 @@ def app():
 
 
 def _fits(b):
-    text = b.text().replace("&&", "&")
-    return b.width() >= b.fontMetrics().horizontalAdvance(text) + 8
+    """Wrapped to at most two lines, every word still there, none cut off.
+    Qt turns "&" in an action name into a mnemonic, so "Brick & Block"
+    arrives with the ampersand already removed."""
+    lines = b.wrapped_lines()
+    if not lines or len(lines) > 2:
+        return False
+    plain = b.text().replace("&&", "&")
+    if [w for line in lines for w in line.split()] != plain.split():
+        return False
+    fm = b.fontMetrics()
+    inner = b.width() - 10
+    return all(fm.horizontalAdvance(line) <= inner + 1 for line in lines)
 
 
 def test_whole_labels_with_a_large_font(app):

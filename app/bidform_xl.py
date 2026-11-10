@@ -24,6 +24,7 @@ import datetime
 import os
 import re
 from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
+from .dmoney import c2 as _c2
 
 UNITS = (r"LS|L\.S\.|LUMP\s+SUM|EA|EACH|LF|L\.F\.|SF|S\.F\.|SY|S\.Y\.|CY|"
          r"C\.Y\.|TON|TONS|HR|HRS|GAL|AC|ACRE|VF|VLF|DAY|DAYS|MO|LB|CF|MSF|"
@@ -310,7 +311,7 @@ def totals(book):
 # ---- the calculating PDF ------------------------------------------------------------
 
 def _money(v):
-    return "" if v is None else f"{v:,.2f}"
+    return "" if v is None else f"{_c2(v):,.2f}"
 
 
 def _field(page, name, rect, value="", calc=None, fmt=True, readonly=False):

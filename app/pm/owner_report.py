@@ -29,6 +29,7 @@ import math
 import os
 import re
 from datetime import date, datetime, timedelta
+from ..dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 
@@ -1432,7 +1433,7 @@ def apply_weather_rules(store, rep, days, as_of):
             dd = _day(k)
             d["tracked"] = bool(rain is not None and dd and
                                 dd.weekday() < 5 and
-                                round(rain, 2) >= round(thr, 2))
+                                _c2(rain) >= _c2(thr))
         if lost.get(k, 0) >= ADVERSE_HOURS and not d.get("edited"):
             d["tracked"] = True
         if not by_notice:
@@ -3131,7 +3132,7 @@ def _trial_bytes(store, ph, path, rect, box, preset):
     st = os.stat(path)
     w, h = rect[2] - rect[0], rect[3] - rect[1]
     key = (os.path.abspath(path), st.st_mtime_ns, st.st_size, preset, rot,
-           round(w, 2), round(h, 2), tuple(round(v, 4) for v in box))
+           _c2(w), _c2(h), tuple(round(v, 4) for v in box))
     if key in _trials:
         return _trials[key]
     img = None

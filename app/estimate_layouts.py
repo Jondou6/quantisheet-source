@@ -34,6 +34,7 @@ import logging
 from decimal import Decimal
 
 from . import csi, dmoney, embfiles
+from .dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 
@@ -771,7 +772,7 @@ def cell(row_or_totals, key):
         v = row_or_totals.get(key, "")
         if key == "qty":
             q = dmoney.D(v)
-            return f"{q:,.2f}" if q else ""
+            return f"{_c2(q):,.2f}" if q else ""
         if key == "unit_cost":
             d = dmoney.D(v)
             if not d:

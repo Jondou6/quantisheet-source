@@ -444,6 +444,8 @@ class DirectoryDialog(QDialog):
         v = QVBoxLayout(self)
         self.w = DirectoryWidget(self)
         v.addWidget(self.w)
+        from .closebutton import ensure       # (Chief, Nov 7)
+        self.close_button = ensure(self)
 
 
 class DirectoryPage(QWidget):

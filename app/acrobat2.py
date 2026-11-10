@@ -131,7 +131,8 @@ def text_to_pdf(text):
 
 
 def create_pdf(path):
-    """A new document from any supported file."""
+    """A new document from any supported file. The caller closes it (on
+    Windows an open document keeps its file locked)."""
     ext = os.path.splitext(path)[1].lower()
     if ext == ".pdf":
         return fitz.open(path)
@@ -927,6 +928,7 @@ def run_batch(paths, actions, out_dir, options=None, progress=None):
         out = os.path.join(out_dir, os.path.basename(src))
         if os.path.abspath(out) == os.path.abspath(src):
             out = os.path.splitext(out)[0] + "_processed.pdf"
+        doc = None
         try:
             doc = create_pdf(src)
             if "ocr" in actions and acrobat.pages_needing_ocr(doc):
@@ -954,16 +956,22 @@ def run_batch(paths, actions, out_dir, options=None, progress=None):
                                         original=os.path.getsize(src))
                 except acrobat.NotSmaller as e:
                     if not other:
-                        doc.close()
                         results.append((src, f"SKIPPED: {e}"))
                         continue
-                    safeio.atomic_save(doc, out,
-                                       garbage=safeio.gc_level(doc),
-                                       deflate=True)
+                    # a protected file stays protected: same passwords
+                    # and permissions (Chief's round 5, Nov 9: Watermark +
+                    # Reduce on a protected PDF wrote it unprotected)
+                    safeio.atomic_save_keeping_encryption(
+                        doc, out, garbage=safeio.gc_level(doc), deflate=True)
             else:
-                doc.save(out, garbage=safeio.gc_level(doc), deflate=True)
-            doc.close()
+                safeio.atomic_save_keeping_encryption(
+                    doc, out, garbage=safeio.gc_level(doc), deflate=True)
             results.append((src, out))
         except Exception as e:
             results.append((src, f"ERROR: {e}"))
+        finally:
+            # a file that failed is let go of too, so Windows doesn't keep
+            # it locked (outside review via Chief, Nov 7 - H6)
+            if doc is not None:
+                doc.close()
     return results

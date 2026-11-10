@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (QComboBox, QDialog, QDialogButtonBox,
                                QPushButton)
 
 from . import co_delta
+from .dmoney import c2 as _c2
 
 
 class CODialog(QDialog):
@@ -77,7 +78,7 @@ class CODialog(QDialog):
                                   "Change Order Proposal.pdf")
         co_delta.make_pdf(v.doc, v.page, res, out, sheet=f"page {v.page + 1}")
         self.result.setText(f"{len(res['lines'])} item(s) changed, total "
-                            f"<b>${res['total']:,.2f}</b>" +
+                            f"<b>${_c2(res['total']):,.2f}</b>" +
                             (f"; not priced: {', '.join(res['unpriced'])}"
                              if res["unpriced"] else ""))
         if self.open_result:

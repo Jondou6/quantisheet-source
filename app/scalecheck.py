@@ -19,6 +19,7 @@ The median of measured / printed over the sheet grades it:
 """
 import math
 import re
+from .dmoney import c2 as _c2
 
 MIN_SAMPLES = 4
 _DIM = re.compile(r"^(\d{1,3})'\s*-?\s*(\d{1,2})(?:\s*(\d)/(\d{1,2}))?\"$")
@@ -175,7 +176,7 @@ def grade(page, per_ft, others=()):
     agree = sum(1 for v, m in pts
                 if abs(m - (med * v + b)) <= 0.03 * v + 0.1) / len(pts)
     out["ratio"] = round(med, 4)
-    out["spread"] = round(agree, 2)
+    out["spread"] = _c2(agree)
     med_v = sorted(v for v, _m in pts)[len(pts) // 2]
     if med <= 0.05 or abs(b) > max(1.5, 0.25 * med_v):
         out["ratio"] = None
@@ -209,14 +210,14 @@ def grade(page, per_ft, others=()):
                   + ("" if out["grade"] == "A" else
                      " - check one by hand" if out["grade"] == "B" else
                      f" - the scale looks wrong (true scale about "
-                     f"{per_ft * med:.2f} units per foot)"))
+                     f"{_c2(per_ft * med):.2f} units per foot)"))
     return out
     ratios.sort()
     med = ratios[len(ratios) // 2]
     # agreement: the share of dimensions within 3% of the median
     agree = sum(1 for r in ratios if abs(r / med - 1) <= 0.03) / len(ratios)
     out["ratio"] = round(med, 4)
-    out["spread"] = round(agree, 2)
+    out["spread"] = _c2(agree)
     off = abs(med - 1.0)
     med_v = sorted(v for v, _m in pts)[len(pts) // 2]
     if med <= 0.05 or abs(b) > max(1.5, 0.25 * med_v):
@@ -242,5 +243,5 @@ def grade(page, per_ft, others=()):
                   + ("" if out["grade"] == "A" else
                      " - check one by hand" if out["grade"] == "B" else
                      f" - the scale looks wrong (true scale about "
-                     f"{per_ft * med:.2f} units per foot)"))
+                     f"{_c2(per_ft * med):.2f} units per foot)"))
     return out

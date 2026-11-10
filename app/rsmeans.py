@@ -31,6 +31,7 @@ import os
 import re
 
 from . import assemblies, assembly_csv, costbook, csi, labor
+from .dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 
@@ -168,7 +169,7 @@ def catalog_rows(items, book, labor_factor=LABOR_FACTOR):
                              Cost_Type=ctype, Item_Unit=iunit,
                              Calc_Method="Factor", Calculation=calc,
                              Notes=(f"RSMeans {it['code']}, {it['crew']}; "
-                                    f"national bare ${it['total']:,.2f}/"
+                                    f"national bare ${_c2(it['total']):,.2f}/"
                                     f"{unit}" if seq == 1 else "")))
     return rows
 
@@ -236,7 +237,7 @@ def calibrate(book, items, catalog=None, labor_factor=LABOR_FACTOR,
         theirs = it["m"] + it["e"] + it["l"] / labor_factor
         ratio = ours / theirs if theirs else 0
         if not (limits[0] <= ratio <= limits[1]):
-            skipped.append((name, it["code"], f"too different ({ratio:.2f}x)"
+            skipped.append((name, it["code"], f"too different ({_c2(ratio):.2f}x)"
                             " - probably a different scope"))
             continue
         # target $ per unit
@@ -266,7 +267,7 @@ def calibrate(book, items, catalog=None, labor_factor=LABOR_FACTOR,
             new["source"] = note + "; was " + (item.get("source") or "")
             book.items[costbook.csi.parse_code(part["code"]) or
                        part["code"]] = new
-        done.append((name, it["code"], f"{ratio:.2f}x before"))
+        done.append((name, it["code"], f"{_c2(ratio):.2f}x before"))
     return done, skipped
 
 
@@ -292,7 +293,7 @@ def build_book(items, base, header=None, labor_factor=LABOR_FACTOR,
             if kind == "Labor":
                 book.set(code, "hr", 0.0, 1.0, crew,
                          desc=f"{it['name']} - labor", type="Labor",
-                         basis="RSMeans", source=f"{SOURCE}; ${val:,.2f}/"
+                         basis="RSMeans", source=f"{SOURCE}; ${_c2(val):,.2f}/"
                          f"{it['unit']} at {labor_factor:g} x QuantiSheet "
                          "national crew rate")
             else:

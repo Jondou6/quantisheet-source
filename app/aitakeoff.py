@@ -43,6 +43,7 @@
 import logging
 import math
 import re
+from .dmoney import c2 as _c2
 
 log = logging.getLogger(__name__)
 
@@ -505,7 +506,7 @@ def _scale_evidence(page, sc, frm, raster, dpi, engines):
             "not checked against printed dimensions (nothing is measured "
             "on this sheet)"]
     return {"scale_conf": ev["score"], "scale_why": ev["reasons"],
-            "scale_rect": [round(c, 2) for c in ev["rect"]] if ev["rect"]
+            "scale_rect": [_c2(c) for c in ev["rect"]] if ev["rect"]
             else None, "scale_text": ev["text"],
             "scale_review": bool(ev["review"] and (measured or raster))}
 
@@ -939,8 +940,8 @@ def _ducts(doc, pno, name, ppu, unit, res, sheet):
                             "method": "AI takeoff: ducts",
                             "csi": "23 33 46"}}))
         sheet.setdefault("ducts", {})
-        sheet["ducts"][f["name"]] = round(
-            sheet["ducts"].get(f["name"], 0) + f["length"], 2)
+        sheet["ducts"][f["name"]] = _c2(
+            sheet["ducts"].get(f["name"], 0) + f["length"])
     try:
         from . import fittings
         fc = fittings.count_ducts(kept, tt._per_ft(ppu, unit), fx)
@@ -1134,7 +1135,7 @@ def _pipe_drops(page, pno, name, unit, res):
         n_assumed += 1
         res["quantities"].append({
             "engine": "pipe drops", "name": g["name"] + " drops",
-            "qty": round(g["length_ft"] * to_unit, 2),
+            "qty": _c2(g["length_ft"] * to_unit),
             "unit": "LF" if to_unit == 1.0 else "M",
             "status": "taken off", "page": pno, "sheet": name,
             "csi": "22 11 00", "basis": g["basis"], "assumption": True})
@@ -1622,20 +1623,20 @@ def door_finish_lines(res):
     for fc, lf in sorted(frames.items()):
         res["quantities"].append({
             "engine": "schedules", "status": "taken off", "unit": "LF",
-            "name": f"Door frame finish {fc}", "qty": round(lf, 2),
+            "name": f"Door frame finish {fc}", "qty": _c2(lf),
             "page": None, "sheet": "door schedule", "csi": "09 91 00",
             "basis": "2 x height + width of each frame with that finish "
                      "in the door schedule"})
         res["quantities"].append({
             "engine": "schedules", "status": "taken off", "unit": "LF",
             "name": f"Door trim finish {fc} (both faces)",
-            "qty": round(2 * lf, 2), "page": None, "sheet": "door schedule",
+            "qty": _c2(2 * lf), "page": None, "sheet": "door schedule",
             "csi": "09 91 00",
             "basis": "the frame length on both faces of the wall"})
         res["quantities"].append({
             "engine": "schedules", "status": "taken off", "unit": "LF",
             "name": "Sealant & backer rod at door frames",
-            "qty": round(2 * lf, 2), "page": None, "sheet": "door schedule",
+            "qty": _c2(2 * lf), "page": None, "sheet": "door schedule",
             "csi": "07 92 00",
             "basis": "around each frame with that finish, both faces"})
 
@@ -1734,12 +1735,12 @@ def _paint_height(doc, rows, res):
     lo, hi = min(hs), max(hs)
     if hi - lo < 0.5:
         return lo, (f"walls painted full height to the structure (the "
-                    f"partitions run to it): {lo:.2f} ft from the level "
+                    f"partitions run to it): {_c2(lo):.2f} ft from the level "
                     "marks on the elevations")
     h = (lo + hi) / 2
     return h, (f"walls painted full height to the structure (the "
                f"partitions run to it), under a roof sloping from "
-               f"{lo:.2f} to {hi:.2f} ft: {h:.2f} ft average - check rooms "
+               f"{_c2(lo):.2f} to {_c2(hi):.2f} ft: {_c2(h):.2f} ft average - check rooms "
                "at the high or low side")
 
 
@@ -2302,14 +2303,14 @@ def _walls_sheet(doc, row, legend, leg_pages, res, rows_by_page,
             if f.startswith("no building outline"):
                 continue
             review("Exterior Walls", None, "ft", f, ext_csi)
-    sheet["walls"] = {g: round(v, 2) for g, v in tot.items()}
-    sheet["wall_untagged"] = {lab: round(v * k, 2) for lab, v in
+    sheet["walls"] = {g: _c2(v) for g, v in tot.items()}
+    sheet["wall_untagged"] = {lab: _c2(v * k) for lab, v in
                               (types.get("untagged") or {}).items()}
-    sheet["wall_classes"] = [{"label": c["label"], "lf": round(c["lf"] * k, 2),
+    sheet["wall_classes"] = [{"label": c["label"], "lf": _c2(c["lf"] * k),
                               "assembly": c.get("assembly"),
                               "confident": c.get("confident")}
                              for c in classes]
-    sheet["wall_roles"] = {r: round(v * k, 2) for r, v in
+    sheet["wall_roles"] = {r: _c2(v * k) for r, v in
                            ((roles or {}).get("summary") or {}).items()}
     res["walls"][pno] = {"types": types["by_type"], "legend": leg,
                          "heights": hts, "classes": classes,
@@ -2358,21 +2359,21 @@ def _ai_line(res, engine, name, qty, unit, pno, sheet, csi, basis, conf):
     """One AI-derived line: a quantity (ai_derived, confidence, the basis
     saying so) when conf >= REVIEW_BELOW, else a review entry carrying
     the confidence."""
-    conf = round(float(conf), 2)
+    conf = _c2(float(conf))
     if qty is not None and conf >= REVIEW_BELOW:
         res["quantities"].append({
             "engine": engine, "name": name, "qty": round(float(qty), 1),
             "unit": unit, "status": "taken off", "page": pno,
             "sheet": sheet, "csi": csi, "ai_derived": True,
             "confidence": conf,
-            "basis": f"AI-derived (confidence {conf:.2f}): {basis}"})
+            "basis": f"AI-derived (confidence {_c2(conf):.2f}): {basis}"})
     else:
         res["review"].append({
             "sheet": sheet, "page": pno, "name": name,
             "qty": None if qty is None else round(float(qty), 1),
             "unit": unit, "ai_derived": True, "confidence": conf,
             "engine": engine, "csi": csi,
-            "why": f"AI-derived, confidence {conf:.2f} - {basis}; check it"})
+            "why": f"AI-derived, confidence {_c2(conf):.2f} - {basis}; check it"})
 
 
 def _openings(res):
@@ -2529,7 +2530,7 @@ def _stage3(doc, rows, res):
                 _ai_line(res, "roof", "Downspouts (length)",
                          rt["downspouts"] * min(hs), "LF", pno, nm,
                          "07 71 23", f"{rt['downspouts']} downspouts x "
-                         f"{min(hs):.2f} ft (the eave / bearing level on the "
+                         f"{_c2(min(hs)):.2f} ft (the eave / bearing level on the "
                          "elevations, to the floor) - add the drop below the "
                          "floor to grade and the offsets at the gutter",
                          REVIEW_BELOW - 0.05)
@@ -2734,12 +2735,12 @@ def _stage3(doc, rows, res):
                          "set", "07 20 00" if "insul" in ln["name"] else
                          "07 27 00" if "barrier" in ln["name"] else
                          "04 20 00",
-                         f"{ext_lf:,.1f} LF x {h:.2f} ft - "
+                         f"{ext_lf:,.1f} LF x {_c2(h):.2f} ft - "
                          f"{ev['openings_sf']:,.0f} SF of openings"
                          + ("" if op is not None else
                             " (openings unknown - none deducted)")
                          + (f"; higher wall marks also shown "
-                            f"({', '.join(f'{x:.2f}' for x in hs[1:])} ft) "
+                            f"({', '.join(f'{_c2(x):.2f}' for x in hs[1:])} ft) "
                             "- dormer / parapet walls not added"
                             if not gross and len(hs) > 1 else ""), cf)
         else:
@@ -2817,9 +2818,9 @@ def _exterior_cmu(doc, rows, res, ext_lf, title):
         return
     top = max(hs)
     sf = ext_lf * top
-    alt = "; ".join(f"at {h:.2f} ft: {ext_lf * h:,.0f} SF" for h in hs
+    alt = "; ".join(f"at {_c2(h):.2f} ft: {ext_lf * h:,.0f} SF" for h in hs
                     if h != top)
-    basis = (f"{ext_lf:,.1f} LF of exterior wall x {top:.2f} ft (the top "
+    basis = (f"{ext_lf:,.1f} LF of exterior wall x {_c2(top):.2f} ft (the top "
              f"wall mark on the elevations); the wall-type detail draws the "
              f"block back-up and the sections ({', '.join(said[:3])}) name "
              f"{size}\" CMU - how high the block goes isn't written"
@@ -2870,8 +2871,8 @@ def _exterior_inside_face(doc, rows, res, ext_lf, title):
     fs = wa._frac(fur)
     _ai_line(res, "envelope", f"Exterior wall inside face - {fs} metal "
              "furring channels", ext_lf * rows_, "LF", None, "set",
-             "09 22 16", f"{ext_lf:,.1f} LF of exterior wall x {rows_:.2f} "
-             f"rows (24\" OC up {h:.2f} ft, the bearing height); the "
+             "09 22 16", f"{ext_lf:,.1f} LF of exterior wall x {_c2(rows_):.2f} "
+             f"rows (24\" OC up {_c2(h):.2f} ft, the bearing height); the "
              "wall-type detail draws the furring", 0.62)
     # the exterior types' own furring / board lines (from their tagged
     # length) are the same material: this whole-wall line replaces them
@@ -2888,7 +2889,7 @@ def _exterior_inside_face(doc, rows, res, ext_lf, title):
         return
     sf = ext_lf * h
     bs = wa._frac(board)
-    why = (f"{ext_lf:,.1f} LF x {h:.2f} ft; the board on the furring isn't "
+    why = (f"{ext_lf:,.1f} LF x {_c2(h):.2f} ft; the board on the furring isn't "
            f"named in the exterior wall detail - taken as the partitions' "
            f"{bs} type X; openings not deducted")
     for nm, q, u in (
@@ -3137,7 +3138,7 @@ def _slab_on_grade(doc, rows, res):
                  "SF", None, sheet, "07 26 00", why, cf)
     if base:
         _ai_line(res, "slab", f"Slab on grade - {base[0]}\" {base[1].lower()}",
-                 round(area * base[0] / 12.0 / 27.0, 2), "CY", None, sheet,
+                 _c2(area * base[0] / 12.0 / 27.0), "CY", None, sheet,
                  "31 23 23", f"{area:,.0f} SF x {base[0]} in / 27 (the base "
                  "under the slab named on the structural notes); " + why, cf)
 
@@ -3340,7 +3341,7 @@ def run(doc, rows, progress=None, engines=None, sheet_time_limit=None,
                     if autotakeoff.scale_looks_wrong(found):
                         res["problems"].append(
                             f"{name}: rooms measure about "
-                            f"{autotakeoff.scale_ratio(found):.2f}x their "
+                            f"{_c2(autotakeoff.scale_ratio(found)):.2f}x their "
                             "tagged areas - the sheet scale looks wrong")
                     elif settings.get("rooms_use_tag_area", True):
                         n_tag = autotakeoff.prefer_tags(found)
@@ -3424,8 +3425,8 @@ def run(doc, rows, progress=None, engines=None, sheet_time_limit=None,
                                           "why": f"failed ({e})"})
             finally:
                 if eng not in SET_ENGINES:
-                    res["timing"][f"{name} {eng}"] = round(
-                        _time.perf_counter() - t0, 2)
+                    res["timing"][f"{name} {eng}"] = _c2(
+                        _time.perf_counter() - t0)
     _fitting_lines(res)
     # rooms: each room once, from its floor plan
     if room_found:
@@ -3588,7 +3589,7 @@ def run(doc, rows, progress=None, engines=None, sheet_time_limit=None,
                 res["unfinished"].append({
                     "sheet": _sheet_name(rows_by_page, pg), "page": pg,
                     "engine": "civil", "why": f"failed ({e})"})
-        res["timing"]["civil"] = round(_time.time() - t0, 2)
+        res["timing"]["civil"] = _c2(_time.time() - t0)
     if device_pages:
         if tick("fixtures & devices from the legends") is False:
             return stopped()
@@ -3667,7 +3668,7 @@ def run(doc, rows, progress=None, engines=None, sheet_time_limit=None,
                 res["unfinished"].append({
                     "sheet": _sheet_name(rows_by_page, pg), "page": pg,
                     "engine": "devices", "why": f"failed ({e})"})
-        res["timing"]["devices"] = round(_time.time() - t0, 2)
+        res["timing"]["devices"] = _c2(_time.time() - t0)
     if schedule_pages:
         if tick("schedules and their keys on the plans") is False:
             return stopped()
@@ -3683,7 +3684,7 @@ def run(doc, rows, progress=None, engines=None, sheet_time_limit=None,
                 res["unfinished"].append({
                     "sheet": _sheet_name(rows_by_page, pg), "page": pg,
                     "engine": "schedules", "why": f"failed ({e})"})
-        res["timing"]["schedules"] = round(_time.time() - t0, 2)
+        res["timing"]["schedules"] = _c2(_time.time() - t0)
     # walls by type and the exterior wall loop, one floor plan per level
     if wall_pages:
         if tick("walls by type and the exterior wall") is False:
@@ -3710,9 +3711,8 @@ def run(doc, rows, progress=None, engines=None, sheet_time_limit=None,
                 res["unfinished"].append({"sheet": nm, "page": p,
                                           "engine": "walls",
                                           "why": f"failed ({e})"})
-            res["timing"][f"{nm} walls"] = round(_time.perf_counter() - t1,
-                                                 2)
-        res["timing"]["walls"] = round(_time.time() - t0, 2)
+            res["timing"][f"{nm} walls"] = _c2(_time.perf_counter() - t1)
+        res["timing"]["walls"] = _c2(_time.time() - t0)
     # finishes: floor / base / ceiling / wall paint from the rooms kept
     # (each room once) and the finish schedule
     if room_kept:
@@ -3743,7 +3743,7 @@ def run(doc, rows, progress=None, engines=None, sheet_time_limit=None,
             _parking(doc, rows, res)
         except Exception:                                # noqa: BLE001
             log.info("parking", exc_info=True)
-        res["timing"]["envelope/site"] = round(_time.time() - t1, 2)
+        res["timing"]["envelope/site"] = _c2(_time.time() - t1)
     # steel: each member once across the S plans (3c C3, N10), column
     # heights from a column schedule when the set has one
     if steel_found:
@@ -4552,7 +4552,7 @@ def _trenches(res, spec):
         exc = L * w * depth / 27.0
         bedcy = L * w * bed / 12.0 / 27.0
         pipe = L * math.pi * (size / 24.0) ** 2 / 27.0
-        base = (f"{L:,.0f} LF x {w:.2f} ft wide ({size:g}\" pipe + "
+        base = (f"{L:,.0f} LF x {_c2(w):.2f} ft wide ({size:g}\" pipe + "
                 f"{clear}\" each side"
                 + (f", {rules['min_w_in']}\" minimum" if rules["min_w_in"]
                    and rules["min_w_in"] > size + 2 * clear else "")
