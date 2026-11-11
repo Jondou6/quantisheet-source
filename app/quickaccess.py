@@ -375,11 +375,17 @@ class _PinMenu:
         self.win = win
 
     def install(self, _w):
-        from PySide6.QtCore import QObject
+        from PySide6.QtCore import QObject, QEvent
         from PySide6.QtWidgets import QApplication
+        menu = QEvent.ContextMenu
 
         class F(QObject):
+            # sees every event in the program: the type test comes first and
+            # nothing is imported per event (torture test, Nov 10: imports
+            # here cost a second of every theme change)
             def eventFilter(f, obj, ev):                  # noqa: N805
+                if ev.type() != menu:
+                    return False
                 return self.filter(obj, ev)
         self._f = F(self.win)
         QApplication.instance().installEventFilter(self._f)
@@ -1369,10 +1375,14 @@ class _AltKey:
     do); Alt with another key is left alone."""
 
     def __init__(self, win):
-        from PySide6.QtCore import QObject
+        from PySide6.QtCore import QObject, QEvent
+        wanted = {QEvent.KeyPress, QEvent.KeyRelease,
+                  QEvent.MouseButtonPress, QEvent.Wheel}
 
         class F(QObject):
             def eventFilter(f, obj, ev):                  # noqa: N805
+                if ev.type() not in wanted:  # most events: nothing to do
+                    return False
                 return self.filter(obj, ev)
         self.win = win
         self.alone = False

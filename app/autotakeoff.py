@@ -57,7 +57,7 @@ except ImportError:              # pragma: no cover
 
 import fitz
 
-from . import annotate
+from . import annotate, roomsnap
 
 log = logging.getLogger(__name__)
 
@@ -79,9 +79,26 @@ FINE_PEN_PT = 0.35               # line weights up to this are "fine" pens
 GOOD = 0.12                       # within 12% of its tag = a sure match
 TRACE_INSET_PX = 0.25             # traced outline inside filled walls
 NAMED_MAX_SF = 5000               # a room named without an area: at most
+NAMED_HUGE_SF = 60000             # ...or this, with HUGE_ON_LINES of its
+HUGE_ON_LINES = 0.9               # outline on the drawing's own lines
+NAMED_MIN_SF = 15                 # ...and at least (a bare name)
+NUMBERED_MIN_SF = 4               # ...or this, when it has a room number
 NOTE_DIFF, REVIEW_DIFF = 0.02, 0.05   # trace vs tag: noted / for review
 OVERLAP_SF = 4.0                  # traces overlapping more: both flagged
 DOORWAY_FT = 1.5                  # an opening through a wall this thick
+SNAP_MIN_SHARE = 0.5              # outline put on the drawn lines when this
+                                  # much of it runs along them
+SNAP_MAX_CHANGE = 0.04            # ...and the area changes no more than this
+SNAP_REACH_FT = 0.0               # a face may be this far outside the trace
+SNAP_MIN_LINE_FT = 0.4            # drawn lines shorter than this don't count
+STUB_FT = (0.25, 1.4)             # a free-standing wall stub is this thick
+STUB_MIN_FT = 0.5                 # ...at least this long
+STUB_FILL = 0.85                  # ...and fills this much of its box
+STUB_RUN_FT = 0.5                 # wall pieces this short, in the walls' pen
+JAMB_MAX_FT = 1.5                 # a wall at a door's jamb is at most this thick
+JAMB_STUB_FT = 2.0                # a door's line runs on this far to a wall
+DOOR_LINE_FT = 0.085              # the line a door is shut with is this wide
+HINGE_WALL_FT = 1.0               # a door's hinge is this close to a wall
 
 FT_PER_UNIT = {"ft": 1.0, "in": 1 / 12, "yd": 3.0, "m": 3.28084,
                "cm": 0.0328084, "mm": 0.00328084}
@@ -553,6 +570,7 @@ class Plan:
 
     def __init__(self, page, scale, claimed=True, check=None):
         page = cached_page(page)
+        self._page = page
         # check(): called between the slow steps; raises _Stop to end the
         # run (the caller's progress said stop, or the time budget is up)
         self.check = check or (lambda: None)
@@ -627,6 +645,9 @@ class Plan:
         # wall blanks a piece of it. The wall faces read from the linework
         # are drawn back in solid.
         self.vector_walls = 0
+        # what the wall faces and the closed doors add, kept apart so it
+        # goes into every wall picture whole
+        self._added = np.zeros(self.shape, np.uint8)
         # how far inside the wall face a trace runs (pixels): a quarter
         # pixel against filled (poche) walls, half the pen plus half a
         # pixel against stroked face lines (set by _vector_walls), half a
@@ -676,10 +697,13 @@ class Plan:
         self.check()
         self.layers = [self.walls]
         if heavy is not None and heavy.any():
-            hw = wall_mask(None, self.ppf, ink=heavy)
-            # what the wall faces and closed doors added goes in both
-            added = self.walls & (1 - base)
-            self.layers.append(hw | added)
+            hw = wall_mask(None, self.ppf, ink=heavy, stubs="any")
+            # what the wall faces and closed doors added goes in both -
+            # all of it: taking "what the first picture gained" left out
+            # every wall face that fixtures or hatching beside it had
+            # already thickened there, and the room ran through that wall
+            # in this picture (made-up plans, Nov 10)
+            self.layers.append(hw | self._added)
         self.layer = 0
         self._caches = [{} for _ in self.layers]
         self._cache = self._caches[0]
@@ -704,6 +728,8 @@ class Plan:
         ws = []
         styled = _memo(page, "styled", lambda: styled_segments(page))
         pen = {}
+        by_style = {}
+        pts_per_ft_ = self.pts_per_ft
         # the sheet's minor pen draws fixtures, casework and furniture: a
         # desk edge 6" from a chair edge is not a wall
         fine = fine_pen(page)
@@ -720,6 +746,7 @@ class Plan:
             except autowalls.AutoWallsError:
                 continue
             ws += got
+            by_style[style] = (sum(w["length"] for w in got), segs)
             try:
                 th = max(1, int(round(float(style[1]) * self.zoom)))
             except (TypeError, ValueError, IndexError):
@@ -728,6 +755,23 @@ class Plan:
         if pen:
             th = max(pen, key=pen.get)          # the pen most walls use
             self.inset_px = 0.5 + th / 2.0
+            # ...and in that pen, the short pieces too: the foot of
+            # partition between a door and the corner beside it is under
+            # the usual 1'-6" run, and too thin for the wall picture - the
+            # closet behind it then ran out through its own wall (made-up
+            # plans, Nov 10). Only the walls' own pen: short pairs of
+            # lines in any other are casework and frames.
+            best = max(by_style, key=lambda k: by_style[k][0]) \
+                if by_style else None
+            if best is not None:
+                try:
+                    more = autowalls.walls(
+                        page, self.ppu, unit, segs=by_style[best][1],
+                        min_run_ft=STUB_RUN_FT, min_seg_ft=STUB_RUN_FT)
+                except autowalls.AutoWallsError:
+                    more = []
+                ws += [w for w in more
+                       if w["length"] * self.ppu / pts_per_ft_ < 1.6]
         z = self.zoom
         for w in ws:
             (x0, y0), (x1, y1) = w["p0"], w["p1"]
@@ -747,28 +791,103 @@ class Plan:
                              [(a.x - ex - nx) * z, (a.y - ey - ny) * z]],
                             np.int32)
             cv2.fillPoly(self.walls, [poly.reshape(-1, 1, 2)], 1)
+            cv2.fillPoly(self._added, [poly.reshape(-1, 1, 2)], 1)
             self.vector_walls += 1
 
     def _close_doors(self, page, m, pts_per_ft):
         z = self.zoom
-        width = max(2, int(round(0.25 * self.ppf)))       # a 3 in line
+        # a 1 in line (two pixels at least). It was 3 in: astride the
+        # opening's face it took an inch and a half off the room, the width
+        # of the opening - 2 to 4 % of a closet (made-up plans, Nov 10).
+        # The open floor is found half a door width from any wall and the
+        # grow-back stops at the doorway fill, so a thin line seals as well
+        width = max(2, int(round(DOOR_LINE_FT * self.ppf)))
         H, Wd = self.walls.shape
         near = max(2, int(round(0.4 * self.ppf)))
 
         def on_wall(x, y):
             return self.walls[max(0, y - near):min(H, y + near + 1),
                               max(0, x - near):min(Wd, x + near + 1)].any()
+        reach = max(near, int(round(HINGE_WALL_FT * self.ppf)))
+        leaves = None
+        base0 = self.walls.copy()          # the walls before any door line
         for c, ends in door_swings(page, pts_per_ft):
             cc = c * m
             pts = [(int((e * m).x * z), int((e * m).y * z)) for e in ends]
+            # a door hangs on a wall: a quarter circle whose centre is out
+            # on the floor with no leaf drawn from it (a rounded counter,
+            # a round table's quadrant, a turning circle) is not a door
+            hx, hy = int(cc.x * z), int(cc.y * z)
+            if not self.walls[max(0, hy - reach):min(H, hy + reach + 1),
+                              max(0, hx - reach):min(Wd, hx + reach + 1)
+                              ].any():
+                if leaves is None:
+                    arr, lens = _straight_lines(page)
+                    leaves = arr[lens >= 1.0 * pts_per_ft]
+                r_ = abs(ends[0] - c)
+                if not _leaf_at(leaves, c, ends, 0.08 * r_):
+                    continue
             # the arc's latch end meets the far jamb; the other end is the
             # open leaf's tip, out on the floor - closing the door along
             # the leaf too would leave a 3' stub of wall in the room. When
             # it can't be told which is which, both are closed.
             touch = [p for p in pts if on_wall(*p)]
+            if len(touch) != 1:
+                # ...unless the leaf itself is drawn: the end a straight
+                # line runs to from the hinge is the leaf's tip (in a
+                # closet the tip of the open leaf is by the back wall, so
+                # both ends "touch" - the leaf was closed too and cut the
+                # closet in two; made-up plans, Nov 10)
+                if leaves is None:
+                    arr, lens = _straight_lines(page)
+                    leaves = arr[lens >= 1.0 * pts_per_ft]
+                r_ = abs(ends[0] - c)
+                tip = [_leaf_at(leaves, c, [e], 0.08 * r_) for e in ends]
+                if tip[0] != tip[1]:
+                    touch = [pts[1] if tip[0] else pts[0]]
+            h0 = (int(cc.x * z), int(cc.y * z))
             for p in (touch if len(touch) == 1 else pts):
-                cv2.line(self.walls, (int(cc.x * z), int(cc.y * z)), p, 1,
-                         width)
+                a0, b0 = h0, p
+                if len(touch) == 1:
+                    # the line is 3" wide: laid on the wall's side of the
+                    # opening's face (away from the open leaf), not astride
+                    # it - astride, it took a 1-1/2" strip off the room the
+                    # door swings into, the width of the opening (4% of a
+                    # closet; made-up plans, Nov 10)
+                    tipp = pts[1] if p == pts[0] else pts[0]
+                    dx, dy = p[0] - h0[0], p[1] - h0[1]
+                    L = math.hypot(dx, dy)
+                    if L > 0:
+                        nx, ny = -dy / L, dx / L
+                        if (tipp[0] - h0[0]) * nx + (tipp[1] - h0[1]) * ny \
+                                > 0:
+                            nx, ny = -nx, -ny
+                        sh = width / 2.0
+                        a0 = (int(round(h0[0] + nx * sh)),
+                              int(round(h0[1] + ny * sh)))
+                        b0 = (int(round(p[0] + nx * sh)),
+                              int(round(p[1] + ny * sh)))
+                band = None
+                if len(touch) == 1:
+                    # ...and the opening is shut through the wall's whole
+                    # thickness, as far as the jambs go: a door that
+                    # swings out of a closet has its line on the far face,
+                    # and the closet took the floor in the doorway (3 to
+                    # 5 % of it; made-up plans, Nov 10)
+                    if L > 0:
+                        T = self._jamb_depth(h0, p, (nx, ny), base0)
+                        if T >= 2:
+                            band = np.array(
+                                [h0, p,
+                                 (int(round(p[0] + nx * T)),
+                                  int(round(p[1] + ny * T))),
+                                 (int(round(h0[0] + nx * T)),
+                                  int(round(h0[1] + ny * T)))], np.int32)
+                    a0, b0 = self._to_walls(a0, b0, base0)
+                for pic in (self.walls, self._added):
+                    cv2.line(pic, a0, b0, 1, width)
+                    if band is not None:
+                        cv2.fillPoly(pic, [band.reshape(-1, 1, 2)], 1)
             self.doors_closed += 1
         # bifold and accordion doors: zig-zag leaves across the opening -
         # close the opening from jamb to jamb when both ends touch a wall
@@ -782,8 +901,68 @@ class Plan:
             if any(self.walls[max(0, y - near):min(h, y + near + 1),
                               max(0, x - near):min(w, x + near + 1)].any()
                    for x, y in ends):
-                cv2.line(self.walls, ends[0], ends[1], 1, width)
+                e0, e1 = self._to_walls(ends[0], ends[1], base0)
+                cv2.line(self.walls, e0, e1, 1, width)
+                cv2.line(self._added, e0, e1, 1, width)
                 self.doors_closed += 1
+
+    def _jamb_depth(self, a, b, n, walls):
+        """How thick (pixels) the wall is at the jambs of the opening a-b,
+        measured from the opening's line in direction n (a unit vector):
+        the deeper of the two jambs, 0 when neither is found."""
+        H, W = walls.shape
+        dx, dy = b[0] - a[0], b[1] - a[1]
+        L = math.hypot(dx, dy)
+        if L < 2:
+            return 0
+        ux, uy = dx / L, dy / L
+        cap = int(round(JAMB_MAX_FT * self.ppf))
+        best = 0
+        for (px, py), sg in ((a, -1.0), (b, 1.0)):
+            for off in (2, 4):                   # just outside the opening
+                sx, sy = px + sg * ux * off, py + sg * uy * off
+                last, free = -1, 0
+                for k in range(cap + 1):
+                    x = int(round(sx + n[0] * k))
+                    y = int(round(sy + n[1] * k))
+                    if not (0 <= x < W and 0 <= y < H):
+                        break
+                    if walls[y, x]:
+                        last, free = k, 0
+                    else:
+                        free += 1
+                        if free > 2:
+                            break
+                if cap > last >= 1:
+                    best = max(best, last + 1)
+        return best
+
+    def _to_walls(self, a, b, walls):
+        """The line a-b run on at each end to the wall it points at, when
+        that wall is within JAMB_STUB_FT. The piece of wall between a door
+        and the corner beside it - a foot of 3-1/2" partition - is too
+        thin and too short to be in the wall picture, and the room ran out
+        round the end of the door's line (made-up plans, Nov 10)."""
+        H, W = walls.shape
+        dx, dy = b[0] - a[0], b[1] - a[1]
+        L = math.hypot(dx, dy)
+        if L < 2:
+            return a, b
+        ux, uy = dx / L, dy / L
+        n = int(round(JAMB_STUB_FT * self.ppf))
+        out = []
+        for (px, py), sg in ((a, -1.0), (b, 1.0)):
+            hit = None
+            for k in range(1, n + 1):
+                x = int(round(px + sg * ux * k))
+                y = int(round(py + sg * uy * k))
+                if not (0 <= x < W and 0 <= y < H):
+                    break
+                if walls[y, x]:
+                    hit = (x, y)
+                    break
+            out.append(hit or (px, py))
+        return out[0], out[1]
 
     # coordinates
     def to_px(self, pt):
@@ -867,7 +1046,24 @@ class Plan:
             ys, xs = np.nonzero(free[y0:sy + 3 * r, x0:sx + 3 * r])
             if len(xs) == 0:
                 return None
-            i = int(np.argmin((xs + x0 - sx) ** 2 + (ys + y0 - sy) ** 2))
+            # the nearest open floor that can be seen from the tag: the
+            # nearest of all is, for a tag in a closet narrower than the
+            # door width being tried, the room on the other side of its
+            # wall - which was then traced as the closet (made-up plans,
+            # Nov 10: "JAN. 115" came out 245 SF, the meeting room)
+            d2 = (xs + x0 - sx) ** 2 + (ys + y0 - sy) ** 2
+            labs = labels[ys + y0, xs + x0]
+            best = None
+            for lb in np.unique(labs):
+                sel = np.nonzero(labs == lb)[0]
+                i = int(sel[np.argmin(d2[sel])])
+                if best is not None and d2[i] >= best[0]:
+                    continue
+                if self._sees((sx, sy), (int(xs[i] + x0), int(ys[i] + y0))):
+                    best = (d2[i], i)
+            if best is None:
+                return None
+            i = best[1]
             sx, sy = int(xs[i] + x0), int(ys[i] + y0)
         lab = int(labels[sy, sx])
         if lab == 0 or leak[lab]:
@@ -881,6 +1077,39 @@ class Plan:
         if key not in self._cache:
             self._cache[key] = self._trace(labels, stats, lab, r)
         return self._cache[key]
+
+    def _faces(self):
+        """The drawing's straight lines square to the picture (pixels,
+        not rounded), for roomsnap; None on a scan."""
+        if not hasattr(self, "_face_lines"):
+            self._face_lines = None
+            try:
+                g = _ink_geom(self._page) if self.from_vectors else None
+                if g is not None and g["n"]:
+                    m = self._page.rotation_matrix
+                    R = np.array([[m.a, m.b], [m.c, m.d]], float) * self.zoom
+                    t = np.array([m.e, m.f], float) * self.zoom
+                    keep = np.zeros(g["n"], bool)
+                    for first, last, _w, _f, _s, _l in g["rows"]:
+                        keep[first:last] = True
+                    self._face_lines = roomsnap.face_lines(
+                        g["all"] @ R + t, g["offs"], keep,
+                        SNAP_MIN_LINE_FT * self.ppf)
+            except Exception:
+                log.warning("face lines not read", exc_info=True)
+        return self._face_lines
+
+    def _sees(self, a, b):
+        """No wall between pixels a and b (wall under a itself - a tag
+        printed on a wall - is let through)."""
+        n = int(max(abs(b[0] - a[0]), abs(b[1] - a[1]))) + 1
+        xs = np.linspace(a[0], b[0], n).round().astype(int)
+        ys = np.linspace(a[1], b[1], n).round().astype(int)
+        w = self.walls[ys, xs] > 0
+        k = 0
+        while k < n and w[k]:               # out of the wall the tag is on
+            k += 1
+        return not w[k:].any()
 
     def _trace(self, labels, stats, lab, r):
         h, w = labels.shape
@@ -1070,7 +1299,11 @@ class Plan:
                     (strict or dist[int(y), int(x)] > 0.75 * self.ppf):
                 oth.append((float(x), float(y)))
         oth_px = np.array(oth, np.int32).reshape(-1, 2) if oth else None
-        cap = 3 * expected if expected else max_sf
+        # a named room over max_sf is still a room when its outline lies
+        # on the drawing's lines (a gym, a warehouse, an open office): the
+        # search looks up to NAMED_HUGE_SF and the size is judged at the end
+        cap = 3 * expected if expected else \
+            (max(max_sf, NAMED_HUGE_SF) if max_sf else max_sf)
         max_px = cap * self.ppf ** 2 if cap else None
         cands = []
         cur = self.layer
@@ -1084,7 +1317,16 @@ class Plan:
         # worked out.
         steps = (door,) if door else DOOR_ORDER
         done = False
-        for li in (range(len(self.layers)) if expected else (cur,)):
+        # a room with no area on its tag has nothing to choose a picture
+        # by: the one without the finest pen comes first (furniture,
+        # fixtures, casework and hatching can't cut the room up in it);
+        # the full picture is the fallback when no room is found there
+        # (a sheet with wall layers already has only its walls in the
+        # first picture)
+        order = range(len(self.layers)) if expected else \
+            ((1, 0) if len(self.layers) > 1 and cur == 0 and
+             self.wl is None else (cur,))
+        for li in order:
             self.use(li)
             for d in steps:
                 self.check()
@@ -1124,7 +1366,7 @@ class Plan:
                         abs(self.sqft(cv2.contourArea(c)) - expected):
                     c = c2
         else:
-            d, c, _a, li = min(cands, key=lambda t: abs(t[0] - DEFAULT_DOOR))
+            d, c, _a, li = cands[0]             # the first found (see above)
             if door is None:
                 # stalls: bridge only narrow gaps and keep the pockets that
                 # open off the room (stalls_join)
@@ -1155,12 +1397,35 @@ class Plan:
         # comes out short by a square foot or two
         area_px += perim_px * self.inset_px
         perim_px += 8 * self.inset_px
+        pts_px, on_lines = poly, 0.0
+        # ...and where the sides run along the drawing's own lines, the
+        # outline is put on them: the area is then the drawing's, not the
+        # picture's (app/roomsnap.py)
+        faces = self._faces()
+        if faces is not None:
+            try:
+                got = roomsnap.snap(
+                    c, SIMPLIFY_FT * self.ppf, faces, self.inset_px,
+                    reach=SNAP_REACH_FT * self.ppf)
+            except Exception:
+                log.debug("outline not snapped", exc_info=True)
+                got = None
+            if got is not None and got[1] >= SNAP_MIN_SHARE:
+                a2 = roomsnap.area(got[0])
+                if abs(a2 - area_px) <= max(SNAP_MAX_CHANGE * area_px,
+                                            2.0 * self.ppf ** 2):
+                    pts_px, on_lines = got[0], got[1]
+                    area_px, perim_px = a2, roomsnap.perimeter(got[0])
         sqft = self.sqft(area_px)
         if sqft < 4:
             return None
-        return {"pts": [self.to_pt(p) for p in poly], "sqft": sqft,
+        if not expected and max_sf and sqft > max_sf and \
+                on_lines < HUGE_ON_LINES:
+            return None
+        return {"pts": [self.to_pt(p) for p in pts_px], "sqft": sqft,
                 "door": d, "perim_ft": perim_px / self.ppf,
-                "face_fill_sf": round(face_sf, 1)}
+                "face_fill_sf": round(face_sf, 1),
+                "on_lines": round(on_lines, 3)}
 
 
 FACE_BAND_FT = 2.0      # an untagged trace grows at most this far to a face
@@ -1491,6 +1756,18 @@ def _swing_arcs(page):
                     continue
                 ctr, r = got
                 if not rmin <= r <= rmax:
+                    continue
+                # a piece of a circle, not of an oval: a quarter of an
+                # oval table, sink or toilet also lies on a circle through
+                # three of its points - about some centre out on the floor
+                # - and was "closed" like a door, cutting the room in two
+                # (made-up plans, Nov 10)
+                q1 = (p0 * 0.421875 + p1 * 0.421875 + p2 * 0.140625 +
+                      p3 * 0.015625)
+                q3 = (p0 * 0.015625 + p1 * 0.140625 + p2 * 0.421875 +
+                      p3 * 0.421875)
+                if abs(abs(q1 - ctr) - r) > 0.03 * r or \
+                        abs(abs(q3 - ctr) - r) > 0.03 * r:
                     continue
                 a0 = math.atan2(p0.y - ctr.y, p0.x - ctr.x)
                 a1 = math.atan2(p3.y - ctr.y, p3.x - ctr.x)
@@ -2067,7 +2344,7 @@ def _with_benches(r, ink, thick, ppf):
 
 def wall_mask(gray, ppf, text_boxes=(), ink_level=INK_LEVEL,
               close_ft=CLOSE_FT, open_ft=OPEN_FT, island_ft=ISLAND_FT,
-              ink=None):
+              ink=None, stubs="ink"):
     """1 where there is wall. `text_boxes` (pixel rects) are blanked.
     Solid blobs smaller than `island_ft` that touch no wall (plumbing
     fixtures, casework, columns) are dropped: they sit on the floor.
@@ -2090,6 +2367,25 @@ def wall_mask(gray, ppf, text_boxes=(), ink_level=INK_LEVEL,
                                                            connectivity=8)
         small = np.maximum(st[:, 2], st[:, 3]) < island_ft * ppf
         small[0] = False
+        # ...but a solid bar as thick as a wall is a wall: the stub
+        # between two doors side by side, a pier, a column. Dropped, the
+        # two openings became one too wide to close and the rooms either
+        # side of it were one room (made-up plans, Nov 10)
+        # Solid in the drawing itself (poche), not made solid by closing
+        # the gaps between a fixture's lines - a bench, a counter, a grab
+        # bar are bars too; `stubs`="any" (the picture without the fine
+        # pen, where fixtures aren't drawn) takes the closed shape
+        thin = np.minimum(st[:, 2], st[:, 3])
+        if stubs == "any":
+            filled = st[:, 4]
+        else:
+            filled = np.bincount(lab.ravel(), weights=ink.ravel(),
+                                 minlength=len(st))
+        solid = filled >= STUB_FILL * st[:, 2] * st[:, 3]
+        stub = small & solid & (thin >= STUB_FT[0] * ppf) & \
+            (thin <= STUB_FT[1] * ppf) & \
+            (np.maximum(st[:, 2], st[:, 3]) >= STUB_MIN_FT * ppf)
+        small &= ~stub
         if small.any():
             walls[small[lab]] = 0
     return walls
@@ -2171,6 +2467,8 @@ def _result(plan, res, tag):
             "net_sf": res["sqft"],
             "perimeter_lf": perim,
             "face_fill_sf": res.get("face_fill_sf") or 0.0,
+            # share of the outline that lies on the drawing's own lines
+            "on_lines": res.get("on_lines") or 0.0,
             "flags": []}
 
 
@@ -2771,11 +3069,21 @@ def _trace_rooms(page, scale, plan, tags, check, work, skip_measured):
     def cap(t):
         return None if t["sf"] else NAMED_MAX_SF
 
-    def plausible(r, sf):
+    def least(i):
+        # a named space with a room number is a room however small (a
+        # 2' x 4' closet, a chase); a bare name must be 15 SF to count
+        return NUMBERED_MIN_SF if i is not None and nums[i] else \
+            NAMED_MIN_SF
+
+    def most(r):
+        return NAMED_HUGE_SF if (r.get("on_lines") or 0) >= HUGE_ON_LINES \
+            else NAMED_MAX_SF
+
+    def plausible(r, sf, i=None):
         if r is None:
             return False
         if sf is None:
-            return 15 <= r["sqft"] <= NAMED_MAX_SF
+            return least(i) <= r["sqft"] <= most(r)
         return sf / 2 <= r["sqft"] <= sf * 2
 
     def good(i):
@@ -2783,7 +3091,7 @@ def _trace_rooms(page, scale, plan, tags, check, work, skip_measured):
         if r is None:
             return False
         if tags[i]["sf"] is None:
-            return 15 <= r["sqft"] <= NAMED_MAX_SF
+            return least(i) <= r["sqft"] <= most(r)
         return abs(r["sqft"] - tags[i]["sf"]) <= GOOD * tags[i]["sf"]
 
     for i, t in enumerate(tags):
@@ -2835,7 +3143,8 @@ def _trace_rooms(page, scale, plan, tags, check, work, skip_measured):
             return
         r, ap = got
         sf = tags[i]["sf"]
-        if plausible(r, sf) and (out[i] is None or _closer(r, out[i], sf)):
+        if plausible(r, sf, i) and (out[i] is None or
+                                    _closer(r, out[i], sf)):
             out[i], plans[i] = r, ap
     fitted = set()
     for i, t in enumerate(tags):
@@ -2864,7 +3173,7 @@ def _trace_rooms(page, scale, plan, tags, check, work, skip_measured):
             take_detail(i)
     # far off its tag means it found the wrong space: leave it to the user
     for i, t in enumerate(tags):
-        if out[i] is not None and not plausible(out[i], t["sf"]):
+        if out[i] is not None and not plausible(out[i], t["sf"], i):
             out[i] = None
     # still missed: a tag set outside its room on a leader ("JAN 113"
     # beside a closet, an arrow into it) - look where the leader ends
@@ -2897,8 +3206,8 @@ def _trace_rooms(page, scale, plan, tags, check, work, skip_measured):
                     raise
                 except Exception:
                     r = None
-                if plausible(r, sf) and (best is None or
-                                         _closer(r, best, sf)):
+                if plausible(r, sf, i) and (best is None or
+                                            _closer(r, best, sf)):
                     best, best_seed = r, sp
             if best is not None:
                 if pl is not plan and ds:
@@ -2939,7 +3248,7 @@ def _trace_rooms(page, scale, plan, tags, check, work, skip_measured):
                                 max_sf=cap(tags[i]), strict=True)
         except AutoTakeoffError:
             r = None
-        if plausible(r, sf) and not any(
+        if plausible(r, sf, i) and not any(
                 j != i and not same_room(i, j) and _inside(pts[j], r["pts"])
                 for j in range(n)):
             if out[i].get("detail_scale"):

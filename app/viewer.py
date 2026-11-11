@@ -3054,6 +3054,10 @@ class PdfView(QWidget):
                                           or kinds & annotate.FULL_UNDO_KINDS))
             for pg in pages:
                 self.page_changed.emit(pg)
+            if before is not None:
+                # after the redraw, which counts as a change too: the next
+                # edit reuses this one's "after" if nothing else happens
+                self.history.stamp(self.doc)
         if "set_scale" in kinds:
             note = annotate.take_scale_notice(self.doc)
             if note:                    # damaged scale file was replaced

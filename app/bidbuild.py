@@ -13,6 +13,7 @@ Every step is tracked per line, so line prices, trade revenue and the
 schedule of values add up to the bid to the cent. With only tax, overhead
 and profit set it gives exactly the old proposal prices.
 """
+import math
 import re
 from .dmoney import c2 as _c2
 
@@ -67,10 +68,14 @@ def format_margins(margins):
 
 
 def _num(v):
+    """A rate or amount; 0 for blank or unreadable. NaN and infinity are
+    unreadable too (torture test, Nov 10: an overhead of nan made the bid
+    total nan)."""
     try:
-        return float(v)
+        f = float(v)
     except (TypeError, ValueError):
         return 0.0
+    return f if math.isfinite(f) else 0.0
 
 
 def _margin_for(trade, margins):

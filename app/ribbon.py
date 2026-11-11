@@ -331,8 +331,17 @@ class RibbonButton(QToolButton):
 
     def _apply_metrics(self):
         self.ensurePolished()
-        h = self.box_height()
-        w = self._layout_width()
+        # a theme change sends each button several style events; measure
+        # again only when the font or the label changed (torture test,
+        # Nov 10: 18,000 re-measures per theme change)
+        key = (self.font().key(), self._plain(), self.logicalDpiY())
+        got = getattr(self, "_metrics", None)
+        if got and got[0] == key:
+            h, w = got[1], got[2]          # sizes put back, not measured
+        else:
+            h = self.box_height()
+            w = self._layout_width()
+            self._metrics = (key, h, w)
         self.setFixedHeight(h)
         self.setMinimumWidth(w)
         self.setMaximumWidth(w)

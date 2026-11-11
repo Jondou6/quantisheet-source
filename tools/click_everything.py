@@ -32,7 +32,9 @@ SKIP = {"Exit", "Close Tab", "Print", "Start Relay (host on this computer)",
         "ClaimIT (Insurance Claim Estimate)", "Read the Energy Code Online",
         "Open Project Folder", "Terms of Service", "Privacy",
         "Third-Party Licenses", "Support Bundle for IT",
-        "Add the QuantiSheet Printer"}
+        "Add the QuantiSheet Printer",
+        # pops a menu at the mouse and waits for a click (Nov 10)
+        "Convert Selected To"}
 
 ERRORS = []
 EXIT_CHECK = False      # --exit-check: exit normally, dump threads if stuck

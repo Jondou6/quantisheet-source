@@ -132,7 +132,10 @@ def read(doc):
 
 
 def write(doc, data):
-    raw = json.dumps(data, indent=1).encode("utf-8")
+    # compact text: json writes indented text in slow pure Python. With 8
+    # certified applications of 400 lines (1 MB) every entry took half a
+    # second (torture test, Nov 10); compact goes through the fast encoder
+    raw = json.dumps(data).encode("utf-8")
     embfiles.put(doc, FILE, raw, "QuantiSheet billing")
 
 

@@ -206,7 +206,7 @@ def read(doc):
 
 
 def write(doc, data):
-    embfiles.put(doc, FILE, json.dumps(data, indent=1).encode("utf-8"),
+    embfiles.put(doc, FILE, json.dumps(data).encode("utf-8"),
                  "QuantiSheet code check settings")
 
 

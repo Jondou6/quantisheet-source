@@ -223,7 +223,7 @@ def read(doc):
 
 def write(doc, lines):
     data = {"version": VERSION, "lines": [clean(x) for x in lines]}
-    embfiles.put(doc, FILE, json.dumps(data, indent=1).encode("utf-8"),
+    embfiles.put(doc, FILE, json.dumps(data).encode("utf-8"),
                  "QuantiSheet added estimate lines")
 
 

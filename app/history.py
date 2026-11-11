@@ -34,6 +34,22 @@ _SKIP_RE = re.compile(r"/(?:P|Parent|IRT|Kids|Dest|D)\s+\d+\s+0\s+R"
                       r"|/(?:Kids|Dest|D)\s*\[[^\]]*\]")
 
 
+# object source -> (structural?, references). The same markup text gives
+# the same answer, and most markups don't change between two edits: the
+# regex work was half of every undo record (torture test, Nov 10)
+_SCAN = {}
+
+
+def _scan(src):
+    got = _SCAN.get(src)
+    if got is None:
+        if len(_SCAN) > 50000:
+            _SCAN.clear()
+        got = (bool(_STRUCTURAL.search(src)), _refs(_SKIP_RE.sub("", src)))
+        _SCAN[src] = got
+    return got
+
+
 def _capture(doc, x, objs, page_xref):
     """Record object `x` and the objects it uses (appearance streams,
     fonts, popups). Reads each object's source once and finds its
@@ -46,11 +62,12 @@ def _capture(doc, x, objs, page_xref):
         if x in objs or x <= 0 or x >= n or x == page_xref:
             continue
         src = doc.xref_object(x, compressed=False)
-        if _STRUCTURAL.search(src):
+        structural, refs = _scan(src)
+        if structural:
             continue
         stream = doc.xref_stream(x) if doc.xref_is_stream(x) else None
         objs[x] = (src, stream)
-        todo += _refs(_SKIP_RE.sub("", src))
+        todo += refs
 
 
 def page_state(doc, pno):
@@ -104,6 +121,20 @@ def restore_page(doc, st):
         typ, val = st["form"]
         doc.xref_set_key(doc.pdf_catalog(), "AcroForm",
                          val if typ != "null" else "null")
+
+
+def _edit_count(doc):
+    from . import annotate
+    return annotate.edit_count(doc)
+
+
+def _fingerprint(doc, pno):
+    """Cheap check that a page's markups weren't replaced or added to."""
+    try:
+        return (doc.xref_length(),
+                doc.xref_get_key(doc.page_xref(pno), "Annots"))
+    except Exception:                                     # noqa: BLE001
+        return None
 
 
 def _size(states):
@@ -178,11 +209,14 @@ class History:
 
     # ---- recording -----------------------------------------------------------
     def reset(self, initial=None):
+        self._after = None
         data = self._source() if initial is None else initial
         self.stack = [("full", data, None, len(data))]
         self.pos = 0
 
     def _push(self, entry):
+        if entry[0] != "pages":
+            self._after = None
         self.stack = self.stack[:self.pos + 1]
         self.stack.append(entry)
         self.pos = len(self.stack) - 1
@@ -199,11 +233,37 @@ class History:
 
     def begin_pages(self, doc, pages):
         """Call before a markup edit on `pages`; pass the result to
-        commit_pages() afterwards."""
-        return {p: page_state(doc, p) for p in sorted(set(pages))}
+        commit_pages() afterwards.
+
+        A page whose state the last commit recorded, untouched since, is
+        not read again (torture test, Nov 10: every markup read all the
+        page's markups twice - 218 ms for one rectangle on a sheet with
+        500). Untouched means: stamp() was called after that commit, the
+        document's edit counter hasn't moved since, and the page's markup
+        list and the object count are the same."""
+        out = {}
+        hit = self._after
+        valid = hit is not None and hit["count"] is not None and \
+            hit["doc"] == id(doc) and hit["count"] == _edit_count(doc)
+        for p in sorted(set(pages)):
+            if valid and p in hit["after"] and \
+                    hit["fp"].get(p) == _fingerprint(doc, p):
+                out[p] = hit["after"][p]
+            else:
+                out[p] = page_state(doc, p)
+        return out
+
+    def stamp(self, doc):
+        """Call when the edit just committed is finished (the window has
+        recorded it as a change): its pages may be reused by the next
+        begin_pages() if nothing changes in between."""
+        if self._after is not None and self._after["doc"] == id(doc):
+            self._after["count"] = _edit_count(doc)
 
     def commit_pages(self, doc, before, label=None):
         after = {p: page_state(doc, p) for p in before}
+        self._after = {"doc": id(doc), "count": None, "after": after,
+                       "fp": {p: _fingerprint(doc, p) for p in after}}
         if after == before:
             return
         self._push(_step("pages", before, after,
@@ -277,6 +337,7 @@ class History:
     def undo(self, doc=None):
         """Step back. Returns bytes to reload, or (for markup steps, done
         in place on `doc`) the set of page numbers that changed."""
+        self._after = None
         if self.pos <= 0:
             return None
         e = self.stack[self.pos]
@@ -289,6 +350,7 @@ class History:
         return self.state_bytes(self.pos)
 
     def redo(self, doc=None):
+        self._after = None
         if self.pos >= len(self.stack) - 1:
             return None
         self.pos += 1

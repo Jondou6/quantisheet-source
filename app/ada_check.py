@@ -591,5 +591,5 @@ def read(doc):
 def write(doc, project):
     import json
     from . import embfiles
-    embfiles.put(doc, FILE, json.dumps(project, indent=1).encode("utf-8"),
+    embfiles.put(doc, FILE, json.dumps(project).encode("utf-8"),
                  "QuantiSheet ADA check")

@@ -53,7 +53,7 @@ def write(doc, items):
     data = {"items": [{"name": it["name"], "type": it["type"],
                        "color": list(it["color"]) if it.get("color")
                        else None} for it in items]}
-    embfiles.put(doc, FILE, json.dumps(data, indent=1).encode("utf-8"),
+    embfiles.put(doc, FILE, json.dumps(data).encode("utf-8"),
                  "QuantiSheet takeoff items")
 
 

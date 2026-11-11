@@ -228,7 +228,7 @@ def read_job(doc):
 
 
 def write_job(doc, data):
-    embfiles.put(doc, FILE, json.dumps(data, indent=1).encode("utf-8"),
+    embfiles.put(doc, FILE, json.dumps(data).encode("utf-8"),
                  "QuantiSheet assembly bindings")
 
 

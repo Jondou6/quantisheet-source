@@ -171,8 +171,21 @@ def tag_of(annot):
 
 
 def is_applied(page, op_id):
+    """True when an annotation on the page was made by op `op_id`. Reads
+    each annotation's /NM key alone: going through annot.info read six
+    keys per markup, 200 ms per received op on a sheet with 1,500 (torture
+    test, Nov 10)."""
     t = str(op_id)
-    return any(tag_of(a) == t for a in iter_annots(page))
+    want = {TAG + t, _TAG_OLD + t}
+    try:
+        doc = page.parent
+        for a in iter_annots(page):
+            typ, val = doc.xref_get_key(a.xref, "NM")
+            if typ == "string" and val in want:
+                return True
+        return False
+    except Exception:                                     # noqa: BLE001
+        return any(tag_of(a) == t for a in iter_annots(page))
 
 
 def _tag(doc, annot, op_id):
@@ -856,8 +869,17 @@ def apply_op(doc, op, fresh=False):
 
 def _apply_op(doc, op, fresh=False):
     """apply_op() without the edit counter."""
+    if not isinstance(op, dict):
+        log.warning("op is not an object: %r", type(op).__name__)
+        return False
     kind = op.get("kind")
     p = op.get("payload") or {}
+    if not isinstance(p, dict):
+        # a peer's junk (torture test, Nov 10): refused here, not left to
+        # fail with a traceback in the log inside each kind's code
+        log.warning("op %s (%s): payload is not an object", op.get("id"),
+                    kind)
+        return False
     pno = op.get("page")
     oid = str(op.get("id", ""))
     if kind not in KINDS:
@@ -3003,8 +3025,17 @@ _EDITS_BY_ID = {}                     # documents that can't be weakly held
 
 
 def bump_edits(doc):
+    """One more change to `doc`. The count is kept on the document itself:
+    kept by id() (or by a hash a new document can share), a document made
+    after another was closed started at the old one's count (Nov 10: a new
+    document read 10)."""
     if doc is None:
         return
+    try:
+        doc._qs_edits = getattr(doc, "_qs_edits", 0) + 1
+        return
+    except Exception:                                     # noqa: BLE001
+        pass
     try:
         _EDITS[doc] = _EDITS.get(doc, 0) + 1
     except TypeError:
@@ -3012,6 +3043,9 @@ def bump_edits(doc):
 
 
 def edit_count(doc):
+    n = getattr(doc, "_qs_edits", None)
+    if n is not None:
+        return n
     try:
         return _EDITS.get(doc, 0)
     except TypeError:

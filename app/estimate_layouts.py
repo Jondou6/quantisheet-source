@@ -254,7 +254,7 @@ def write_store(doc, store):
             "current": _text(store.get("current"))}
     for x in data["layouts"]:
         x.pop("builtin", None)
-    embfiles.put(doc, FILE, json.dumps(data, indent=1).encode("utf-8"),
+    embfiles.put(doc, FILE, json.dumps(data).encode("utf-8"),
                  "QuantiSheet estimate layouts")
 
 

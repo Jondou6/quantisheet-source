@@ -341,7 +341,7 @@ def _put(doc, name, data, desc):
             return
         if x:
             try:
-                doc.update_stream(x, data)
+                _write_stream(doc, x, data)
             except Exception:
                 log.warning("embedded file %s is damaged; rewriting it",
                             name, exc_info=True)
@@ -361,6 +361,25 @@ def _put(doc, name, data, desc):
         del entries[i]
         doc.xref_set_key(loc[0], loc[1], _array(entries))
     doc.embfile_add(name, data, filename=name, desc=desc)
+
+
+FAST_ABOVE = 128 * 1024        # bytes: bigger job data is compressed fast
+
+
+def _write_stream(doc, x, data):
+    """Replace stream `x` with `data`, compressed. PDF code compresses at
+    its slowest setting: 100 ms for every save of a half-megabyte billing
+    record, on every entry (torture test, Nov 10). Big data is compressed
+    here at a fast setting and stored already compressed; put() reads it
+    back and compares, so a mistake can't pass silently."""
+    if len(data) < FAST_ABOVE:
+        doc.update_stream(x, data)
+        return
+    import zlib
+    doc.update_stream(x, zlib.compress(data, 1), compress=False)
+    doc.xref_set_key(x, "Filter", "/FlateDecode")
+    if doc.xref_get_key(x, "DecodeParms")[0] != "null":
+        doc.xref_set_key(x, "DecodeParms", "null")
 
 
 def _flat_first(doc):

@@ -50,7 +50,7 @@ def test_whats_new_111():
         assert w in s
     assert "Adobe" not in s and "Bluebeam" not in s
     from app import __version__
-    assert __version__ == "1.1.2"
+    assert __version__ == "1.1.3"
 
 
 def test_whats_new_112():
@@ -67,3 +67,19 @@ def test_whats_new_112():
                  encoding="utf-8").read()
     assert notes.startswith("QuantiSheet 1.1.2\n")
     assert "quantisheet-source/tree/v1.1.2" in notes
+
+
+def test_whats_new_113():
+    p = os.path.join(os.path.dirname(helpcenter.__file__), "data",
+                     "whats_new.json")
+    s = json.load(open(p, encoding="utf-8"))["1.1.3"]
+    for w in ("Auto Takeoff rooms", "pen by pen", "pay application",
+              "still a draft to check"):
+        assert w in s
+    for w in ("Adobe", "Acrobat", "Bluebeam", "P6", "Stirling", "Manual J"):
+        assert w not in s
+    root = os.path.dirname(os.path.dirname(helpcenter.__file__))
+    notes = open(os.path.join(root, "docs", "TEAM_NOTES_1.1.3.txt"),
+                 encoding="utf-8").read()
+    assert notes.startswith("QuantiSheet 1.1.3\n")
+    assert "quantisheet-source/tree/v1.1.3" in notes

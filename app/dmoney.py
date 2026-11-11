@@ -51,8 +51,19 @@ def bad(v, blank_ok=True):
         return True
 
 
+def _quantize(d, exp, v):
+    """d rounded half up to `exp`. ValueError, not decimal's
+    InvalidOperation, when the number is too big to carry those places
+    (torture test, Nov 10: c2(1e300) and c2("1e400") raised an error no
+    caller catches)."""
+    try:
+        return d.quantize(exp, rounding=ROUND_HALF_UP)
+    except InvalidOperation:
+        raise ValueError(f"too large to round: {v!r}") from None
+
+
 def cents(v):
-    return D(v).quantize(CENT, rounding=ROUND_HALF_UP)
+    return _quantize(D(v), CENT, v)
 
 
 def text(v):
@@ -114,7 +125,7 @@ def c2(v):
     d = _dec(v)
     if not d.is_finite():
         return float(d)
-    return float(d.quantize(CENT, rounding=ROUND_HALF_UP))
+    return float(_quantize(d, CENT, v))
 
 
 def half_up(v, places=2):
@@ -133,5 +144,4 @@ def half_up(v, places=2):
     d = _dec(v)
     if not d.is_finite():
         return float(d)
-    return float(d.quantize(Decimal(1).scaleb(-places),
-                            rounding=ROUND_HALF_UP))
+    return float(_quantize(d, Decimal(1).scaleb(-places), v))

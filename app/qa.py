@@ -103,7 +103,7 @@ def read(doc):
 
 
 def write(doc, data):
-    raw = json.dumps(data, indent=1).encode("utf-8")
+    raw = json.dumps(data).encode("utf-8")
     embfiles.put(doc, FILE, raw, "QuantiSheet quality")
 
 

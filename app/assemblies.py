@@ -399,7 +399,7 @@ def read_job(doc):
 
 
 def write_job(doc, job):
-    data = json.dumps(job, indent=1).encode("utf-8")
+    data = json.dumps(job).encode("utf-8")
     embfiles.put(doc, JOB_FILE, data, "QuantiSheet job assemblies")
 
 

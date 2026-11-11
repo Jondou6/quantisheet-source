@@ -99,7 +99,7 @@ def follow_rename(doc, old, mtype, new):
 
 
 def write_prices(doc, prices):
-    data = json.dumps(prices, indent=1).encode("utf-8")
+    data = json.dumps(prices).encode("utf-8")
     embfiles.put(doc, FILE, data, "QuantiSheet estimate pricing")
 
 
@@ -161,7 +161,7 @@ def write_set_items(doc, rows, page, label=None):
     data = {"page": int(page), "label": label, "rows": [
         {"group": g, "item": i, "quantity": q, "unit": u, "how": h}
         for g, i, q, u, h in rows]}
-    embfiles.put(doc, SET_FILE, json.dumps(data, indent=1).encode("utf-8"),
+    embfiles.put(doc, SET_FILE, json.dumps(data).encode("utf-8"),
                  "QuantiSheet generated-set quantities")
 
 

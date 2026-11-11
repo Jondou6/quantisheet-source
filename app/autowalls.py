@@ -198,7 +198,8 @@ def _evenly_spaced(partners):
 
 
 def walls(page, ppu, unit="ft", min_t=MIN_T_IN, max_t=None,
-          segs=None, info=None, resolution_in=None):
+          segs=None, info=None, resolution_in=None, min_run_ft=None,
+          min_seg_ft=None, by_pen=True):
     """[{p0, p1, thickness (inches), length (unit)}] for the walls drawn on
     `page` at `ppu` points per `unit`. `segs` overrides the page's
     linework (raster_segments for a scan).
@@ -214,16 +215,22 @@ def walls(page, ppu, unit="ft", min_t=MIN_T_IN, max_t=None,
                     "yd": 1 / 3.0}.get(unit, 1.0)
     if per_ft <= 0:
         raise AutoWallsError("Set the scale for this page first.")
+    if segs is None and by_pen and page is not None:
+        # the page's own linework: pen by pen (walls_by_pen)
+        return walls_by_pen(page, ppu, unit, info=info, min_t=min_t,
+                            max_t=max_t, resolution_in=resolution_in,
+                            min_run_ft=min_run_ft, min_seg_ft=min_seg_ft)
     if max_t is None:
         max_t = MAX_T_IN
     lo, hi = min_t / 12 * per_ft, max_t / 12 * per_ft
+    min_seg = MIN_SEG_FT if min_seg_ft is None else min_seg_ft
     if resolution_in is None:            # before segs is filtered below
         resolution_in = getattr(segs, "px_in", None)
     if segs is None:
-        segs = segments(page, MIN_SEG_FT * per_ft)
+        segs = segments(page, min_seg * per_ft)
     else:
         segs = [q for q in segs if math.hypot(q[2] - q[0], q[3] - q[1])
-                >= MIN_SEG_FT * per_ft]
+                >= min_seg * per_ft]
     if not segs:
         raise AutoWallsError("This page has no drawn lines to read (a scan "
                              "or an image). Run OCR / use Auto Area "
@@ -240,13 +247,49 @@ def walls(page, ppu, unit="ft", min_t=MIN_T_IN, max_t=None,
         groups.append(cur)
     if len(groups) > 1 and groups[0][0][0] + math.pi - groups[-1][-1][0] \
             <= ANGLE_TOL:
-        groups[0] = groups[-1] + groups[0]       # 0 and 180 deg are one
+        # 0 and 180 deg are one direction. The lines just under 180 are
+        # turned half a circle first (angle - pi, offset and run negated):
+        # averaged in as they were, ONE line at 179.3 deg among fifteen at
+        # 0 put every wall of that pen at 11 deg, across the rooms
+        # (made-up plans, Nov 10)
+        groups[0] = [(f[0] - math.pi, -f[1], -f[3], -f[2])
+                     for f in groups[-1]] + groups[0]
         groups.pop()
-    min_run = MIN_RUN_FT * per_ft
+    # a chain of lines each within the tolerance of the next (arcs drawn
+    # as chords) is not one direction: cut it into runs no wider than the
+    # tolerance
+    cut = []
+    for g in groups:
+        if g[-1][0] - g[0][0] <= 2 * ANGLE_TOL:
+            cut.append(g)
+            continue
+        g = sorted(g, key=lambda f: f[0])
+        run = [g[0]]
+        for f in g[1:]:
+            if f[0] - run[0][0] > ANGLE_TOL:
+                cut.append(run)
+                run = []
+            run.append(f)
+        cut.append(run)
+    groups = cut
+    min_run = (MIN_RUN_FT if min_run_ft is None else min_run_ft) * per_ft
     pieces = []
     for g in groups:
-        a = sum(f[0] for f in g) / len(g)
-        lines = sorted(((f[1], f[2], f[3]) for f in g))
+        wsum = sum(f[3] - f[2] for f in g) or 1.0
+        a = sum(f[0] * (f[3] - f[2]) for f in g) / wsum
+        # each line's offset and run in the group's frame, not its own:
+        # a line half a degree off the rest sits elsewhere in its own
+        ca, sa = math.cos(a), math.sin(a)
+        lines = []
+        for f in g:
+            ux, uy = math.cos(f[0]), math.sin(f[0])
+            ends = []
+            for t in (f[2], f[3]):
+                x, y = t * ux - f[1] * uy, t * uy + f[1] * ux
+                ends.append((x * ca + y * sa, -x * sa + y * ca))
+            t0, t1 = sorted((ends[0][0], ends[1][0]))
+            lines.append(((ends[0][1] + ends[1][1]) / 2, t0, t1))
+        lines.sort()
         # merge duplicates (the same line drawn twice, or split pieces)
         # lines a hair apart (CAD float noise) are one line: cluster by
         # offset first, then join pieces along it only where they touch -
@@ -360,6 +403,57 @@ def walls(page, ppu, unit="ft", min_t=MIN_T_IN, max_t=None,
                             "thickness": w["th"] / per_ft * 12,
                             "length": (w["t1"] - w["t0"]) / ppu,
                             "why": w["why"]} for w in dropped]
+        info["classes"] = thickness_classes(out)
+    return out
+
+
+def walls_by_pen(page, ppu, unit="ft", info=None, **kw):
+    """walls() pen by pen: a wall's two faces are drawn with one pen, so
+    lines are only paired with lines of their own colour, weight and dash
+    - and not at all in the sheet's fine pen, which draws furniture,
+    casework, fixtures and hatching, nor in dashed lines (hidden and
+    overhead work). On the made-up hard plans (Nov 10) pairing every line
+    with every other found 7.6% more wall than is drawn, in two dozen
+    "thicknesses": a wall face against a counter, shelving against
+    shelving. Falls back to walls() when the sheet has one pen only."""
+    from .tradetakeoff import styled_segments
+    try:
+        from .autotakeoff import fine_pen
+        fine = fine_pen(page)
+    except Exception:                                    # noqa: BLE001
+        fine = None
+    styled = styled_segments(page)
+    solid = {k: v for k, v in styled.items()
+             if not k[2] and len(v) >= 2}
+    if len(solid) < 2:
+        return walls(page, ppu, unit, info=info, by_pen=False, **kw)
+    out, dropped, light = [], [], []
+    for style, segs in solid.items():
+        is_fine = False
+        try:
+            is_fine = bool(fine) and float(style[1]) <= fine * 1.15
+        except (TypeError, ValueError):
+            pass
+        sub = {}
+        try:
+            got = walls(page, ppu, unit, segs=segs, info=sub, **kw)
+        except AutoWallsError:
+            continue
+        if is_fine:
+            light += got
+            continue
+        out += got
+        dropped += sub.get("dropped") or []
+    # a sheet whose walls ARE in its finest pen (heavier pens: the border,
+    # the title block, a few symbols): most of the wall length is there
+    if sum(w["length"] for w in light) > sum(w["length"] for w in out):
+        out += light
+    if not out:
+        return walls(page, ppu, unit, info=info, by_pen=False, **kw)
+    _cluster(out, kw.get("resolution_in"))
+    out.sort(key=lambda w: -w["length"])
+    if info is not None:
+        info["dropped"] = dropped
         info["classes"] = thickness_classes(out)
     return out
 
