@@ -494,11 +494,64 @@ def rows_from_proposal(p, have=()):
             if not k or k in seen:
                 continue
             seen.add(k)
-            out.append(new_clarification(t, kind))
+            row = new_clarification(t, kind)
+            if kind in ("Exclusion", "Clarification"):
+                # Nov 11: where the quote says it (page and rectangle)
+                try:
+                    from .. import proposal_level
+                    src = proposal_level.source_of(p, kind.lower(), t)
+                except Exception:                         # noqa: BLE001
+                    src = None
+                if src:
+                    row["src"] = src
+            if t in ((p or {}).get("ai_texts") or []):
+                row["ai"] = True       # read by AI, accepted by a person
+            out.append(row)
     return out
 
 
+def clean_src(src):
+    """A stored source ({"file", "page", "rect"}) or None."""
+    try:
+        rect = [float(v) for v in src["rect"]]
+        if len(rect) != 4:
+            return None
+        return {"file": _s(src.get("file")), "page": int(src["page"]),
+                "rect": rect}
+    except (TypeError, KeyError, ValueError):
+        return None
+
+
 # ============================================================ math
+def exclusion_bids(sheet):
+    """Each bidder's exclusions and inclusions for the Exclusions table
+    (exclusions.matrix): the Exclusion rows typed or imported for the
+    bidder, and as inclusions the scope lines the bidder priced or
+    flagged Y."""
+    out = []
+    for i, b in enumerate(sheet["bidders"]):
+        inc = []
+        for ln in sheet["lines"]:
+            c = bid_cell(ln, b["id"])
+            if ln.get("desc") and (c["amount"] is not None or
+                                   c["flag"] == "Y"):
+                inc.append(ln["desc"])
+        out.append({"bidder": bidder_name(sheet, b, i),
+                    "id": b["id"],
+                    "exclusions": [c["text"] for c in clarifications(sheet, b)
+                                   if c["kind"] == "Exclusion" and c["text"]],
+                    "inclusions": inc})
+    return out
+
+
+def exclusion_row(sheet, b, wording):
+    """The bidder's Exclusion row with this wording, or None."""
+    want = " ".join(str(wording).split()).lower()
+    return next((c for c in clarifications(sheet, b)
+                 if c["kind"] == "Exclusion" and c["text"].lower() == want),
+                None)
+
+
 def budget_line_total(ln):
     """Qty x Unit $ (to the cent), else the typed lump sum, else None."""
     q, p = ln.get("qty"), ln.get("unit_price")
@@ -762,6 +815,11 @@ def _clar_list(rows):
             cid = _id()
         seen.add(cid)
         nc["id"] = cid
+        src = clean_src(c.get("src"))
+        if src:
+            nc["src"] = src
+        if c.get("ai") is True:
+            nc["ai"] = True
         if nc["text"] or nc["amount"] is not None:
             out.append(nc)
     return out
@@ -818,7 +876,18 @@ def from_dict(d):
                    "amount": _int_or_none(a.get("amount")),
                    "approved_by": _s(a.get("approved_by")),
                    "approved_on": _s(a.get("approved_on"))}
+    ov = a.get("override")
+    if isinstance(ov, dict) and _s(ov.get("reason")):
+        # an award made in spite of a qualification warning (qualify.py)
+        sh["award"]["override"] = {
+            "company": _s(ov.get("company")), "reason": _s(ov.get("reason")),
+            "warnings": [_s(w) for w in ov.get("warnings") or []],
+            "by": _s(ov.get("by")), "at": _s(ov.get("at"))}
     sh["level"] = d.get("level") if d.get("level") in LEVEL_MODES else "none"
+    mv = d.get("ex_moves")
+    if isinstance(mv, dict) and mv:
+        # the Exclusions table's split / merge choices (exclusions.py)
+        sh["ex_moves"] = {_s(k): _s(v) for k, v in mv.items()}
     for k, v in d.items():
         if k.startswith("_"):
             sh[k] = v
@@ -844,12 +913,16 @@ def content(sheet):
         b.pop("directory_id", None)
         for c in b.get("clar") or []:
             c.pop("id", None)
+            c.pop("src", None)          # not in the workbook
+            c.pop("ai", None)
     for ln in d["lines"]:
         ln.pop("id")
         ln["bids"] = {pos[k]: v for k, v in sorted(
             ln["bids"].items(), key=lambda kv: pos[kv[0]])}
     a = d["award"]
     a["bidder"] = pos.get(a["bidder"], "")
+    a.pop("override", None)            # kept in the job, not in the workbook
+    d.pop("ex_moves", None)
     return d
 
 

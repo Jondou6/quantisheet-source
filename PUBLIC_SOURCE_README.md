@@ -1,7 +1,7 @@
 # QuantiSheet
 
 This directory is the corresponding source for QuantiSheet release main
-(commit 145c518a428afc7b1a4bb35e720f4e34fda30c1a).
+(commit 9984affadc6bfc62256c4027f444950008c60e78).
 
 QuantiSheet is a program for reviewing and marking up PDFs, measuring
 quantities from drawings, estimating, signing documents, and collaborating

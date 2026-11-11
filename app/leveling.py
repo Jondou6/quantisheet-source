@@ -217,7 +217,8 @@ def cell(res, item, bidder):
     return f"{_c2(p):,.2f}", mark
 
 
-def export_xlsx(res, path):
+def export_xlsx(res, path, extra=()):
+    """`extra`: more (sheet name, rows) tabs, e.g. the Exclusions table."""
     from . import acrobat
     b = res["bidders"]
     summary = [["Bidder", "Base bid", "Omissions", "Added (median / plugs)",
@@ -249,5 +250,5 @@ def export_xlsx(res, path):
                      _c2(it.median), "; ".join(om),
                      _c2(it.median * it.qty), round(it.spread)])
     acrobat.write_xlsx(path, [("Leveling", summary), ("Matrix", matrix),
-                              ("Scope Gaps", gaps)])
+                              ("Scope Gaps", gaps)] + list(extra))
     return path

@@ -92,7 +92,17 @@ def new_sheet(package, scope, bidders):
                      # Nov 3 leveling board: priced but not clearly
                      # included (yellow)
                      "unclear": [str(x) for x in b.get("unclear") or []],
-                     "notes": str(b.get("notes", ""))} for b in bidders]}
+                     "notes": str(b.get("notes", "")),
+                     # Nov 11: the quote's own exclusions and inclusions,
+                     # word for word, for the Exclusions table
+                     **{k: [str(x) for x in b[k]] for k in
+                        ("exclusions", "inclusions") if b.get(k)},
+                     # ... and where each value is in the quote file
+                     **({"file": str(b["file"]),
+                         "src": dict(b.get("src") or {}),
+                         "ex_src": list(b.get("ex_src") or [])}
+                        if b.get("file") else {})}
+                    for b in bidders]}
 
 
 def compare(sheet):
@@ -230,6 +240,47 @@ def export(result, path):
 
 # ---- in the PDF ---------------------------------------------------------------
 
+# sheet-level records that outlive new_sheet(): the Exclusions table's
+# split / merge choices, and the reason given for using a quote in spite
+# of a qualification warning
+KEEP = ("ex_moves", "award_override")
+
+
+def set_extra(doc, package, key, value):
+    """Set (or with a falsy value, clear) one of the KEEP records."""
+    if key not in KEEP:
+        raise BidDayError(f"Not a record of the sheet: {key!r}.")
+    sheet = load(doc, package)
+    if sheet is None:
+        raise BidDayError(f"No package named {package!r}.")
+    sheets = [s for s in _all(doc) if s.get("package") != package]
+    if value:
+        sheet[key] = value
+    else:
+        sheet.pop(key, None)
+    sheets.append(sheet)
+    _put(doc, sheets)
+
+
+def exclusion_bids(doc, package):
+    """Each bidder's exclusions and inclusions for the Exclusions table:
+    the quote's own lists, plus as inclusions the scope rows it priced."""
+    sheet = load(doc, package)
+    if sheet is None:
+        return []
+    out = []
+    for b in sheet["bidders"]:
+        inc = list(b.get("inclusions") or [])
+        for s in sheet["scope"]:
+            if s["id"] not in b.get("excluded", []) and \
+                    str(b["prices"].get(s["id"]) or "").strip():
+                inc.append(s["desc"])
+        out.append({"bidder": b["name"],
+                    "exclusions": list(b.get("exclusions") or []),
+                    "inclusions": inc})
+    return out
+
+
 def _all(doc):
     try:
         if FILE in embfiles.names(doc):
@@ -258,6 +309,10 @@ def load(doc, package):
 
 def save(doc, sheet):
     compare(sheet)                                   # refuse bad amounts
+    was = load(doc, sheet["package"]) or {}
+    for k in KEEP:                  # kept when the sheet is rebuilt
+        if k not in sheet and was.get(k):
+            sheet[k] = was[k]
     sheets = [s for s in _all(doc) if s.get("package") != sheet["package"]]
     sheets.append(sheet)
     _put(doc, sheets)

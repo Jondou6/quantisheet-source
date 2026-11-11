@@ -19,7 +19,8 @@ from . import settings
 FILE = "company_directory.json"
 FIELDS = ["company", "contact", "division", "trade", "type", "phone",
           "email", "address", "city", "state", "zip", "notes", "favorite",
-          "source", "certs", "license", "insurance_exp", "bond_limit",
+          "source", "certs", "license", "license_exp", "insurance_exp",
+          "bond_limit",
           "rating", "prequal", "prequal_exp", "prequal_limit"]
 # small-business and labour certifications owners ask about
 CERTS = ["MBE", "WBE", "DBE", "SBE", "VOSB", "SDVOSB", "HUBZone",
@@ -200,6 +201,7 @@ def alerts(contacts=None, today=None, days=30):
     out = []
     for c in (load() if contacts is None else contacts):
         for key, what in (("insurance_exp", "Insurance"),
+                          ("license_exp", "License"),
                           ("prequal_exp", "Prequalification")):
             if key == "prequal_exp" and c.get("prequal") != "Approved":
                 continue
@@ -292,6 +294,8 @@ _COLS = {
     "zip": ("company zip", "business postal code", "zip", "postal"),
     "notes": ("notes",),
     "certs": ("certifications", "certification", "certs", "mwbe"),
+    "license_exp": ("license exp", "license expires", "license expiry",
+                    "license expiration"),
     "license": ("license no", "license number", "contractor license",
                 "license"),
     "insurance_exp": ("insurance exp", "insurance expires", "coi exp",

@@ -81,6 +81,33 @@ def ocr_words(page):
     return words
 
 
+def ocr_page_lines(page):
+    """The page's lines of text with where each word is: [{"text",
+    "words": [(word, (x0, y0, x1, y1))]}], in PDF coordinates, top to
+    bottom as Tesseract read them (one run)."""
+    out, cur, key = [], None, None
+    for line in _run(page, "tsv").splitlines()[1:]:
+        cols = line.split("\t")
+        if len(cols) < 12 or not cols[11].strip():
+            continue
+        try:
+            left, top, w, h = (int(c) for c in cols[6:10])
+        except ValueError:
+            continue
+        r = (fitz.Rect(left, top, left + w, top + h) / SCALE) * \
+            page.derotation_matrix
+        r.normalize()
+        k = tuple(cols[1:5])              # page, block, paragraph, line
+        if k != key:
+            cur = {"text": "", "words": []}
+            out.append(cur)
+            key = k
+        cur["words"].append((cols[11].strip(), (r.x0, r.y0, r.x1, r.y1)))
+    for ln in out:
+        ln["text"] = " ".join(w for w, _r in ln["words"])
+    return out
+
+
 def ocr_document(path):
     doc = fitz.open(path)
     try:

@@ -30,6 +30,8 @@ class LevelBoard(QDialog):
         top.addWidget(self.pkg)
         for text, fn in (("New From Trade…", self.new_from_trade),
                          ("Add Sub Quote PDF…", self.add_quote),
+                         ("Read a Quote with AI…", self.read_with_ai),
+                         ("Exclusions…", self.exclusions),
                          ("Export Scope Sheet…", self.export_scope),
                          ("Use Low in Estimate", self.use_low)):
             b = QPushButton(text)
@@ -99,9 +101,83 @@ class LevelBoard(QDialog):
         parts = [f"<b>{b['name']}</b>: ${_c2(b['total']):,.2f} "
                  f"({b['gaps']} gap(s), {b['unclear']} unclear)"
                  for b in d["bidders"]]
+        from .. import qualify_ui
+        q = qualify_ui.line([(b["name"], b["total"]) for b in d["bidders"]])
         self.summary.setText(" &nbsp; ".join(parts) + (
-            f"<br>Leveled low: <b>{d['low']}</b>" if d["low"] else ""))
+            f"<br>Leveled low: <b>{d['low']}</b>" if d["low"] else "") +
+            ("<br>" + q if q else ""))
         return d
+
+    def read_with_ai(self, bidder=None, ask=None, review=None):
+        """Read one bidder's quote file again with the AI on this PC;
+        what the user accepts is added and the quote is matched to the
+        scope rows again (cells changed by hand for that bidder are set
+        again from the quote)."""
+        from .. import proposal_ai_ui, proposal_level
+        p = self.package()
+        sheet = bidday.load(self.doc, p) if p else None
+        have = [b for b in (sheet or {}).get("bidders") or []
+                if b.get("file")]
+        if not have:
+            QMessageBox.information(
+                self, self.windowTitle(), "Add a sub's quote first (Add "
+                "Sub Quote PDF). Read with AI reads that file again.")
+            return None
+        names = [b["name"] for b in have]
+        if bidder is None:
+            bidder, ok = (names[0], True) if len(names) == 1 else \
+                QInputDialog.getItem(self, "Read with AI", "Which quote?",
+                                     names, 0, False)
+            if not ok:
+                return None
+        b = next((x for x in have if x["name"] == bidder), None)
+        if b is None:
+            return None
+        try:
+            parsed = proposal_level.parse(b["file"])
+        except Exception as e:                            # noqa: BLE001
+            QMessageBox.warning(self, self.windowTitle(),
+                                f"That quote couldn't be read: {e}")
+            return None
+        parsed["bidder"] = b["name"]
+        got = (review or proposal_ai_ui.offer)(self, parsed, ask)
+        if got is None:
+            return None
+        res = LB.import_quote(self.doc, p, parsed=got)
+        self._changed()
+        self.refresh()
+        if got.get("check"):
+            self.summary.setText(self.summary.text() + "<br>" + got["check"])
+        return res
+
+    def show_source(self, bidder, row_id=None, exclusion=None, modal=True):
+        from .. import source_view
+        return source_view.show(
+            self, LB.source_of(self.doc, self.package(), bidder, row_id,
+                               exclusion),
+            f"{bidder}: {exclusion or 'price'}", modal=modal)
+
+    def exclusions(self, show=True):
+        """Who excludes what, from the quotes on this board."""
+        from ..exclusions_ui import ExclusionsDialog
+        p = self.package()
+        if not p:
+            QMessageBox.information(self, self.windowTitle(),
+                                    "Make a package first (New From Trade).")
+            return None
+        sheet = bidday.load(self.doc, p) or {}
+        dlg = ExclusionsDialog(self, f"Exclusions - {p}")
+        dlg.panel.source = lambda n, w: self.show_source(n, exclusion=w)
+        dlg.panel.set_bids(bidday.exclusion_bids(self.doc, p),
+                           sheet.get("ex_moves"))
+
+        def keep(moves):
+            bidday.set_extra(self.doc, p, "ex_moves", dict(moves))
+            self._changed()
+        dlg.panel.moves_changed.connect(keep)
+        if show:
+            dlg.exec()
+        return dlg
 
     def _menu(self, pos):
         it = self.table.itemAt(pos)
@@ -115,6 +191,9 @@ class LevelBoard(QDialog):
                     lambda: self.set_cell(bidder, rid, LB.RED))
         m.addAction("Type Their Price…",
                     lambda: self.set_cell(bidder, rid, LB.GREEN, ask=True))
+        if LB.source_of(self.doc, self.package(), bidder, row_id=rid):
+            m.addAction(f"Show this in {bidder}'s quote",
+                        lambda: self.show_source(bidder, row_id=rid))
         m.exec(self.table.viewport().mapToGlobal(pos))
 
     def set_cell(self, bidder, rid, status, ask=False, amount=None):
@@ -207,14 +286,26 @@ class LevelBoard(QDialog):
                 return None
         return LB.scope_csv(sheet, path)
 
-    def use_low(self, bidder=None):
+    def use_low(self, bidder=None, reason=None):
         if not self.package():
+            return None
+        from .. import qualify_ui
+        d = self.data or LB.board(self.doc, self.package())
+        who = bidder or d["low"]
+        amt = next((b["total"] for b in d["bidders"] if b["name"] == who),
+                   None)
+        ov = qualify_ui.confirm(self, who, amt, self.windowTitle(),
+                                reason=reason) if who else \
+            qualify_ui.NO_WARNING
+        if ov == qualify_ui.CANCELLED:
             return None
         try:
             got = LB.use_low(self.doc, self.package(), bidder)
         except bidday.BidDayError as e:
             QMessageBox.warning(self, self.windowTitle(), str(e))
             return None
+        bidday.set_extra(self.doc, self.package(), "award_override",
+                         ov if isinstance(ov, dict) else None)
         self._changed()
         self.refresh()
         self.summary.setText(self.summary.text() + f"<br>In the estimate: "

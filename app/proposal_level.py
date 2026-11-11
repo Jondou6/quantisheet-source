@@ -17,9 +17,10 @@ Exclusions: permits") couldn't be read, and plugs never used past bids.
   named. as_plugs() turns them into leveling plugs.
 * exclusions_matrix(proposals): who excludes what, side by side.
 
-Text PDFs only. Scanned quotes need OCR first (ocr.py), which this doesn't
-call. The parser is pattern-based, no AI. Low-confidence lines are left
-out, never guessed (see "check").
+Scanned quotes and photos are read with OCR (ocr.py) when Tesseract is
+installed. The parser is pattern-based, no AI. Low-confidence lines are
+left out, never guessed (see "check"). Nov 11: every value read keeps
+where it came from in the file (page and rectangle), see parse().
 """
 import difflib
 import os
@@ -77,43 +78,133 @@ def _open(path):
     return fitz.open(path)
 
 
-def text_lines(path, ocr=True, info=None):
-    """The quote's lines of text. Nov 4: a scanned page (or a picture) is
-    read with OCR when Tesseract is installed; `info` gets "ocr": "used",
-    "unavailable" or "" so the caller can say so."""
+def _clean(ln):
+    return re.sub(r"\s+", " ", ln.replace("\u2013", "-")).strip()
+
+
+def located_lines(path, ocr=True, info=None):
+    """The quote's lines of text, each with where it is on the page:
+    [{"text", "page", "words": [(word, (x0, y0, x1, y1))]}]. A scanned
+    page (or a picture) is read with OCR when Tesseract is installed;
+    `info` gets "ocr": "used", "unavailable" or "". A line OCR gave as
+    text only has no words (so no place on the page)."""
     out, used, missing = [], False, False
     with _open(path) as d:
-        for page in d:
+        for n, page in enumerate(d):
             text = page.get_text("text")
             if ocr and len(re.sub(r"\s", "", text)) < MIN_TEXT:
                 try:
                     from . import ocr as _ocr
+                    try:
+                        got = _ocr.ocr_page_lines(page)
+                    except Exception:                     # noqa: BLE001
+                        got = []
+                    if got:
+                        used = True
+                        for ln in got:
+                            t = _clean(ln["text"])
+                            if t:
+                                out.append({"text": t, "page": n,
+                                            "words": ln["words"]})
+                        continue
                     text = _ocr.ocr_page(page)
                     used = True
                 except Exception:                         # noqa: BLE001
                     missing = True
-            for ln in text.splitlines():
-                ln = re.sub(r"\s+", " ", ln.replace("\u2013", "-")).strip()
-                if ln:
-                    out.append(ln)
+                for ln in text.splitlines():
+                    ln = _clean(ln)
+                    if ln:
+                        out.append({"text": ln, "page": n, "words": []})
+                continue
+            # the same lines get_text("text") gives, with each word's box
+            rows, order = {}, []
+            for x0, y0, x1, y1, w, blk, line, _no in page.get_text("words"):
+                k = (blk, line)
+                if k not in rows:
+                    rows[k] = []
+                    order.append(k)
+                rows[k].append((w, (x0, y0, x1, y1)))
+            for k in order:
+                t = _clean(" ".join(w for w, _r in rows[k]))
+                if t:
+                    out.append({"text": t, "page": n, "words": rows[k]})
     if info is not None:
         info["ocr"] = "used" if used else "unavailable" if missing else ""
     return out
 
 
+def text_lines(path, ocr=True, info=None):
+    """The quote's lines of text (see located_lines)."""
+    return [ln["text"] for ln in located_lines(path, ocr, info)]
+
+
+def _union(rects):
+    return [min(r[0] for r in rects), min(r[1] for r in rects),
+            max(r[2] for r in rects), max(r[3] for r in rects)]
+
+
+def _alnum(s):
+    return re.sub(r"[^a-z0-9]", "", str(s).lower())
+
+
+def _src(ln, part=None, last_number=False):
+    """Where a value is: {"page", "rect"} for the whole line, for the
+    words of `part` in it, or for the last number on it. None when the
+    line has no place on the page (typed lines, OCR text without boxes)."""
+    if not ln or not ln.get("words"):
+        return None
+    words = ln["words"]
+    pick = None
+    if last_number:
+        for w, r in reversed(words):
+            if re.search(r"\d", w):
+                pick = [r]
+                break
+    elif part:
+        want = [_alnum(t) for t in str(part).split()]
+        want = [t for t in want if t]
+        have = [_alnum(w) for w, _r in words]
+        n = len(want)
+        for i in range(len(have) - n + 1 if n else 0):
+            if have[i:i + n] == want:
+                pick = [r for _w, r in words[i:i + n]]
+                break
+        if pick is None and n:             # the words, wherever they are
+            hits = [r for (w, r), h in zip(words, have) if h and h in want]
+            pick = hits or None
+    return {"page": ln["page"],
+            "rect": [round(v, 3) for v in _union(
+                pick or [r for _w, r in words])]}
+
+
 def parse(path, lines=None):
+    """Read a quote. Every value read from the file says where it came
+    from: lines carry "src" (the line) and "src_amount" (the amount on
+    it); "sources" has "bidder", "total", and lists alongside
+    "exclusions", "inclusions", "alternates" and "unread" - each
+    {"page", "rect"} in PDF points, or None when there is no place to
+    point at (`lines` typed in, OCR that gave text only)."""
     info = {"ocr": ""}
-    lines = lines if lines is not None else text_lines(path, info=info)
-    p = {"file": os.path.basename(path), "bidder": "", "lines": [],
+    if lines is not None:
+        loc = [{"text": ln, "page": 0, "words": []} for ln in lines]
+    else:
+        loc = located_lines(path, info=info)
+    p = {"file": os.path.basename(path), "path": os.path.abspath(path),
+         "bidder": "", "lines": [],
          "total": None, "alternates": [], "exclusions": [], "inclusions": [],
-         "unread": []}
+         "unread": [],
+         "sources": {"bidder": None, "total": None, "exclusions": [],
+                     "inclusions": [], "alternates": [], "unread": []}}
+    S = p["sources"]
     section = None
-    for ln in lines:
+    for L in loc:
+        ln = L["text"]
         t = re.sub(r"\b(\d+)\s*(?:inch|in\.)(?=\s)", r'\1"', ln.strip(),
                    flags=re.I)
         if not p["bidder"] and re.search(r"[A-Za-z]{3}", t) and \
                 not _SKIP_NAME.match(t) and not _ITEM.match(t):
             p["bidder"] = t
+            S["bidder"] = _src(L)
             continue
         h = _HEAD.match(t)
         if h:
@@ -121,20 +212,25 @@ def parse(path, lines=None):
             section = "exclusions" if kind.startswith(("excl", "not")) else \
                 "inclusions" if kind.startswith("incl") else None
             if section and h.group(2):
-                p[section] += _split_list(h.group(2))
+                for part in _split_list(h.group(2)):
+                    p[section].append(part)
+                    S[section].append(_src(L, part))
             continue
         if section and re.match(r"^[-•*]\s*", t):
             p[section].append(t.lstrip("-•* ").strip())
+            S[section].append(_src(L))
             continue
         m = _TOTAL.match(t)
         if m:
             p["total"] = _f(m.group(1))
+            S["total"] = _src(L, last_number=True)
             section = None
             continue
         m = _ALT.match(t)
         if m:
             p["alternates"].append({"no": m.group(1), "desc": m.group(2)
                                     .strip(), "amount": _f(m.group(3))})
+            S["alternates"].append(_src(L))
             continue
         m = _ITEM.match(t)
         if m:
@@ -143,9 +239,12 @@ def parse(path, lines=None):
                 p["lines"].append({"item_no": m.group(1) or "",
                                    "desc": _norm_desc(m.group(2)),
                                    "qty": qty, "unit": m.group(4).upper(),
-                                   "price": price, "amount": amt})
+                                   "price": price, "amount": amt,
+                                   "src": _src(L),
+                                   "src_amount": _src(L, last_number=True)})
             else:
                 p["unread"].append(t)
+                S["unread"].append(_src(L))
             section = None
             continue
         m = _LUMP.match(t)
@@ -153,11 +252,14 @@ def parse(path, lines=None):
             amt = _f(m.group(3))
             p["lines"].append({"item_no": m.group(1) or "",
                                "desc": _norm_desc(m.group(2)), "qty": 1.0,
-                               "unit": "LS", "price": amt, "amount": amt})
+                               "unit": "LS", "price": amt, "amount": amt,
+                               "src": _src(L),
+                               "src_amount": _src(L, last_number=True)})
             section = None
             continue
         if section is None and re.search(r"\$\s?[\d,]+", t):
             p["unread"].append(t)                      # money we didn't read
+            S["unread"].append(_src(L))
     if not p["bidder"]:
         p["bidder"] = os.path.splitext(p["file"])[0]
     p["ocr"] = info["ocr"]
@@ -170,6 +272,32 @@ def parse(path, lines=None):
                       "installed, so it couldn't be read. " +
                       p["check"]).strip()
     return p
+
+
+def source_of(p, kind, key):
+    """Where a value of the parsed quote `p` is, as {"file", "page",
+    "rect"} for the viewer, or None. kind: "line" (key: index or
+    description), "amount" (same), "exclusion" / "inclusion" (the
+    wording), "total", "bidder"."""
+    S = p.get("sources") or {}
+    src = None
+    if kind in ("line", "amount"):
+        rows = p.get("lines") or []
+        r = rows[key] if isinstance(key, int) and 0 <= key < len(rows) \
+            else next((x for x in rows if x.get("desc") == key), None)
+        src = r and r.get("src_amount" if kind == "amount" else "src")
+    elif kind in ("exclusion", "inclusion", "clarification"):
+        names = p.get(kind + "s") or []
+        want = str(key).strip().lower()
+        i = next((i for i, t in enumerate(names)
+                  if t.strip().lower() == want), None)
+        lst = S.get(kind + "s") or []
+        src = lst[i] if i is not None and i < len(lst) else None
+    elif kind in ("total", "bidder"):
+        src = S.get(kind)
+    if not src or not p.get("path"):
+        return None
+    return {"file": p["path"], "page": src["page"], "rect": list(src["rect"])}
 
 
 def check(p):
@@ -192,7 +320,9 @@ def to_bids(proposals):
         for r in p["lines"]:
             rows.append({"desc": r["desc"], "unit": r["unit"],
                          "qty": r["qty"], "price": r["price"],
-                         "item_no": "", "bidder": p["bidder"], "note": ""})
+                         "item_no": "", "bidder": p["bidder"],
+                         "note": "read by AI - check" if r.get("ai")
+                         else ""})
     return bids
 
 

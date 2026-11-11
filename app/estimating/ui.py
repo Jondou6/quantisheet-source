@@ -931,6 +931,13 @@ class BidDayPage(Page):
                          f"lowest complete: {r['lowest_complete'] or '-'}"
                          + (f";  in the estimate: {ap['bidder']}"
                             if ap.get("bidder") else ""))
+        try:                       # Nov 11: qualification at a glance
+            from .. import qualify_ui
+            q = qualify_ui.line([(n, by[n]["total"]) for n in names])
+            if q:
+                self.msg.setText(self.msg.text() + "<br>" + q)
+        except Exception:                                 # noqa: BLE001
+            pass
         return None
 
     def pick_takeoff(self):
@@ -1006,8 +1013,20 @@ class BidDayPage(Page):
                     "takes it back). Nothing is written to the price "
                     "database."):
             return
+        from .. import qualify_ui
+        r = getattr(self, "result", None) or {}
+        name = who if who not in ("", LOWEST_COMPLETE) else \
+            r.get("lowest_complete") or ""
+        amt = next((b["total"] for b in r.get("bidders") or []
+                    if b["name"] == name), None)
+        ov = qualify_ui.confirm(self, name, amt, "Bid Day") if name else \
+            qualify_ui.NO_WARNING
+        if ov == qualify_ui.CANCELLED:
+            return
         res = bidday.apply_quote(self.doc, pkg, None if who in (
             "", LOWEST_COMPLETE) else who)
+        bidday.set_extra(self.doc, pkg, "award_override",
+                         ov if isinstance(ov, dict) else None)
         self.edited()
         self.show_sheet()
         bits = [f"{len(res['line_ids'])} line(s) of {res['bidder']}'s quote "

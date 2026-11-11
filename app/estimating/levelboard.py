@@ -245,6 +245,7 @@ def import_quote(doc, package, path=None, parsed=None):
         raise bidday.BidDayError(f"No package named {package!r}.")
     p = parsed or proposal_level.parse(path)
     prices, unclear, matched, unmatched = {}, [], [], []
+    src_rows = {}                      # scope row id -> where its price is
     for ln in p.get("lines") or []:
         best, score = None, 0.0
         for s in sheet["scope"]:
@@ -257,7 +258,12 @@ def import_quote(doc, package, path=None, parsed=None):
             unmatched.append(ln["desc"])
             continue
         prices[best["id"]] = f"{_c2(Decimal(str(ln['amount']))):.2f}"
-        (matched if score >= MATCH else unclear).append(best["id"])
+        if ln.get("src_amount") or ln.get("src"):
+            src_rows[best["id"]] = ln.get("src_amount") or ln["src"]
+        # a line the AI read (accepted by a person) stays yellow: it is
+        # priced, and still to be checked against the quote
+        (matched if score >= MATCH and not ln.get("ai")
+         else unclear).append(best["id"])
     excluded = []
     for ex in p.get("exclusions") or []:
         for s in sheet["scope"]:
@@ -268,6 +274,13 @@ def import_quote(doc, package, path=None, parsed=None):
     bidders = [b for b in sheet["bidders"] if b["name"] != name]
     bidders.append({"name": name, "kind": "sub", "prices": prices,
                     "excluded": excluded, "unclear": unclear,
+                    # Nov 11: where each value is in the quote file
+                    "file": p.get("path") or "",
+                    "src": src_rows,
+                    "ex_src": list((p.get("sources") or {}).get(
+                        "exclusions") or []),
+                    "exclusions": list(p.get("exclusions") or []),
+                    "inclusions": list(p.get("inclusions") or []),
                     "notes": "; ".join(filter(None, [
                         p.get("check", ""),
                         ("Exclusions: " + "; ".join(p["exclusions"]))
@@ -311,3 +324,25 @@ def use_low(doc, package, bidder=None):
     bidday.save(doc, bidday.new_sheet(package, sheet["scope"],
                                       sheet["bidders"]))
     return bidday.apply_quote(doc, package, bidder or b["low"] or None)
+
+
+def source_of(doc, package, bidder, row_id=None, exclusion=None):
+    """Where a price (by scope row) or an exclusion (by its wording) is in
+    that bidder's quote file: {"file", "page", "rect"} or None."""
+    sheet = bidday.load(doc, package) or {}
+    b = next((x for x in sheet.get("bidders") or []
+              if x["name"] == bidder), None)
+    if b is None or not b.get("file"):
+        return None
+    src = None
+    if row_id is not None:
+        src = (b.get("src") or {}).get(str(row_id))
+    elif exclusion is not None:
+        names = [t.strip().lower() for t in b.get("exclusions") or []]
+        want = str(exclusion).strip().lower()
+        lst = b.get("ex_src") or []
+        if want in names and names.index(want) < len(lst):
+            src = lst[names.index(want)]
+    if not src:
+        return None
+    return {"file": b["file"], "page": src["page"], "rect": src["rect"]}

@@ -580,6 +580,12 @@ class ScopeSheetEditor(QWidget):
             return
         bid = self.award.currentData() or ""
         if self.sheet["award"].get("bidder") != bid:
+            b = ss.bidder(self.sheet, bid) if bid else None
+            if b is not None and not self.confirm_award(b):
+                self.render()             # back to the award as it was
+                return
+            if b is None:
+                self.sheet["award"].pop("override", None)
             self.sheet["award"]["bidder"] = bid
             self.sheet["award"]["amount"] = None
             self.changed()
@@ -1093,7 +1099,64 @@ class ScopeSheetEditor(QWidget):
         if s["math_errors"]:
             parts.append(f"<span style='color:#b00020'><b>Math check:</b> "
                          f"{s['math_errors']} bidder(s) don't add up</span>")
-        self.summary.setText("  ·  ".join(parts))
+        q = self.qualification_html()
+        self.summary.setText("  ·  ".join(parts) + ("<br>" + q if q else ""))
+
+    # -------------------------------------------------------- qualification
+    def contact_for(self, b):
+        """The bidder's Company Directory entry, or None."""
+        from .. import qualify
+        cs = self.contacts()
+        did = b.get("directory_id")
+        hit = next((c for c in cs if did and c.get("id") == did), None)
+        return hit or qualify.find(b.get("company"), cs)
+
+    def bidder_badges(self, b):
+        from .. import qualify
+        t = ss.bidder_total(self.sheet, b)
+        return qualify.badges(self.contact_for(b),
+                              None if t is None else t / 100)
+
+    def qualification_html(self):
+        from .. import qualify
+        sh = self.sheet
+        if sh is None:
+            return ""
+        return qualify.html([
+            (ss.bidder_name(sh, b, i), self.bidder_badges(b))
+            for i, b in enumerate(sh["bidders"])
+            if b.get("company") or ss.active(sh, b)])
+
+    def award_warnings(self, b):
+        from .. import qualify
+        t = ss.bidder_total(self.sheet, b)
+        return qualify.award_warnings(self.contact_for(b),
+                                      None if t is None else t / 100)
+
+    def confirm_award(self, b, reason=None):
+        """True when the award may go to this bidder. With a qualification
+        warning (expired insurance or license, over the bonding or the
+        approved limit) a reason is asked for and kept on the award."""
+        from .. import qualify
+        warn = self.award_warnings(b)
+        if not warn:
+            self.sheet["award"].pop("override", None)
+            return True
+        if reason is None:
+            reason, ok = QInputDialog.getText(
+                self, "Recommended Award",
+                ss.bidder_name(self.sheet, b) + ":\n- " + "\n- ".join(warn)
+                + "\n\nTo award anyway, give the reason (it is kept with "
+                "the award):")
+            if not ok:
+                return False
+        try:
+            self.sheet["award"]["override"] = qualify.override(
+                ss.bidder_name(self.sheet, b), warn, reason,
+                settings.get("author", "") or "")
+        except ValueError:
+            return False
+        return True
 
 
 # ======================================================== clarifications
@@ -1133,7 +1196,24 @@ class ClarificationsBox(QWidget):
                                 "bidder's proposal PDF (text PDFs) as "
                                 "Pending rows")
         self.imp_btn.clicked.connect(lambda: self.import_from_proposal())
-        for b in (self.add_btn, self.del_btn, self.imp_btn):
+        self.ai_btn = QPushButton("Import with AI…")
+        self.ai_btn.setToolTip("Read the proposal with the AI on this PC "
+                               "(nothing leaves the computer). Only what "
+                               "is in the quote word for word is offered, "
+                               "and you accept each one")
+        self.ai_btn.clicked.connect(
+            lambda: self.import_from_proposal(ai=True))
+        self.src_btn = QPushButton("Show Source")
+        self.src_btn.setToolTip("Open the bidder's proposal at the words "
+                                "this row was read from (rows made by "
+                                "Import from Proposal)")
+        self.src_btn.clicked.connect(lambda: self.show_source())
+        self.ex_btn = QPushButton("Compare Exclusions…")
+        self.ex_btn.setToolTip("Who excludes what, side by side: every "
+                               "bidder's Exclusion rows in one table")
+        self.ex_btn.clicked.connect(lambda: self.compare_exclusions())
+        for b in (self.add_btn, self.del_btn, self.imp_btn, self.ai_btn,
+                  self.src_btn, self.ex_btn):
             top.addWidget(b)
         top.addStretch()
         v.addLayout(top)
@@ -1291,6 +1371,92 @@ class ClarificationsBox(QWidget):
         self.ed.changed(render=False)
         self.ed.render()               # leveled row, totals, summary
 
+    # ------------------------------------------------- exclusions compare
+    def compare_exclusions(self, show=True):
+        """The Exclusions table for this sheet's bidders. Returns the
+        dialog (shown unless show=False)."""
+        from ..exclusions_ui import ExclusionsDialog
+        sh = self.sheet()
+        if sh is None:
+            return None
+        dlg = ExclusionsDialog(
+            self, "Exclusions - " + (ss.title(sh) or "Scope Sheet"),
+            ("Set $ adjustment…", lambda n, w: self.price_exclusion(
+                n, w, dlg=dlg)))
+        dlg.panel.source = lambda n, w: self.show_source(name=n, wording=w)
+        dlg.panel.set_bids(ss.exclusion_bids(sh), sh.get("ex_moves"))
+        dlg.panel.moves_changed.connect(self._moves_changed)
+        if show:
+            dlg.exec()
+        return dlg
+
+    def source_for(self, row=None, name=None, wording=None):
+        """The stored source of a row: the selected one, or the named
+        bidder's Exclusion row with that wording. None when it has none."""
+        sh = self.sheet()
+        if sh is None:
+            return None, ""
+        if name is not None:
+            b = next((x for i, x in enumerate(sh["bidders"])
+                      if ss.bidder_name(sh, x, i) == name), None)
+            c = ss.exclusion_row(sh, b, wording) if b else None
+        else:
+            b = self.current_bidder()
+            lst = ss.clarifications(sh, b) if b else []
+            r = self.table.currentRow() if row is None else row
+            c = lst[r] if 0 <= r < len(lst) else None
+        return (c or {}).get("src"), (c or {}).get("text", "")
+
+    def show_source(self, row=None, name=None, wording=None, modal=True):
+        from .. import source_view
+        src, text = self.source_for(row, name, wording)
+        return source_view.show(self, src, text, modal=modal)
+
+    def _moves_changed(self, moves):
+        sh = self.sheet()
+        if sh is None:
+            return
+        if moves:
+            sh["ex_moves"] = dict(moves)
+        else:
+            sh.pop("ex_moves", None)
+        self.ed.changed(render=False)
+
+    def price_exclusion(self, name, wording, amount=None, dlg=None):
+        """One click from the Exclusions table: put a $ adjustment on the
+        bidder's Exclusion row (it stays Pending until you accept or
+        reject it, as before)."""
+        sh = self.sheet()
+        b = next((x for i, x in enumerate(sh["bidders"])
+                  if ss.bidder_name(sh, x, i) == name), None)
+        if b is None:
+            return None
+        c = ss.exclusion_row(sh, b, wording)
+        if c is None:
+            c = ss.add_clarification(sh, b, wording, "Exclusion")
+        if amount is None:
+            text, ok = QInputDialog.getText(
+                self, "Exclusion", f"{name} excludes \"{wording}\".\n"
+                "What it will cost to cover it ($, a credit in "
+                "parentheses):", text=ss.plain_money(c.get("amount")) or "")
+            if not ok:
+                return None
+            try:
+                amount = ss.parse_money(text)
+            except ss.ScopeError as e:
+                self.ed.show_error(str(e))
+                return None
+        if amount is None:
+            ss.set_clarification(sh, b, c["id"], clear_amount=True)
+        else:
+            ss.set_clarification(sh, b, c["id"], amount=amount)
+        i = self.bidder.findData(b["id"])
+        if i >= 0:
+            self.bidder.setCurrentIndex(i)
+        self._done()
+        self.refresh()
+        return c
+
     def _set(self, cid, **kw):
         if self._loading or not self._editable():
             return False
@@ -1372,10 +1538,13 @@ class ClarificationsBox(QWidget):
             self._done()
         return len(ids)
 
-    def import_from_proposal(self, path=None):
+    def import_from_proposal(self, path=None, ai=False, ask=None,
+                             review=None):
         """Prefill rows from a sub's proposal PDF (proposal_level.parse):
         its exclusions as Pending rows with no $. Returns how many were
-        added."""
+        added. ai=True: Read with AI first (the local model; you accept
+        each value it found in the quote) - for a quote whose exclusions
+        the patterns didn't find."""
         b = self.current_bidder()
         if b is None or not self._editable():
             return 0
@@ -1391,6 +1560,11 @@ class ClarificationsBox(QWidget):
             log.warning("proposal not read", exc_info=True)
             self.ed.show_error(f"Couldn't read that proposal: {e}")
             return 0
+        if ai:
+            from .. import proposal_ai_ui
+            p = (review or proposal_ai_ui.offer)(self, p, ask)
+            if p is None:
+                return 0
         have = [c["text"] for c in ss.clarifications(self.sheet(), b)]
         rows = ss.rows_from_proposal(p, have)
         b.setdefault("clar", []).extend(rows)
@@ -1401,8 +1575,9 @@ class ClarificationsBox(QWidget):
                                 "Pending - price them, then accept or "
                                 "reject each.")
         else:
-            self.ed.msg.setText(f"No exclusions found in {name} (text PDFs "
-                                "only; a scanned quote needs OCR first).")
+            self.ed.msg.setText(f"No new exclusions found in {name}. If "
+                                "the quote lists some, Import with AI can "
+                                "look for them.")
         return len(rows)
 
 

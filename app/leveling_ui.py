@@ -97,6 +97,17 @@ class LevelingDialog(QDialog):
         self.gaps.horizontalHeader().setSectionResizeMode(
             0, QHeaderView.Stretch)
         tabs.addTab(self.gaps, "Scope Gaps")
+        from .exclusions_ui import ExclusionsPanel
+        self.ex_moves = {}
+        self.exclusions = ExclusionsPanel(self, (
+            "Add an adjustment…", lambda n, w: self._ask_adjust(n, w)))
+        self.exclusions.moves_changed.connect(
+            lambda m: setattr(self, "ex_moves", dict(m)))
+        self.exclusions.source = lambda n, w: self.show_source(
+            n, "exclusion", w)
+        tabs.addTab(self.exclusions, "Exclusions")
+        self.qual = QLabel("")
+        self.qual.setWordWrap(True)
         pw = QWidget()
         pv = QVBoxLayout(pw)
         self.plug_table = QTableWidget(0, 5)
@@ -134,9 +145,17 @@ class LevelingDialog(QDialog):
                         " base bid + omitted items at the median (or your "
                         "plug) + adjustments.")
         lay.addWidget(legend)
+        lay.addWidget(self.qual)
         bb = QDialogButtonBox(QDialogButtonBox.Close)
         b = bb.addButton("Export to Excel…", QDialogButtonBox.ActionRole)
         b.clicked.connect(lambda: self.export())
+        b = bb.addButton("Read a Proposal with AI…",
+                         QDialogButtonBox.ActionRole)
+        b.setToolTip("For a proposal with lines that weren't read or that "
+                     "don't add up: the AI on this PC reads it (nothing "
+                     "leaves the computer). Only values found in the quote "
+                     "word for word are offered, and you accept each one")
+        b.clicked.connect(lambda: self.read_with_ai())
         bb.rejected.connect(self.reject)
         lay.addWidget(bb)
 
@@ -202,8 +221,10 @@ class LevelingDialog(QDialog):
                 continue
             if not pr.get("lines"):
                 notes.append(f"{os.path.basename(p)}: no priced lines found"
-                             " (a scanned quote needs Make Searchable "
-                             "first).")
+                             " - Read a Proposal with AI can try it.")
+                self.unread_props = [
+                    x for x in getattr(self, "unread_props", [])
+                    if x.get("path") != pr.get("path")] + [pr]
                 continue
             props.append(pr)
             c = proposal_level.check(pr)
@@ -223,6 +244,55 @@ class LevelingDialog(QDialog):
             QMessageBox.information(self, "Bid Leveling - check these",
                                     "\n".join(notes))
         return res
+
+    def ai_candidates(self):
+        """Parsed proposals Read with AI could help: lines unread, lines
+        that don't add up, or nothing read at all."""
+        from . import proposal_ai
+        every = list(getattr(self, "proposals", None) or []) + \
+            list(getattr(self, "unread_props", None) or [])
+        return [p for p in every if proposal_ai.needs_ai(p)]
+
+    def read_with_ai(self, bidder=None, ask=None, review=None):
+        """Read one proposal with the AI on this PC; what the user accepts
+        goes into that bidder's lines (marked as read by AI) and the
+        leveling is run again. Returns the updated proposal or None."""
+        from . import proposal_ai_ui, proposal_level
+        cands = self.ai_candidates()
+        if not cands:
+            QMessageBox.information(
+                self, "Bid Leveling", "Every proposal here was read in "
+                "full and adds up, so there is nothing for the AI to "
+                "look for. (Use Proposals first.)")
+            return None
+        names = [p["bidder"] for p in cands]
+        if bidder is None:
+            bidder, ok = (names[0], True) if len(names) == 1 else \
+                QInputDialog.getItem(self, "Read with AI",
+                                     "Which proposal?", names, 0, False)
+            if not ok:
+                return None
+        p = next((x for x in cands if x["bidder"] == bidder), None)
+        if p is None:
+            return None
+        got = (review or proposal_ai_ui.offer)(self, p, ask)
+        if got is None:
+            return None
+        self.unread_props = [x for x in getattr(self, "unread_props", [])
+                             if x.get("path") != p.get("path")]
+        props = [x for x in getattr(self, "proposals", None) or []
+                 if x.get("path") != p.get("path")]
+        if got.get("lines"):
+            props.append(got)
+        self.proposals = props
+        if len(props) >= 2:
+            self.bids = proposal_level.to_bids(props)
+            if self.project.findData("files") < 0:
+                self.project.addItem(f"Proposals: {len(props)} PDF(s)",
+                                     "files")
+            self.project.setCurrentIndex(self.project.findData("files"))
+            self.run()
+        return got
 
     def suggest_plugs(self, accept=None):
         """Plugs for omitted items from past bids (or this job's median);
@@ -319,6 +389,15 @@ class LevelingDialog(QDialog):
                                    f"${it.median * it.qty:,.0f}")):
                 g.setItem(r, c, _it(v, c in (2, 3, 5)))
 
+        self.exclusions.set_bids(
+            [x for x in self.exclusion_bids() if x["bidder"] in b],
+            self.ex_moves)
+        try:
+            from . import qualify_ui
+            self.qual.setText(qualify_ui.line(
+                [(x["bidder"], x["leveled"]) for x in res["results"]]))
+        except Exception:                                 # noqa: BLE001
+            self.qual.setText("")
         pt = self.plug_table
         pt.setRowCount(len(self.plugs))
         for r, p in enumerate(self.plugs):
@@ -375,7 +454,35 @@ class LevelingDialog(QDialog):
                         lambda: self._ask_plug(bidder, it, "Override"))
         if leveling.plug_for(self.res, it, bidder):
             m.addAction("Clear plug", lambda: self._clear(bidder, ref))
+        if bidder in it.prices and self.source_of(bidder, "amount", it.desc):
+            m.addAction(f"Show this in {bidder}'s proposal",
+                        lambda: self.show_source(bidder, "amount", it.desc))
         m.exec(self.matrix.viewport().mapToGlobal(pos))
+
+    # ------------------------------------------------- click to source
+    def source_of(self, bidder, kind, key):
+        """Where a value was read in that bidder's proposal PDF, or None
+        (bids from a bid tab have no file to show)."""
+        from . import proposal_level
+        p = next((x for x in getattr(self, "proposals", None) or []
+                  if x.get("bidder") == bidder), None)
+        if p is None:
+            return None
+        if kind in ("line", "amount"):
+            # the leveled item's wording may be another bidder's: take
+            # this bidder's closest line
+            import difflib
+            names = [r["desc"] for r in p.get("lines") or []]
+            hit = difflib.get_close_matches(str(key), names, 1, 0.5)
+            if not hit:
+                return None
+            key = hit[0]
+        return proposal_level.source_of(p, kind, key)
+
+    def show_source(self, bidder, kind, key, modal=True):
+        from . import source_view
+        return source_view.show(self, self.source_of(bidder, kind, key),
+                                f"{bidder}: {key}", modal=modal)
 
     def _ask_plug(self, bidder, it, kind):
         if kind == "Plug":
@@ -412,15 +519,24 @@ class LevelingDialog(QDialog):
                     lambda: self._ask_adjust(bidder))
         m.exec(self.summary.viewport().mapToGlobal(pos))
 
-    def _ask_adjust(self, bidder):
+    def _ask_adjust(self, bidder, what=None):
         val, ok = QInputDialog.getDouble(
             self, "Bid Leveling", f"Add to {bidder}'s leveled number "
-            "(negative takes off) - $", 0, -1e12, 1e12, 2)
+            "(negative takes off)" + (f" for \"{what}\"" if what else "")
+            + " - $", 0, -1e12, 1e12, 2)
         if not ok or not val:
             return None
-        note, _ok = QInputDialog.getText(self, "Bid Leveling",
-                                         "What for (e.g. excludes bond)")
+        if what:
+            note = "excludes " + what
+        else:
+            note, _ok = QInputDialog.getText(
+                self, "Bid Leveling", "What for (e.g. excludes bond)")
         return self.add_plug(bidder, "", "Adjustment", val, note or "")
+
+    def exclusion_bids(self):
+        from . import exclusions
+        return exclusions.from_proposals(getattr(self, "proposals", None)
+                                         or [])
 
     def export(self, path=None):
         if not self.res:
@@ -436,4 +552,7 @@ class LevelingDialog(QDialog):
                 "Excel (*.xlsx)")
         if not path:
             return None
-        return leveling.export_xlsx(self.res, path)
+        bids = self.exclusion_bids()
+        extra = [("Exclusions", self.exclusions.table_rows())] if any(
+            b["exclusions"] for b in bids) else []
+        return leveling.export_xlsx(self.res, path, extra)

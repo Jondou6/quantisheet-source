@@ -970,13 +970,18 @@ def bid_from_company(ctx, r):
         st = pick.split()[1]
         match = [c for c in match if c.get("state") == st]
     # flag what the GC should know before inviting
-    late = {c.get("company") for c, what, _d, ex in subdir.alerts(match)
-            if ex}
+    al = subdir.alerts(match)
+    late = {c.get("company") for c, what, _d, ex in al
+            if ex and what == "Insurance"}
+    late_lic = {c.get("company") for c, what, _d, ex in al
+                if ex and what == "License"}
     for c in match:
         c["_flag"] = "; ".join(x for x in (
             "" if subdir.prequal_ok(c) else
             f"prequal: {subdir.prequal_status(c).lower()}",
-            "insurance expired" if c.get("company") in late else "") if x)
+            "insurance expired" if c.get("company") in late else "",
+            "license expired" if c.get("company") in late_lic else "")
+            if x)
     n = _add_bidders(r, [{"company": c.get("company"),
                           "contact": c.get("contact"),
                           "email": c.get("email"),
