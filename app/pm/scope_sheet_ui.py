@@ -240,6 +240,12 @@ class ScopeSheetEditor(QWidget):
                               "shaded green; your entries don't change.")
         self.level.currentIndexChanged.connect(self._level_changed)
         row.addWidget(self.level)
+        self.var_btn = QPushButton("Variance…")
+        self.var_btn.setToolTip("Each bidder line by line against the "
+                                "budget lines: difference in $ and %, "
+                                "missing scope, and a report")
+        self.var_btn.clicked.connect(lambda: self.variance())
+        row.addWidget(self.var_btn)
         v.addLayout(row)
         # ---- the grid, and under it the bidders' clarifications
         self.grid = ScopeGrid(self)
@@ -691,13 +697,28 @@ class ScopeSheetEditor(QWidget):
         if self.sheet is None or self.store is None:
             return 0
         n = ss.bidders_from_package(self.store, self.sheet)
-        if n:
+        # Nov 11: their answers on the bid form too - nothing retyped
+        got = ss.fill_from_package(self.store, self.sheet)
+        filled = got["flags"] + got["amounts"] + got["rows"]
+        if n or filled:
             self.changed()
-            self.msg.setText(f"Added {n} bidder(s) from the bid package.")
+            bits = []
+            if n:
+                bits.append(f"Added {n} bidder(s) from the bid package.")
+            if filled:
+                bits.append(
+                    f"From the bid forms: {got['flags']} included / "
+                    f"excluded answer(s), {got['amounts']} price(s), "
+                    f"{got['rows']} exclusion or clarification row(s)" +
+                    (f", {got['lines']} new scope line(s)" if got["lines"]
+                     else "") + ". Rows are Pending until you accept "
+                    "them; cells you had filled in were left alone.")
+            self.msg.setText(" ".join(bits))
         else:
-            self.msg.setText("No bid package with new bidders for this "
-                             "trade (Project Center > Bid Packages).")
-        return n
+            self.msg.setText("No bid package with new bidders or answers "
+                             "for this trade (Project Center > Bid "
+                             "Packages).")
+        return n + filled
 
     def clear_selection(self):
         cells = sorted({(ix.row(), self._span_col(ix.row(), ix.column()))
@@ -1101,6 +1122,19 @@ class ScopeSheetEditor(QWidget):
                          f"{s['math_errors']} bidder(s) don't add up</span>")
         q = self.qualification_html()
         self.summary.setText("  ·  ".join(parts) + ("<br>" + q if q else ""))
+
+    def variance(self, show=True):
+        """Each bidder line by line against our budget lines."""
+        from .. import variance as V
+        from ..variance_ui import VarianceDialog
+        if self.sheet is None:
+            return None
+        dlg = VarianceDialog(
+            lambda: V.from_scope_sheet(self.sheet), ss.title(self.sheet),
+            self, (self.company or {}).get("name", ""))
+        if show:
+            dlg.exec()
+        return dlg
 
     # -------------------------------------------------------- qualification
     def contact_for(self, b):

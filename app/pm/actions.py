@@ -637,6 +637,15 @@ def bid_invite(ctx, r):
         for b, inv in zip(new, res["invites"]):
             b["token"] = inv["token"]
             links[inv["token"]] = _bid_link(ctx, inv["link"])
+        # Nov 11: a hub from before Scope items shows them as price boxes
+        from . import bidforms
+        if any(ln.get("type") == bidforms.SCOPE for ln in r.get("form")
+               or []) and "scope_items" not in (res.get("features") or []):
+            ctx.notify("Your hub server is older than this bid form: "
+                       "bidders will see a price box, not Included / "
+                       "Excluded, on the scope items, and can't list "
+                       "clarifications. Update the hub (see the hub's "
+                       "README), then the same links show the new form.")
     # the personal invitation (Chief's v18): "Hi Steve,", the package,
     # the sheets to start with, key dates, and Yes / Unsure / No buttons;
     # sent from the "Bid invites send as" mailbox (Bids@...), never from
@@ -809,9 +818,31 @@ def bid_form(ctx, r):
     opts = [f"Template: {n}" for n in lib]
     opts += ["Quantities from the takeoff in the open drawing",
              "Import from Excel or CSV…", "Copy from another bid package"]
+    # Nov 11: lines asked on every package of the project (bid bond,
+    # addenda, schedule questions...) are kept once
+    com = bidforms.common(ctx.store)
+    if com:
+        opts.append(f"Project-wide lines ({len(com)}): add to this package")
+    if bidforms.questions(r.get("form") or []):
+        opts.append("Project-wide lines: use this package's questions on "
+                    "every package")
     pick = ctx.ask("Bid form from", opts)
     if not pick:
         return None
+    if pick.startswith("Project-wide lines: use"):
+        com = bidforms.set_common(ctx.store,
+                                  bidforms.questions(r.get("form") or []))
+        r["form"], _n = bidforms.with_common(r.get("form") or [], com)
+        ctx.notify(f"{len(com)} line(s) are now asked on every package of "
+                   "this project: they are added to a package when its bid "
+                   "form is set, or with Bid Form > Project-wide lines.")
+        return r
+    if pick.startswith("Project-wide lines ("):
+        r["form"], n = bidforms.with_common(r.get("form") or [], com)
+        ctx.notify(f"Added {n} project-wide line(s) at the end of the "
+                   "form." if n else "This package already has every "
+                   "project-wide line.")
+        return r
     if pick.startswith("Template: "):
         lines = lib[pick[len("Template: "):]]
     elif pick.startswith("Quantities"):
@@ -852,10 +883,27 @@ def bid_form(ctx, r):
             lines = bidforms.clean(list(r["form"]) + list(lines))
             for i, ln in enumerate(lines, 1):
                 ln["item"] = str(i)
-    r["form"] = bidforms.clean(lines)
-    ctx.notify(f"Bid form has {len(r['form'])} line(s). Bidders price them "
-               "on their bid page.")
+    r["form"], n_com = bidforms.with_common(lines, com)
+    ctx.notify(f"Bid form has {len(r['form'])} line(s)" + (
+        f", {n_com} of them the project-wide lines" if n_com else "") +
+        ". Bidders price them on their bid page.")
     return r
+
+
+def bid_form_pdf(ctx, r):
+    """The package's bid form as a PDF to print or email by hand, saved
+    in the project's Bid Forms folder. Nothing is sent."""
+    import re
+    from . import bidforms, scope_sheet as ss
+    folder = os.path.join(ctx.store.folder, "Bid Forms")
+    os.makedirs(folder, exist_ok=True)
+    name = re.sub(r'[\\/:*?"<>|]+', " ", f"Bid Form - {r.get('_no') or ''} "
+                  f"{r.get('title') or ''}").strip() + ".pdf"
+    path = bidforms.form_pdf(r, os.path.join(folder, name), ctx.store.name,
+                             ss.company_info(ctx.store)["name"])
+    ctx.notify(f"Saved {path}. Nothing was sent.")
+    ctx.open_file(path)
+    return None
 
 
 def bid_save_template(ctx, r):
@@ -1314,6 +1362,8 @@ ACTIONS = {
                     not b.get("token") and not b.get("invited")
                     for b in r.get("bidders") or []), bid_invite),
                ("Bid Form…", "form", st("Draft", "Open"), bid_form),
+               ("Print Bid Form…", "print",
+                lambda r: bool(r.get("form")), bid_form_pdf),
                ("Save Form as Template", "save",
                 lambda r: bool(r.get("form")), bid_save_template),
                ("Import Bidders…", "import", st("Draft", "Open"),

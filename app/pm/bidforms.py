@@ -10,6 +10,15 @@ bids come back in the same shape and level line by line:
     Alternate           add (or deduct, negative) price, not in the base bid
     Yes / No            a question ("Bid bond included?")
     Text                a short answer ("Lead time for switchgear")
+    Scope item          a piece of the scope the bidder marks Included or
+                        Excluded (Nov 11) - it fills the Scope Sheet's
+                        included flags with nothing retyped
+
+Besides the lines, every bidder can list inclusions, exclusions and
+clarifications (one per line); those become the Scope Sheet's rows.
+
+Project-wide lines (bid bond, addenda, schedule questions...) are kept
+once per project and added to every package's form (common()).
 
 Templates come from the built-in set below, your own library (saved from
 any package), another package, a CSV / Excel sheet, or straight from the
@@ -23,8 +32,11 @@ import os
 import re
 from ..dmoney import c2 as _c2
 
+SCOPE = "Scope item"
 TYPES = ["Lump sum", "Unit price", "Allowance", "Alternate", "Yes / No",
-         "Text"]
+         "Text", SCOPE]
+INCLUDED, EXCLUDED = "Included", "Excluded"
+COMMON_KEY = "bid_form_common"       # the project's own lines (a setting)
 PRICED = ("Lump sum", "Unit price", "Allowance")
 
 
@@ -40,6 +52,17 @@ BUILT_IN = {
         L(3, "Bid bond included?", "Yes / No"),
         L(4, "Addenda acknowledged and included?", "Yes / No"),
         L(5, "Exclusions / clarifications", "Text"),
+    ],
+    "Scope checklist (included / excluded)": [
+        L(1, "Base bid - complete scope per plans and specs"),
+        L(2, "Permits and fees", SCOPE),
+        L(3, "Bonds", SCOPE),
+        L(4, "Sales tax", SCOPE),
+        L(5, "Hoisting and equipment", SCOPE),
+        L(6, "Cleanup and haul-off", SCOPE),
+        L(7, "Testing and inspections", SCOPE),
+        L(8, "Temporary protection", SCOPE),
+        L(9, "Addenda acknowledged and included?", "Yes / No"),
     ],
     "Site utilities": [
         L(1, "Mobilization", "Lump sum"),
@@ -159,11 +182,156 @@ def clean(lines):
                 if ln.get("qty") not in (None, "") else None
         except ValueError:
             q = None
-        out.append({"item": str(ln.get("item") or i + 1).strip()[:12],
-                    "description": d[:300], "type": t,
-                    "qty": q, "unit": str(ln.get("unit") or "")[:12],
-                    "note": str(ln.get("note") or "")[:300]})
+        row = {"item": str(ln.get("item") or i + 1).strip()[:12],
+               "description": d[:300], "type": t,
+               "qty": q, "unit": str(ln.get("unit") or "")[:12],
+               "note": str(ln.get("note") or "")[:300]}
+        if ln.get("common") is True:
+            row["common"] = True       # a project-wide line (common())
+        out.append(row)
     return out
+
+
+# ------------------------------------------------ project-wide lines
+def common(store):
+    """The project's own bid form lines, asked on every package."""
+    return [dict(x, common=True)
+            for x in clean(store.setting(COMMON_KEY) or [])]
+
+
+def set_common(store, lines):
+    rows = clean(lines)
+    for r in rows:
+        r.pop("common", None)
+    store.set_setting(COMMON_KEY, rows)
+    return common(store)
+
+
+def _same(a, b):
+    return a.get("type") == b.get("type") and \
+        " ".join(str(a.get("description") or "").lower().split()) == \
+        " ".join(str(b.get("description") or "").lower().split())
+
+
+def with_common(lines, common_lines):
+    """(lines, added): the package's lines with the project-wide ones it
+    doesn't have yet added at the END - lines already there keep their
+    place, so answers bidders have sent still belong to the same line."""
+    out = clean(lines)
+    added = 0
+    for c in common_lines or []:
+        hit = next((x for x in out if _same(x, c)), None)
+        if hit is not None:
+            hit["common"] = True
+            continue
+        row = dict(c, common=True)
+        row["item"] = str(len(out) + 1)
+        out.append(row)
+        added += 1
+    return clean(out), added
+
+
+def questions(lines):
+    """The lines of a form that make sense for every package: yes/no,
+    text and scope items (not prices)."""
+    return [ln for ln in clean(lines)
+            if ln["type"] in ("Yes / No", "Text", SCOPE)]
+
+
+# ------------------------------------------------- answers, structured
+def scope_answer(value):
+    """A bidder's answer on a Scope item: "Y" (included), "N" (excluded)
+    or "" (not answered, or not readable as either)."""
+    t = str(value or "").strip().lower()
+    if t in ("included", "include", "incl", "yes", "y", "x", "in"):
+        return "Y"
+    if t in ("excluded", "exclude", "excl", "no", "n", "nic", "out",
+             "not included"):
+        return "N"
+    return ""
+
+
+def split_notes(text):
+    """What a bidder typed in Inclusions / Exclusions / Clarifications as
+    separate items: one per line (or per semicolon), bullets and
+    numbering dropped, their words kept."""
+    out = []
+    for part in re.split(r"[\r\n;]+", str(text or "")):
+        t = re.sub(r"^\s*(?:[-*\u2022]+|\d{1,2}[.)])\s*", "", part).strip()
+        if t and t.lower() not in ("none", "n/a", "na", "-") and \
+                t not in out:
+            out.append(t[:500])
+    return out
+
+
+def answers(rec, bidder):
+    """One bidder's structured answers on the package's form:
+    {"scope": [(description, "Y" | "N" | "")], "prices": [(description,
+    dollars)], "inclusions": [...], "exclusions": [...],
+    "clarifications": [...]}."""
+    lines = clean(rec.get("form") or [])
+    vals = bidder.get("form_values") or {}
+    scope, prices = [], []
+    for i, ln in enumerate(lines):
+        v = vals.get(str(i))
+        if ln["type"] == SCOPE:
+            scope.append((ln["description"], scope_answer(v)))
+        elif ln["type"] in ("Lump sum", "Unit price") and num(v) is not None:
+            prices.append((ln["description"], _c2(line_total(ln, v))))
+    return {"scope": scope, "prices": prices,
+            "inclusions": split_notes(bidder.get("inclusions")),
+            "exclusions": split_notes(bidder.get("exclusions")),
+            "clarifications": split_notes(bidder.get("clarifications"))}
+
+
+def form_pdf(rec, path, project="", company=""):
+    """The package's bid form as a PDF to print or email: every line with
+    a place for the price or answer, then Inclusions, Exclusions and
+    Clarifications to fill in. Nothing is sent."""
+    from .. import forms
+    lines = clean(rec.get("form") or [])
+    f = forms.Form("Bid Form", " - ".join(x for x in (
+        project, str(rec.get("_no") or ""), rec.get("title") or "") if x),
+        company=company)
+    f.fields([("Bidder", ""), ("Date", ""), ("Contact", ""),
+              ("Phone / email", ""),
+              ("Bids due", " ".join(x for x in (
+                  str(rec.get("due") or ""), str(rec.get("due_time") or ""))
+                  if x)), ("Addenda acknowledged", "")])
+    priced = [ln for ln in lines if ln["type"] in PRICED + ("Alternate",)]
+    if priced:
+        f.heading("Prices")
+        f.table(["#", "Description", "Qty", "Unit", "Type", "Unit price",
+                 "Amount"],
+                [[ln["item"], ln["description"] + (
+                    f" ({ln['note']})" if ln["note"] else ""),
+                  "" if ln["qty"] is None else f"{ln['qty']:g}",
+                  ln["unit"], ln["type"], "", ""] for ln in priced],
+                [0.5, 4.2, 0.7, 0.6, 1.1, 1.2, 1.4])
+    scope = [ln for ln in lines if ln["type"] == SCOPE]
+    if scope:
+        f.heading("Scope - mark each Included or Excluded")
+        f.table(["#", "Scope item", "Included", "Excluded", "Note"],
+                [[ln["item"], ln["description"] + (
+                    f" ({ln['note']})" if ln["note"] else ""), "[  ]", "[  ]",
+                  ""] for ln in scope],
+                [0.5, 4.6, 0.9, 0.9, 2.8],
+                aligns=["l", "l", "c", "c", "l"])
+    asked = [ln for ln in lines if ln["type"] in ("Yes / No", "Text")]
+    if asked:
+        f.heading("Questions")
+        f.table(["#", "Question", "Answer"],
+                [[ln["item"], ln["description"],
+                  "Yes  [  ]    No  [  ]" if ln["type"] == "Yes / No" else ""]
+                 for ln in asked], [0.5, 5.2, 4.0])
+    for title, hint in (("Inclusions", "What your price includes"),
+                        ("Exclusions", "What your price does not include"),
+                        ("Clarifications", "Assumptions and conditions of "
+                         "your price")):
+        f.heading(title + " (one per line)")
+        f.table([hint], [[""] for _ in range(4)], [1.0], row_h=18)
+    f.signatures(["Signed", "Name and title", "Date"])
+    return f.save(path)
 
 
 _TYPE_ALIAS = {"ls": "Lump sum", "lump": "Lump sum", "lump sum": "Lump sum",
@@ -171,7 +339,9 @@ _TYPE_ALIAS = {"ls": "Lump sum", "lump": "Lump sum", "lump sum": "Lump sum",
                "up": "Unit price", "allowance": "Allowance",
                "alt": "Alternate", "alternate": "Alternate",
                "yes/no": "Yes / No", "yes / no": "Yes / No",
-               "y/n": "Yes / No", "text": "Text", "question": "Text"}
+               "y/n": "Yes / No", "text": "Text", "question": "Text",
+               "scope": "Scope item", "scope item": "Scope item",
+               "included?": "Scope item", "incl/excl": "Scope item"}
 
 
 def _read_table(path):

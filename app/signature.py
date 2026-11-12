@@ -1,7 +1,8 @@
 """Fill & Sign: a drawn signature / initials, saved once and reused.
 
 (These are handwritten-style signatures, not certificate-based digital
-signatures.) Strokes are stored normalised to 0..1 in settings.json.
+signatures.) Strokes are stored normalised to 0..1, encrypted for your
+Windows account (sigstore.py; before Nov 11 they sat in settings.json).
 """
 from PySide6.QtCore import QPointF, Qt
 from PySide6.QtGui import QColor, QPainter, QPainterPath, QPen
@@ -81,11 +82,18 @@ class SignaturePad(QDialog):
         data = self.pad.normalised()
         if not data:
             return
-        settings.set(self.kind, data)
+        from . import sigstore
+        if self.kind in sigstore.KINDS:
+            sigstore.save(self.kind, data)       # encrypted for your account
+        else:
+            settings.set(self.kind, data)
         self.accept()
 
 
 def saved(kind):
+    from . import sigstore
+    if kind in sigstore.KINDS:
+        return sigstore.load(kind)
     data = settings.get(kind)
     return data if isinstance(data, dict) and data.get("strokes") else None
 

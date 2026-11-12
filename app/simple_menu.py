@@ -114,7 +114,7 @@ TREE = [
                            "Export Priced Bid Schedule", "Export Cash Flow"], None),
     ("Reports", "Job cost", ["Job Cost Feedback (Bid vs Actual)",
                              "Civil Job Cost (Bid vs Actual)",
-                             "Estimating Dashboard"], None),
+                             "Estimating Dashboard", "Bid Board"], None),
     ("Project", "Project", ["Project Center", "Weekly Owner Report",
                             "Drawing Register", "Transmittals",
                             "Addenda", "Punch List"], None),

@@ -1078,6 +1078,36 @@ tut("levelboard", "Estimating", "Leveling Board and trade scope sheets", 4,
      "Bid Leveling and Bid-Day packages still work as before."],
     try_=["Leveling Board"], practice=False)
 
+tut("bidboard", "Estimating", "Bid Board: the invitations you get", 4,
+    "Keep every invitation to bid in one list: when it is due, who is "
+    "pricing it, whether to go after it and how it came out.",
+    ["Estimate > <b>Bid Board</b>. <b>Add</b> an invitation by typing it "
+     "in, or <b>From Email</b> to read a saved invitation email (.eml - "
+     "you can drag the file onto the window). The fields it found are "
+     "listed; check each one, then Save. Nothing is sent and the email is "
+     "not changed.",
+     "If it looks like a project already on the board - a similar name "
+     "with a close due date, or the same address, even from another GC - "
+     "you are told why before it is saved. Rows for the same project are "
+     "marked, so it is priced once and every GC gets the same number.",
+     "<b>Go / No-Go</b>: answer what you know (scope, location, the GC, "
+     "your results with them, workload, bonding). It gives a score and a "
+     "recommendation; you decide and give the reason, which is kept. "
+     "<b>Weights</b> changes how much each answer counts.",
+     "<b>Set Status</b> as it moves: Accepted, Submitted, then Won or "
+     "Lost (or Declined). The <b>Calendar</b> tab lists bids due, job "
+     "walks and question cutoffs; <b>Export Calendar File</b> makes an "
+     ".ics file to import into your calendar.",
+     "The <b>Results</b> tab shows win rate by GC, bids per month and "
+     "each estimator's open bids. The same results are in Estimate > "
+     "<b>Estimating Dashboard</b> > Hit Rate, grouped by <b>GC (bid "
+     "to)</b>."],
+    ["Win rate counts Won and Lost only.",
+     "An Outlook .msg file isn't read: save the email as .eml, or copy "
+     "its text and use Paste Email Text.",
+     "The board is kept on this PC."],
+    try_=["Bid Board"], practice=False)
+
 tut("bidforms", "Estimating", "Bid form, bid results and change orders", 4,
     "Fill the owner's bid form from the estimate, track how you did, and "
     "price a revised sheet as a change order.",

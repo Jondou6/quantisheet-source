@@ -970,6 +970,8 @@ class MainWindow(QMainWindow):
 
         fsm = menus["Fill & Sign"]
         fsm.addSeparator()
+        self._act(fsm, "Fill From the Job and Sign…", None,
+                  lambda: self.fill_from_job_and_sign(), False)
         self._act(fsm, "Change Signature…", None,
                   lambda: self._redraw_signature("signature"), False)
         self._act(fsm, "Change Initials…", None,
@@ -1123,6 +1125,7 @@ class MainWindow(QMainWindow):
                   lambda: self.job_cost_feedback(), False)
         self._act(t, "Estimating Dashboard…", None,
                   lambda: self.estimating_dashboard(), False)
+        self._act(t, "Bid Board…", None, lambda: self.bid_board(), False)
         a = self._act(t, "Show Unpriced Markups", None,
                       lambda: self.toggle_unpriced())
         a.setCheckable(True)
@@ -2257,6 +2260,7 @@ class MainWindow(QMainWindow):
         missing += self._ribbon_put("Estimate", "Output", (
             ("Material Order List", "Materials", "list"),
             ("Estimating Dashboard", "Dashboard", "panels"),
+            ("Bid Board", "Bid Board", "list"),
             ("Export to Sage 300 Job Cost (CSV)", "Sage 300", "export"),
         ))
         missing += self._ribbon_put("Estimate", "Civil Estimate", (
@@ -6038,6 +6042,12 @@ class MainWindow(QMainWindow):
         from . import dashboard_ui
         return dashboard_ui.show(self, folders)
 
+    def bid_board(self):
+        """Invitations to bid that came to us: dates, who is pricing
+        them, go / no-go and results (bidboard_ui.py)."""
+        from . import bidboard_ui
+        return bidboard_ui.show(self)
+
     def toggle_unpriced(self, on=None):
         """Outline in red every markup and revision cloud that isn't
         priced, excluded or sent as an RFI yet."""
@@ -8653,6 +8663,42 @@ class MainWindow(QMainWindow):
             made.append(self.open_document(
                 doc, os.path.splitext(os.path.basename(path))[0] + ".pdf"))
         return made
+
+    def fill_from_job_and_sign(self, path=None, show=True):
+        """Fill a form's fields from what QuantiSheet knows (each value
+        shown with where it comes from), then sign it on request. Works
+        on the open PDF as saved on disk, or a picked file; the result is
+        a new file (fillsign_ui.py)."""
+        from . import fillsign_ui, subdir
+        tab = self.tabs.currentWidget()
+        job_doc = self._view.doc if self._view else None
+        if path is None:
+            cur = getattr(tab, "path", None) if isinstance(tab, DocTab) \
+                else None
+            if cur and os.path.isfile(cur) and self._view is not None \
+                    and not self._view.dirty:
+                path = cur
+            else:
+                if cur and self._view is not None and self._view.dirty:
+                    QMessageBox.information(
+                        self, "Fill From the Job and Sign",
+                        "Save this PDF first, or pick the form's file: the "
+                        "form is filled from the file on disk into a new "
+                        "file.")
+                path, _f = QFileDialog.getOpenFileName(
+                    self, "Form to Fill and Sign", "", "PDF (*.pdf)")
+                if not path:
+                    return None
+        try:
+            contacts = subdir.load()
+        except Exception:                                 # noqa: BLE001
+            contacts = []
+        dlg = fillsign_ui.FillSignDialog(
+            path, self, job_doc, contacts, on_open=self.open_path)
+        if show:
+            dlg.setAttribute(Qt.WA_DeleteOnClose)
+            dlg.show()
+        return dlg
 
     def _redraw_signature(self, kind):
         from .signature import SignaturePad

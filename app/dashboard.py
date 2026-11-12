@@ -70,11 +70,13 @@ PROJECT_SETTINGS = ("building_type", "building_sf", "bid_date", "estimator",
 LOW_SETTING = "low_bid"                # Nov 3: the low bidder's number
 MIN_OUTLIER_N = 4
 FENCE = Decimal("1.5")
-HIT_BY = ("type", "owner", "month", "estimator", "size", "markup")
+HIT_BY = ("type", "owner", "gc", "month", "estimator", "size", "markup")
 BY_LABEL = {"type": "Building type", "owner": "Owner", "month": "Bid month",
+            "gc": "GC (bid to)",
             "estimator": "Estimator", "division": "CSI division",
             "size": "Job size (our bid)", "markup": "Markup on cost"}
 NO_GROUP = {"type": "(no building type)", "owner": "(no owner)",
+            "gc": "(not bid to a GC)",
             "month": "(no bid date)", "estimator": "(no estimator)",
             "size": "(no bid amount)", "markup": "(no cost to compare)"}
 # Nov 3 hit rate by size and markup: (upper limit, label), last open-ended
@@ -549,7 +551,8 @@ def _new_job(key, **kw):
          "est_cost": None, "actual_cost": None, "cost": None,
          "cost_basis": "", "result": "Pending", "result_source": "",
          "closed": False, "divisions": {}, "div_basis": "",
-         "can_set_result": False}
+         "can_set_result": False,
+         "gc": ""}                 # who we bid to (Bid Board jobs)
     j.update(kw)
     return j
 
@@ -774,6 +777,13 @@ def load(folders=None, price_db=True, progress=None):
         except Exception as e:                            # noqa: BLE001
             log.warning("dashboard: project %s skipped", f, exc_info=True)
             skipped.append({"folder": f, "reason": f"unreadable ({e})"})
+    if folders is None:      # Nov 11: bids we sent to GCs (Bid Board)
+        try:
+            from . import bidboard
+            for bj in bidboard.dashboard_jobs():
+                jobs.append(_new_job(bj.pop("key"), **bj))
+        except Exception:                                 # noqa: BLE001
+            log.warning("bid board not added", exc_info=True)
     try:                     # Nov 4: estimating time from the Time Log
         attach_time(jobs)
     except Exception:                                     # noqa: BLE001

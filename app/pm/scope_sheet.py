@@ -1069,6 +1069,82 @@ def bidders_from_package(store, sheet):
     return n
 
 
+def _line_for(sheet, desc):
+    """The sheet's scope line for a bid form line's description: the same
+    words, else a close match; None when nothing is close."""
+    import difflib
+    want = " ".join(str(desc or "").lower().split())
+    if not want:
+        return None
+    names = [" ".join((ln.get("desc") or "").lower().split())
+             for ln in sheet["lines"]]
+    if want in names:
+        return sheet["lines"][names.index(want)]
+    hit = difflib.get_close_matches(want, [n for n in names if n], 1, 0.8)
+    return sheet["lines"][names.index(hit[0])] if hit else None
+
+
+def fill_from_package(store, sheet):
+    """Nov 11: what the bidders answered on the bid package's form goes
+    straight into the sheet - nothing retyped. For each of the sheet's
+    bidders that is on the package: Scope items they marked Included /
+    Excluded set the line's Y / N flag, priced lines fill the amount, and
+    their exclusions and clarifications become Pending rows. Cells and
+    rows already filled in are left alone. Scope items with no line on
+    the sheet yet are added as lines. Returns {"flags", "amounts",
+    "rows", "lines", "bidders"}."""
+    from . import bidforms
+    out = {"flags": 0, "amounts": 0, "rows": 0, "lines": 0, "bidders": 0}
+    pk = packages_for(store, sheet.get("csi"), sheet.get("trade"))
+    if not pk:
+        return out
+    rec = pk[0]
+    by_name = {(r.get("company") or "").strip().lower(): r
+               for r in rec.get("bidders") or []}
+    for b in sheet["bidders"]:
+        row = by_name.get((b.get("company") or "").strip().lower())
+        if not row:
+            continue
+        ans = bidforms.answers(rec, row)
+        touched = False
+        for desc, yn in ans["scope"]:
+            if not yn:
+                continue
+            ln = _line_for(sheet, desc)
+            if ln is None:
+                ln = add_line(sheet, desc)
+                out["lines"] += 1
+            c = bid_cell(ln, b["id"])
+            if not c["flag"] and c["amount"] is None:
+                set_bid(sheet, ln["id"], b["id"], flag=yn)
+                out["flags"] += 1
+                touched = True
+        for desc, dollars in ans["prices"]:
+            ln = _line_for(sheet, desc)
+            if ln is None:
+                continue
+            c = bid_cell(ln, b["id"])
+            if c["amount"] is None and c["flag"] != "N":
+                set_bid(sheet, ln["id"], b["id"],
+                        amount=to_cents(Decimal(str(dollars))))
+                out["amounts"] += 1
+                touched = True
+        have = {" ".join(c["text"].lower().split())
+                for c in clarifications(sheet, b)}
+        for key, kind in (("exclusions", "Exclusion"),
+                          ("clarifications", "Clarification")):
+            for t in ans[key]:
+                k = " ".join(t.lower().split())
+                if k in have:
+                    continue
+                have.add(k)
+                add_clarification(sheet, b, t, kind)
+                out["rows"] += 1
+                touched = True
+        out["bidders"] += touched
+    return out
+
+
 def directory_matches(contacts, csi="", trade=""):
     """Company Directory entries for this trade: same CSI division, or a
     trade word in common; the rest after them. Favorites first."""

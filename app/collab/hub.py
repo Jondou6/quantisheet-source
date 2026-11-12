@@ -1138,7 +1138,9 @@ class Hub:
                         "link": f"/bid.html?t={tok}"})
         self._activity(slug, self._who(a), "invited bidders", f"{len(out)} on "
                        f"{data['items'][rid].get('_no', '')}")
-        return {"invites": out}
+        # "features": what this hub's bid page can show, so the sender
+        # is told when a bid form needs a newer hub (Nov 11)
+        return {"invites": out, "features": list(BID_FEATURES)}
 
     def _invite(self, token):
         token = str(token or "")
@@ -1336,13 +1338,15 @@ class Hub:
                 "addenda": addenda, "acks": row.get("ack_list") or [],
                 "inclusions": mine.get("inclusions") or "",
                 "exclusions": mine.get("exclusions") or "",
+                "clarifications": mine.get("clarifications") or "",
                 "documents": docs,
                 "closed": rec.get("status") in ("Closed", "Awarded")}
 
     # sealed bids: the numbers stay in the hub, out of the package record,
     # until someone opens them after the bid deadline
     SEALED_KEYS = ("amount", "form_values", "form_missing", "alternates",
-                   "inclusions", "exclusions", "bid_file")
+                   "inclusions", "exclusions", "clarifications",
+                   "bid_file")
 
     @staticmethod
     def _sealed(rec):
@@ -1394,7 +1398,7 @@ class Hub:
         if addenda:
             row["ack_list"] = acks
             row["acks"] = ", ".join(acks) if acks else ""
-        for k in ("inclusions", "exclusions"):
+        for k in ("inclusions", "exclusions", "clarifications"):
             if a.get(k) is not None:
                 row[k] = _text(a.get(k), 2000)
         has_form = bool(values and any(v not in ("", None)
@@ -1634,6 +1638,11 @@ def _c2(v):
     v = round(v, 8 if abs(v) < 1e6 else 6 if abs(v) < 1e8 else 4)
     return float(Decimal(repr(v)).quantize(Decimal("0.01"),
                                            rounding=ROUND_HALF_UP))
+
+
+# what the bid page of this hub understands beyond prices: "Scope item"
+# lines (Included / Excluded) and a Clarifications list
+BID_FEATURES = ("scope_items", "clarifications")
 
 
 def bid_totals(lines, values):

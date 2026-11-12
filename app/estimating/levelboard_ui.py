@@ -32,6 +32,7 @@ class LevelBoard(QDialog):
                          ("Add Sub Quote PDF…", self.add_quote),
                          ("Read a Quote with AI…", self.read_with_ai),
                          ("Exclusions…", self.exclusions),
+                         ("Variance…", self.variance),
                          ("Export Scope Sheet…", self.export_scope),
                          ("Use Low in Estimate", self.use_low)):
             b = QPushButton(text)
@@ -156,6 +157,21 @@ class LevelBoard(QDialog):
             self, LB.source_of(self.doc, self.package(), bidder, row_id,
                                exclusion),
             f"{bidder}: {exclusion or 'price'}", modal=modal)
+
+    def variance(self, show=True):
+        """Each bidder line by line against our own number."""
+        from .. import variance as V
+        from ..variance_ui import VarianceDialog
+        p = self.package()
+        if not p:
+            QMessageBox.information(self, self.windowTitle(),
+                                    "Make a package first (New From Trade).")
+            return None
+        dlg = VarianceDialog(
+            lambda: V.from_board(LB.board(self.doc, p)), p, self)
+        if show:
+            dlg.exec()
+        return dlg
 
     def exclusions(self, show=True):
         """Who excludes what, from the quotes on this board."""

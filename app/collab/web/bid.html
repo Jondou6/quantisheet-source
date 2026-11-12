@@ -62,6 +62,7 @@ function formHtml(i){
   ${i.form.map((ln, k) => { const v = values[k] ?? "";
     let input;
     if (ln.type === "Yes / No") input = `<select class="fv" data-i="${k}"><option value=""></option>${["Yes","No"].map(o => `<option ${v===o?"selected":""}>${o}</option>`).join("")}</select>`;
+    else if (ln.type === "Scope item") input = `<select class="fv" data-i="${k}"><option value=""></option>${["Included","Excluded"].map(o => `<option ${v===o?"selected":""}>${o}</option>`).join("")}</select>`;
     else if (ln.type === "Text") input = `<input class="fv" data-i="${k}" value="${esc(v)}">`;
     else if (ln.type === "Allowance") input = `<span class="muted">${ln.qty != null ? money(ln.qty) + " (allowance)" : ""}</span>`;
     else input = `<input class="fv" data-i="${k}" inputmode="decimal" placeholder="${ln.type === "Unit price" ? "$ / " + esc(ln.unit || "unit") : ln.type === "Alternate" ? "+/- $" : "$"}" value="${esc(v)}">`;
@@ -120,8 +121,9 @@ function render(msg){
    <div class="big">Will you bid?</div>
    <div class="choices">${["Will Bid","Might Bid","Won't Bid"].map(c => `<button class="choice ${c===intent?"on":""}" data-c="${c}">${c}</button>`).join("")}</div>
    ${i.form.length ? formHtml(i) : `<label>Bid amount (optional now - you can send it later)</label><input id="amt" inputmode="decimal" placeholder="$0.00" value="${esc(i.amount ?? "")}">`}
-   <label>Inclusions</label><textarea id="incl" rows="2" placeholder="What your price includes">${esc(i.inclusions||"")}</textarea>
-   <label>Exclusions / clarifications</label><textarea id="excl" rows="2" placeholder="What your price does not include">${esc(i.exclusions||"")}</textarea>
+   <label>Inclusions (one per line)</label><textarea id="incl" rows="2" placeholder="What your price includes">${esc(i.inclusions||"")}</textarea>
+   <label>Exclusions (one per line)</label><textarea id="excl" rows="2" placeholder="What your price does not include">${esc(i.exclusions||"")}</textarea>
+   <label>Clarifications (one per line)</label><textarea id="clar" rows="2" placeholder="Assumptions and conditions of your price">${esc(i.clarifications||"")}</textarea>
    <label>Bid form or proposal (PDF)</label><input id="file" type="file" accept=".pdf,image/*">
    <label>Note</label><textarea id="note" rows="3" placeholder="Exclusions, questions, alternates…">${esc(i.note || "")}</textarea>
    <button class="send" id="send">Send response</button>`}
@@ -147,9 +149,10 @@ function render(msg){
       const r = await call("bid.respond", {token, intent: bidding && intent !== "Won't Bid" ? "Bid Received" : (intent || "Will Bid"),
         amount: amt, note: $("#note").value, file, file_name: f ? f.name : "",
         form: info.form.length ? values : undefined, acks: [...acks],
-        inclusions: $("#incl").value, exclusions: $("#excl").value});
+        inclusions: $("#incl").value, exclusions: $("#excl").value,
+        clarifications: $("#clar").value});
       info.status = r.status; info.amount = amt || info.amount; info.note = $("#note").value;
-      info.inclusions = $("#incl").value; info.exclusions = $("#excl").value; info.values = values;
+      info.inclusions = $("#incl").value; info.exclusions = $("#excl").value; info.clarifications = $("#clar").value; info.values = values;
       render({ok:true, text:"Thanks - your response was sent."});
     } catch (e) { render({ok:false, text:e.message}); }
   };
