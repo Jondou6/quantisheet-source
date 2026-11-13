@@ -1,0 +1,4 @@
+QuantiSheet 1.1.11
+- Work Notes Takeoff reads the feeder tags on an electrical one-line diagram ('4 #2, #8G., 1 1/4"C.' under its tag): the conduit, wire and ground sizes of each feeder are listed, once per feeder, with the length shown as 'measure' because the route isn't drawn. The From column says One-line diagram.
+- A keyed note whose symbol is marked TYP says so: one symbol stands for every one like it, so count them on the sheet.
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.11 - the full source of this build. Help > About shows the same link.

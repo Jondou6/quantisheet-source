@@ -1,0 +1,4 @@
+QuantiSheet 1.1.9
+- Work Notes Takeoff, keyed notes on electrical sheets: a note's items are now counted by its symbol's drawn shape (a hexagon, a diamond...), so a duct number in a circle or a bare number in a schedule is no longer taken for a note symbol. On the checked real job one sheet's counts are now all right and the other went from badly over to nearly right. A keyed note that says to demolish something is read too.
+- Rooms on scanned plans: a long box drawn in a pen lighter than the walls' (shelving, a counter) is no longer filled in as wall, so the room keeps its floor under it. A little better on our hard test plans as scans (within 5% of the true area: 82% to 84%); rooms found and plans with real linework are unchanged.
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.9 - the full source of this build. Help > About shows the same link.

@@ -1,0 +1,8 @@
+QuantiSheet 1.1.7
+- Civil > Work Notes Takeoff (new): for rehab and upfit drawings that give their quantities in words. It reads the boxed work notes on every sheet ('INSTALL: 2 - 6-INCH PLUG VALVE', 'REMOVE AND REPLACE: 105 LF SITE FENCING') into a list, adds the same item up across the set, and you can double-click a row to go to its sheet. Export to Excel writes the totals and every row.
+- It also reads what the set says away from the notes, and the From column says which: the summary table (an X for a station that has no note on its sheet), ratings and feeder make-up from numbered notes, keyed notes on electrical sheets counted by their symbols, and the removal half of every 'remove and replace'.
+- Fence is measured as drawn: the fence layer's line at the sheet's own bar scale is shown beside the length the note states. On a checked real job the stated lengths ran 20% over a careful takeoff; the measured ones were within 4%.
+- Choose Specification to work out fence posts and barbed wire strands from the specification's own rules (post spacing, number of strands). A rule the specification doesn't give is not applied.
+- Rows that need a look are yellow and say why: no number in the note (counted as 1), marked approximate, the same note twice on a sheet, a count taken from symbols, a gate inside a measured line. Nothing is added to your takeoff or estimate from this window.
+- Not read yet: conduit and wire routes that aren't drawn, and sizes that are only on a standard detail outside the set.
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.7 - the full source of this build. Help > About shows the same link.

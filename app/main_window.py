@@ -1347,6 +1347,8 @@ class MainWindow(QMainWindow):
         cv = mb.addMenu("&Civil")
         self._act(cv, "Civil Takeoff (Trades)…", None,
                   lambda: self.trade_takeoff())
+        self._act(cv, "Work Notes Takeoff…", None,
+                  lambda: self.work_notes_takeoff())
         self._act(cv, "Haul Calculator…", None, lambda: self.civil(6),
                   False)
         self._act(cv, "Export to CivilBid (Excel)…", None,
@@ -1601,6 +1603,7 @@ class MainWindow(QMainWindow):
                                 ["Export My Estimate"]]),
         ("Civil", "Takeoff", [("Civil Takeoff (Trades)", "Takeoff",
                                "measure_volume"),
+                              ("Work Notes Takeoff", "Notes", "list"),
                               ("Haul Calculator", "Haul", "truck"),
                               # was only in the Civil menu (Jon, Oct 19)
                               ("Aerial Photo Page", "Aerial", "photo"),
@@ -6041,6 +6044,12 @@ class MainWindow(QMainWindow):
         (dashboard_ui.py); opens empty with a hint when there's no data."""
         from . import dashboard_ui
         return dashboard_ui.show(self, folders)
+
+    def work_notes_takeoff(self, modal=True):
+        """Civil > Work Notes Takeoff: quantities a retrofit set states
+        in its notes, summary table and specification (callouts_ui.py)."""
+        from . import callouts_ui
+        return callouts_ui.show(self, modal)
 
     def bid_board(self):
         """Invitations to bid that came to us: dates, who is pricing

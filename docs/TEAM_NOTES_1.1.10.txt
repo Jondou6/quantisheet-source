@@ -1,0 +1,3 @@
+QuantiSheet 1.1.10
+- Microsoft Store copy, Help > About: it no longer says "Up to date". The Store copy asks the Microsoft Store on your PC whether an update is waiting, so it now says "No update is waiting in the Microsoft Store (updates come through the Store)", or that an update is ready there. The team copy's line is unchanged.
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.10 - the full source of this build. Help > About shows the same link.

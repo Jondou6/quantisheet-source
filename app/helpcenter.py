@@ -1078,6 +1078,35 @@ tut("levelboard", "Estimating", "Leveling Board and trade scope sheets", 4,
      "Bid Leveling and Bid-Day packages still work as before."],
     try_=["Leveling Board"], practice=False)
 
+tut("worknotes", "Takeoff", "Work Notes Takeoff: what the sheets say", 4,
+    "Rehab and upfit drawings often give the quantities in words - "
+    "'INSTALL: 2 - 6-INCH PLUG VALVE', 'REMOVE AND REPLACE: 105 LF SITE "
+    "FENCING' - not in linework. This reads them into a list.",
+    ["Open the drawing set, then Civil > <b>Work Notes Takeoff</b> and "
+     "<b>Read the Drawings</b>. <b>Totals</b> adds the same item up "
+     "across the sheets; <b>Every row</b> lists each one with its sheet. "
+     "Double-click a row to go to that sheet.",
+     "The <b>From</b> column says where a row came from: a sheet note, "
+     "the summary table (an X for a station with no note on its sheet), "
+     "a numbered or keyed note, the fence line measured as drawn, or "
+     "worked out (the removal half of a 'remove and replace').",
+     "<b>Choose Specification</b> to work out fence posts and barbed "
+     "wire strands from the specification's own rules (post spacing, "
+     "number of strands). A rule the specification doesn't give is not "
+     "applied.",
+     "Yellow rows need a look, and <b>Check</b> says why: no number in "
+     "the note (counted as 1), marked approximate, the same note twice "
+     "on a sheet (two views of one item look the same), a count taken "
+     "from symbols, or a measured length that differs from the note.",
+     "<b>Export to Excel</b> writes the totals and every row."],
+    ["It reads what is written. Conduit and wire routes that aren't "
+     "drawn, and sizes that are on a standard detail outside the set, "
+     "are not in the list.",
+     "A length shown as 'measure' has its make-up from the notes but no "
+     "length: measure the run yourself.",
+     "Nothing is added to your takeoff or estimate from this window."],
+    try_=["Work Notes Takeoff"], practice=False)
+
 tut("bidboard", "Estimating", "Bid Board: the invitations you get", 4,
     "Keep every invitation to bid in one list: when it is due, who is "
     "pricing it, whether to go after it and how it came out.",

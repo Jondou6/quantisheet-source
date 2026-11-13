@@ -70,6 +70,10 @@ def run(name="hmb", sheet=None, dump=False, pic=()):
     scale = {"ppu": sc[1], "unit": sc[2]}
     info = {}
     t = time.perf_counter()
+    if pic:
+        at.DEBUG_TRACES = []
+        at.DEBUG_DIR = os.path.join(ROOT, ".run", "hard")
+        os.makedirs(at.DEBUG_DIR, exist_ok=True)
     found, missed = at.all_rooms(doc[row["page"]], scale, info=info,
                                  skip_measured=False)
     took = time.perf_counter() - t
@@ -109,9 +113,46 @@ def run(name="hmb", sheet=None, dump=False, pic=()):
             im = np.frombuffer(pm.samples, np.uint8).reshape(
                 pm.h, pm.w, pm.n)[:, :, :3].copy()
             im = cv2.cvtColor(im, cv2.COLOR_RGB2BGR)
+            # the raw traces that lie in this room's box, in blue (the
+            # picture's own outline, before it is put on the lines)
+            for k_, d_ in enumerate(at.DEBUG_TRACES or []):
+                tr_ = d_["pts"]
+                xs = [q.x for q in tr_]
+                ys = [q.y for q in tr_]
+                if min(xs) >= box.x0 and max(xs) <= box.x1 and \
+                        min(ys) >= box.y0 and max(ys) <= box.y1:
+                    cv2.polylines(im, [np.array(
+                        [[(q.x - box.x0) * z, (q.y - box.y0) * z]
+                         for q in d_["before"]], np.int32)], True,
+                        (0, 170, 0), 2)           # before the fill: green
+                    cv2.polylines(im, [np.array(
+                        [[(q.x - box.x0) * z, (q.y - box.y0) * z]
+                         for q in tr_], np.int32)], True, (255, 128, 0), 2)
+                    print("     trace: layer", d_["layer"], "door", d_["door"])
+                    # the trace and the drawn lines around it, for working
+                    # on roomsnap away from the drawing (stays in .run)
+                    import json
+                    pl_ = d_["plan"]
+                    fc = pl_._faces() or {}
+                    px = np.array(d_["px"])
+                    lo, hi = px.min(0) - 30, px.max(0) + 30
+                    near = {}
+                    for key, a_, b_ in (("h", 1, 0), ("v", 0, 1)):
+                        L = fc.get(key)
+                        if L is None:
+                            continue
+                        m = (L[:, 0] > lo[a_]) & (L[:, 0] < hi[a_]) & \
+                            (L[:, 2] > lo[b_]) & (L[:, 1] < hi[b_])
+                        near[key] = np.round(L[m], 3).tolist()
+                    with open(os.path.join(
+                            ROOT, ".run", "hard",
+                            f"trace_{t_['no']}_{k_}.json"), "w") as fj:
+                        json.dump({"px": d_["px"], "eps": d_["eps"],
+                                   "inset": d_["inset"], "ppf": pl_.ppf,
+                                   "faces": near}, fj)
             cv2.polylines(im, [np.array([[(q.x - box.x0) * z,
                                           (q.y - box.y0) * z] for q in pts],
-                                        np.int32)], True, (0, 0, 255), 1)
+                                        np.int32)], True, (0, 0, 255), 2)
             os.makedirs(os.path.join(ROOT, ".run", "hard"), exist_ok=True)
             cv2.imwrite(os.path.join(ROOT, ".run", "hard",
                                      f"truth_{t_['no']}.png"), im)

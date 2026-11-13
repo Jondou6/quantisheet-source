@@ -1,0 +1,5 @@
+QuantiSheet 1.1.8
+- Auto Takeoff rooms on scanned plans (a sheet that is a picture, with no linework): walls drawn as two face lines or hatched are now filled in before rooms are looked for, 4" partitions are kept, and the soft edge of a scanned wall no longer makes every room a little small.
+- On our hard test plans turned into scans, rooms found went from half to 97%, and rooms within 2% of the true area from a quarter to about 70%. None is wrong by more than 2% without a warning. Plans with real linework are unchanged (every room found, all within 2%).
+- Still weaker on scans: rooms with casework or shelving along a wall (the boxes can read as wall, so the room comes out a few percent small and is flagged), and small-scale sheets (1/8" = 1'-0"). A plan with real linework is always the better source when you can get one.
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.8 - the full source of this build. Help > About shows the same link.

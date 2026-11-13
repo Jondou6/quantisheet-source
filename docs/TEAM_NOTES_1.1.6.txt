@@ -1,0 +1,7 @@
+QuantiSheet 1.1.6
+- Auto Takeoff rooms on sheets whose walls are drawn solid on wall layers: a room now runs out to the solid walls, past the thin lines those layers also carry - door leaves and swings, benches, wall shelves and grab bars, shower curtains. The strip behind an open door, the floor beside a wall-hung fixture and the ends of each stall front are no longer left out. On the checked real sheet the worst room went from 3.9% low to 0.6% low, and a room that was 1.1% high is now exact.
+- A toilet stall's door is no longer shut along its open leaf (that put a 3' bar of wall across the room), and a door leaf drawn with its thickness is read as a leaf.
+- Auto Area (click in a room): a click now finds its room where the space runs on through a cased opening and holds more than one tag - on our hard test plans one click in three found no room; now every click does, 98% of them within 2% of the true area. Rooms named without an area count as rooms for a click, as they do for Auto Takeoff Rooms.
+- Auto Doors: a 2'-6" door is counted (one in three was being left out as a stall door). On our hard test plans every swing door is now counted, pairs as one door.
+- Auto Takeoff is quicker on dense sheets (about a fifth less time on the checked real sheet).
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.6 - the full source of this build. Help > About shows the same link.

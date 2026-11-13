@@ -337,7 +337,8 @@ def versions():
 
 def update_status(now=None):
     """" · Up to date · last checked Nov 4, 2:10 PM" (Nov 4, review
-    Part F), or "" when this copy doesn't check."""
+    Part F), or "" when this copy doesn't check. The Microsoft Store
+    copy says what the Store has for it, not "Up to date"."""
     import time
     from . import updatecheck
     try:
@@ -355,8 +356,15 @@ def update_status(now=None):
         waiting = None
     when = time.strftime("%b %d, %I:%M %p", time.localtime(last)) \
         .replace(" 0", " ")
-    state = (f"version {waiting['version']} is ready to install"
-             if waiting else "Up to date")
+    if _store() and not updatecheck.team_build():
+        # the Store copy only knows what the Microsoft Store has for it:
+        # "Up to date" read as "the newest QuantiSheet there is" (Nov 12)
+        state = ("an update is ready in the Microsoft Store" if waiting
+                 else "No update is waiting in the Microsoft Store "
+                      "(updates come through the Store)")
+    else:
+        state = (f"version {waiting['version']} is ready to install"
+                 if waiting else "Up to date")
     auto = "" if updatecheck.enabled() else " · automatic checks are off"
     return f" · {state} · last checked {when}{auto}"
 

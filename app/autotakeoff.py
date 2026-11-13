@@ -78,6 +78,7 @@ FILL_NOTCH_FT = (2.5, 4.0, 6.0, 8.0)  # fixture notches tried when a tag says
 FINE_PEN_PT = 0.35               # line weights up to this are "fine" pens
 GOOD = 0.12                       # within 12% of its tag = a sure match
 TRACE_INSET_PX = 0.25             # traced outline inside filled walls
+SCAN_INSET_PX = 1.1               # ...inside a scan's soft-edged walls
 NAMED_MAX_SF = 5000               # a room named without an area: at most
 NAMED_HUGE_SF = 60000             # ...or this, with HUGE_ON_LINES of its
 HUGE_ON_LINES = 0.9               # outline on the drawing's own lines
@@ -637,7 +638,15 @@ class Plan:
         else:
             boxes = [(fitz.Rect(w[:4]) * m).normalize() * zoom
                      for w in page.get_text("words")]
-            self.walls = wall_mask(gray, self.ppf, boxes)
+            # a scan has no linework to read wall faces from: walls drawn
+            # hollow or hatched are filled in the picture first
+            scan_ink = scan_ink_of(gray)
+            _blank(scan_ink, boxes)
+            self.hollow_filled = fill_hollow(scan_ink, self.ppf, gray=gray)
+            # with no wall faces to draw back in, a 4" partition has to
+            # survive the opening by itself
+            self.walls = wall_mask(None, self.ppf, ink=scan_ink,
+                                   open_ft=SCAN_OPEN_FT)
         self.check()
         # CAD drawings draw walls hollow (two face lines). Closing and
         # opening the picture can't keep those reliably - thin partitions
@@ -648,11 +657,15 @@ class Plan:
         # what the wall faces and the closed doors add, kept apart so it
         # goes into every wall picture whole
         self._added = np.zeros(self.shape, np.uint8)
+        self._doorlines = np.zeros(self.shape, np.uint8)   # shut doors only
         # how far inside the wall face a trace runs (pixels): a quarter
         # pixel against filled (poche) walls, half the pen plus half a
         # pixel against stroked face lines (set by _vector_walls), half a
         # pixel on a scan
-        self.inset_px = TRACE_INSET_PX if ink is not None else 0.5
+        # a picture of a sheet has soft edges; a sheet of a few crisp
+        # shapes (too few to count as linework) does not
+        self.inset_px = (TRACE_INSET_PX if ink is not None else
+                         SCAN_INSET_PX if mostly_picture(page) else 0.5)
         try:
             self._vector_walls(page, m)
         except Exception:
@@ -822,7 +835,7 @@ class Plan:
                               max(0, hx - reach):min(Wd, hx + reach + 1)
                               ].any():
                 if leaves is None:
-                    arr, lens = _straight_lines(page)
+                    arr, lens = _leaf_lines(page)
                     leaves = arr[lens >= 1.0 * pts_per_ft]
                 r_ = abs(ends[0] - c)
                 if not _leaf_at(leaves, c, ends, 0.08 * r_):
@@ -832,6 +845,21 @@ class Plan:
             # the leaf too would leave a 3' stub of wall in the room. When
             # it can't be told which is which, both are closed.
             touch = [p for p in pts if on_wall(*p)]
+            if len(touch) == 1:
+                # ...but when the one end on a wall is the end the leaf is
+                # drawn to, that is the open leaf's tip resting by a wall,
+                # and the door shuts onto something that is no wall: a
+                # toilet stall's door, hung on a partition post. Not a
+                # room's door - shutting it along its open leaf put a 3'
+                # bar of wall across the room (Nov 12, HMB 103: 2.8 SF)
+                if leaves is None:
+                    arr, lens = _leaf_lines(page)
+                    leaves = arr[lens >= 1.0 * pts_per_ft]
+                r_ = abs(ends[0] - c)
+                tip = [_leaf_at(leaves, c, [e], 0.08 * r_) for e in ends]
+                ti = pts.index(touch[0])
+                if tip[ti] and not tip[1 - ti]:
+                    continue
             if len(touch) != 1:
                 # ...unless the leaf itself is drawn: the end a straight
                 # line runs to from the hinge is the leaf's tip (in a
@@ -839,7 +867,7 @@ class Plan:
                 # both ends "touch" - the leaf was closed too and cut the
                 # closet in two; made-up plans, Nov 10)
                 if leaves is None:
-                    arr, lens = _straight_lines(page)
+                    arr, lens = _leaf_lines(page)
                     leaves = arr[lens >= 1.0 * pts_per_ft]
                 r_ = abs(ends[0] - c)
                 tip = [_leaf_at(leaves, c, [e], 0.08 * r_) for e in ends]
@@ -884,7 +912,7 @@ class Plan:
                                  (int(round(h0[0] + nx * T)),
                                   int(round(h0[1] + ny * T)))], np.int32)
                     a0, b0 = self._to_walls(a0, b0, base0)
-                for pic in (self.walls, self._added):
+                for pic in (self.walls, self._added, self._doorlines):
                     cv2.line(pic, a0, b0, 1, width)
                     if band is not None:
                         cv2.fillPoly(pic, [band.reshape(-1, 1, 2)], 1)
@@ -904,6 +932,7 @@ class Plan:
                 e0, e1 = self._to_walls(ends[0], ends[1], base0)
                 cv2.line(self.walls, e0, e1, 1, width)
                 cv2.line(self._added, e0, e1, 1, width)
+                cv2.line(self._doorlines, e0, e1, 1, width)
                 self.doors_closed += 1
 
     def _jamb_depth(self, a, b, n, walls):
@@ -1279,6 +1308,104 @@ class Plan:
             return c, 0.0
         return c2, self.sqft(a2 - a0)
 
+    def _fill_to_solid(self, c, oth=()):
+        """(contour, SF added) or None: on a sheet whose wall layers are
+        drawn solid (filled), an untagged room's trace grown out to the
+        solid walls. There the walls themselves say where the room ends,
+        so the thin lines the wall layers also carry - door leaves and
+        swings, benches, shelves and grab bars, shower curtains - do not
+        stop it (Nov 12, HMB 109: the strip behind an open door, the
+        floor above and below a wall shelf and the ends of each stall
+        front were left out, 4% of the room).
+
+        Stops: solid wall-layer ink (what is left of it after thin lines
+        are taken off), the lines doors were shut with, and openings up
+        to FACE_GAP_FT between solid walls shut straight across - except
+        an opening the trace already runs through (a stall front, a cased
+        opening inside the room): that one belongs to the room from jamb
+        to jamb.
+
+        None when this doesn't apply or can't be trusted, and the older
+        fill is used: the walls here aren't solid, the result holds
+        another room's tag, grows the room by more than SOLID_MAX_GAIN,
+        or its edge isn't on solid wall nearly all the way round (the
+        room is open to something this can't see)."""
+        if self.wl is None:
+            return None
+        band = max(2, int(round(FACE_BAND_FT * self.ppf)))
+        k = max(3, int(round(FACE_GAP_FT * self.ppf)) | 1)
+        x, y, w, h = cv2.boundingRect(c)
+        pad = band + k + 2
+        H, W = self.wl.shape[:2]
+        x0, y0 = max(0, x - pad), max(0, y - pad)
+        x1, y1 = min(W, x + w + pad), min(H, y + h + pad)
+        off = np.array([[[x0, y0]]], dtype=c.dtype)
+        t = np.zeros((y1 - y0, x1 - x0), np.uint8)
+        cv2.drawContours(t, [c - off], -1, 1, -1)
+        ink = (self.wl[y0:y1, x0:x1] > 0).astype(np.uint8)
+        ks = max(3, int(round(SOLID_MIN_FT * self.ppf)))
+        solid = cv2.morphologyEx(ink, cv2.MORPH_OPEN,
+                                 np.ones((ks, ks), np.uint8))
+        if int(solid.sum()) < SOLID_SHARE * max(1, int(ink.sum())):
+            return None                       # walls drawn as lines here
+        doors = (self._doorlines[y0:y1, x0:x1] > 0).astype(np.uint8)
+        stop = solid | doors
+        # openings between solid walls, shut along the wall line
+        shut = np.maximum(
+            cv2.morphologyEx(stop, cv2.MORPH_CLOSE, np.ones((1, k), np.uint8)),
+            cv2.morphologyEx(stop, cv2.MORPH_CLOSE, np.ones((k, 1), np.uint8)))
+        gaps = shut & (1 - stop)
+        n, lab = cv2.connectedComponents(gaps, connectivity=4)
+        if n > 1:
+            tot = np.bincount(lab.ravel(), minlength=n)
+            inside = np.bincount(lab.ravel(), weights=t.ravel(),
+                                 minlength=n)
+            through = np.flatnonzero(inside >= SOLID_THROUGH * tot)
+            through = through[through > 0]
+            if len(through):
+                gaps = gaps & (1 - np.isin(lab, through).astype(np.uint8))
+        stop = stop | gaps
+        grow = cv2.dilate(t, cv2.getStructuringElement(
+            cv2.MORPH_ELLIPSE, (2 * band + 1, 2 * band + 1)))
+        cand = np.maximum(grow & (1 - stop), t & (1 - solid))
+        n, lab = cv2.connectedComponents(cand, connectivity=4)
+        keep = [i for i in np.unique(lab[t > 0]) if i]
+        r = np.isin(lab, keep).astype(np.uint8)
+        # thin ink inside it (a curtain line, a bench edge) is floor too
+        r = cv2.morphologyEx(r, cv2.MORPH_CLOSE, np.ones((3, 3), np.uint8)) \
+            & (1 - stop)
+        cnts, _ = cv2.findContours(r, cv2.RETR_EXTERNAL,
+                                   cv2.CHAIN_APPROX_SIMPLE)
+        if DEBUG_DIR:                       # what stopped it, as a picture
+            im = np.full(t.shape + (3,), 255, np.uint8)
+            im[t > 0] = (225, 225, 225)
+            im[r > 0] = (200, 235, 200)
+            im[ink > 0] = (150, 150, 150)
+            im[gaps > 0] = (0, 140, 255)
+            im[solid > 0] = (0, 0, 0)
+            im[doors > 0] = (255, 0, 0)
+            cv2.imwrite(os.path.join(DEBUG_DIR, "solid_%d_%d.png" % (x, y)),
+                        cv2.resize(im, None, fx=3, fy=3,
+                                   interpolation=cv2.INTER_NEAREST))
+        if not cnts:
+            return None
+        big = max(cnts, key=cv2.contourArea)
+        a0, a2 = cv2.contourArea(c), cv2.contourArea(big)
+        if a2 <= a0 or a2 > a0 * (1 + SOLID_MAX_GAIN):
+            return None
+        # the new edge has to lie on what stops it: an edge out in the
+        # open is the end of the growing band, not a wall
+        edge = np.zeros_like(r)
+        cv2.drawContours(edge, [big], -1, 1, 1)
+        near = cv2.dilate(stop, np.ones((5, 5), np.uint8))
+        on = int((edge & near).sum()) / float(max(1, int(edge.sum())))
+        if on < SOLID_EDGE_SHARE:
+            return None
+        c2 = big + off
+        if _holds_any(c2, oth):
+            return None
+        return c2, self.sqft(a2 - a0)
+
     def detect(self, seed_pt, others=(), expected=None, door=None,
                max_sf=None, strict=False):
         """The room around `seed_pt` (screen point). `others`: tag points
@@ -1382,11 +1509,22 @@ class Plan:
                         break
                 c = join_pockets(c, self.walls, self.ppf, oth)
             # out to the wall-layer faces (fixture notches, edge strip)
-            c, face_sf = self._fill_to_faces(c, oth)
+            c_before = c
+            got = self._fill_to_solid(c, oth)
+            c, face_sf = got if got is not None else \
+                self._fill_to_faces(c, oth)
         self.use(cur)
         poly = cv2.approxPolyDP(c, SIMPLIFY_FT * self.ppf, True).reshape(-1, 2)
         if len(poly) < 3:
             return None
+        if DEBUG_TRACES is not None:        # tools/truth_rooms.py --pic
+            DEBUG_TRACES.append({
+                "pts": [self.to_pt(p) for p in c.reshape(-1, 2)],
+                "px": c.reshape(-1, 2).tolist(), "plan": self,
+                "eps": SIMPLIFY_FT * self.ppf, "inset": self.inset_px,
+                "before": [self.to_pt(p) for p in
+                           locals().get("c_before", c).reshape(-1, 2)],
+                "layer": li, "door": d})
         arr = poly.reshape(-1, 1, 2)
         area_px = cv2.contourArea(arr)
         perim_px = cv2.arcLength(arr, True)
@@ -1427,6 +1565,16 @@ class Plan:
                 "face_fill_sf": round(face_sf, 1),
                 "on_lines": round(on_lines, 3)}
 
+
+DEBUG_TRACES = None     # a list: detect() adds each raw trace (page points)
+DEBUG_DIR = None        # a folder: _fill_to_solid saves what stopped it
+
+SOLID_MIN_FT = 0.2      # wall-layer ink at least this thick (2.4") is solid wall
+SOLID_SHARE = 0.6       # the walls round a room are solid when this much of
+                        # the wall-layer ink there is
+SOLID_THROUGH = 0.3     # an opening this much inside the trace is the room's
+SOLID_MAX_GAIN = 0.35   # the fill to solid walls adds no more than this
+SOLID_EDGE_SHARE = 0.9  # ...and this much of its edge lies on wall or door
 
 FACE_BAND_FT = 2.0      # an untagged trace grows at most this far to a face
 FACE_GAP_FT = 3.0       # wall openings up to this are closed first (doors)
@@ -1559,7 +1707,10 @@ def _zigzags(page):
             return []
         out = []
         for p in paths:
-            for chain in _line_chains(p.get("items", ())):
+            items = p.get("items", ())
+            if len(items) < 2:              # a zig-zag is two lines or more
+                continue
+            for chain in _line_chains(items):
                 if not 3 <= len(chain) <= 9:
                     continue
                 segs = [abs(chain[i + 1] - chain[i])
@@ -1593,6 +1744,37 @@ def _straight_lines(page):
         arr = np.array(ab, float).reshape(-1, 4)
         return arr, np.hypot(arr[:, 2] - arr[:, 0], arr[:, 3] - arr[:, 1])
     return _memo(page, "straight", build)
+
+
+def _leaf_lines(page):
+    """Straight lines a door leaf can be drawn with: the line items, and
+    the sides of rectangles and quads - a leaf drawn with its thickness
+    is a thin box, and a box has no line items (Nov 12: such leaves were
+    not seen, so a door was shut along its open leaf as well as across
+    its opening). (n, 4) array and lengths, read once."""
+    def build():
+        arr, _lens = _straight_lines(page)
+        ab = []
+        try:
+            paths = page.get_drawings()
+        except Exception:
+            paths = []
+        for p in paths:
+            for it in p.get("items", ()):
+                if it[0] == "re":
+                    r = it[1]
+                    q = [r.tl, r.tr, r.br, r.bl]
+                elif it[0] == "qu":
+                    u = it[1]
+                    q = [u.ul, u.ur, u.lr, u.ll]
+                else:
+                    continue
+                for i in range(4):
+                    a, b = q[i], q[(i + 1) % 4]
+                    ab.append((a.x, a.y, b.x, b.y))
+        out = np.vstack([arr, np.array(ab, float).reshape(-1, 4)])
+        return out, np.hypot(out[:, 2] - out[:, 0], out[:, 3] - out[:, 1])
+    return _memo(page, "leaf_lines", build)
 
 
 def bifolds(page, pts_per_ft, leaf=(0.6, 2.5), span=(2.0, 8.0)):
@@ -1675,12 +1857,17 @@ def _line_chains(items):
             cur = []
             continue
         a, b = it[1], it[2]
-        if cur and abs(cur[-1] - a) < 0.05:
-            cur.append(b)
-        else:
+        # (plain numbers: a Point - Point and its length for every line
+        # on a dense sheet was a second and a half, Nov 12)
+        if cur:
+            e = cur[-1]
+            dx, dy = e.x - a.x, e.y - a.y
+            if dx * dx + dy * dy < 0.0025:
+                cur.append(b)
+                continue
             if len(cur) > 2:
                 out.append(cur)
-            cur = [a, b]
+        cur = [a, b]
     if len(cur) > 2:
         out.append(cur)
     return out
@@ -1775,7 +1962,10 @@ def _swing_arcs(page):
                 arcs.append([ctr, r, [p0, p3], sweep])
             # many CAD exports (Revit among them) draw arcs as runs of
             # short straight lines
-            for chain in _line_chains(p.get("items", ())):
+            items = p.get("items", ())
+            if len(items) < 3:        # an arc drawn in lines has many
+                continue
+            for chain in _line_chains(items):
                 for run in _bends(chain):
                     got = _arc_fit(run, rmin, rmax)
                     if got:
@@ -2030,6 +2220,17 @@ def _ink_geom(page):
         g["need"] = need
         return g
     return _memo(page, "ink_geom", build)
+
+
+def mostly_picture(page):
+    """Is more than half the page covered by images (a scan)?"""
+    try:
+        area = page.rect.width * page.rect.height
+        img = sum(fitz.Rect(i["bbox"]).get_area()
+                  for i in page.get_image_info())
+        return bool(area and img > 0.5 * area)
+    except Exception:
+        return False
 
 
 def vector_ink(page, zoom, shape, m=None, min_paths=60, box_pts=0,
@@ -2342,6 +2543,116 @@ def _with_benches(r, ink, thick, ppf):
     return np.maximum(out, edge)
 
 
+def scan_ink_of(gray, level=INK_LEVEL):
+    """0/1 ink of a scanned sheet. A scan's edges are soft: a pixel
+    counts as ink when it is at least half as dark as the darkest ink
+    beside it, so a wall's face lands where the wall ends and not a
+    pixel outside it (rooms came out about 1% small)."""
+    dark = cv2.erode(gray, np.ones((9, 9), np.uint8))
+    half = (dark.astype(np.int16) + 255) // 2
+    return ((gray < level) & (gray.astype(np.int16) <= half)).astype(np.uint8)
+
+
+SCAN_OPEN_FT = 0.22     # on a scan, wall at least this thick is kept (vs OPEN_FT)
+HOLLOW_MAX_FT = 1.5     # a hollow wall is at most this thick between faces
+HOLLOW_MIN_FT = 1.5     # ...and at least this long
+
+
+def _blank(ink, boxes):
+    h, w = ink.shape
+    for b in boxes:
+        x0, y0 = max(0, int(b[0]) - 1), max(0, int(b[1]) - 1)
+        x1, y1 = min(w, int(b[2]) + 2), min(h, int(b[3]) + 2)
+        if x1 > x0 and y1 > y0:
+            ink[y0:y1, x0:x1] = 0
+
+
+HOLLOW_PEN_SHARE = 0.42 # a hollow wall's lighter face is drawn at least this heavy,
+#                         against the usual long one on the sheet
+HOLLOW_REF_FT = 4.0     # ...the long ones being at least this long
+HOLLOW_REF_MIN = 4      # ...and at least this many, or pens aren't compared
+
+
+def _light_boxes(ink, gray, lab, st, cand, ppf, deep):
+    """Which of the thin spaces `cand` (bool per label) are bounded by
+    light linework - a shelf or a counter drawn in a fine grey pen, not
+    a wall. Ink per foot of its lighter long side (darkness x width) is
+    compared with the sheet's heavy long thin spaces, so it does not depend on the
+    scan's resolution. None when the sheet gives nothing to compare."""
+    n = len(st)
+    lbl = np.where(cand[lab], lab, 0)
+    dark = (255.0 - gray.astype(np.float64)) / 255.0
+    is_ink = ink > 0
+    side = []                      # ink on the line below, above, right, left
+    for dy, dx in ((-3, 0), (3, 0), (0, -3), (0, 3)):
+        near = np.roll(lbl, (dy, dx), axis=(0, 1))
+        pick = is_ink & (near > 0)
+        side.append(np.bincount(near[pick], weights=dark[pick], minlength=n))
+    wide = st[:, 2] >= st[:, 3]
+    # how long the space is, whatever its shape: its area over its width
+    run = st[:, 4] / np.maximum(2.0 * deep, 1.0)
+    # a wall has a heavy face on both long sides; a box against a wall
+    # has the wall's face on one side and its own fine line on the other
+    lighter = np.where(wide, np.minimum(side[0], side[1]),
+                       np.minimum(side[2], side[3])) / np.maximum(run, 1.0)
+    ref = lighter[cand & (run >= HOLLOW_REF_FT * ppf)]
+    if len(ref) < HOLLOW_REF_MIN:
+        return None
+    heavy = float(np.median(ref))
+    if heavy <= 0:
+        return None
+    return cand & (lighter < HOLLOW_PEN_SHARE * heavy)
+
+
+def fill_hollow(ink, ppf, max_ft=HOLLOW_MAX_FT, min_ft=HOLLOW_MIN_FT,
+                gray=None):
+    """Fill, in a 0/1 ink picture, the closed spaces that are long and
+    no thicker than a wall: the inside of a wall drawn as two face
+    lines, and the cells of a hatched one. Rooms (thicker everywhere
+    than a wall) are left; so is, when the grey picture is given, a
+    long box drawn in a pen lighter than the walls' (a shelf, a
+    counter). Returns how many spaces were filled. For scans, where
+    there is no linework to read the faces from."""
+    free = (ink == 0).astype(np.uint8)
+    n, lab, st, _c = cv2.connectedComponentsWithStats(free, connectivity=4)
+    if n <= 1:
+        return 0
+    dist = cv2.distanceTransform(free, cv2.DIST_L2, 3)
+    deep = np.zeros(n, np.float32)
+    np.maximum.at(deep, lab.ravel(), dist.ravel())
+    long_ = np.maximum(st[:, 2], st[:, 3])
+    h, w = ink.shape
+    edge = (st[:, 0] <= 0) | (st[:, 1] <= 0) | \
+        (st[:, 0] + st[:, 2] >= w) | (st[:, 1] + st[:, 3] >= h)
+    thin = (2.0 * deep <= max_ft * ppf) & ~edge
+    thin[0] = False
+    if gray is not None and thin.any():
+        # a long box in a fine pen is casework or shelving, not a wall
+        light = _light_boxes(ink, gray, lab, st,
+                             thin & (long_ >= min_ft * ppf), ppf, deep)
+        if light is not None:
+            thin &= ~light
+    # one hatch cell is short; cells in a row are a wall together: a
+    # short thin space counts when thin spaces around it make a long run
+    seed = thin & (long_ >= min_ft * ppf)
+    if thin.any() and (thin & ~seed).any():
+        pic = thin[lab].astype(np.uint8)
+        k = max(3, int(round(0.2 * ppf)) | 1)
+        joined = cv2.dilate(pic, np.ones((k, k), np.uint8))
+        _n2, lab2, st2, _c2 = cv2.connectedComponentsWithStats(
+            joined, connectivity=8)
+        run = np.maximum(st2[:, 2], st2[:, 3]) >= min_ft * ppf
+        run[0] = False
+        ok = np.zeros(n, bool)
+        ok[np.unique(lab[(pic > 0) & run[lab2]])] = True
+        seed |= thin & ok
+    seed[0] = False
+    if not seed.any():
+        return 0
+    ink[seed[lab]] = 1
+    return int(seed.sum())
+
+
 def wall_mask(gray, ppf, text_boxes=(), ink_level=INK_LEVEL,
               close_ft=CLOSE_FT, open_ft=OPEN_FT, island_ft=ISLAND_FT,
               ink=None, stubs="ink"):
@@ -2424,6 +2735,13 @@ def room_at(page, scale, pt):
             raise AutoTakeoffError("That spot is already measured.")
     plan = Plan(page, scale)
     tags = room_tags(page)
+    # rooms tagged by name alone are rooms too: the clicked room may not
+    # swallow them, and its own name caps how big it can be (as Auto
+    # Takeoff Rooms does)
+    try:
+        tags = tags + room_labels(page, skip=[t["pt"] for t in tags])
+    except Exception:
+        log.debug("room names not read", exc_info=True)
     # which tag is in this room? Look with the narrowest door bridging
     # that closes it off.
     mine = None
@@ -2435,8 +2753,29 @@ def room_at(page, scale, pt):
         inside = [t for t in tags if _inside(t["pt"], tight["pts"])]
         if len(inside) == 1:
             mine = inside[0]
+        elif len(inside) > 1:
+            # the space runs on through an opening with no door (a cased
+            # opening) and holds several tags: the clicked room's is the
+            # nearest one the click can see. With none picked, the room's
+            # own tag counted as "another room's" and every outline that
+            # held it was turned down - a third of the clicks on the
+            # made-up plans found no room (Nov 12)
+            sp = plan.to_px(pt)
+            seen = [t for t in inside
+                    if plan._sees(tuple(int(v) for v in sp),
+                                  tuple(int(v) for v in plan.to_px(t["pt"])))]
+            pool = seen or inside
+            mine = min(pool, key=lambda t: abs(t["pt"] - pt))
     others = [t["pt"] for t in tags if t is not mine]
-    res = plan.detect(pt, others, expected=mine["sf"] if mine else None)
+    res = plan.detect(pt, others, expected=mine["sf"] if mine else None,
+                      max_sf=NAMED_MAX_SF if mine and not mine["sf"]
+                      else None)
+    if res is None and mine is not None:
+        # the nearest tag was not this room's after all (an untagged room
+        # beside a tagged one): every tag is another room's
+        res = plan.detect(pt, [t["pt"] for t in tags])
+        if res is not None:
+            mine = None
     if res is None:
         raise AutoTakeoffError(
             "Couldn't find a closed room there. Click in open floor away "
@@ -2923,14 +3262,26 @@ def _thin_lines_read(page):
         drawings = page.get_drawings()
     except Exception:
         return out
+    raw = []
     for d in drawings:
         if d.get("type") not in ("s", "fs") or (d.get("width") or 0) > 0.6:
             continue
         for it in d["items"]:
             if it[0] == "l":
-                a, b = it[1] * rot, it[2] * rot
-                out.append(((a.x, a.y), (b.x, b.y)))
-    return out
+                raw.append((it[1].x, it[1].y, it[2].x, it[2].y))
+    if not raw:
+        return out
+    # turned to the screen all at once: one Point * Matrix per end was
+    # most of this function's time on a dense sheet (270,000 of them on
+    # HMB A101, Nov 12)
+    a = np.array(raw, float)
+    ma, mb, mc, md, me, mf = rot.a, rot.b, rot.c, rot.d, rot.e, rot.f
+    x0 = a[:, 0] * ma + a[:, 1] * mc + me
+    y0 = a[:, 0] * mb + a[:, 1] * md + mf
+    x1 = a[:, 2] * ma + a[:, 3] * mc + me
+    y1 = a[:, 2] * mb + a[:, 3] * md + mf
+    return [((p, q), (r, t)) for p, q, r, t in
+            zip(x0.tolist(), y0.tolist(), x1.tolist(), y1.tolist())]
 
 
 def leader_seeds(pt, lines, near=30.0, reach=150.0):

@@ -835,7 +835,26 @@ def _inside(poly, xy):
                                 False) >= 0
 
 
-def score(n=6, seed=21, verbose=True, out=None, only=None, debug=False):
+def as_scan(doc, dpi=200):
+    """The same sheets as a scanned set: each page a picture of itself
+    (grey, `dpi`), with its words as invisible text - what a scanned plan
+    looks like after Make Searchable. No linework is left to read."""
+    out = fitz.open()
+    for page in doc:
+        pm = page.get_pixmap(dpi=dpi, colorspace=fitz.csGRAY, alpha=False)
+        pg = out.new_page(width=page.rect.width, height=page.rect.height)
+        pg.insert_image(pg.rect, pixmap=pm)
+        for b in page.get_text("dict")["blocks"]:
+            for ln in b.get("lines", ()):
+                for sp in ln.get("spans", ()):
+                    if sp["text"].strip():
+                        pg.insert_text(fitz.Point(sp["origin"]), sp["text"],
+                                       fontsize=sp["size"], render_mode=3)
+    return out
+
+
+def score(n=6, seed=21, verbose=True, out=None, only=None, debug=False,
+          scan=False):
     from app import autotakeoff
     rnd = random.Random(seed)
     doc = fitz.open()
@@ -843,9 +862,11 @@ def score(n=6, seed=21, verbose=True, out=None, only=None, debug=False):
     for i in range(n):
         ppf = [18.0, 18.0, 13.5, 9.0, 18.0, 9.0, 13.5][i % 7]
         sheets.append(Sheet(doc, rnd, ppf).build())
+    if scan:
+        doc = as_scan(doc)
     if out:
         os.makedirs(out, exist_ok=True)
-        doc.save(os.path.join(out, "hard.pdf"))
+        doc.save(os.path.join(out, "hard_scan.pdf" if scan else "hard.pdf"))
     rows, extra, missed_tags = [], 0, 0
     took = 0.0
     for i, s in enumerate(sheets):
@@ -1054,6 +1075,102 @@ def _picture(page, s, found, path):
     cv2.imwrite(path, img)
 
 
+def click_score(n=3, seed=21, verbose=True, only=None):
+    """Auto Area on the same plans: a click in each room's open floor
+    (just under its tag), the traced area against the room's true area.
+    Returns {"rooms", "found", "within1", "within2", "within5", "median",
+    "worst": [(plan, room, err %)]}."""
+    from app import autotakeoff
+    rnd = random.Random(seed)
+    doc = fitz.open()
+    errs, worst, tried, t0 = [], [], 0, time.perf_counter()
+    for i in range(n):
+        ppf = [18.0, 18.0, 13.5, 9.0, 18.0, 9.0, 13.5][i % 7]
+        s = Sheet(doc, rnd, ppf).build()
+        if only is not None and i != only:
+            continue
+        sc = {"ppu": ppf, "unit": "ft"}
+        for r in s.rooms:
+            cx, cy = r["c"]
+            u = r["use"]
+            # open floor: a foot and a half under the tag, inside the room
+            y = min(cy + 1.5, u[3] - 0.6)
+            pt = s.pt(cx, y)
+            tried += 1
+            try:
+                res = autotakeoff.room_at(doc[i], sc, pt)
+            except Exception as e:                        # noqa: BLE001
+                worst.append((i, r["name"], r["no"], None, str(e)[:50]))
+                continue
+            e = 100.0 * (res["sqft"] - r["sf"]) / r["sf"]
+            errs.append(abs(e))
+            if abs(e) > 2:
+                worst.append((i, r["name"], r["no"], round(e, 1),
+                              ";".join(res.get("flags") or [])[:60]))
+    errs.sort()
+    out = {"rooms": tried, "found": len(errs),
+           "within1": sum(e <= 1 for e in errs),
+           "within2": sum(e <= 2 for e in errs),
+           "within5": sum(e <= 5 for e in errs),
+           "median": errs[len(errs) // 2] if errs else None,
+           "worst": worst}
+    if verbose:
+        for w in worst:
+            print("  ", w)
+        t = max(1, tried)
+        print(f"clicks {tried}: a room found {out['found']} "
+              f"({100.0 * out['found'] / t:.1f}%), within 1% "
+              f"{out['within1']} ({100.0 * out['within1'] / t:.1f}%), "
+              f"within 2% {out['within2']} "
+              f"({100.0 * out['within2'] / t:.1f}%), within 5% "
+              f"{out['within5']} ({100.0 * out['within5'] / t:.1f}%); "
+              f"median {out['median'] if out['median'] is None else round(out['median'], 2)}%; "
+              f"{time.perf_counter() - t0:.0f} s")
+    return out
+
+
+def doors_score(n=7, seed=21, verbose=True):
+    """Auto Doors on the same plans: swing doors counted against the ones
+    drawn. A pair of leaves is one door. Pocket and bifold doors have no
+    swing to count and are reported apart; a cased opening is no door.
+    Returns [(plan, drawn singles, drawn pairs, found singles, found
+    pairs, doors without a swing)]."""
+    from app import autowalls
+    rnd = random.Random(seed)
+    doc = fitz.open()
+    rows = []
+    for i in range(n):
+        ppf = [18.0, 18.0, 13.5, 9.0, 18.0, 9.0, 13.5][i % 7]
+        s = Sheet(doc, rnd, ppf).build()
+        t1 = sum(1 for g in s.gaps if g["kind"] == "swing")
+        t2 = sum(1 for g in s.gaps if g["kind"] == "double")
+        other = sum(1 for g in s.gaps if g["kind"] in ("pocket", "bifold"))
+        ds = autowalls.doors(doc[i], ppf, "ft")
+        f1 = sum(1 for d in ds if d["leaves"] == 1)
+        f2 = sum(1 for d in ds if d["leaves"] == 2)
+        rows.append((i, t1, t2, f1, f2, other))
+        if verbose and (t1, t2) != (f1, f2):
+            every = autowalls.doors(doc[i], ppf, "ft", include_narrow=True)
+            tw = sorted(round(g["g1"] - g["g0"], 2) for g in s.gaps
+                        if g["kind"] == "swing")
+            fw = sorted(round(d["width"], 2) for d in every
+                        if d["leaves"] == 1)
+            print("   drawn widths", tw)
+            print("   found widths", fw, "narrow kept out:",
+                  sum(1 for d in every if d.get("narrow")))
+        if verbose:
+            print(f"plan {i}: singles drawn {t1:3d} found {f1:3d}   pairs "
+                  f"drawn {t2:2d} found {f2:2d}   (no swing: {other})"
+                  + ("" if (t1, t2) == (f1, f2) else "   <-- differs"))
+    if verbose:
+        T = sum(r[1] + r[2] for r in rows)
+        F = sum(r[3] + r[4] for r in rows)
+        right = sum(1 for r in rows if (r[1], r[2]) == (r[3], r[4]))
+        print(f"doors drawn {T}, found {F} ({100.0 * F / max(1, T):.1f}%); "
+              f"plans counted exactly: {right} of {len(rows)}")
+    return rows
+
+
 if __name__ == "__main__":
     a = sys.argv[1:]
     seed = int(a[a.index("--seed") + 1]) if "--seed" in a else 21
@@ -1062,7 +1179,12 @@ if __name__ == "__main__":
     n = int(a[0]) if a and a[0].isdigit() else 6
     if "--show" in a:
         SHOW = float(a[a.index("--show") + 1])
-    if "--walls" in a:
+    if "--click" in a:
+        click_score(n, seed, only=only)
+    elif "--doors" in a:
+        doors_score(n, seed)
+    elif "--walls" in a:
         walls_score(n, seed)
     else:
-        score(n, seed, out=out, only=only, debug="--debug" in a)
+        score(n, seed, out=out, only=only, debug="--debug" in a,
+              scan="--scan" in a)

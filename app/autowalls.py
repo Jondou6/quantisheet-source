@@ -811,6 +811,7 @@ def _ang_mean(angles, weights=None):
 
 
 NARROW_FT = 2.5          # under 2'-6": toilet partition / shower doors
+NARROW_SLACK_FT = 0.06   # ...by more than 3/4" (the swing is measured)
 
 
 def doors(page, ppu, unit="ft", min_w_ft=2.0, max_w_ft=4.0,
@@ -900,7 +901,10 @@ def doors(page, ppu, unit="ft", min_w_ft=2.0, max_w_ft=4.0,
                                    cy + r * math.sin(ma))})
     out = _merge_swings(found, per_ft)
     for d in out:
-        d["narrow"] = d["leaves"] == 1 and d["width"] < NARROW_FT
+        # a 2'-6" door is a door: its swing measures a hair under 2.5 as
+        # often as over (Nov 12: one in three of them was left out)
+        d["narrow"] = d["leaves"] == 1 and \
+            d["width"] < NARROW_FT - NARROW_SLACK_FT
     return out if include_narrow else [d for d in out if not d["narrow"]]
 
 
