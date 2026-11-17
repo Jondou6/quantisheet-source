@@ -124,3 +124,26 @@ def test_new_edit_after_undo_drops_redo():
     _mark(h, d, 0, "add_ellipse", rect=[10, 10, 50, 50])
     assert not h.can_redo()
     assert _types(d, 0) == ["Circle"]
+
+
+def test_a_big_file_is_saved_through_a_temp_file(tmp_path, monkeypatch):
+    # Nov 17: twice as fast as tobytes() on a 100 MB set; same document
+    import glob
+    import tempfile
+    from app import history as H
+    d = fitz.open()
+    for i in range(3):
+        d.new_page().insert_text((72, 72), f"page {i}")
+    p = tmp_path / "big.pdf"
+    d.save(p)
+    d.close()
+    doc = fitz.open(p)
+    monkeypatch.setattr(H, "BIG_FILE", 1)            # this one counts as big
+    monkeypatch.setattr(tempfile, "tempdir", str(tmp_path))
+    data = H.doc_bytes(doc)
+    again = fitz.open(stream=data, filetype="pdf")
+    assert again.page_count == 3 and "page 2" in again[2].get_text()
+    assert [x.xref for x in again] == [x.xref for x in doc]    # same objects
+    assert not glob.glob(str(tmp_path / "qs-undo-*"))          # cleaned up
+    monkeypatch.setattr(H, "BIG_FILE", 10 ** 12)     # small: tobytes()
+    assert fitz.open(stream=H.doc_bytes(doc), filetype="pdf").page_count == 3

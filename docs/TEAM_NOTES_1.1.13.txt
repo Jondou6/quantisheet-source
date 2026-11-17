@@ -1,0 +1,7 @@
+QuantiSheet 1.1.13
+- Work Notes Takeoff, keyed notes marked TYP: the count follows the note's leader to the symbol it points at and counts every symbol like it on the sheet (with the same label beside it, such as G). On a checked real job the ground rods went from 1 to 8, matching the hand takeoff. The row says how it was counted.
+- Work Notes Takeoff, fences: a gate whose width the notes give (16-FOOT WIDE GATE) comes out of the measured fence line as a Gate Openings row, and posts and barbed wire are worked out on the line without it.
+- Work Notes Takeoff: Add to Estimate puts the totals in the Estimate panel as lines to price, each with a note saying which sheets it came from and what to check. Adding again updates the quantities instead of making new lines.
+- Rooms on scanned plans: a counter or shelf drawn in a mid-grey pen is no longer read as wall, so rooms beside casework no longer come out small (up to 13% before on 1/8" scans). Small-scale scans are still the weakest case.
+- Big drawing sets open without the window freezing: scales and sheet names are read in the background without holding up the window. On a 100 MB, 32-sheet set, opening went from 14 seconds to under half a second, and the first Ctrl+K from 6 seconds to half a second.
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.13 - the full source of this build. Help > About shows the same link.

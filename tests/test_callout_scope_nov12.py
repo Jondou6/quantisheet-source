@@ -268,8 +268,31 @@ def test_posts_use_the_line_as_drawn_when_there_is_one():
           (0, 0, 9, 9))], "C-2")
     g += cs.measured(g, pens, 7.2, "C-2")
     cs.flag_gates(g)
+    # the gate's width is given: a 16 LF opening, taken out for posts/wire
+    gap = [r for r in g if r["what"] == "GATE OPENINGS IN THE LINE"]
+    assert [(r["qty"], r["unit"], r["source"]) for r in gap] == [
+        (16.0, "LF", "measured")]
+    cs.flag_gates(g)                                  # not twice
+    assert len([r for r in g if r["what"].startswith("GATE OPEN")]) == 1
     new = next(r for r in g if r["what"].startswith("NEW FENCE LINE"))
+    assert cs.GATE_IN_LINE not in new["check"]
+    parts = cs.fence_parts(g, facts)
+    # 55 LF drawn less 16 LF of gate: 39 LF -> 5 posts, 117 LF of wire
+    assert [(r["qty"], r["unit"]) for r in parts] == [(5, "EA"),
+                                                      (117, "LF")]
+    assert "less 16 LF of gate openings" in parts[0]["check"][0]
+    # a gate with no width: the line only says the gate may be inside it
+    w = notes("C-2") + co.read_blocks(
+        [(["INSTALL:", "1 - ACCESS GATE"], (0, 0, 9, 9))], "C-2")
+    w += cs.measured(w, pens, 7.2, "C-2")
+    cs.flag_gates(w)
+    assert not [r for r in w if r["what"].startswith("GATE OPEN")]
+    new = next(r for r in w if r["what"].startswith("NEW FENCE LINE"))
     assert cs.GATE_IN_LINE in new["check"]
+    # a gate valve is not a gate
+    assert cs.gate_openings(co.read_blocks(
+        [(["INSTALL:", "1 - 6-INCH GATE VALVE"], (0, 0, 9, 9))], "C-2"),
+        "C-2") == (0, 0)
     table = cs.sheet_table(g)
     assert table[0][:2] == ["Sheet", "From"]
     assert {row[1] for row in table[1:]} == {"Sheet note",
@@ -382,3 +405,147 @@ def test_a_symbol_marked_typical_says_so():
     assert cs.TYPICAL in brk["check"] and brk["qty"] == 3
     assert cs.TYPICAL not in by["RACK EQUIPMENT"]["check"]
     assert "One-line diagram" in cs.SOURCES.values()
+
+
+def test_typ_set_apart_from_its_number():
+    # 'TYP' as its own text just under the symbol's number (Nov 16)
+    b = keyed_blocks() + [(["7"], (300, 400, 310, 410)),
+                          (["TYP"], (298, 413, 314, 423))]
+    rows = cs.keyed(b, "E-4")
+    rack = next(r for r in rows if r["what"] == "RACK EQUIPMENT")
+    assert cs.TYPICAL in rack["check"]
+    # with a counter: the symbols it points at are counted
+    rows = cs.keyed(b, "E-4", typ_count=lambda n: (8, "G") if n == 7
+                    else None)
+    rack = next(r for r in rows if r["what"] == "RACK EQUIPMENT")
+    assert rack["qty"] == 8
+    assert rack["check"] == [cs.TYP_COUNTED.format(n=8, label=" marked 'G'")]
+    # a counter that finds fewer than counted already changes nothing
+    rows = cs.keyed(b, "E-4", typ_count=lambda n: (1, None))
+    rack = next(r for r in rows if r["what"] == "RACK EQUIPMENT")
+    assert cs.TYPICAL in rack["check"]
+
+
+def _hexagon(shape, cx, cy, r=10):
+    import math
+    pts = [fitz.Point(cx + r * math.cos(math.pi / 3 * k),
+                      cy + r * math.sin(math.pi / 3 * k)) for k in range(7)]
+    shape.draw_polyline(pts)
+    shape.finish(color=(0, 0, 0), width=0.6)
+
+
+def _rod(page, x, y, label="G"):
+    sh = page.new_shape()
+    sh.draw_circle(fitz.Point(x, y), 5)
+    sh.finish(color=(0, 0, 0), fill=(0, 0, 0), width=0.5)
+    sh.commit()
+    if label:
+        page.insert_text(fitz.Point(x + 8, y + 10), label, fontsize=9)
+
+
+def test_typical_counter_follows_the_leader(tmp_path):
+    doc = fitz.open()
+    page = doc.new_page(width=600, height=500)
+    sh = page.new_shape()
+    for n, (x, y) in {14: (60, 60), 15: (120, 60), 16: (80, 200)}.items():
+        _hexagon(sh, x, y)
+    sh.commit()
+    for n, (x, y) in {14: (60, 60), 15: (120, 60), 16: (80, 200)}.items():
+        page.insert_text(fitz.Point(x - 5, y + 3), str(n), fontsize=8)
+    page.insert_text(fitz.Point(70, 222), "TYP", fontsize=8)
+    # leader from the 16 symbol to a rod
+    ld = page.new_shape()
+    ld.draw_line(fitz.Point(90, 200), fitz.Point(150, 160))
+    ld.finish(color=(0, 0, 0), width=0.5)
+    ld.commit()
+    _rod(page, 156, 156)
+    for x, y in ((300, 100), (420, 120), (380, 300), (250, 400), (500, 420)):
+        _rod(page, x, y)
+    for x, y in ((200, 330), (520, 200)):          # same circle, no 'G'
+        _rod(page, x, y, label=None)
+    p = tmp_path / "typ.pdf"
+    doc.save(p)
+    with fitz.open(p) as d:
+        pg = d[0]
+        count = cs.typical_counter(pg)
+        assert count(16) == (6, "G")
+        assert count(15) is None                # 15 is not marked TYP
+
+
+def _work_rows():
+    rows = co.read_blocks([(["INSTALL:", "2 - 6-INCH PLUG VALVE"],
+                            (0, 0, 9, 9))], "C-1")
+    rows += co.read_blocks([(["INSTALL:", "1 - 6-INCH PLUG VALVE"],
+                             (0, 0, 9, 9))], "C-2")
+    measure = co._row("Install", 0, "LF", '1" CONDUIT', "", [cs.MEASURE])
+    measure.update(sheet="E-3", source="notes")
+    return rows + [measure]
+
+
+def test_work_notes_go_into_the_estimate():
+    from app import callouts_ui as cu
+    from app import estimate_lines as el
+    lines = cu.estimate_lines(_work_rows())
+    assert len(lines) == 1
+    desc, qty, unit, note = lines[0]
+    assert (desc, qty, unit) == ("Install 6-INCH PLUG VALVE", 3, "EA")
+    assert "sheets C-1, C-2" in note
+    doc = fitz.open()
+    doc.new_page()
+    assert cu.add_to_estimate(doc, _work_rows()) == (1, 0, 1)
+    (ln,) = el.read(doc)
+    from decimal import Decimal
+    assert ln["source"] == cu.SOURCE and Decimal(ln["qty"]) == 3
+    assert ln["unit"] == "ea" and Decimal(ln["mat"]) == 0
+    # read again with another valve: the same line takes the new count
+    more = _work_rows() + co.read_blocks(
+        [(["INSTALL:", "4 - 6-INCH PLUG VALVE"], (0, 0, 9, 9))], "C-3")
+    assert cu.add_to_estimate(doc, more) == (0, 1, 1)
+    (ln,) = el.read(doc)
+    assert Decimal(ln["qty"]) == 7 and "C-3" in ln["note"]
+
+
+def test_the_window_adds_to_the_estimate(win, tmp_path):
+    from app import callouts_ui as cu
+    from app import estimate_lines as el
+
+    class Est:
+        doc = fitz.open()
+        refreshed = 0
+
+        def refresh(self):
+            Est.refreshed += 1
+    Est.doc.new_page()
+    p = tmp_path / "set.pdf"
+    d = fitz.open()
+    d.new_page()
+    d.save(p)
+    dlg = cu.WorkNotesDialog(str(p), win, estimate=Est())
+    said = []
+    assert dlg.to_estimate(said.append) is None and "Read the" in said[0]
+    dlg.rows = _work_rows()
+    assert dlg.to_estimate(said.append) == (1, 0, 1)
+    assert "1 line added" in said[-1] and "left out" in said[-1]
+    assert Est.refreshed == 1 and len(el.read(Est.doc)) == 1
+    dlg.estimate = None
+    assert dlg.to_estimate(said.append) is None
+    assert "main window" in said[-1]
+    dlg.close()
+
+
+def test_replacing_only_the_barbed_wire_sets_no_posts():
+    # Nov 17: 'REMOVE AND REPLACE: 105 LF SITE FENCING BARBED WIRE' got
+    # fence posts as if it were new fence
+    facts = {"post_spacing_ft": 10.0, "barbed_strands": 3}
+    w = co.read_blocks([(["REMOVE AND REPLACE:",
+                          "105 LF SITE FENCING BARBED WIRE"], (0, 0, 9, 9))],
+                       "C-2")
+    assert cs.wire_only(w[0]) and cs.is_fence(w[0])
+    parts = cs.fence_parts(w, facts)
+    assert [(r["qty"], r["unit"], r["what"]) for r in parts] == [
+        (315, "LF", "STRAND BARBED WIRE REPLACED")]
+    # with a fence note on the same sheet, the fence note covers the wire
+    both = w + co.read_blocks([(["INSTALL:", "130 LF SITE FENCING"],
+                                (0, 20, 9, 29))], "C-2")
+    assert [(r["qty"], r["unit"]) for r in cs.fence_parts(both, facts)] == [
+        (14, "EA"), (390, "LF")]

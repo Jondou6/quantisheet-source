@@ -7,7 +7,11 @@ from PySide6.QtWidgets import (QApplication, QDialog, QFileDialog,
                                QPlainTextEdit, QProgressDialog, QPushButton,
                                QTableWidget, QTableWidgetItem, QVBoxLayout)
 
+import logging
+
 from . import aitakeoff as ait
+
+log = logging.getLogger(__name__)
 
 
 PENCIL = [6, 4]          # dash pattern of an AI proposal not yet checked
@@ -401,6 +405,10 @@ class AITakeoffDialog(QDialog):
             QApplication.restoreOverrideCursor()
         self.result = res
         self.rows = rows
+        # quantities worked out, not drawn, go to the Estimate panel
+        # (Nov 17): a re-run of these sheets replaces them
+        self._ai_pages = [r["page"] for r in rows if r.get("engines")]
+        self.store_quantities()
         unit = next((r["scale"][2] for r in rows if r["scale"]), "ft")
         self.summary.setPlainText(ait.summary_text(rows, res, unit))
         stopped = "Stopped before the end." in res.get("problems", [])
@@ -424,6 +432,26 @@ class AITakeoffDialog(QDialog):
             self.win.qty_dock.show()
         return res
 
+    def store_quantities(self):
+        """Keep the result's taken-off quantities in the PDF and refresh
+        the Estimate panel; returns how many are stored."""
+        from . import ai_quantities
+        if not self.result or self.view is None or self.view.doc is None:
+            return 0
+        try:
+            n = ai_quantities.store(self.view.doc, self.result,
+                                    getattr(self, "_ai_pages", None))
+        except Exception:                                 # noqa: BLE001
+            log.warning("AI quantities not stored", exc_info=True)
+            return 0
+        est = getattr(self.win, "estimate", None)
+        if est is not None and hasattr(est, "refresh"):
+            try:
+                est.refresh()
+            except Exception:                             # noqa: BLE001
+                log.info("estimate refresh", exc_info=True)
+        return n
+
     def confirm_rerun(self, dlg):
         """Show the run-again choice (tests replace this)."""
         return dlg.exec() == QDialog.Accepted
@@ -442,10 +470,12 @@ class AITakeoffDialog(QDialog):
 
         def changed():
             c = rv.counts(self.result)
+            self.store_quantities()
             self.status.setText(
                 f"Review: {c['accepted']} accepted, {c['fixed']} fixed, "
-                f"{c['deleted']} deleted, {c['left']} still to check. Make "
-                "the Estimate Workbook again to carry them.")
+                f"{c['deleted']} deleted, {c['left']} still to check. The "
+                "Estimate panel follows; make the Estimate Workbook again "
+                "to carry them there.")
         dlg = ReviewDialog(self.win, self.result,
                            who=settings.author() or "reviewer",
                            on_change=changed)

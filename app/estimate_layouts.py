@@ -89,8 +89,8 @@ DAMAGED_MESSAGE = (
     "The estimate layouts and tags saved in this PDF can't be read (the "
     "stored data is damaged), so nothing was saved: saving now would "
     "replace them. The damaged data is still in the PDF; open an earlier "
-    "copy of the PDF, or keep a damaged copy to set it aside and start "
-    "fresh.")
+    "copy of the PDF, or choose Keep a Copy and Start Fresh to set it "
+    "aside and start again.")
 
 
 # ---- a layout ---------------------------------------------------------------

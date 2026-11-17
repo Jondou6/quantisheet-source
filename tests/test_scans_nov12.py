@@ -118,3 +118,13 @@ def test_too_few_walls_to_compare_pens_fills_as_before():
     ink = at.scan_ink_of(g)
     at.fill_hollow(ink, PPF, gray=g)
     assert ink[94, 200] == 1                 # filled: nothing to compare with
+
+
+def test_a_counter_in_a_mid_grey_pen_is_not_wall():
+    # Nov 16: on 1/8" scans a counter against a wall read about 0.6 of
+    # the walls' pen and was filled in as wall (rooms up to 13% small)
+    g = shelf_plan(110, 2)
+    ink = at.scan_ink_of(g)
+    at.fill_hollow(ink, PPF, gray=g)
+    assert at.wall_mask(None, PPF, ink=ink,
+                        open_ft=at.SCAN_OPEN_FT)[143, 250] == 0

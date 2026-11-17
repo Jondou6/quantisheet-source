@@ -1132,6 +1132,8 @@ class MainWindow(QMainWindow):
         self.unpriced_act = a
         self._act(t, "Create Proposal…", "Ctrl+Shift+B",
                   lambda: self.create_proposal())
+        self._act(t, "Export Bid Package…", None,
+                  lambda: self.export_bid_package())
         t.addSeparator()
         t.addAction(self.est_dock.toggleViewAction())
         self._act(t, "Price These…", None, lambda: self.price_these())
@@ -4812,6 +4814,59 @@ class MainWindow(QMainWindow):
                 self._open_file_external(path)
         return path
 
+    def export_bid_package(self, folder=None, ask=None):
+        """Estimate > Export Bid Package: the proposal, the estimate
+        summary (PDF and Excel), the estimate detail, the takeoff sheets
+        and - after AI Takeoff - the estimate workbook, in one folder and
+        one zip, with a contents list of what still needs a look (Nov 17).
+        `folder` and `ask` are for tests. Returns bidpackage.make's
+        result or None."""
+        from . import bidpackage, proposal
+        v = self._view
+        if not v:
+            return None
+        if folder is None:
+            start = os.path.dirname(self._path or "") or os.path.expanduser(
+                "~")
+            folder = QFileDialog.getExistingDirectory(
+                self, "Export Bid Package To", start)
+            if not folder:
+                return None
+        ai = getattr(self, "_ai_dlg", None)
+        res = rows = None
+        try:
+            if ai is not None and ai.view is v and ai.result:
+                res, rows = ai.result, getattr(ai, "rows", None)
+        except RuntimeError:                   # the dialog was closed
+            res = rows = None
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        try:
+            out = bidpackage.make(v.doc, folder, comp=proposal.company(),
+                                  ai_rows=rows, ai_result=res)
+        except Exception as ex:                           # noqa: BLE001
+            log.exception("bid package")
+            QMessageBox.warning(self, "Bid Package",
+                                f"Could not make the bid package:\n{ex}")
+            return None
+        finally:
+            QApplication.restoreOverrideCursor()
+        names = [os.path.basename(p) for _k, p in out["files"]]
+        text = (f"{len(names)} file(s) in {os.path.basename(out['folder'])}"
+                f", and {os.path.basename(out['zip'])} to send.")
+        if out["skipped"]:
+            text += "\n\nNot included:\n" + "\n".join(
+                f"- {bidpackage.LABEL[k]}: {why}" for k, why in out["skipped"])
+        if out["checks"]:
+            text += "\n\nBefore you send it:\n" + "\n".join(
+                f"- {c}" for c in out["checks"])
+        text += "\n\nOpen the folder?"
+        if ask is None:
+            ask = (lambda t: QMessageBox.question(
+                self, "Bid Package", t) == QMessageBox.Yes)
+        if ask(text):
+            self._open_file_external(out["folder"])
+        return out
+
     def _open_file_external(self, path):
         try:
             os.startfile(path)                    # noqa: S606 (Windows)
@@ -5136,6 +5191,11 @@ class MainWindow(QMainWindow):
                 quickaccess.auto_scale_on_open(self, view, path)
             except Exception:                             # noqa: BLE001
                 log.debug("auto scale on open", exc_info=True)
+            try:                       # Ctrl+K sheet names (Nov 16)
+                from . import quickaccess
+                quickaccess.labels_on_open(view, path)
+            except Exception:                             # noqa: BLE001
+                log.debug("sheet names on open", exc_info=True)
         if getattr(doc, "is_repaired", False):
             # a non-blocking notice: the file opens as usual
             note = repaired_notice(path)

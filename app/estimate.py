@@ -248,6 +248,22 @@ def lines(doc, page=None):
         g["count"] += 1
         g["_q"] = g.get("_q", _Z) + dmoney.D(it["quantity"])
         g["pages"].add(it["page"] + 1)
+    # AI Takeoff quantities worked out, not drawn (Nov 17: steel weight,
+    # wall area, finishes, work-note counts) - live, replaced by a re-run
+    from . import ai_quantities
+    for it in ai_quantities.rows(doc):
+        if page is not None and it["page"] != page:
+            continue
+        k = (it["name"], ai_quantities.TYPE, it["unit"])
+        g = groups.setdefault(k, {"name": it["name"],
+                                  "type": ai_quantities.TYPE,
+                                  "unit": it["unit"], "count": 0,
+                                  "quantity": 0.0, "pages": set(),
+                                  "csi": it["csi"]})
+        g["count"] += 1
+        g["_q"] = g.get("_q", _Z) + dmoney.D(it["qty"])
+        if it["page"] is not None:
+            g["pages"].add(it["page"] + 1)
     out = []
     for k in sorted(groups):
         g = groups[k]
@@ -256,7 +272,8 @@ def lines(doc, page=None):
         g["multiplier"] = _num(p.get("multiplier"), 1.0, "multiplier")
         g["unit_cost"] = _num(p.get("unit_cost"), 0.0, "unit_cost")
         # CSI code and cost type typed on the line (0.13: Estimate panel)
-        g["code"] = _text(p.get("code"), 40)
+        g["code"] = _text(p.get("code"), 40) or _text(g.pop("csi", ""), 40)
+        g.pop("csi", None)
         g["cost_type"] = _text(p.get("cost_type"), 20)
         # Venice #15 (Nov 4): quantities add up in exact decimals (each
         # markup's value as shown, no float drift from the order they were
@@ -459,6 +476,13 @@ def export_csv(doc, path, page=None):
             if page is None or it["page"] == page:
                 w.writerow([it["page"] + 1, it["item"], "set",
                             _hu(it["quantity"], 3), it["unit"], "manual"])
+        from . import ai_quantities
+        for it in ai_quantities.rows(doc):
+            if page is None or it["page"] == page:
+                w.writerow(["" if it["page"] is None else it["page"] + 1,
+                            it["name"], ai_quantities.TYPE,
+                            _hu(it["qty"], 3), it["unit"],
+                            "AI takeoff (worked out)"])
         pend = [it for it in annotate.takeoff_items(doc)
                 if it.get("pending") and (page is None or
                                           it["page"] == page)]

@@ -1,0 +1,4 @@
+QuantiSheet 1.1.14
+- Work Notes Takeoff, fences: a note that replaces only the barbed wire (SITE FENCING BARBED WIRE) no longer gets fence posts as if it were new fence. It gives the barbed wire strands alone, as Strand Barbed Wire Replaced.
+- Big drawing sets: setting a scale, rotating pages and undoing them are about twice as fast on large files (on a 100 MB set, the first scale set went from 0.8 to under half a second).
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.14 - the full source of this build. Help > About shows the same link.

@@ -24,6 +24,10 @@ settings._cache = {"author": "Probe"}
 
 def main(argv):
     path = argv[0].strip('"')
+    if not os.path.isfile(path):          # a pattern, for paths with spaces
+        import glob
+        hits = sorted(glob.glob(os.path.join(ROOT, path)))
+        path = hits[0] if hits else path
     from PySide6.QtWidgets import QApplication, QMessageBox
     app = QApplication.instance() or QApplication([])
     for n in ("information", "warning", "critical"):

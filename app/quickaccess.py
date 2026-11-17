@@ -502,9 +502,20 @@ def palette_extras(win):
     if v is not None:
         try:
             from . import sheets
+            # Nov 16: reading every sheet's words took 6 s on each Ctrl+K
+            # on a real 32-sheet set; a page's label is kept for the open
+            # document, by the page object (moves and rotates keep it)
+            cache = getattr(v, "_palette_labels", None)
+            if cache is None or cache[0] is not v.doc:
+                cache = (v.doc, {})
+                v._palette_labels = cache
             for i in range(min(v.doc.page_count, 600)):
                 try:
-                    lab = sheets.label_for(v.doc[i]) or ""
+                    pg = v.doc[i]
+                    key = (pg.xref, tuple(pg.get_contents()))
+                    lab = cache[1].get(key)
+                    if lab is None:
+                        lab = cache[1][key] = sheets.label_for(pg) or ""
                 except Exception:                         # noqa: BLE001
                     lab = ""
                 lab = lab or (v.doc[i].get_label() or "")
@@ -1596,16 +1607,24 @@ def load_unconfirmed(view):
     return getattr(view, "_auto_scaled", set())
 
 
-def scale_rows(path, pages=None):
+def scale_rows(path, pages=None, process=False):
     """Read title-block scales from a copy of the file (off the window's
-    document, so it can run in the background)."""
+    document, so it can run in the background). With `process`, in a
+    process of its own (scale_proc), so MuPDF holding Python's lock can't
+    freeze the window; if that process can't run, here instead."""
     import fitz
     from . import autoscale
     d = fitz.open(path)
     try:
         n = min(d.page_count, MAX_AUTO_PAGES)
-        return autoscale.detect(d, pages=pages if pages is not None
-                                else range(n), use_ocr=False)
+        pages = list(pages if pages is not None else range(n))
+        if process:
+            from . import scale_proc
+            try:
+                return scale_proc.scale_rows(path, pages)
+            except Exception as e:                        # noqa: BLE001
+                log.info("scales read in the window instead: %s", e)
+        return autoscale.detect(d, pages=pages, use_ocr=False)
     finally:
         d.close()
 
@@ -1648,6 +1667,31 @@ def apply_scale_rows(win, view, rows):
     return n
 
 
+LABELS_AHEAD = 12          # sets of this many pages get Ctrl+K names read
+
+
+def labels_on_open(view, path):
+    """Read the sheet names Ctrl+K lists in another process while the set
+    opens, so the first Ctrl+K on a big set doesn't wait for them."""
+    if view is None or not path or not os.path.isfile(path):
+        return None
+    n = min(view.doc.page_count, 600)
+    if n < LABELS_AHEAD:
+        return None
+    from . import bg, scale_proc
+    doc = view.doc
+
+    def done(found):
+        cache = getattr(view, "_palette_labels", None)
+        if cache is None or cache[0] is not doc:
+            cache = (doc, {})
+            view._palette_labels = cache
+        for k, lab in found.items():
+            cache[1].setdefault(k, lab)
+    return bg.run(lambda: scale_proc.sheet_labels(path, range(n)), done,
+                  lambda e: log.info("sheet names on open: %s", e), view)
+
+
 def auto_scale_on_open(win, view, path, wait=False):
     """When a set opens with no scales, read them from the title blocks
     in the background and set the clean ones."""
@@ -1666,7 +1710,7 @@ def auto_scale_on_open(win, view, path, wait=False):
     if wait:
         return apply_scale_rows(win, view, scale_rows(path))
     from . import bg
-    bg.run(lambda: scale_rows(path),
+    bg.run(lambda: scale_rows(path, process=True),
            lambda rows: apply_scale_rows(win, view, rows),
            lambda e: log.info("auto scale on open: %s", e), win)
     return True

@@ -261,6 +261,9 @@ def _note_items(text):
 IN_SYMBOL = "from a keyed note; counted by its symbols on the sheet"
 TYPICAL = ("its symbol is marked TYP: one symbol stands for every one like "
            "it - count them on the sheet")
+TYP_COUNTED = ("its symbol is marked TYP: counted the {n} symbols{label} "
+               "on the sheet that look like the one it points at - check "
+               "the count")
 SYMBOL_KEYS = 3        # a shape is the notes' symbol when it holds this many
 #                        different note numbers
 
@@ -310,11 +313,152 @@ def page_symbols(page):
     return out
 
 
-def keyed(blocks, sheet="", page=None, symbols=None):
+def _shape_sig(d):
+    kinds = [it[0] for it in d["items"]]
+    r = d["rect"]
+    return (kinds.count("l"), kinds.count("c"), kinds.count("re"),
+            int(round(r.width)), int(round(r.height)), bool(d.get("fill")))
+
+
+def _ends(d):
+    """The end points of a drawn path's line pieces."""
+    pts = []
+    for it in d["items"]:
+        if it[0] == "l":
+            pts += [it[1], it[2]]
+        elif it[0] == "c":
+            pts += [it[1], it[4]]
+    return pts
+
+
+def typical_counter(page, symbols=None, debug=None):
+    """A typ_count(n) for keyed(): for the note symbol n marked TYP, follow
+    its leader line to the symbol it points at, then count the symbols on
+    the sheet drawn the same way (and, when that symbol has a short label
+    beside it such as 'G', with the same label). Returns (count, label) or
+    None when the leader or its target can't be found."""
+    import fitz
+    drawings = page.get_drawings()
+    small = [d for d in drawings if 3 <= max(d["rect"].width,
+                                             d["rect"].height) <= 40]
+    words = page.get_text("words")
+    pairs = symbols if symbols is not None else page_symbols(page)
+
+    def shape_of_notes():
+        by = {}
+        for num, shp in pairs:
+            if shp is not None:
+                by.setdefault(shp, set()).add(num)
+        return max(by, key=lambda k: len(by[k])) if by else None
+    note_shape = shape_of_notes()
+
+    def note_rects(n):
+        out = []
+        for w in words:
+            if w[4].strip() != str(n):
+                continue
+            c = fitz.Point((w[0] + w[2]) / 2, (w[1] + w[3]) / 2)
+            best = None
+            for d in small:
+                r = d["rect"]
+                kinds = [it[0] for it in d["items"]]
+                sig = (kinds.count("l"), kinds.count("c"),
+                       int(round(r.width)), int(round(r.height)))
+                if r.contains(c) and sig == note_shape and (
+                        best is None or r.get_area() < best.get_area()):
+                    best = r
+            if best is not None:
+                out.append(best)
+        return out
+
+    def near_typ(r):
+        h = max(r.width, r.height)
+        for w in words:
+            if re.fullmatch(r"TYP(?:ICAL)?\.?", w[4].strip(), re.I):
+                wr = fitz.Rect(w[:4])
+                if (wr.intersects(r + (-1.5 * h, -1.5 * h, 1.5 * h,
+                                       1.5 * h))):
+                    return True
+        return False
+
+    def label_near(r):
+        h = max(r.width, r.height, 4)
+        c = (r.tl + r.br) / 2
+        best = None
+        for w in words:
+            t = w[4].strip()
+            if not (1 <= len(t) <= 2 and t.isalpha() and t.isupper()):
+                continue
+            wc = fitz.Point((w[0] + w[2]) / 2, (w[1] + w[3]) / 2)
+            dist = abs(wc - c)
+            if dist <= 2.2 * h and not r.contains(wc) and (
+                    best is None or dist < best[0]):
+                best = (dist, t)
+        return best[1] if best else None
+
+    say = debug.append if debug is not None else (lambda *_: None)
+
+    def count(n):
+        say(("note shape", note_shape, "rects", note_rects(n)))
+        for rs in note_rects(n):
+            if not near_typ(rs):
+                say(("no TYP near", rs))
+                continue
+            c0 = (rs.tl + rs.br) / 2
+            grab = rs + (-3, -3, 3, 3)
+            far = None
+            for d in drawings:
+                if d["rect"] == rs or max(d["rect"].width,
+                                          d["rect"].height) > 600:
+                    continue
+                pts = _ends(d)
+                if not any(grab.contains(p) for p in pts):
+                    continue
+                if d["rect"].width <= rs.width + 1 and \
+                        d["rect"].height <= rs.height + 1:
+                    continue                      # the symbol itself
+                p = max(pts, key=lambda q: abs(q - c0))
+                if far is None or abs(p - c0) > abs(far - c0):
+                    far = p
+            say(("leader end", far))
+            if far is None:
+                continue
+            target = None
+            for d in small:
+                r = d["rect"]
+                if not (r + (-12, -12, 12, 12)).contains(far):
+                    continue
+                kinds = [it[0] for it in d["items"]]
+                if "c" not in kinds and "re" not in kinds and \
+                        len(kinds) <= 3:
+                    continue                      # a leader piece, an arrow
+                if r.width < 4 or r.height < 4:
+                    continue                      # a dot, a tick
+                dist = abs((r.tl + r.br) / 2 - far)
+                if target is None or dist < target[0]:
+                    target = (dist, d)
+            say(("target", target and (_shape_sig(target[1]),
+                                       target[1]["rect"])))
+            if target is None:
+                continue
+            sig = _shape_sig(target[1])
+            label = label_near(target[1]["rect"])
+            same = [d for d in small if _shape_sig(d) == sig]
+            if label:
+                same = [d for d in same if label_near(d["rect"]) == label]
+            if same:
+                return len(same), label
+        return None
+    return count
+
+
+def keyed(blocks, sheet="", page=None, symbols=None, typ_count=None):
     """Rows from a sheet's 'NOTES BY SYMBOL': each note that asks for
     something, counted by how many times its number stands as a symbol
     on the drawing. `blocks` as callouts.page_blocks(); `symbols` as
-    page_symbols() lets the count go by the symbol's drawn shape."""
+    page_symbols() lets the count go by the symbol's drawn shape.
+    `typ_count(n)` (typical_counter()) counts what a note marked TYP
+    points at, so one symbol can stand for all of them."""
     head = next((b for b in blocks if _KEYHEAD.search(" ".join(b[0]))), None)
     if not head:
         return []
@@ -350,6 +494,25 @@ def keyed(blocks, sheet="", page=None, symbols=None):
             typical |= {int(ln) for ln in lines
                         if re.fullmatch(r"\d{1,2}", ln.strip()) and
                         int(ln) in notes}
+    # 'TYP' set as its own text just under or beside the symbol
+    nums = [(int(lines[0]), rect) for lines, rect in blocks
+            if id(lines) not in used and len(lines) == 1 and
+            re.fullmatch(r"\d{1,2}", lines[0].strip()) and
+            int(lines[0]) in notes]
+    for lines, rect in blocks:
+        if len(lines) != 1 or not re.fullmatch(r"TYP(?:ICAL)?\.?",
+                                               lines[0].strip(), re.I):
+            continue
+        h = max(rect[3] - rect[1], 1.0)
+        cx, cy = (rect[0] + rect[2]) / 2, (rect[1] + rect[3]) / 2
+        best = None
+        for n, r in nums:
+            d = ((cx - (r[0] + r[2]) / 2) ** 2 +
+                 (cy - (r[1] + r[3]) / 2) ** 2) ** 0.5
+            if d <= 3 * h and (best is None or d < best[0]):
+                best = (d, n)
+        if best:
+            typical.add(best[1])
     shaped = pick_symbols(symbols, set(notes)) if symbols else None
     if shaped is not None:
         count = shaped
@@ -361,7 +524,14 @@ def keyed(blocks, sheet="", page=None, symbols=None):
                         [(IN_SYMBOL if shaped is not None else KEYED)
                          if q else KEY_ONCE])
             if n in typical and k == 0:
-                r["check"].append(TYPICAL)
+                got = typ_count(n) if typ_count else None
+                if got and got[0] > r["qty"]:
+                    r["qty"] = got[0]
+                    r["check"] = [TYP_COUNTED.format(
+                        n=got[0], label=f" marked '{got[1]}'" if got[1]
+                        else "")]
+                else:
+                    r["check"].append(TYPICAL)
             r.update(sheet=sheet, page=page, rect=None, source="keyed")
             rows.append(r)
     return rows
@@ -562,28 +732,48 @@ def _run_length(row, rows):
     return row["qty"], "the length the note states"
 
 
+def wire_only(r):
+    """A fence note for its barbed wire alone ('REPLACE ALL SITE FENCING
+    BARBED WIRE')."""
+    return bool(re.search(r"\bBARB(?:ED)?\b", r["what"], re.I))
+
+
 def fence_parts(rows, facts):
     """Posts and barbed wire strands for each sheet's new fence, by the
     specification's spacing and strand count, once per sheet."""
     out, done = [], set()
-    for r in list(rows):
-        if (not is_fence(r) or not r["qty"] or
-                r.get("source", "note") != "note"):
+    notes = [r for r in rows if is_fence(r) and r["qty"] and
+             r.get("source", "note") == "note"]
+    # Nov 17: a note that replaces only the barbed wire ('SITE FENCING
+    # BARBED WIRE') sets no posts; on a sheet with a fence note too, the
+    # fence note covers the wire
+    fenced = {r.get("sheet") for r in notes if not wire_only(r)}
+    for r in notes:
+        only = wire_only(r)
+        if only and r.get("sheet") in fenced:
             continue
         feet, how = _run_length(r, rows)
         key = (r.get("sheet"), how)
+        if how != "the length the note states":
+            gap = sum(x["qty"] for x in rows
+                      if x.get("sheet") == r.get("sheet") and
+                      x["what"] == "GATE OPENINGS IN THE LINE")
+            if gap and gap < feet:
+                feet = round(feet - gap, 3)
+                how += ", " + GATE_TAKEN_OUT.format(f=gap)
         if how != "the length the note states":
             if key in done:
                 continue
             done.add(key)
         sp, st = facts.get("post_spacing_ft"), facts.get("barbed_strands")
         add = []
-        if sp:
+        if sp and not only:
             posts = int(feet / sp + 0.5) + 1
             add.append((posts, "EA", f"FENCE POSTS AT {sp:g} FT"))
         if st:
             add.append((round(feet * st, 3), "LF",
-                        "STRAND BARBED WIRE ON NEW FENCE"))
+                        "STRAND BARBED WIRE REPLACED" if only
+                        else "STRAND BARBED WIRE ON NEW FENCE"))
         for q, u, what in add:
             x = co._row("Install", q, u, what, "",
                         [BY_SPEC + f", on {how} ({feet:g} LF)"], r["approx"])
@@ -593,15 +783,55 @@ def fence_parts(rows, facts):
     return out
 
 
-def flag_gates(rows):
-    """Mark a measured new line on a sheet that also has a gate note."""
-    gates = {r.get("sheet") for r in rows if re.search(r"\bGATE\b",
-                                                       r["what"])}
+_GATE_W = re.compile(
+    r"(\d+(?:\.\d+)?)\s*(?:-\s*)?(?:FOOT|FEET|FT\.?|')\s*(?:WIDE\s+)?"
+    r"(?:(?:DOUBLE|SINGLE|SWING|SLIDE|SLIDING|CANTILEVER|VEHICLE|VEHICULAR|"
+    r"ACCESS|CHAIN[\s-]*LINK)\s+)*GATE\b", re.I)
+GATE_OPENING = ("gate openings the notes give a width for, taken out of the "
+                "line as drawn for posts and barbed wire")
+GATE_TAKEN_OUT = "less {f:g} LF of gate openings"
+
+
+def gate_openings(rows, sheet):
+    """(feet, gates) of new gates with a stated width on a sheet."""
+    feet = gates = 0
     for r in rows:
-        if (r.get("source") == "measured" and r.get("sheet") in gates and
-                r["what"].startswith("NEW") and
-                GATE_IN_LINE not in r["check"]):
-            r["check"].append(GATE_IN_LINE)
+        if (r.get("sheet") != sheet or r["unit"] != "EA" or
+                r.get("source") == "implied" or
+                r["action"] not in ("Install", "Remove and replace",
+                                    "Replace")):
+            continue
+        m = _GATE_W.search(r["what"])
+        if m and r["qty"]:
+            feet += float(m.group(1)) * r["qty"]
+            gates += r["qty"]
+    return feet, gates
+
+
+def flag_gates(rows):
+    """On a sheet with a measured line: gates whose width the notes give
+    become a GATE OPENINGS row (taken out for posts and wire); a gate
+    note without a width marks the measured new line instead."""
+    gates = {r.get("sheet") for r in rows if re.search(r"\bGATE\b",
+                                                       r["what"]) and
+             not re.search(r"\bGATE\s+VALVE", r["what"])}
+    sheets = {r.get("sheet") for r in rows if r.get("source") == "measured"}
+    for sheet in sheets & gates:
+        if any(r.get("sheet") == sheet and
+               r["what"] == "GATE OPENINGS IN THE LINE" for r in rows):
+            continue
+        feet, n = gate_openings(rows, sheet)
+        if feet:
+            x = co._row("", feet, "LF", "GATE OPENINGS IN THE LINE", "",
+                        [GATE_OPENING + f" ({n:g} gate{'s' if n != 1 else ''})"])
+            x.update(sheet=sheet, page=None, rect=None, source="measured")
+            rows.append(x)
+            continue
+        for r in rows:
+            if (r.get("source") == "measured" and r.get("sheet") == sheet
+                    and r["what"].startswith("NEW") and
+                    GATE_IN_LINE not in r["check"]):
+                r["check"].append(GATE_IN_LINE)
 
 
 def sheet_table(rows):
@@ -656,7 +886,9 @@ def read_set(path, spec_text="", sheet_of=None):
             rows += got
             blocks = co.page_blocks(page)
             if any(_KEYHEAD.search(" ".join(b[0])) for b in blocks):
-                rows += keyed(blocks, name, n, page_symbols(page))
+                syms = page_symbols(page)
+                rows += keyed(blocks, name, n, syms,
+                              typical_counter(page, syms))
             rows += from_feeder_tags(blocks, name, n)
             words = page_words(page)
             table_marks += marks(words)

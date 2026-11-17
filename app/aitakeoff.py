@@ -436,7 +436,19 @@ def plan_set(doc, progress=None):
         if why_rooms:
             engines.remove("rooms")
         dpi = scan_dpi(doc[pno]) if raster else None
-        if raster:
+        if raster and kind == "plan" and "rooms" in engines:
+            # Nov 17: a scanned floor plan - the rooms engine traces rooms
+            # from the picture (97% of rooms found on the scanned test
+            # plans); its scale is checked like any scan's
+            engines = ["rooms"]
+            note = ("scanned plan - rooms traced from the picture; check "
+                    "each one" if sc is not None else
+                    "scanned plan - set its scale, then run again to trace "
+                    "its rooms")
+            if dpi and dpi < LOW_DPI:
+                note += (f"; scanned at about {dpi:.0f} DPI - under "
+                         f"{LOW_DPI} DPI, check every number closely")
+        elif raster:
             # 3c C9: a picture - nothing to measure from its lines
             kind, engines = "raster", []
             note = "raster sheet, measure by hand (no vector linework)"
@@ -1991,7 +2003,8 @@ def walls_pages(rows):
     A-101 and again on A-102 is counted once. Roof, ceiling, demolition,
     framing and similar plans are left out."""
     cand = [r for r in rows if "rooms" in (r.get("engines") or ()) and
-            r.get("scale") and r.get("kind", "plan") == "plan"]
+            r.get("scale") and r.get("kind", "plan") == "plan" and
+            not r.get("raster")]           # walls are read from linework
     good = [r for r in cand if not _NO_WALLS.search(r.get("title") or "")
             or plan_rank(r) == 0]
     cand = good or cand
@@ -3351,6 +3364,14 @@ def run(doc, rows, progress=None, engines=None, sheet_time_limit=None,
                                 "the room tag (trace more than 5% off)")
                     room_found[pno] = found
                     room_missed[pno] = missed
+                    if not found and not missed and \
+                            rows_by_page.get(pno, {}).get("raster"):
+                        # Nov 17: a scan with no text layer has no room
+                        # names to trace from
+                        res["problems"].append(
+                            f"{name}: scanned plan with no readable room "
+                            "names - run Make Searchable (OCR) on it, then "
+                            "run again")
                 elif eng == "civil":
                     civil_pages.append(pno)
                     continue
@@ -3744,6 +3765,19 @@ def run(doc, rows, progress=None, engines=None, sheet_time_limit=None,
         except Exception:                                # noqa: BLE001
             log.info("parking", exc_info=True)
         res["timing"]["envelope/site"] = _c2(_time.time() - t1)
+    # the work notes on every sheet - 'INSTALL: 2 - MANUAL TRANSFER
+    # SWITCH', keyed notes, one-line feeder tags (Nov 17): a count with
+    # nothing to check goes in; anything with a check, and every length or
+    # area (a measuring engine may already have it), waits for review
+    if engines is None or "worknotes" in engines:
+        t1 = _time.time()
+        try:
+            worknotes(doc, rows_by_page, res,
+                      say_no_file=bool(engines and "worknotes" in engines))
+        except Exception as e:                           # noqa: BLE001
+            log.exception("AI takeoff work notes")
+            res["problems"].append(f"Work notes failed ({e})")
+        res["timing"]["work notes"] = _c2(_time.time() - t1)
     # steel: each member once across the S plans (3c C3, N10), column
     # heights from a column schedule when the set has one
     if steel_found:
@@ -3770,6 +3804,101 @@ def run(doc, rows, progress=None, engines=None, sheet_time_limit=None,
         log.info("scale review", exc_info=True)
     mark_sources(rows, res)
     return res
+
+
+WORKNOTE_SOURCE = "work notes"
+
+
+_WORD = re.compile(r"[A-Z0-9]{3,}")
+_COMMON = {"INSTALL", "PROVIDE", "REMOVE", "REPLACE", "NEW", "EXISTING",
+           "AND", "THE", "WITH", "FOR", "TYP", "ALL"}
+
+
+def _words_of(name):
+    return {w for w in _WORD.findall(str(name or "").upper())
+            if w not in _COMMON}
+
+
+def _counted_elsewhere(name, res):
+    """True when another engine already counted something by this name (a
+    legend symbol, a schedule line) - the note's number then waits for
+    review instead of being added a second time."""
+    mine = _words_of(name)
+    if not mine:
+        return False
+    others = [q.get("name") for q in res.get("quantities") or ()
+              if q.get("engine") != WORKNOTE_SOURCE]
+    for sh in (res.get("sheets") or {}).values():
+        if isinstance(sh, dict):
+            others += list((sh.get("devices") or {}).keys())
+    for o in others:
+        theirs = _words_of(o)
+        if theirs and len(mine & theirs) >= max(1, min(len(mine),
+                                                       len(theirs)) - 1):
+            return True
+    return False
+
+
+def worknotes(doc, rows_by_page, res, read=None, say_no_file=False):
+    """Add the work notes' totals to res["quantities"] (engine 'work
+    notes'): counts with nothing to check are taken off; lengths, areas,
+    anything the reader flagged and anything another engine already
+    counted are pending review. `read(path)` stands in for
+    callout_scope.read_set in tests."""
+    import os
+    import tempfile
+    path = getattr(doc, "name", "") or ""
+    tmp = None
+    if not path or not os.path.isfile(path):
+        # a copy in memory (the drawing has unsaved changes): the notes
+        # are read from a temporary file of it
+        try:
+            fd, tmp = tempfile.mkstemp(prefix="qs-notes-", suffix=".pdf")
+            os.close(fd)
+            doc.save(tmp)
+            path = tmp
+        except Exception:                                # noqa: BLE001
+            log.info("work notes temp file", exc_info=True)
+            if say_no_file:
+                res["problems"].append("Work notes: save the PDF first, "
+                                       "then run again")
+            return 0
+    from . import callout_scope as cs
+    from . import callouts as co
+    num = {p: (r.get("number") or "") for p, r in rows_by_page.items()}
+
+    def sheet_of(page):
+        return num.get(page.number) or None
+    try:
+        rows, _facts = (read(path) if read else
+                        cs.read_set(path, "", sheet_of=sheet_of))
+    finally:
+        if tmp:
+            try:
+                os.remove(tmp)
+            except OSError:
+                pass
+    n = 0
+    for s in co.summary([r for r in rows if r["qty"]]):
+        name = " ".join(x for x in (s["action"], s["what"]) if x)
+        twice = _counted_elsewhere(s["what"], res)
+        clean = s["unit"] == "EA" and not s["check"] and not s["approx"] \
+            and not twice
+        sheets = [str(x) for x in s["sheets"] if x]
+        basis = "stated in the work notes" + (
+            f" on {', '.join(sheets)}" if sheets else "")
+        if s["check"]:
+            basis += " - check: " + "; ".join(s["check"])
+        if twice:
+            basis += " - a symbol or schedule count may already have it"
+        res["quantities"].append({
+            "engine": WORKNOTE_SOURCE, "name": name[:200],
+            "qty": s["qty"], "unit": s["unit"],
+            "status": "taken off" if clean else "pending review",
+            "page": None, "sheet": ", ".join(sheets)[:120], "csi": "",
+            "basis": basis[:400]})
+        n += 1
+    return n
 
 
 def mark_sources(rows, res):
@@ -4309,9 +4438,17 @@ def summary_text(rows, res, unit="ft"):
     if rows:
         nv = sum(1 for r in rows if (r.get("source") or "vector") ==
                  "vector" and r.get("kind") != "raster")
+        traced = [r for r in rows if r.get("raster") and
+                  r.get("kind") == "plan"]
         lines.append(f"Sheets: {nv} vector, {len(rows) - nv} scanned "
-                     "(scans are measured by hand and checked more "
-                     "closely).")
+                     "(scans are checked more closely" +
+                     (f"; rooms traced on {len(traced)} scanned plan(s)"
+                      if traced else "") + ").")
+        if traced:
+            lines.append("Scanned plans, rooms traced from the picture "
+                         f"({len(traced)}): " + ", ".join(
+                             r["number"] or f"p.{r['page'] + 1}"
+                             for r in traced[:15]))
     if raster:
         lines.append(f"\nRaster sheets, measure by hand ({len(raster)}): " +
                      ", ".join(r["number"] or f"p.{r['page'] + 1}"

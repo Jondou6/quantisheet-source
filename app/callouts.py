@@ -400,7 +400,7 @@ def summary(rows):
                                "repeats": 0, "approx": False, "check": [],
                                "also": [], "_seen": set()})
         s["notes"] += 1
-        s["qty"] += r["qty"]
+        s["qty"] = _q(s["qty"] + r["qty"])     # no 1171.3999999 drift
         s["approx"] = s["approx"] or r["approx"]
         if own[1] != k[1] and own[1] not in s["also"]:
             s["also"].append(own[1])

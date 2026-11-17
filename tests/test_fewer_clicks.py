@@ -806,3 +806,55 @@ def test_start_page_has_the_service_desk(win):
     labels = [c.text() for c in w.start_page.cards]
     assert any("Service desk" in t for t in labels)
     assert any("Compare revisions" in t for t in labels)
+
+
+def test_scales_read_in_their_own_process(tmp_path):
+    # Nov 16: MuPDF holds Python's lock, so the scales of a big set are
+    # read in another process; the rows are the same as read here
+    path = _plan(str(tmp_path / "proc.pdf"), pages=2)
+    here = QA.scale_rows(path)
+    there = QA.scale_rows(path, process=True)
+    assert [(r["page"], r.get("ppu"), r["status"]) for r in there] == \
+        [(r["page"], r.get("ppu"), r["status"]) for r in here]
+    assert all(r.get("ppu") for r in there)
+    from app import scale_proc
+    with pytest.raises(RuntimeError):
+        scale_proc.scale_rows(str(tmp_path / "missing.pdf"), [0])
+
+
+def test_sheet_names_in_ctrl_k_are_read_once(win, qapp, monkeypatch):
+    w, tmp = win
+    path = _plan(str(tmp / "k.pdf"), pages=3)
+    assert w.open_path(path)
+    from app import sheets
+    calls = []
+    real = sheets.label_for
+    monkeypatch.setattr(sheets, "label_for",
+                        lambda pg: calls.append(1) or real(pg))
+    first = [a.text() for k, a in QA.palette_extras(w) if k == "Go to sheet"]
+    assert len(calls) == 3 and len(first) == 3
+    again = [a.text() for k, a in QA.palette_extras(w) if k == "Go to sheet"]
+    assert again == first and len(calls) == 3      # not read again
+
+
+def test_sheet_names_read_ahead_in_another_process(win, qapp, monkeypatch):
+    w, tmp = win
+    path = _plan(str(tmp / "ahead.pdf"), pages=3)
+    assert w.open_path(path)
+    v = w._view
+    v._palette_labels = None
+    monkeypatch.setattr(QA, "LABELS_AHEAD", 2)
+    assert QA.labels_on_open(v, path) is not None
+    t0 = time.monotonic()
+    while getattr(v, "_palette_labels", None) is None and \
+            time.monotonic() - t0 < 60:
+        qapp.processEvents()
+        time.sleep(0.05)
+    assert len(v._palette_labels[1]) == 3
+    from app import sheets
+    monkeypatch.setattr(sheets, "label_for",
+                        lambda pg: pytest.fail("read again in the window"))
+    names = [a.text() for k, a in QA.palette_extras(w) if k == "Go to sheet"]
+    assert len(names) == 3
+    monkeypatch.setattr(QA, "LABELS_AHEAD", 99)
+    assert QA.labels_on_open(v, path) is None        # a small set: no need

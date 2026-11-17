@@ -546,31 +546,30 @@ def import_pdf(office, path, job_id=None, note="",
 
 
 def _store_one(office, report, job_id, path, kept, note):
-    if True:                    # (kept indented as it was inside the tx)
-        jid = _job_for(office, report, job_id)
-        iid = office.db.insert(
-            "sage_imports", job_id=jid, job_number=report["job_number"],
-            job_name=report["job_name"], address=report["address"],
-            source_name=os.path.basename(str(path)), source_path=kept,
-            source_hash=store.file_hash(kept), status="stored",
-            page_count=report.get("page_count") or 0, note=note or "")
-        n = 0
-        for code in report["codes"]:
-            for ln in code["lines"]:
-                n += 1
-                office.db.insert(
-                    "sage_lines", import_id=iid, line_no=n,
-                    cost_code=code["code"], description=code["description"],
-                    category=ln["category"], is_total=ln["is_total"],
-                    original=ln["original"], changes_amt=ln["changes_amt"],
-                    total_estimate=ln["total_estimate"],
-                    committed=ln["committed"], remaining=ln["remaining"],
-                    jtd=ln["jtd"], variance=ln["variance"],
-                    overrun=ln["overrun"])
-        office.audit("import", "sage_import", iid, None,
-                     {"job_id": jid, "job_number": report["job_number"],
-                      "codes": len(report["codes"]), "lines": n,
-                      "file": os.path.basename(str(path))})
+    jid = _job_for(office, report, job_id)
+    iid = office.db.insert(
+        "sage_imports", job_id=jid, job_number=report["job_number"],
+        job_name=report["job_name"], address=report["address"],
+        source_name=os.path.basename(str(path)), source_path=kept,
+        source_hash=store.file_hash(kept), status="stored",
+        page_count=report.get("page_count") or 0, note=note or "")
+    n = 0
+    for code in report["codes"]:
+        for ln in code["lines"]:
+            n += 1
+            office.db.insert(
+                "sage_lines", import_id=iid, line_no=n,
+                cost_code=code["code"], description=code["description"],
+                category=ln["category"], is_total=ln["is_total"],
+                original=ln["original"], changes_amt=ln["changes_amt"],
+                total_estimate=ln["total_estimate"],
+                committed=ln["committed"], remaining=ln["remaining"],
+                jtd=ln["jtd"], variance=ln["variance"],
+                overrun=ln["overrun"])
+    office.audit("import", "sage_import", iid, None,
+                 {"job_id": jid, "job_number": report["job_number"],
+                  "codes": len(report["codes"]), "lines": n,
+                  "file": os.path.basename(str(path))})
     return iid
 
 

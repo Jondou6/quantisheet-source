@@ -360,9 +360,27 @@ def _show_store(win, status, info, manual):
         refresh_reminders(win)
     if not manual:
         return
+    if status == "error":
+        # The Store gave no answer (Nov 16): offer its page for QuantiSheet,
+        # where Update / Get updates works, instead of a dead end.
+        box = QMessageBox(win)
+        box.setWindowTitle("QuantiSheet")
+        box.setIcon(QMessageBox.Information)
+        box.setText("QuantiSheet couldn't get an answer from the Microsoft "
+                    "Store. Open QuantiSheet's page in the Store to check "
+                    "for an update there?")
+        box.setStandardButtons(QMessageBox.Open | QMessageBox.Close)
+        if box.exec() == QMessageBox.Open:
+            from . import storeupdate
+            storeupdate.open_store()
+        return
     text = {
         "current": "QuantiSheet is up to date.",
         "ineligible": "Update checks are turned off for this copy.",
+        "not_from_store": "This copy of QuantiSheet was installed from a "
+                          "package file, not from the Microsoft Store, so "
+                          "the Store can't update it. Install the next "
+                          "version the same way you installed this one.",
     }.get(status, "The Microsoft Store couldn't be asked about updates "
                   "right now. The Store still updates QuantiSheet on its "
                   "own; you can also look in the Store's Library.")
@@ -436,6 +454,10 @@ def _show(win, status, info, manual):
         "offline": "Couldn't reach the update server. Check the internet "
                    "connection and try again later.",
         "ineligible": "Update checks are turned off for this copy.",
+        "not_from_store": "This copy of QuantiSheet was installed from a "
+                          "package file, not from the Microsoft Store, so "
+                          "the Store can't update it. Install the next "
+                          "version the same way you installed this one.",
     }.get(status, "The update information couldn't be checked. Try again "
                   "later.")
     QMessageBox.information(win, "QuantiSheet", text)

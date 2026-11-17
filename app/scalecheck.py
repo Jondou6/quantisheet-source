@@ -212,36 +212,3 @@ def grade(page, per_ft, others=()):
                      f" - the scale looks wrong (true scale about "
                      f"{_c2(per_ft * med):.2f} units per foot)"))
     return out
-    ratios.sort()
-    med = ratios[len(ratios) // 2]
-    # agreement: the share of dimensions within 3% of the median
-    agree = sum(1 for r in ratios if abs(r / med - 1) <= 0.03) / len(ratios)
-    out["ratio"] = round(med, 4)
-    out["spread"] = _c2(agree)
-    off = abs(med - 1.0)
-    med_v = sorted(v for v, _m in pts)[len(pts) // 2]
-    if med <= 0.05 or abs(b) > max(1.5, 0.25 * med_v):
-        out["ratio"] = None
-        out["why"] = (f"the {len(pts)} dimensions measured don't follow "
-                      "their printed values (the wrong lines were read) - "
-                      "the scale is not graded")
-        return out
-    if agree < 0.5:
-        out["why"] = (f"the {len(ratios)} dimensions measured disagree with "
-                      "each other - the scale is not graded")
-        return out
-    out["grade"] = "A" if off <= 0.02 else "B" if off <= 0.05 else "F"
-    if out["grade"] == "F" and (len(pts) < 8 or agree < 0.7 or
-                                not 0.4 <= med <= 2.5):
-        out["grade"] = None              # too few or too loose to stop on
-        out["why"] = (f"{len(pts)} printed dimensions measure {med:.3f}x "
-                      "their values, but too few agree to be sure - the "
-                      "scale is not graded; check one dimension by hand")
-        return out
-    out["why"] = (f"{len(ratios)} printed dimensions measure "
-                  f"{med:.3f}x their values at this scale"
-                  + ("" if out["grade"] == "A" else
-                     " - check one by hand" if out["grade"] == "B" else
-                     f" - the scale looks wrong (true scale about "
-                     f"{_c2(per_ft * med):.2f} units per foot)"))
-    return out

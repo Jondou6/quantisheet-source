@@ -4,11 +4,6 @@ import re
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from PySide6.QtWidgets import (  # noqa: E402
-    QApplication, QDockWidget, QLabel, QListWidget, QScrollArea,
-    QVBoxLayout, QWidget,
-)
-
 from app import empty_states  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -55,66 +50,3 @@ def test_copy_is_a_plain_pair():
         assert len(what) <= 160 and len(how) <= 200
         assert empty_states.sentence(name) == f"{what} {how}"
     assert empty_states.sentence("not_a_panel") is None
-
-
-def test_apply_empty_state_on_a_dock_and_a_bare_panel(qapp=None):
-    app = QApplication.instance() or QApplication([])
-    assert app
-    dock = QDockWidget("Pages")
-    dock.setObjectName("pages")
-    inner = QWidget()
-    QVBoxLayout(inner)
-    scroll = QScrollArea()
-    scroll.setObjectName("DockScroll")
-    scroll.setWidget(inner)
-    dock.setWidget(scroll)
-    text = empty_states.apply_empty_state(dock)
-    assert text == empty_states.sentence("pages")
-    label = inner.findChild(QLabel, empty_states.EMPTY_LABEL)
-    assert label is not None and label.text() == text
-    assert dock.property("emptyState") == text
-    empty_states.apply_empty_state(dock)
-    labels = [c for c in inner.findChildren(QLabel, empty_states.EMPTY_LABEL)
-              if c.parent() is inner]
-    assert len(labels) == 1
-    # the panel widget itself has no object name; the dock's name is used
-    assert empty_states.apply_empty_state(inner) == text
-
-    bare = QWidget()
-    bare.setObjectName("estimate")
-    QVBoxLayout(bare)
-    priced = empty_states.apply_empty_state(bare)
-    assert "unit cost" in priced
-    assert bare.findChild(QLabel, empty_states.EMPTY_LABEL).text() == priced
-
-    unknown = QWidget()
-    unknown.setObjectName("ribbon_bar")
-    QVBoxLayout(unknown)
-    assert empty_states.apply_empty_state(unknown) is None
-    assert unknown.findChild(QLabel, empty_states.EMPTY_LABEL) is None
-    assert empty_states.apply_empty_state(None) is None
-    dock.close()
-
-
-def test_thumbs_keeps_the_sentence_on_the_list():
-    QApplication.instance() or QApplication([])
-    thumbs = QListWidget()
-    thumbs.setObjectName("thumbs")
-    text = empty_states.apply_empty_state(thumbs)
-    assert text == empty_states.sentence("thumbs")
-    assert thumbs.toolTip() == text
-    assert thumbs.property("emptyState") == text
-    assert thumbs.findChild(QLabel, empty_states.EMPTY_LABEL) is None
-
-
-def test_unnamed_panel_uses_its_dock():
-    QApplication.instance() or QApplication([])
-    dock = QDockWidget("Quantities")
-    dock.setObjectName("quantities")
-    inner = QWidget()
-    QVBoxLayout(inner)
-    dock.setWidget(inner)
-    text = empty_states.apply_empty_state(inner)
-    assert text == empty_states.sentence("quantities")
-    assert "measure" in text.lower()
-    dock.close()

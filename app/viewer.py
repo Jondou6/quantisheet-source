@@ -25,7 +25,7 @@ from PySide6.QtWidgets import (QApplication, QColorDialog, QFileDialog,
 
 from . import annotate, settings, snap, takeoff
 from .collab.oplog import _plain
-from .history import History
+from .history import History, doc_bytes
 from .macros import Recorder
 from .dmoney import c2 as _c2
 
@@ -254,7 +254,7 @@ class PdfView(QWidget):
         self.session = None
         self.on_change = None           # set by MainWindow
         self.recorder = Recorder()
-        self.history = History(lambda: self.doc.tobytes(),
+        self.history = History(lambda: doc_bytes(self.doc),
                                initial=self._base_bytes())
         from . import count_triage, snap_indicator
         count_triage.apply_undo_limit(self.history,

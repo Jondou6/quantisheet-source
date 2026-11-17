@@ -956,6 +956,49 @@ class QuickSFDialog(QDialog):
 
 # ---- saved estimate layouts --------------------------------------------------
 
+def start_fresh(parent, doc, ask=None):
+    """The job's saved layouts and tags can't be read: offer to set the
+    damaged data aside (kept in the PDF under another name, byte for byte)
+    and start fresh. Returns the kept copy's name, or None when the person
+    says no or there was nothing damaged. `ask` replaces the question
+    (tests)."""
+    from . import estimate_layouts as L
+    if doc is None or not L.is_damaged(doc):
+        return None
+    if ask is None:
+        def ask():
+            box = QMessageBox(parent)
+            box.setIcon(QMessageBox.Warning)
+            box.setWindowTitle("Estimate Layouts")
+            box.setText("The estimate layouts and tags saved in this PDF "
+                        "can't be read.")
+            box.setInformativeText(
+                "Keep a copy and start fresh? The damaged data stays in the "
+                "PDF under another name, unchanged, and this job starts "
+                "with no layouts or tags of its own. Save the PDF to keep "
+                "the change.")
+            yes = box.addButton("Keep a Copy and Start Fresh",
+                                QMessageBox.AcceptRole)
+            box.addButton(QMessageBox.Cancel)
+            box.exec()
+            return box.clickedButton() is yes
+    if not ask():
+        return None
+    return L.keep_damaged_copy(doc)
+
+
+def with_fresh_start(parent, doc, fn, ask=None):
+    """fn(); when the saved layouts are damaged, offer start_fresh() and
+    run fn() once more. Raises the damage error when the person says no."""
+    from . import estimate_layouts as L
+    try:
+        return fn()
+    except L.LayoutStoreDamaged:
+        if not start_fresh(parent, doc, ask):
+            raise
+        return fn()
+
+
 class LayoutsDialog(QDialog):
     """Your estimate layouts: make, change and delete them, tag lines, and
     save them to / load them from a small JSON file to use on another job.
@@ -1073,6 +1116,7 @@ class LayoutsDialog(QDialog):
         for b in (self.new_btn, self.save_btn, self.delete_btn,
                   self.tags_btn, self.import_btn):
             b.setEnabled(doc is not None)
+        self.ask_fresh = None             # tests: replaces the question
         if doc is None:
             self.msg.setText("Open a PDF to make, change or load layouts "
                              "(the built-in ones are shown).")
@@ -1146,7 +1190,10 @@ class LayoutsDialog(QDialog):
         if self.doc is None:
             return None
         try:
-            lay = L.save_layout(self.doc, self.form_layout())
+            lay = with_fresh_start(
+                self, self.doc,
+                lambda: L.save_layout(self.doc, self.form_layout()),
+                self.ask_fresh)
         except L.LayoutError as e:
             self.msg.setText(str(e))
             return None
@@ -1168,7 +1215,9 @@ class LayoutsDialog(QDialog):
             self.msg.setText("Built-in layouts can't be deleted.")
             return False
         try:
-            ok = L.delete_layout(self.doc, name)
+            ok = with_fresh_start(self, self.doc,
+                                  lambda: L.delete_layout(self.doc, name),
+                                  self.ask_fresh)
         except L.LayoutError as e:
             self.msg.setText(str(e))
             return False
@@ -1209,7 +1258,9 @@ class LayoutsDialog(QDialog):
         if not path:
             return []
         try:
-            names = L.import_file(self.doc, path)
+            names = with_fresh_start(self, self.doc,
+                                     lambda: L.import_file(self.doc, path),
+                                     self.ask_fresh)
         except (OSError, L.LayoutError) as e:
             self.msg.setText(f"Couldn't load {os.path.basename(path)}: {e}")
             return []
@@ -1239,6 +1290,7 @@ class TagsDialog(QDialog):
         super().__init__(parent)
         from . import estimate_export, estimate_layouts as L
         self.doc = doc
+        self.ask_fresh = None             # tests: replaces the question
         self.setWindowTitle("Tag Estimate Lines")
         self.resize(640, 480)
         lay = QVBoxLayout(self)
@@ -1278,7 +1330,10 @@ class TagsDialog(QDialog):
         if self._filling or item.column() != 3 or self.doc is None:
             return
         try:
-            L.set_tag(self.doc, item.data(Qt.UserRole), item.text())
+            key, text = item.data(Qt.UserRole), item.text()
+            with_fresh_start(self, self.doc,
+                             lambda: L.set_tag(self.doc, key, text),
+                             self.ask_fresh)
             self.msg.setText("")
         except Exception as e:                            # noqa: BLE001
             self.msg.setText(str(e))

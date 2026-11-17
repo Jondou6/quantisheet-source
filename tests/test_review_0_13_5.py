@@ -352,6 +352,7 @@ def test_layouts_dialog_shows_the_damaged_message(layouts_doc):
     doc = layouts_doc
     bad = _damaged(doc)
     dlg = LayoutsDialog(doc)
+    dlg.ask_fresh = lambda: False  # say no to Start Fresh
     dlg.name.setText("Example C")
     assert dlg.save_current() is None
     assert "can't be read" in dlg.msg.text()

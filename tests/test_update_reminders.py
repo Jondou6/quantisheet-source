@@ -106,6 +106,26 @@ def test_store_check_other_answers(store_copy, out, want):
     assert storeupdate.check(manual=True, run=lambda s: out)[0] == want
 
 
+@pytest.mark.parametrize("out,want", [
+    ("SIG Developer\r\nERR Exception", "not_from_store"),
+    ("SIG Enterprise\nUPDATES 0 ", "not_from_store"),
+    ("SIG Store\nUPDATES 1 1.0.3.0", "available"),
+    ("SIG Store\nERR COMException", "error"),
+    ("SIG unknown\nUPDATES 0 ", "current")])
+def test_store_check_knows_a_copy_not_from_the_store(store_copy, out, want):
+    assert storeupdate.check(manual=True, run=lambda s: out)[0] == want
+
+
+def test_not_from_store_message_says_so(monkeypatch):
+    from app import updatecheck_ui as ui
+    shown = []
+    monkeypatch.setattr(ui.QMessageBox, "information",
+                        lambda *a, **k: shown.append(a[2]))
+    ui._show_store(None, "not_from_store", "Developer", True)
+    assert "not from the Microsoft Store" in shown[0]
+    assert "couldn't be asked" not in shown[0]
+
+
 def test_store_check_never_runs_outside_the_store_copy(monkeypatch):
     monkeypatch.setattr(storeupdate, "store_copy", lambda: False)
     ran = []
@@ -235,3 +255,36 @@ def test_start_page_line(qtbot):
     assert hit == [1]
     sp.set_update(None)
     assert not sp.update_line.isVisibleTo(sp)
+
+
+def test_store_error_offers_the_store_page(monkeypatch):
+    from app import storeupdate, updatecheck_ui as ui
+    opened, texts = [], []
+
+    class Box:
+        Information, Open, Close = 1, 2, 4
+
+        def __init__(self, *a):
+            pass
+
+        def setWindowTitle(self, t):
+            pass
+
+        def setIcon(self, i):
+            pass
+
+        def setText(self, t):
+            texts.append(t)
+
+        def setStandardButtons(self, b):
+            pass
+
+        def exec(self):
+            return Box.Open
+    monkeypatch.setattr(ui, "QMessageBox", Box)
+    monkeypatch.setattr(storeupdate, "open_store",
+                        lambda: opened.append(1))
+    ui._show_store(None, "error", "no answer from the Store", True)
+    assert opened == [1] and "Open QuantiSheet's page" in texts[0]
+    ui._show_store(None, "error", "x", False)       # automatic: silent
+    assert opened == [1]

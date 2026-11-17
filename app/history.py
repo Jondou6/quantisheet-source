@@ -15,15 +15,53 @@ The document must keep its object numbers between steps, so snapshots use
 doc.tobytes() with no garbage collection (its default).
 """
 import logging
+import os
 import re
+import tempfile
 
 import fitz
+
+log = logging.getLogger("quantisheet")
 
 _REF = re.compile(r"(\d+)\s+0\s+R")
 # keys that lead away from the annotation: its page, its form-field parent
 # (shared with widgets on other pages), the annotation it replies to
 _SKIP_KEYS = {"P", "Parent", "IRT", "Kids", "Dest", "D"}
 _STRUCTURAL = re.compile(r"/Type\s*/(Page|Pages|Catalog)\b")
+
+
+# A full step saves the whole document. MuPDF hands tobytes() its output
+# through Python a few KB at a time; saving to a file is twice as fast on
+# a big set (100 MB: 0.39 s against 0.19 s, and 1.1 s the first time;
+# Nov 17). The bytes are the same apart from the file ID, which differs
+# on every save either way.
+BIG_FILE = 8_000_000
+
+
+def doc_bytes(doc):
+    """The document's bytes for an undo step, as doc.tobytes() gives them
+    (no garbage collection, so object numbers stay)."""
+    name = getattr(doc, "name", "") or ""
+    try:
+        size = os.path.getsize(name) if name and os.path.isfile(name) else 0
+    except OSError:
+        size = 0
+    if size < BIG_FILE:
+        return doc.tobytes()
+    fd, tmp = tempfile.mkstemp(prefix="qs-undo-", suffix=".pdf")
+    os.close(fd)
+    try:
+        doc.save(tmp)
+        with open(tmp, "rb") as f:
+            return f.read()
+    except Exception:                                     # noqa: BLE001
+        log.debug("undo step through a file failed", exc_info=True)
+        return doc.tobytes()
+    finally:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
 
 
 def _refs(text):

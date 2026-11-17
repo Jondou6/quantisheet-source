@@ -46,6 +46,11 @@ def log(*a):
 
 
 def main(path):
+    import glob
+    if not os.path.isfile(path):          # a glob relative to ROOT
+        hits = sorted(glob.glob(os.path.join(ROOT, path)))
+        if hits:
+            path = hits[0]
     open(LOG, "w").close()
     fh = open(LOG + ".fault", "w")
     faulthandler.enable(fh)
@@ -77,6 +82,12 @@ def main(path):
     res = ait.run(doc, rows, p2)
     log(f"ran in {time.time() - t:.1f}s: {len(res['marks'])} marks")
     log(ait.summary_text(rows, res))
+    wn = [q for q in res["quantities"] if q.get("engine") == "work notes"]
+    log(f"work notes: {len(wn)} line(s), "
+        f"{res['timing'].get('work notes')} s")
+    for q in wn:
+        log("  ", q["status"], "|", q["qty"], q["unit"], "|", q["name"][:70],
+            "|", q["sheet"][:40])
 
 
 if __name__ == "__main__":

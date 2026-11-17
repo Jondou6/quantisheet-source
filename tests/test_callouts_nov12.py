@@ -194,3 +194,12 @@ def test_read_a_sheet(tmp_path, rotate):
     out = co.export_xlsx(rows, str(tmp_path / "c.xlsx"))
     import zipfile
     assert zipfile.is_zipfile(out)
+
+
+def test_totals_have_no_float_drift():
+    rows = [co._row("", q, "LF", "WHOLE FENCE LINE AS DRAWN", "", [])
+            for q in (0.1, 0.2, 1171.1)]
+    for i, r in enumerate(rows):
+        r["sheet"] = f"C-{i}"
+    (s,) = co.summary(rows)
+    assert s["qty"] == 1171.4

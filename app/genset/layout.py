@@ -57,54 +57,6 @@ def footprint(gross_sf, building_type, ratio=None, min_ratio=1.0):
     return float(w), float(d)
 
 
-# ---- squarified treemap ---------------------------------------------------------
-def _worst(row, side):
-    s = sum(row)
-    return max(max(side * side * r / (s * s), s * s / (side * side * r))
-               for r in row)
-
-
-def squarify(values, rect):
-    """Rectangles (x0, y0, x1, y1) for `values` (areas, adding up to the
-    rect's area) in order. The first row always runs along the south edge,
-    so the first room (the hub) faces the street."""
-    x0, y0, x1, y1 = rect
-    out, vals, first = [], list(values), True
-    while vals:
-        w, h = x1 - x0, y1 - y0
-        along_bottom = first or w < h
-        side = w if along_bottom else h
-        row, i = [vals[0]], 1
-        while i < len(vals) and _worst(row + [vals[i]], side) <= \
-                _worst(row, side):
-            row.append(vals[i])
-            i += 1
-        if i == len(vals) - 0 and len(vals) == len(row):
-            pass
-        s = sum(row)
-        if along_bottom:
-            rh = s / w if w else 0
-            xx = x0
-            for k, v in enumerate(row):
-                cw = v / rh if rh else 0
-                x_end = x1 if k == len(row) - 1 else xx + cw
-                out.append((xx, y0, x_end, y0 + rh if vals[i:] else y1))
-                xx = x_end
-            y0 = y0 + rh
-        else:
-            cw = s / h if h else 0
-            yy = y0
-            for k, v in enumerate(row):
-                rh = v / cw if cw else 0
-                y_end = y1 if k == len(row) - 1 else yy + rh
-                out.append((x0, yy, x0 + cw if vals[i:] else x1, y_end))
-                yy = y_end
-            x0 = x0 + cw
-        vals = vals[i:]
-        first = False
-    return out
-
-
 # ---- zoned plan (Grok review M1/M2) -------------------------------------
 # The main room and the other shared rooms fill one end; the private rooms
 # sit in rows along a hall in the other end, so every bedroom has an

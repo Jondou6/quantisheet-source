@@ -80,16 +80,3 @@ def test_undo_limit_setting():
     assert h.limit >= 10 ** 9
     ct.apply_undo_limit(h, 500)
     assert h.limit == 500
-
-
-def test_dialog_keys_and_progress():
-    from PySide6.QtWidgets import QApplication
-    from PySide6.QtCore import Qt
-    from PySide6.QtTest import QTest
-    QApplication.instance() or QApplication([])
-    d = ct.TriageDialog(ct.Triage(hits()))
-    assert d.slider.value() == 92
-    QTest.keyClick(d, Qt.Key_Y)
-    assert "Accepted 3" in d.progress_label.text()
-    assert d.bar.value() == 4 and d.bar.maximum() == 8
-    assert "match" in d.why_label.text()

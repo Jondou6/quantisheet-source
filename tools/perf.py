@@ -55,12 +55,26 @@ def t(label, fn, n=1, budget=0.15):
     from PySide6.QtWidgets import QApplication
     app = QApplication.instance()
     app.processEvents()
+    want = os.environ.get("PERF_PROFILE", "")
+    prof = None
+    if want and want in label:          # where does this step's time go?
+        import cProfile
+        prof = cProfile.Profile()
+        prof.enable()
     start = time.perf_counter()
     out = None
     for _ in range(n):
         out = fn()
         app.processEvents()
     dt = (time.perf_counter() - start) / n
+    if prof is not None:
+        prof.disable()
+        import io
+        import pstats
+        buf = io.StringIO()
+        pstats.Stats(prof, stream=buf).sort_stats("cumulative").print_stats(
+            30)
+        print(buf.getvalue())
     flag = "VERY SLOW" if dt > 1.0 else "SLOW" if dt > budget else ""
     RESULTS.append((label, dt, flag))
     print(f"  {label:<48} {dt * 1000:9.0f} ms  {flag}")
@@ -69,6 +83,8 @@ def t(label, fn, n=1, budget=0.15):
 
 
 def main(argv):
+    if "--profile" in argv:
+        os.environ["PERF_PROFILE"] = argv[argv.index("--profile") + 1]
     n = int(argv[0]) if argv and argv[0].isdigit() else 120
     tmp = tempfile.mkdtemp(prefix="quantisheet-perf-")
     from app import settings
@@ -77,6 +93,16 @@ def main(argv):
     settings._cache = None
     path = argv[argv.index("--pdf") + 1].strip('"') if "--pdf" in argv else \
         os.path.join(tmp, f"perf-{n}.pdf")
+    if "--pdf" in argv and not os.path.isfile(path):
+        import glob                       # a pattern, for paths with spaces
+        hits = sorted(glob.glob(os.path.join(ROOT, path)))
+        path = hits[0] if hits else path
+    if "--pdf" in argv and os.path.isfile(path):
+        # work on a copy in the temp folder: the run rotates and marks up
+        import shutil
+        copy = os.path.join(tmp, "set.pdf")
+        shutil.copyfile(path, copy)
+        path = copy
     if "--pdf" not in argv:
         print(f"Building a {n}-sheet set with a marked-up first sheet...")
         make(path, n)

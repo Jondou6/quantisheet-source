@@ -34,8 +34,13 @@ STORE_FALLBACK = "ms-windows-store://downloadsandupdates"
 # Windows PowerShell 5.1 (on every supported Windows) can call WinRT. The
 # output is one line: "UPDATES <count> <version of the first one>".
 PS_SCRIPT = r"""
-$ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Runtime.WindowsRuntime
+try {
+  $null = [Windows.ApplicationModel.Package, Windows.ApplicationModel, ContentType=WindowsRuntime]
+  "SIG $([Windows.ApplicationModel.Package]::Current.SignatureKind)"
+} catch { "SIG unknown" }
+try {
+$ErrorActionPreference = 'Stop'
 $null = [Windows.Services.Store.StoreContext, Windows.Services.Store, ContentType=WindowsRuntime]
 $ctx = [Windows.Services.Store.StoreContext]::GetDefault()
 $asTask = ([System.WindowsRuntimeSystemExtensions].GetMethods() | Where-Object {
@@ -52,9 +57,22 @@ if ($ups.Count -gt 0) {
   $v = "$($p.Major).$($p.Minor).$($p.Build).$($p.Revision)"
 }
 "UPDATES $($ups.Count) $v"
+} catch { "ERR $($_.Exception.GetType().Name)" }
 """
 
 _OUT = re.compile(r"UPDATES\s+(\d+)\s*([\d.]*)")
+_SIG = re.compile(r"SIG\s+(\w+)")
+# How Windows says the package was signed. Only "Store" means the
+# Microsoft Store installed it and can update it; a copy installed from a
+# package file (Developer / Enterprise / None) is never updated by the
+# Store, so asking it only ever fails.
+NOT_FROM_STORE = ("Developer", "Enterprise", "None", "System")
+
+
+def signature(out):
+    """The package's signature kind from the PowerShell output, or ''."""
+    m = _SIG.search(out or "")
+    return m.group(1) if m and m.group(1) != "unknown" else ""
 
 
 def store_copy():
@@ -101,6 +119,7 @@ def _run_ps(script, timeout=TIMEOUT):
 def check(manual=False, run=None, now=None):
     """Never raises. (status, info) like updatecheck.check:
         "ineligible" / "not_due" / "error" / "current" /
+        "not_from_store" (installed from a package file, not the Store) /
         "available" (info {"version": "1.0.3.0" or "", "notes": ""})."""
     import time
     from . import settings, updatecheck
@@ -115,9 +134,12 @@ def check(manual=False, run=None, now=None):
         if run is None and sys.platform != "win32":
             return "error", "not Windows"
         out = (run or _run_ps)(PS_SCRIPT)
+        if signature(out) in NOT_FROM_STORE:
+            return "not_from_store", signature(out)
         got = parse(out)
         if got is None:
-            log.info("store update check: no answer (%r)", (out or "")[:200])
+            log.warning("store update check: no answer (%r)",
+                        (out or "")[:200])
             return "error", "no answer from the Store"
         n, v = got
         if n <= 0:

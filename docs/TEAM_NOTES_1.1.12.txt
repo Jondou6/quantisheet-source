@@ -1,0 +1,4 @@
+QuantiSheet 1.1.12
+- Estimate layouts and tags saved in a PDF that can't be read no longer block you: saving a layout or a tag offers Keep a Copy and Start Fresh. The unreadable data stays in the PDF under another name, unchanged, and the job starts with no layouts or tags of its own.
+- Help > Check for Updates in the Microsoft Store copy: if the Store doesn't answer, it offers to open QuantiSheet's page in the Store, where Update works. A copy installed from a package file instead of the Store now says the Store can't update it.
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.12 - the full source of this build. Help > About shows the same link.

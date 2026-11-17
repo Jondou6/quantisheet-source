@@ -1173,6 +1173,14 @@ def doors_score(n=7, seed=21, verbose=True):
 
 if __name__ == "__main__":
     a = sys.argv[1:]
+    # --set NAME=VALUE: try a different autotakeoff constant (experiments)
+    while "--set" in a:
+        i = a.index("--set")
+        k, v = a[i + 1].split("=", 1)
+        from app import autotakeoff as _at
+        setattr(_at, k, type(getattr(_at, k))(v))
+        print("set", k, "=", getattr(_at, k))
+        del a[i:i + 2]
     seed = int(a[a.index("--seed") + 1]) if "--seed" in a else 21
     out = a[a.index("--out") + 1] if "--out" in a else None
     only = int(a[a.index("--only") + 1]) if "--only" in a else None

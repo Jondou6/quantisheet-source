@@ -89,11 +89,15 @@ def test_activity_lookahead_excel(pm_store, tmp_path):
     pytest.importorskip("openpyxl")
     from datetime import date
     from app.pm import activity_lookahead as la
+    # today's date, not a fixed one: the schedule moves unfinished work to
+    # the real status date, so a fixed past start fell out of the window
+    # once that date had passed (Nov 16)
+    today = date.today()
     pm_store.save_record("activity", {"name": EVIL, "duration": 5,
-                                      "start": "2026-11-03", "notes": AT,
-                                      "constraints": AT})
+                                      "start": today.isoformat(),
+                                      "notes": AT, "constraints": AT})
     path = str(tmp_path / "act.xlsx")
-    la.export_xlsx(pm_store, path, 2, date(2026, 11, 4))
+    la.export_xlsx(pm_store, path, 2, today)
     openpyxl = pytest.importorskip("openpyxl")
     ws = openpyxl.load_workbook(path).active
     for row in ws.iter_rows():

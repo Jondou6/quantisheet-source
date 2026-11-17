@@ -2567,8 +2567,13 @@ def _blank(ink, boxes):
             ink[y0:y1, x0:x1] = 0
 
 
-HOLLOW_PEN_SHARE = 0.42 # a hollow wall's lighter face is drawn at least this heavy,
-#                         against the usual long one on the sheet
+HOLLOW_PEN_SHARE = 0.7  # a hollow wall's lighter face is drawn at least this heavy,
+#                         against the usual long one on the sheet. Was 0.42;
+#                         on 1/8" scans a counter or a shelf against a wall
+#                         measured 0.55-0.65 and was filled in as wall, so
+#                         the room came out up to 13% small (Nov 16). Real
+#                         hollow walls measure about 0.85 and up; 0.8 lost
+#                         rooms on another set of plans.
 HOLLOW_REF_FT = 4.0     # ...the long ones being at least this long
 HOLLOW_REF_MIN = 4      # ...and at least this many, or pens aren't compared
 
@@ -2624,7 +2629,7 @@ def fill_hollow(ink, ppf, max_ft=HOLLOW_MAX_FT, min_ft=HOLLOW_MIN_FT,
     h, w = ink.shape
     edge = (st[:, 0] <= 0) | (st[:, 1] <= 0) | \
         (st[:, 0] + st[:, 2] >= w) | (st[:, 1] + st[:, 3] >= h)
-    thin = (2.0 * deep <= max_ft * ppf) & ~edge
+    thin = (deep <= 0.5 * max_ft * ppf) & ~edge    # (2*deep overflowed)
     thin[0] = False
     if gray is not None and thin.any():
         # a long box in a fine pen is casework or shelving, not a wall

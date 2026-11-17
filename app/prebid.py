@@ -316,17 +316,6 @@ def _label(doc, a, kind):
     return (subj or kind) + (f": {txt[:60]}" if txt else "")
 
 
-class _LazyKeys(dict):
-    """Sheet keys read only for the pages asked about."""
-
-    def __init__(self, doc):
-        super().__init__()
-        self.doc = doc
-
-    def __missing__(self, pno):
-        return sheet_key(self.doc, pno, self)
-
-
 class _PageKeys(dict):
     """"Page n" for every page, without reading the sheet's text: the
     unpriced count and highlights (sheets=False) never show the sheet
