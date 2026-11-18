@@ -1,0 +1,3 @@
+QuantiSheet 1.1.19
+- Rotate All, Link Sheets and Unlink Sheets no longer leave the drawing area blank until the view is refitted (Ctrl+0): the sheet is drawn again straight away.
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.19 - the full source of this build. Help > About shows the same link.

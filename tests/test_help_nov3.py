@@ -50,7 +50,7 @@ def test_whats_new_111():
         assert w in s
     assert "Adobe" not in s and "Bluebeam" not in s
     from app import __version__
-    assert __version__ == "1.1.18"
+    assert __version__ == "1.1.19"
 
 
 def test_whats_new_112():
@@ -122,6 +122,18 @@ def test_whats_new_115():
                  encoding="utf-8").read()
     assert notes.startswith("QuantiSheet 1.1.5\n")
     assert "quantisheet-source/tree/v1.1.5" in notes
+
+
+def test_whats_new_1119():
+    p = os.path.join(os.path.dirname(helpcenter.__file__), "data",
+                     "whats_new.json")
+    s = json.load(open(p, encoding="utf-8"))["1.1.19"]
+    assert "Rotate All" in s and "blank" in s
+    root = os.path.dirname(os.path.dirname(helpcenter.__file__))
+    notes = open(os.path.join(root, "docs", "TEAM_NOTES_1.1.19.txt"),
+                 encoding="utf-8").read()
+    assert notes.startswith("QuantiSheet 1.1.19\n")
+    assert "quantisheet-source/tree/v1.1.19" in notes
 
 
 def test_whats_new_1118():

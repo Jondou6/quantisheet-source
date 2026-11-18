@@ -358,6 +358,14 @@ class PdfView(QWidget):
         self._content = None
         self._content_raster = None
 
+    def _render_if_blank(self):
+        try:
+            if self.rendered is None and self._doc_open() and \
+                    self.doc.page_count:
+                self._render()
+        except RuntimeError:                  # the tab closed meanwhile
+            pass
+
     # ---- snapping ---------------------------------------------------------------
     def set_snap(self, on):
         self.snap_enabled = bool(on)
@@ -786,6 +794,12 @@ class PdfView(QWidget):
         self._edits += 1
         self._prefetched.clear()
         self._drop_pending()
+        # Nov 18: a reset or "edited" right after a redraw (Link Sheets,
+        # Unlink Sheets, Rotate All) dropped the drawing it had just asked
+        # for, and the sheet stayed blank until the view was refitted:
+        # a sheet left blank is drawn again
+        if getattr(self, "rendered", 1) is None:
+            QTimer.singleShot(0, self._render_if_blank)
 
     def _drop_pending(self, keep=None):
         """Tell the drawing process we no longer want these (review M2,
