@@ -31,6 +31,11 @@ _WHO = re.compile(r"\s+by\s+.{0,80}?\s+in review")
 FILE = "quantisheet_ai_quantities.json"
 TYPE = "ai"
 MAX_ROWS = 2000
+# rows put in by Work Notes Takeoff > Add to Estimate (Nov 17): a person
+# chose them, so a later AI Takeoff run keeps them and doesn't add its own
+# copy of the same note
+WINDOW = "work notes window"
+WORKNOTES = "work notes"
 
 
 def _clean(r):
@@ -50,12 +55,21 @@ def _clean(r):
     page = r.get("page")
     if isinstance(page, bool) or not isinstance(page, int) or page < 0:
         page = None
-    return {"engine": str(r.get("engine") or "")[:40],
-            "name": str(name)[:200], "qty": q, "unit": str(unit)[:12],
-            "page": page, "sheet": str(r.get("sheet") or "")[:120],
-            "csi": str(r.get("csi") or "")[:20],
-            "basis": _WHO.sub(" in review",
-                              str(r.get("basis") or ""))[:400]}
+    out = {"engine": str(r.get("engine") or "")[:40],
+           "name": str(name)[:200], "qty": q, "unit": str(unit)[:12],
+           "page": page, "sheet": str(r.get("sheet") or "")[:120],
+           "csi": str(r.get("csi") or "")[:20],
+           "basis": _WHO.sub(" in review",
+                             str(r.get("basis") or ""))[:400]}
+    if r.get("from") == WINDOW:
+        out["from"] = WINDOW
+    return out
+
+
+def key(r):
+    """What makes two rows the same line in the estimate."""
+    return (" ".join(str(r.get("name") or "").split()).upper(),
+            str(r.get("unit") or "").upper())
 
 
 def rows(doc):
@@ -95,23 +109,49 @@ def taken_off(res):
     return out
 
 
-def store(doc, res, pages=None):
-    """Write the result's taken-off quantities. With `pages` (the sheets
-    this run took off), quantities stored earlier for other sheets stay;
-    set-wide ones (no page) and those of `pages` are replaced. Returns
-    how many are stored."""
-    new = taken_off(res)
-    keep = []
-    if pages is not None:
-        ps = set(pages)
-        keep = [r for r in rows(doc)
-                if r["page"] is not None and r["page"] not in ps]
-    allr = (keep + new)[:MAX_ROWS]
+def _write(doc, allr):
+    allr = allr[:MAX_ROWS]
     if not allr and FILE not in doc.embfile_names():
         return 0
     embfiles.put(doc, FILE, json.dumps({"version": 1, "rows": allr})
                  .encode("utf-8"), "QuantiSheet AI Takeoff quantities")
     return len(allr)
+
+
+def store(doc, res, pages=None):
+    """Write the result's taken-off quantities. With `pages` (the sheets
+    this run took off), quantities stored earlier for other sheets stay;
+    set-wide ones (no page) and those of `pages` are replaced. Rows Work
+    Notes Takeoff added always stay, and the run's own copy of one of
+    them is left out. Returns how many are stored."""
+    old = rows(doc)
+    window = [r for r in old if r.get("from") == WINDOW]
+    taken = {key(r) for r in window}
+    new = [r for r in taken_off(res)
+           if not (r["engine"] == WORKNOTES and key(r) in taken)]
+    keep = []
+    if pages is not None:
+        ps = set(pages)
+        keep = [r for r in old if r.get("from") != WINDOW and
+                r["page"] is not None and r["page"] not in ps]
+    return _write(doc, window + keep + new)
+
+
+def store_worknotes(doc, totals):
+    """Work Notes Takeoff > Add to Estimate: `totals` [{name, qty, unit,
+    sheet, basis}] replace the rows it added before; an AI Takeoff
+    work-note row for the same note is dropped (one line, not two).
+    Returns how many window rows are stored."""
+    mine = []
+    for t in totals:
+        c = _clean(dict(t, engine=WORKNOTES, page=None, **{"from": WINDOW}))
+        if c is not None:
+            mine.append(c)
+    keys = {key(r) for r in mine}
+    other = [r for r in rows(doc) if r.get("from") != WINDOW and
+             not (r["engine"] == WORKNOTES and key(r) in keys)]
+    _write(doc, mine + other)
+    return len(mine)
 
 
 def clear(doc):

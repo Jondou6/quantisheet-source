@@ -18,6 +18,8 @@ from PySide6.QtWidgets import (QDialog, QHBoxLayout, QLabel, QLineEdit,
 from . import settings
 
 T = []
+# QuantiSheet's video tutorials (Help > Video Tutorials, Nov 17)
+VIDEO_URL = "https://www.youtube.com/@QuantiSheet"
 
 
 def tut(id, group, title, minutes, goal, steps, tips=(), try_=(),

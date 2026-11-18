@@ -1,0 +1,7 @@
+QuantiSheet 1.1.17
+- Fillable forms: click into a field and type, the way other PDF readers work (it took a double-click and a box). Enter keeps what you typed, Tab goes to the next field, Esc leaves it as it was, and a check box ticks with one click. Fields are tinted light blue so they can be found.
+- Work Notes Takeoff: Compare with Earlier Set reads the earlier issue of the drawings and lists, on a Changes tab, every work-note total the new set changed - new, gone or a different count - and the sheets where it changed (for example +12 LF of fence on C-7, a gate gone).
+- The Revision Log now counts AI Takeoff's worked-out quantities and the work notes' totals too, so a revision that changes a note's count or a wall's height shows there with the rest.
+- Export Bid Package: when the job is on the Bid Board, it offers to mark that bid Submitted and notes the package's folder on it.
+- Work notes are read about four times faster (on a 32-sheet set, 31 seconds down to 8), in Work Notes Takeoff and in AI Takeoff.
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.17 - the full source of this build. Help > About shows the same link.

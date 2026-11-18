@@ -152,3 +152,41 @@ def test_window_command(win, tmp_path):
     assert "to send" in seen[0] and "Before you send it" in seen[0]
     names = [a.text() for a in win.findChildren(type(win.menuBar().actions()[0]))]
     assert "Export Bid Package…" in names
+
+
+def test_board_match_and_mark_submitted(tmp_path, monkeypatch):
+    from app import bidboard, settings
+    monkeypatch.setattr(settings, "DIR", str(tmp_path / "cfg"))
+    os.makedirs(tmp_path / "cfg", exist_ok=True)
+    a = bidboard.save({"project": "Made Up Clinic Renovation",
+                       "gc": "Made Up Builders", "status": "Accepted"})
+    bidboard.save({"project": "Other Made Up School", "gc": "X",
+                   "status": "Undecided"})
+    bidboard.save({"project": "Made Up Clinic", "gc": "Y",
+                   "status": "Lost"})                 # decided: not offered
+    o = bp.board_match("Made Up Clinic Renovation")
+    assert o and o["id"] == a["id"]
+    assert bp.board_match("Something Else Entirely") is None
+    done = bp.mark_submitted(o, {"folder": str(tmp_path /
+                                               "2026.11.17 X Bid Package")})
+    assert done["status"] == "Submitted"
+    assert "Bid package: 2026.11.17 X Bid Package" in done["notes"]
+
+
+def test_window_offers_the_bid_board(win, tmp_path):
+    from app import bidboard
+    bidboard.save({"project": "Made Up Clinic", "gc": "Made Up Builders",
+                   "status": "Accepted"})
+    d = job(tmp_path)
+    path = d.name
+    d.close()
+    assert win.open_path(path)
+    out_dir = tmp_path / "out2"
+    out_dir.mkdir()
+    seen = []
+    out = win.export_bid_package(folder=str(out_dir),
+                                 ask=lambda t: seen.append(t) or
+                                 "Bid Board" in t)
+    assert "Made Up Builders" in seen[0]
+    assert out["board"]["status"] == "Submitted"
+    assert seen[-1].endswith("Open the folder?")

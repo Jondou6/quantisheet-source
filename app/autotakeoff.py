@@ -1160,6 +1160,20 @@ class Plan:
         if not len(hits):
             return None
         room = (lab2 == np.bincount(hits).argmax()).astype(np.uint8)
+        if SCAN_REACH and not self.from_vectors and \
+                int(room.sum()) > SCAN_REACH_MIN_SF * self.ppf ** 2:
+            # Nov 17: on a scan, the floor behind a sink, a faucet stub or
+            # the end of a counter (narrower than a door, so the square
+            # can't reach it) is still the room's: grow on round them,
+            # step by step inside the walls and shut doorways, as far
+            # again as the square reached
+            free = (stop == 0).astype(np.uint8)
+            k3 = np.ones((3, 3), np.uint8)
+            for _i in range(r):
+                more = cv2.dilate(room, k3) & free
+                if np.array_equal(more, room):
+                    break
+                room = more
         cnts, _ = cv2.findContours(room, cv2.RETR_EXTERNAL,
                                    cv2.CHAIN_APPROX_SIMPLE)
         if not cnts:
@@ -2576,6 +2590,10 @@ HOLLOW_PEN_SHARE = 0.7  # a hollow wall's lighter face is drawn at least this he
 #                         rooms on another set of plans.
 HOLLOW_REF_FT = 4.0     # ...the long ones being at least this long
 HOLLOW_REF_MIN = 4      # ...and at least this many, or pens aren't compared
+HOLLOW_LIGHT_SHORT = True   # short thin spaces get the pen check too
+HOLLOW_FAT_FT = 1.8     # filled cells together fatter than this aren't wall
+SCAN_REACH = True       # on scans, the room reaches round small things
+SCAN_REACH_MIN_SF = 60  # ...in rooms bigger than this (a closet would leak)
 
 
 def _light_boxes(ink, gray, lab, st, cand, ppf, deep):
@@ -2633,7 +2651,11 @@ def fill_hollow(ink, ppf, max_ft=HOLLOW_MAX_FT, min_ft=HOLLOW_MIN_FT,
     thin[0] = False
     if gray is not None and thin.any():
         # a long box in a fine pen is casework or shelving, not a wall
+        # Nov 17: the short pieces of a counter too (a sink or the upper
+        # cabinets' dashed line splits its strip into short cells, which
+        # were then joined into a "wall" run and taken out of the room)
         light = _light_boxes(ink, gray, lab, st,
+                             thin if HOLLOW_LIGHT_SHORT else
                              thin & (long_ >= min_ft * ppf), ppf, deep)
         if light is not None:
             thin &= ~light
@@ -2654,6 +2676,22 @@ def fill_hollow(ink, ppf, max_ft=HOLLOW_MAX_FT, min_ft=HOLLOW_MIN_FT,
     seed[0] = False
     if not seed.any():
         return 0
+    if HOLLOW_FAT_FT:
+        # Nov 17: a box drawn with an X (equipment, a refrigerator space)
+        # is cut into thin triangles that were filled as a wall, taking
+        # its corner out of the room. Cells that, with their neighbours,
+        # make something fatter than any wall are not wall.
+        pic = seed[lab].astype(np.uint8)
+        k = max(3, int(round(0.2 * ppf)) | 1)
+        joined = cv2.morphologyEx(pic, cv2.MORPH_CLOSE,
+                                  np.ones((k, k), np.uint8))
+        d3 = cv2.distanceTransform(joined, cv2.DIST_L2, 3)
+        fat = (pic > 0) & (2.0 * d3 > HOLLOW_FAT_FT * ppf)
+        if fat.any():
+            seed[np.unique(lab[fat])] = False
+            seed[0] = False
+            if not seed.any():
+                return 0
     ink[seed[lab]] = 1
     return int(seed.sum())
 

@@ -225,6 +225,22 @@ def raster_only(page, max_items=40):
     return True
 
 
+def ocr_needed(doc, pages=None):
+    """Scanned sheets with no text layer (Nov 17): AI Takeoff makes them
+    searchable before reading the set, so their sheet numbers, scales and
+    room names can be read. [page]"""
+    from . import acrobat
+    out = []
+    for i in (range(doc.page_count) if pages is None else pages):
+        try:
+            page = doc[i]
+            if raster_only(page) and not acrobat.page_has_text(page):
+                out.append(i)
+        except Exception:                                # noqa: BLE001
+            log.info("ocr check", exc_info=True)
+    return out
+
+
 LOW_DPI = 150                  # a scan under this is too coarse to trust
 
 

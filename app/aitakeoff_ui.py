@@ -133,10 +133,53 @@ class AITakeoffDialog(QDialog):
     def view(self):
         return self.win._view
 
+    def ocr_scans(self, doc):
+        """Scanned sheets with no text are made searchable first (Nov 17),
+        as one Undo step, so the set can be read in one go. Returns how
+        many pages got text; self.ocr_note says what happened."""
+        from . import acrobat, ocr
+        self.ocr_note = ""
+        pages = ait.ocr_needed(doc)
+        if not pages:
+            return 0
+        if not ocr.find_tesseract():
+            self.ocr_note = (f" {len(pages)} scanned sheet(s) have no text "
+                             "and OCR (Tesseract) isn't installed - their "
+                             "sheet names and rooms can't be read.")
+            return 0
+        dlg = QProgressDialog("Reading scanned sheets…", "Skip", 0,
+                              len(pages), self)
+        dlg.setWindowTitle("AI Takeoff")
+        dlg.setMinimumDuration(300)
+
+        def step(n, total):
+            dlg.setValue(n)
+            dlg.setLabelText(f"Making scanned sheet {n + 1} of {total} "
+                             "searchable…")
+            QApplication.processEvents()
+            return not dlg.wasCanceled()
+        skipped = []
+        try:
+            n = self.win._page_change(
+                lambda: acrobat.make_searchable(doc, pages, progress=step,
+                                                skipped=skipped),
+                f"AI Takeoff: made {len(pages)} scanned sheet(s) "
+                "searchable") or 0
+        finally:
+            dlg.close()
+        self.ocr_note = (f" {n} scanned sheet(s) made searchable first "
+                         "(Ctrl+Z takes the text off)." if n else "")
+        return n
+
     def read(self):
         if not self.view:
             return []
         doc = self.view.doc
+        try:
+            self.ocr_scans(doc)
+        except Exception:                                 # noqa: BLE001
+            log.warning("OCR before AI Takeoff", exc_info=True)
+            self.ocr_note = ""
         dlg = QProgressDialog("Reading sheets…", "Cancel", 0,
                               doc.page_count, self)
         dlg.setWindowTitle("AI Takeoff")
@@ -159,7 +202,8 @@ class AITakeoffDialog(QDialog):
         self.status.setText(
             f"{len(self.rows)} sheet(s): {n} to take off"
             + (f", {need} need a scale first (Takeoff > Auto Scale or Set "
-               "Scale)" if need else "") + ".")
+               "Scale)" if need else "") + "."
+            + getattr(self, "ocr_note", ""))
         self.run_btn.setEnabled(n > 0)
         return self.rows
 

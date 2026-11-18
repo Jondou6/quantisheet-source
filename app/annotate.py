@@ -1907,23 +1907,13 @@ def _add_field(doc, page, r, p, oid):
 
 
 def _set_field(page, p):
-    """Fill in a form field by name (searched on this page)."""
-    name = p.get("name")
-    for w in page.widgets():
-        if w.field_name != name:
-            continue
-        v = p.get("value")
-        if w.field_type in (fitz.PDF_WIDGET_TYPE_CHECKBOX,
-                            fitz.PDF_WIDGET_TYPE_RADIOBUTTON):
-            w.field_value = w.on_state() if v else "Off"
-        else:
-            w.field_value = "" if v is None else str(v)
-            if w.field_value == "":
-                # PyMuPDF skips empty values, so clear /V ourselves
-                page.parent.xref_set_key(w.xref, "V", "()")
-        w.update()
-        return True
-    return False
+    """Fill in a form field by name (searched on this page). The form's
+    own calculations and number formats follow (formcalc.py, Nov 17)."""
+    from . import formcalc
+    r = formcalc.fill(page, p.get("name"), p.get("value"))
+    if r is False:
+        log.info("field %r turned the value down", p.get("name"))
+    return bool(r)
 
 
 # ---- takeoff scale (stored inside the PDF) -----------------------------------------

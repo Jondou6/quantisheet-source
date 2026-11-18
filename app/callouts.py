@@ -301,13 +301,18 @@ def read_blocks(blocks, sheet="", page=0):
     return rows
 
 
-def page_blocks(page):
+def page_blocks(page, textpage=None):
     """[(lines, rect)] for a PDF page, in the page's shown (rotated)
-    coordinates."""
+    coordinates. Text only (Nov 17: the default "dict" also copied every
+    picture on the sheet - 0.3 s a sheet on a scanned set)."""
     import fitz
     out = []
     rot = page.rotation_matrix
-    for b in page.get_text("dict")["blocks"]:
+    flags = getattr(fitz, "TEXTFLAGS_TEXT", None)
+    kw = {"textpage": textpage} if textpage is not None else {}
+    if textpage is None and flags is not None:
+        kw["flags"] = flags
+    for b in page.get_text("dict", **kw)["blocks"]:
         if b.get("type") != 0:
             continue
         lines = ["".join(s["text"] for s in ln["spans"]).strip()
@@ -447,3 +452,72 @@ def export_xlsx(rows, path):
     tot, each = table(rows)
     acrobat.write_xlsx(path, [("Totals", tot), ("Every note", each)])
     return path
+
+
+# ------------------------------------------------------- a revised set
+def compare(old_rows, new_rows):
+    """What a revised set changed in the work notes (Nov 17): one row per
+    item whose total moved, [{action, what, unit, before, after, change,
+    kind ('added' | 'removed' | 'changed'), sheets: [(sheet, change)]}],
+    biggest change first. Items are matched the way summary() adds them
+    up (wording differences of a letter or two are the same item); the
+    sheets say where the count changed. Quantities only."""
+    def totals(rows):
+        out = {}
+        for s in summary([r for r in rows if r["qty"]]):
+            out[(s["action"], s["what"], s["unit"])] = s
+        return out
+
+    def by_sheet(rows, key):
+        d = {}
+        for r in rows:
+            if not r["qty"]:
+                continue
+            k = (r["action"], key_of(r["what"]), r["unit"])
+            if _match(k, key):
+                sh = r.get("sheet") or ""
+                d[sh] = _q(d.get(sh, 0) + r["qty"])
+        return d
+
+    def _match(k, key):
+        return k[0] == key[0] and k[2] == key[2] and \
+            (k[1] == key[1] or _same(k[1], key[1]))
+
+    old, new = totals(old_rows), totals(new_rows)
+    keys = list(new)
+    for k in old:
+        if not any(_match(k, n) for n in keys):
+            keys.append(k)
+    out = []
+    for k in keys:
+        o = next((v for kk, v in old.items() if _match(kk, k)), None)
+        n = next((v for kk, v in new.items() if _match(kk, k)), None)
+        b = o["qty"] if o else 0
+        a = n["qty"] if n else 0
+        if abs(a - b) < 1e-9:
+            continue
+        sb, sa = by_sheet(old_rows, k), by_sheet(new_rows, k)
+        sheets = []
+        for sh in sorted(set(sb) | set(sa)):
+            d = _q(sa.get(sh, 0) - sb.get(sh, 0))
+            if abs(d) > 1e-9:
+                sheets.append((sh, d))
+        out.append({"action": k[0], "what": k[1], "unit": k[2],
+                    "before": b, "after": a, "change": _q(a - b),
+                    "kind": "added" if not o else
+                    "removed" if not n else "changed",
+                    "sheets": sheets})
+    out.sort(key=lambda r: (-abs(r["change"]), r["what"]))
+    return out
+
+
+def compare_text(rows):
+    """One line per change: '+12 LF REPLACE CHAIN LINK FENCE (C-7: +12)'."""
+    lines = []
+    for r in rows:
+        where = ", ".join(f"{sh or '?'}: {d:+g}" for sh, d in r["sheets"])
+        tag = {"added": " (new)", "removed": " (gone)"}.get(r["kind"], "")
+        lines.append(f"{r['change']:+g} {r['unit']} "
+                     f"{' '.join(x for x in (r['action'], r['what']) if x)}"
+                     f"{tag}" + (f" ({where})" if where else ""))
+    return lines

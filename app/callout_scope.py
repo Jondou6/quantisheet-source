@@ -856,11 +856,12 @@ def export_xlsx(rows, path):
     return path
 
 
-def page_words(page):
+def page_words(page, textpage=None):
     import fitz
     rot = page.rotation_matrix
     out = []
-    for w in page.get_text("words"):
+    for w in (page.get_text("words", textpage=textpage)
+              if textpage is not None else page.get_text("words")):
         r = fitz.Rect(w[:4]) * rot
         r.normalize()
         out.append((r.x0, r.y0, r.x1, r.y1, w[4]))
@@ -880,21 +881,30 @@ def read_set(path, spec_text="", sheet_of=None):
                         overlay.sheet_number(page)) or f"p.{n + 1}"
             except Exception:                              # noqa: BLE001
                 name = f"p.{n + 1}"
-            got = co.read_page(page, name, n)
+            # one text page per sheet, read once (Nov 17: each sheet's
+            # text was taken out four times - half the time of the read)
+            try:
+                flags = getattr(fitz, "TEXTFLAGS_TEXT", None)
+                tp = (page.get_textpage(flags=flags) if flags is not None
+                      else page.get_textpage())
+            except Exception:                              # noqa: BLE001
+                tp = None
+            blocks = co.page_blocks(page, textpage=tp)
+            got = co.read_blocks(blocks, name, n)
             for r in got:
                 r["source"] = "note"
             rows += got
-            blocks = co.page_blocks(page)
             if any(_KEYHEAD.search(" ".join(b[0])) for b in blocks):
                 syms = page_symbols(page)
                 rows += keyed(blocks, name, n, syms,
                               typical_counter(page, syms))
             rows += from_feeder_tags(blocks, name, n)
-            words = page_words(page)
+            words = page_words(page, textpage=tp)
             table_marks += marks(words)
             if any(r["unit"] == "LF" for r in got):
                 drawn[name] = (page_pens(page), bar_ppf(words))
-            texts[name] = page.get_text("text")
+            texts[name] = page.get_text("text", textpage=tp) \
+                if tp is not None else page.get_text("text")
     rows += from_table(rows, table_marks)
     for name, text in texts.items():
         rows += from_sentences(rows, text, name)

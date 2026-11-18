@@ -2,7 +2,9 @@
 its notes, its summary table, its keyed notes and its specification
 (callouts.py, callout_scope.py). It is a list to check and export;
 Add to Estimate puts the totals in the Estimate panel as lines to price
-(Nov 16), each saying which sheets it came from."""
+(Nov 16), each saying which sheets it came from and linked to the total,
+which is kept with AI Takeoff's quantities so a note is in the estimate
+once (Nov 17)."""
 import os
 
 from PySide6.QtCore import Qt
@@ -37,26 +39,42 @@ def estimate_lines(rows):
 
 
 def add_to_estimate(doc, rows):
-    """Put the totals in the estimate as unpriced lines. A line this
-    window added before (same description) gets the new quantity instead
-    of a second line. Returns (added, updated, left out)."""
+    """Put the totals in the estimate (Nov 17: one place for work notes).
+    Each total is kept with the job's takeoff quantities (the same store
+    AI Takeoff uses, so a note is never in the estimate twice) and gets
+    one estimate line linked to it, to price: the line's quantity follows
+    when the notes are read and added again. A line this window added
+    before (same description) is linked in place, keeping its price.
+    Returns (added, updated, left out)."""
+    from . import ai_quantities as aq
     from . import estimate_lines as el
-    have = {x["desc"]: x for x in el.read(doc) if x.get("source") == SOURCE}
-    new, updated = [], 0
+    totals = []
+    lines = []
     for desc, qty, unit, note in estimate_lines(rows):
+        u = str(unit or "").upper()
+        totals.append({"name": desc, "qty": qty, "unit": u,
+                       "basis": note})
+        lines.append((desc, u, note))
+    aq.store_worknotes(doc, totals)
+    have = {}
+    for x in el.read(doc):
+        if x.get("source") == SOURCE:
+            have.setdefault(x["desc"], x)
+    new, updated = [], 0
+    for desc, u, note in lines:
+        link = {"name": desc[:300], "type": aq.TYPE, "unit": u}
         old = have.get(desc[:300])
         if old is not None:
-            if not old.get("link"):
-                el.update(doc, old["id"], qty=qty, unit=unit.lower(),
-                          note=note)
-                updated += 1
+            el.update(doc, old["id"], link=link, unit=u.lower(), note=note)
+            updated += 1
             continue
-        new.append(el.new_line(desc=desc, qty=qty, unit=unit.lower(),
-                               source=SOURCE, note=note))
+        new.append(el.new_line(desc=desc, unit=u.lower(), source=SOURCE,
+                               note=note, link=link))
     if new:
         el.add(doc, new)
     left = sum(1 for s in co.summary(rows) if not s["qty"])
     return len(new), updated, left
+
 
 CHECK = QColor("#fff3c4")
 INK = QColor("#111111")
@@ -98,10 +116,19 @@ class WorkNotesDialog(QDialog):
         self.every.cellDoubleClicked.connect(self._open)
         self.tabs.addTab(self.totals, "Totals")
         self.tabs.addTab(self.every, "Every row")
+        self.changes = self._table()
+        self.changes_at = self.tabs.addTab(self.changes, "Changes")
+        self.tabs.setTabEnabled(self.changes_at, False)
+        self.changed = []
         v.addWidget(self.tabs, 1)
         bb = QDialogButtonBox(QDialogButtonBox.Close)
         x = bb.addButton("Export to Excel…", QDialogButtonBox.ActionRole)
         x.clicked.connect(lambda: self.export())
+        c = bb.addButton("Compare with Earlier Set…",
+                         QDialogButtonBox.ActionRole)
+        c.setToolTip("Read an earlier issue of the drawings and list what "
+                     "this set changed in the work notes, sheet by sheet")
+        c.clicked.connect(lambda: self.compare())
         a = bb.addButton("Add to Estimate", QDialogButtonBox.ActionRole)
         a.setToolTip("Put the totals in the Estimate panel as lines to "
                      "price, each with the sheets it came from")
@@ -143,6 +170,53 @@ class WorkNotesDialog(QDialog):
         QApplication.restoreOverrideCursor()
         self.fill()
         return self.rows
+
+    def compare(self, path=None):
+        """Compare with an earlier issue of the set (Nov 17): the Changes
+        tab lists every work-note total that moved - added, gone or
+        changed - with the sheets where it changed. Returns the rows."""
+        if not self.rows:
+            self.status.setText("Read the Drawings first, then compare.")
+            return None
+        if path is None:
+            path, _ = QFileDialog.getOpenFileName(
+                self, "Earlier Set of the Drawings",
+                os.path.dirname(self.path), "PDF (*.pdf)")
+            if not path:
+                return None
+        if os.path.abspath(path) == os.path.abspath(self.path):
+            self.status.setText("Pick the earlier issue - that is this set.")
+            return None
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        try:
+            text = cs.pdf_text(self.spec) if self.spec else ""
+            old, _facts = cs.read_set(path, text)
+        except Exception as e:                            # noqa: BLE001
+            QApplication.restoreOverrideCursor()
+            QMessageBox.warning(self, "Work Notes Takeoff",
+                                f"The earlier set couldn't be read: {e}")
+            return None
+        QApplication.restoreOverrideCursor()
+        self.changed = co.compare(old, self.rows)
+        head = ["Change", "Action", "Item", "Before", "Now", "Unit",
+                "Sheets"]
+        body = [[{"added": "New", "removed": "Gone"}.get(r["kind"],
+                                                          "Changed"),
+                 r["action"], r["what"], r["before"], r["after"], r["unit"],
+                 ", ".join(f"{sh or '?'}: {d:+g}" for sh, d in r["sheets"])]
+                for r in self.changed]
+        self._put(self.changes, [head] + (body or [["", "", "No change in "
+                                                    "the work notes", "",
+                                                    "", "", ""]]),
+                  check_col=0)
+        self.tabs.setTabEnabled(self.changes_at, True)
+        self.tabs.setCurrentIndex(self.changes_at)
+        self.status.setText(
+            f"Compared with {os.path.basename(path)}: "
+            f"{len(self.changed)} work-note total(s) changed." if
+            self.changed else f"Compared with {os.path.basename(path)}: "
+            "no work-note total changed.")
+        return self.changed
 
     def fill(self):
         tot, _ = co.table([r for r in self.rows if r["qty"]])

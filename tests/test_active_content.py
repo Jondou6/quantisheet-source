@@ -1,5 +1,7 @@
-"""Venice #1 (Nov 4): PDF JavaScript / XFA - confirm nothing runs, and
-that people are told what a file carries."""
+"""Venice #1 (Nov 4): PDF JavaScript / XFA - confirm nothing runs on its
+own, and that people are told what a file carries. Since Nov 17 a form's
+own calculations run when a person fills a field (formcalc.py), and
+nothing else does."""
 import fitz
 
 from app import activecontent
@@ -26,8 +28,9 @@ def _form(path, with_js=True):
     return path
 
 
-def test_a_form_script_is_not_run(tmp_path):
-    """Change A; if MuPDF ran B's calculation script, B would become 10."""
+def test_a_form_script_is_not_run_on_its_own(tmp_path):
+    """Opening, changing A outside the fill path and saving run nothing:
+    B would become 10 if its calculation ran."""
     d = fitz.open(_form(str(tmp_path / "f.pdf")))
     pg = d[0]                       # keep the page: a widget needs it
     a = next(w for w in pg.widgets() if w.field_name == "A")
@@ -44,8 +47,23 @@ def test_scripts_and_xfa_are_reported(tmp_path):
     d = fitz.open(_form(str(tmp_path / "f.pdf")))
     found = activecontent.scan(d)
     assert found["javascript"] >= 1 and found["auto_actions"] >= 1
-    assert "never runs them" in activecontent.message(found)
+    assert "only form calculations run" in activecontent.message(found)
     plain = fitz.open(_form(str(tmp_path / "p.pdf"), with_js=False))
     assert activecontent.message(activecontent.scan(plain)) == ""
     assert activecontent.message({"xfa": True}).count("XFA") == 1
-    assert activecontent.POLICY == "off"
+    assert activecontent.POLICY == "forms"
+
+
+def test_filling_a_field_runs_the_forms_calculation(tmp_path):
+    """Nov 17: filling A the way the window does runs B's calculation
+    (B = A x 2); the open action (an alert) is never run."""
+    from app import annotate
+    d = fitz.open(_form(str(tmp_path / "f.pdf")))
+    pg = d[0]
+    assert annotate._set_field(pg, {"name": "A", "value": "5"})
+    b = next(w for w in d[0].widgets() if w.field_name == "B")
+    assert b.field_value == "10"
+    d.save(str(tmp_path / "h.pdf"))
+    with fitz.open(str(tmp_path / "h.pdf")) as h:
+        b = next(w for w in h[0].widgets() if w.field_name == "B")
+        assert b.field_value == "10"

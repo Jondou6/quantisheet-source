@@ -495,14 +495,17 @@ def test_work_notes_go_into_the_estimate():
     assert cu.add_to_estimate(doc, _work_rows()) == (1, 0, 1)
     (ln,) = el.read(doc)
     from decimal import Decimal
-    assert ln["source"] == cu.SOURCE and Decimal(ln["qty"]) == 3
+    # Nov 17: the line is linked to the total kept with the takeoff
+    assert ln["source"] == cu.SOURCE and ln["link"]["type"] == "ai"
+    assert el.price(ln, el._groups(doc))["quantity"] == 3
     assert ln["unit"] == "ea" and Decimal(ln["mat"]) == 0
     # read again with another valve: the same line takes the new count
     more = _work_rows() + co.read_blocks(
         [(["INSTALL:", "4 - 6-INCH PLUG VALVE"], (0, 0, 9, 9))], "C-3")
     assert cu.add_to_estimate(doc, more) == (0, 1, 1)
     (ln,) = el.read(doc)
-    assert Decimal(ln["qty"]) == 7 and "C-3" in ln["note"]
+    assert el.price(ln, el._groups(doc))["quantity"] == 7
+    assert "C-3" in ln["note"]
 
 
 def test_the_window_adds_to_the_estimate(win, tmp_path):

@@ -59,6 +59,10 @@ apply_line_setting()
 
 
 # tool id -> (label, kind of input)
+# tools with which a click on a form field fills it (Nov 17)
+FIELD_TOOLS = (None, "select", "select_text", "fs_text", "fs_check",
+               "fs_date")
+
 TOOLS = {
     None: ("Select", "select"),
     "add_highlight": ("Highlight", "rect"),
@@ -676,6 +680,8 @@ class PdfView(QWidget):
             return pg.get_pixmap(matrix=fitz.Matrix(pz, pz), alpha=False)
 
     def _render(self, zoom_only=False, annots_only=False):
+        if not annots_only and getattr(self, "_field_edit", None):
+            self.close_field_editor(keep=True)   # zoom / page: keep it
         self._pg_cache = None
         self._snap_marks = None
         if self.doc.page_count == 0:
@@ -1437,6 +1443,11 @@ class PdfView(QWidget):
         p.setRenderHint(QPainter.Antialiasing)
         p.fillRect(e.rect(), QColor(255, 255, 255))
         self._paint_page(p, e.rect())
+        # form fields shown so they can be found (Nov 17): a light tint, as
+        # other PDF readers do; a field without an appearance of its own
+        # was invisible
+        for r in self.field_rects():
+            p.fillRect(self._q(r), QColor(204, 215, 255, 90))
         # search results
         for r in self.search_hits:
             p.fillRect(self._q(r), QColor(255, 200, 0, 90))
@@ -1712,6 +1723,15 @@ class PdfView(QWidget):
         if e.button() != Qt.LeftButton:
             return
         self.setFocus()
+        # Nov 17: a form field is filled by clicking into it with the
+        # Select, Select Text or Fill & Sign tools, as in other PDF readers
+        # (it took a double-click and a box). Ctrl+click still selects.
+        if self.tool in FIELD_TOOLS and \
+                not (e.modifiers() & Qt.ControlModifier) and \
+                not (self.selected and self.handle_at(pt)):
+            w = self.widget_at(pt)
+            if w is not None and self.edit_field(w):
+                return
         if kind == "text":
             self._text_press(pt, extend=bool(e.modifiers() &
                                               Qt.ShiftModifier))
@@ -1788,6 +1808,22 @@ class PdfView(QWidget):
         if self._tdrag is not None:
             self._text_drag(self._sp(e.position()))
             return
+        if not e.buttons() and self.tool in FIELD_TOOLS:
+            # over a form field: a text cursor, or a hand on a box to tick
+            try:
+                w = self.widget_at(self._sp(e.position()))
+            except Exception:                             # noqa: BLE001
+                w = None
+            if w is not None and not (w.field_flags or 0) & 1:
+                self.setCursor(Qt.IBeamCursor if w.field_type ==
+                               fitz.PDF_WIDGET_TYPE_TEXT else
+                               Qt.PointingHandCursor)
+                self._field_cursor = True
+            elif getattr(self, "_field_cursor", False):
+                self._field_cursor = False
+                self._on_link = False
+                self.setCursor(Qt.ArrowCursor if self.tool is None else
+                               Qt.CrossCursor)   # the tool's own cursor
         had_snap = self._snap_hit is not None
         pt = self._event_point(e) if self.tool in SNAP_TOOLS \
             else self._sp(e.position())
@@ -2050,6 +2086,208 @@ class PdfView(QWidget):
             if fitz.Rect(w.rect).contains(p):
                 return w
         return None
+
+    show_fields = True
+
+    def field_rects(self):
+        """Screen rects of the page's fillable fields (none when switched
+        off or nothing to fill)."""
+        if not self.show_fields:
+            return []
+        try:
+            return [annotate.from_page(self.pg, fitz.Rect(w.rect))
+                    for w in (self.pg.widgets() or [])
+                    if w.field_type != fitz.PDF_WIDGET_TYPE_BUTTON and
+                    not (w.field_flags or 0) & 1]      # read-only
+        except Exception:                                 # noqa: BLE001
+            return []
+
+    def _text_fields(self):
+        return [w for w in (self.pg.widgets() or [])
+                if w.field_type == fitz.PDF_WIDGET_TYPE_TEXT and
+                not (w.field_flags or 0) & 1]
+
+    def edit_field(self, w):
+        """Fill a field where it is (Nov 17): a check box or radio button
+        toggles; a text field opens for typing in place - Enter or
+        clicking away keeps it, Esc leaves it, Tab keeps it and goes to the
+        next field; a list asks which. Returns True when handled."""
+        if (w.field_flags or 0) & 1:                     # read-only
+            self.status.emit(f"'{w.field_name}' is read-only.")
+            return True
+        ft = w.field_type
+        if ft in (fitz.PDF_WIDGET_TYPE_CHECKBOX,
+                  fitz.PDF_WIDGET_TYPE_RADIOBUTTON):
+            self.close_field_editor(keep=True)
+            self.fill_field(w)
+            return True
+        if ft in (fitz.PDF_WIDGET_TYPE_COMBOBOX,
+                  fitz.PDF_WIDGET_TYPE_LISTBOX):
+            return self._choice_editor(w)
+        if ft != fitz.PDF_WIDGET_TYPE_TEXT:
+            return False
+        self.close_field_editor(keep=True)
+        from PySide6.QtWidgets import QLineEdit, QPlainTextEdit
+        multi = bool((w.field_flags or 0) & 4096)
+        box = self._q(annotate.from_page(self.pg, fitz.Rect(w.rect)))
+        view = self
+
+        class _Line(QLineEdit):
+            def event(self, ev):
+                if ev.type() == QEvent.KeyPress and \
+                        ev.key() in (Qt.Key_Tab, Qt.Key_Backtab):
+                    view._field_tab(back=ev.key() == Qt.Key_Backtab)
+                    return True
+                return super().event(ev)
+
+            def keyPressEvent(self, ev):
+                if ev.key() == Qt.Key_Escape:
+                    view.close_field_editor(keep=False)
+                    return
+                super().keyPressEvent(ev)
+
+            def focusOutEvent(self, ev):
+                super().focusOutEvent(ev)
+                QTimer.singleShot(0, lambda: view.close_field_editor(
+                    keep=True))
+
+        class _Multi(QPlainTextEdit):
+            def keyPressEvent(self, ev):
+                if ev.key() == Qt.Key_Escape:
+                    view.close_field_editor(keep=False)
+                    return
+                if ev.key() in (Qt.Key_Tab, Qt.Key_Backtab):
+                    view._field_tab(back=ev.key() == Qt.Key_Backtab)
+                    return
+                super().keyPressEvent(ev)
+
+            def focusOutEvent(self, ev):
+                super().focusOutEvent(ev)
+                QTimer.singleShot(0, lambda: view.close_field_editor(
+                    keep=True))
+        ed = _Multi(self) if multi else _Line(self)
+        val = "" if w.field_value in (None, False) else str(w.field_value)
+        if multi:
+            ed.setPlainText(val)
+        else:
+            ed.setText(val)
+            if w.text_maxlen:
+                ed.setMaxLength(int(w.text_maxlen))
+            ed.returnPressed.connect(
+                lambda: self.close_field_editor(keep=True))
+        f = ed.font()
+        f.setPointSizeF(max(7.0, min(28.0, (w.text_fontsize or 10) *
+                                     self.zoom * 0.75 or 10)))
+        ed.setFont(f)
+        ed.setGeometry(box.toRect().adjusted(0, 0, 0, 2))
+        ed.setStyleSheet("background: #fffbe6; color: #111; "
+                         "border: 1px solid #3060c0;")
+        self._field_edit = (ed, w.field_name, val, self.page)
+        ed.show()
+        ed.setFocus()
+        if not multi:
+            ed.selectAll()
+        self.status.emit(f"Filling '{w.field_label or w.field_name}' - "
+                         "Enter keeps it, Tab goes to the next field, "
+                         "Esc leaves it as it was.")
+        return True
+
+    def _choice_editor(self, w):
+        """A drop-down field opens as a list right on the field; picking
+        an item fills it (Nov 17)."""
+        from PySide6.QtWidgets import QComboBox
+        self.close_field_editor(keep=True)
+        choices = [c if isinstance(c, str) else c[-1]
+                   for c in (w.choice_values or [])]
+        if not choices:
+            self.status.emit(f"'{w.field_name}' has nothing to choose.")
+            return True
+        box = self._q(annotate.from_page(self.pg, fitz.Rect(w.rect)))
+        cb = QComboBox(self)
+        cb.addItems(choices)
+        cur = str(w.field_value or "")
+        if cur in choices:
+            cb.setCurrentIndex(choices.index(cur))
+        cb.setGeometry(box.toRect().adjusted(0, 0, 0, 4))
+        name, page = w.field_name, self.page
+        self._field_edit = None
+
+        def pick(i):
+            cb.hide()
+            cb.deleteLater()
+            if 0 <= i < len(choices) and choices[i] != cur:
+                self.apply_marks([(page, "set_field",
+                                   {"name": name, "value": choices[i]})])
+            self.setFocus()
+        cb.activated.connect(pick)
+        cb.show()
+        cb.showPopup()
+        self._choice_box = cb
+        return True
+
+    def close_field_editor(self, keep=True):
+        """Close the field being typed in, keeping what was typed (or not).
+        Returns 1 if the field was changed."""
+        cur = getattr(self, "_field_edit", None)
+        if not cur:
+            return 0
+        self._field_edit = None
+        ed, name, old, page = cur
+        text = ed.toPlainText() if hasattr(ed, "toPlainText") else ed.text()
+        ed.hide()
+        ed.deleteLater()
+        if not keep or text == old or page != self.page:
+            self.setFocus()
+            return 0
+        n = self.apply_marks([(page, "set_field",
+                               {"name": name, "value": text})])
+        self.setFocus()
+        try:                       # the form turned it down (Nov 17)
+            now = next((w.field_value for w in self.pg.widgets() or []
+                        if w.field_name == name), text)
+            if text and str(now or "") != text:
+                self.status.emit(f"'{name}' didn't take \"{text[:40]}\" - "
+                                 "the form allows something else here "
+                                 "(often a number only).")
+        except Exception:                                 # noqa: BLE001
+            pass
+        return n
+
+    def _field_tab(self, back=False):
+        """Keep the field and open the next one (Shift+Tab: the one
+        before), in the page's own field order."""
+        cur = getattr(self, "_field_edit", None)
+        name = cur[1] if cur else None
+        self.close_field_editor(keep=True)
+        fields = self._text_fields()
+        names = [w.field_name for w in fields]
+        i = names.index(name) if name in names else -1
+        j = i + (-1 if back else 1)
+        if not fields or not 0 <= j < len(fields):
+            # past the page's last field: on to the next page that has
+            # fields (Shift+Tab: back to the last field of the one before)
+            n = self.doc.page_count
+            step = -1 if back else 1
+            for k in range(1, n + 1):
+                pno = (self.page + step * k) % n
+                if pno == self.page:
+                    break
+                ws = [x for x in (self.doc[pno].widgets() or [])
+                      if x.field_type == fitz.PDF_WIDGET_TYPE_TEXT and
+                      not (x.field_flags or 0) & 1]
+                if ws:
+                    self.go_to(pno)
+                    fields = self._text_fields()
+                    j = len(fields) - 1 if back else 0
+                    break
+            else:
+                fields = fields or []
+            if not fields:
+                return None
+            j %= len(fields)
+        nxt = fields[j]
+        self.edit_field(nxt)
+        return nxt.field_name
 
     def select(self, annot, add=False):
         """Select `annot` (None: nothing). add=True (Ctrl+click) adds it to

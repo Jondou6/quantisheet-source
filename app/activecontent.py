@@ -1,12 +1,14 @@
 """What a PDF carries that could act on its own (review 2, Nov 4 - Venice
 #1): JavaScript, open/close actions, launch actions and XFA forms.
 
-QuantiSheet never runs a PDF's scripts: PyMuPDF/MuPDF here doesn't
-execute them (tests/test_active_content.py proves a form calculation
-script doesn't run), links open only web and email after asking (see
-main_window.LINK_SCHEMES), and launch actions are never followed. So the
-policy is fixed at "Off"; there is no "On". What changes is that people
-are told: one line on open, and the log says what was found.
+QuantiSheet runs no script when a PDF opens. Since Nov 17 (Jon: forms
+should work like other PDF readers) a fillable form's own calculations
+and number formats run when a person fills a field, in MuPDF's form
+engine, which can only read and set the form's fields (formcalc.py). Open
+and close actions, page actions and document scripts are never run;
+links open only web and email after asking (see main_window.LINK_SCHEMES)
+and launch actions are never followed. People are told what a file
+carries: one line on open, and the log says what was found.
 
 XFA (dynamic) forms: shown as the static pages the file carries (often a
 "please wait" page). They're not rendered, flattened or filled here; the
@@ -17,7 +19,7 @@ import re
 
 log = logging.getLogger(__name__)
 
-POLICY = "off"                   # the only one: scripts are never run
+POLICY = "forms"   # only form calculations / formats, when a field is filled
 _JS = re.compile(r"/S\s*/JavaScript|/JS\s*[(<]|/JS\s+\d+\s+\d+\s+R|"
                  r"/JavaScript\s*(?:<<|\d+\s+\d+\s+R)")
 _LAUNCH = re.compile(r"/S\s*/Launch")
@@ -55,7 +57,8 @@ def message(found):
     """One plain line for the open file, or ''."""
     bits = []
     if found.get("javascript") or found.get("auto_actions"):
-        bits.append("scripts (QuantiSheet never runs them)")
+        bits.append("scripts (only form calculations run, when you fill a "
+                    "field; nothing else runs)")
     if found.get("launch"):
         bits.append("a 'launch a program' action (never followed)")
     if found.get("xfa"):

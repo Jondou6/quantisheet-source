@@ -76,6 +76,13 @@ def snapshot(doc):
         k = f"{it['group'] or it['type'].title()}|{it['unit']}"
         qty[k] = round(qty.get(k, 0.0) + float(it["value"]), 4)
         n += 1
+    # Nov 17: AI Takeoff's worked-out quantities and the work notes' totals
+    # (ai_quantities) count too, so a revision that changes a note's count
+    # or a wall's height shows here
+    from . import ai_quantities
+    for r in ai_quantities.rows(doc):
+        k = f"{r['name']}|{r['unit']}"
+        qty[k] = round(qty.get(k, 0.0) + float(r["qty"]), 4)
     return {"when": _now(), "total": _c2(total),
             "direct": _c2(direct), "items": items, "quantities": qty,
             "measurements": n}

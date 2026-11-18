@@ -1407,6 +1407,8 @@ class MainWindow(QMainWindow):
         self._help_menu = h
         self._act(h, "Help Center && Tutorials…", "F1", self.help_center,
                   False)
+        self._act(h, "Video Tutorials", None,
+                  lambda: self.video_tutorials(), False)
         self._act(h, "Welcome Tour", None, self.welcome_tour, False)
         self._act(h, "Open Practice Drawings", None, self.open_practice,
                   False)
@@ -1754,6 +1756,7 @@ class MainWindow(QMainWindow):
                                ["Author Name", "Keyboard Shortcuts",
                                 "Document Properties"]]),
         ("Help", "Learn", [("Help Center & Tutorials", "Tutorials", "info"),
+                           ("Video Tutorials", "Videos", "info"),
                            ("Welcome Tour", "Tour", "home"),
                            ("Open Practice Drawings", "Practice", "open"),
                            ("Keyboard Shortcuts", "Shortcuts",
@@ -4859,13 +4862,38 @@ class MainWindow(QMainWindow):
         if out["checks"]:
             text += "\n\nBefore you send it:\n" + "\n".join(
                 f"- {c}" for c in out["checks"])
-        text += "\n\nOpen the folder?"
         if ask is None:
             ask = (lambda t: QMessageBox.question(
                 self, "Bid Package", t) == QMessageBox.Yes)
-        if ask(text):
+        # Nov 17: the Bid Board opportunity it is for can be marked sent
+        opp = bidpackage.board_match(bidpackage.project_of(v.doc))
+        out["board"] = None
+        if opp is not None and ask(
+                text + "\n\nMark \"" + (opp.get("project") or "") + "\" for "
+                + (opp.get("gc") or "the GC") + " as Submitted on the Bid "
+                "Board?"):
+            try:
+                out["board"] = bidpackage.mark_submitted(opp, out)
+                self._flash("Marked Submitted on the Bid Board")
+            except Exception:                             # noqa: BLE001
+                log.warning("bid board", exc_info=True)
+            text = "The bid package is ready."
+        if ask(text + "\n\nOpen the folder?"):
             self._open_file_external(out["folder"])
         return out
+
+    def video_tutorials(self, open_url=None):
+        """Help > Video Tutorials: QuantiSheet's YouTube channel in the
+        browser (Nov 17). Returns the address."""
+        from . import helpcenter
+        url = helpcenter.VIDEO_URL
+        if open_url is None:
+            from PySide6.QtCore import QUrl
+            from PySide6.QtGui import QDesktopServices
+            open_url = (lambda u: QDesktopServices.openUrl(QUrl(u)))
+        open_url(url)
+        self._flash("Opening QuantiSheet's video tutorials in your browser")
+        return url
 
     def _open_file_external(self, path):
         try:
@@ -5202,6 +5230,12 @@ class MainWindow(QMainWindow):
             self.tabs.setTabToolTip(i, f"{path}\n{note}")
             QTimer.singleShot(0, lambda n=note: self._flash(n, 20000))
             log.info("%s was repaired when it was opened", path)
+        elif getattr(doc, "is_form_pdf", 0):
+            # Nov 17: say a form can be filled, and how
+            QTimer.singleShot(0, lambda: self._flash(
+                "This document has fillable form fields (tinted blue) - "
+                "click a field to type in it; Tab goes to the next one.",
+                12000))
         return True
 
     def bid_buildup(self, show=True):

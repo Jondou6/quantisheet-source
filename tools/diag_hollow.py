@@ -80,5 +80,24 @@ def main(a):
               f"heavier {heavier[k] / max(heavy, 1e-9):5.2f}")
 
 
+    if "--png" in a:
+        # what the scan's walls are made of: ink grey, what fill_hollow
+        # adds red, the final wall mask's extra (not ink, not filled) blue
+        out = a[a.index("--png") + 1]
+        filled = ink.copy()
+        at.fill_hollow(filled, ppf, gray=gray)
+        img = np.full((h, w, 3), 255, np.uint8)
+        img[ink > 0] = (150, 150, 150)
+        img[(filled > 0) & (ink == 0)] = (0, 0, 255)
+        wm = getattr(pl, "walls", None)
+        if wm is not None and wm.shape == ink.shape:
+            img[(wm > 0) & (filled == 0)] = (255, 0, 0)
+            edge2 = cv2.morphologyEx(wm.astype(np.uint8), cv2.MORPH_GRADIENT,
+                                     np.ones((3, 3), np.uint8))
+            img[(edge2 > 0)] = (0, 160, 0)
+        cv2.imwrite(out, img)
+        print("wrote", out, img.shape)
+
+
 if __name__ == "__main__":
     main(sys.argv[1:])

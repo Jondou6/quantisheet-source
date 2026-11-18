@@ -1,0 +1,5 @@
+QuantiSheet 1.1.18
+- Fillable forms work the way they do in other PDF readers: click into a field with the Select, Select Text or Fill & Sign tools and type; Tab and Shift+Tab move through the fields and on to the next page; drop-down fields open as a list on the field; the cursor shows a text bar over text fields and a hand over check boxes; a note says when a document has fields to fill.
+- Forms work out their own totals: line totals, subtotals, overhead, profit and contract sums fill in as you type, and amounts show as $1,234.00, as the form's maker set them. Number fields turn letters down. Only a form's calculations and number formats run, and only when you fill a field - nothing in a PDF runs when it is opened.
+- Help > Video Tutorials opens QuantiSheet's YouTube channel.
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.18 - the full source of this build. Help > About shows the same link.

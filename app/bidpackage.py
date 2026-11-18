@@ -239,3 +239,39 @@ def contents_text(project, files, skipped, notes, when=None):
     lines += ["", "Before you send it:"]
     lines += [f"  - {n}" for n in notes] or ["  - Nothing flagged."]
     return "\n".join(lines) + "\n"
+
+
+BOARD_MATCH = 0.8      # how alike the project names must be
+
+
+def board_match(project, items=None):
+    """The Bid Board opportunity this package is for (Nov 17): one still
+    open or accepted whose project name is alike, or None. Two that fit
+    equally well: None (the person marks it by hand)."""
+    from . import bidboard
+    try:
+        items = bidboard.load() if items is None else items
+    except Exception:                                     # noqa: BLE001
+        log.info("bid board", exc_info=True)
+        return None
+    fits = []
+    for o in items:
+        if o.get("status") not in bidboard.OPEN:
+            continue
+        a = bidboard._alike(project, o.get("project"))
+        if a >= BOARD_MATCH:
+            fits.append((a, o))
+    fits.sort(key=lambda t: -t[0])
+    if not fits or (len(fits) > 1 and fits[1][0] == fits[0][0]):
+        return None
+    return fits[0][1]
+
+
+def mark_submitted(o, package):
+    """Mark the opportunity Submitted, noting the package's folder name."""
+    from . import bidboard
+    note = (o.get("notes") or "").rstrip()
+    line = f"Bid package: {os.path.basename(package['folder'])}"
+    o = dict(o, notes=(note + "\n" if note else "") + line)
+    bidboard.save(o)
+    return bidboard.set_status(o["id"], "Submitted")

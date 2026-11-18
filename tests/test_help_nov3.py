@@ -50,7 +50,7 @@ def test_whats_new_111():
         assert w in s
     assert "Adobe" not in s and "Bluebeam" not in s
     from app import __version__
-    assert __version__ == "1.1.15"
+    assert __version__ == "1.1.18"
 
 
 def test_whats_new_112():
@@ -122,6 +122,54 @@ def test_whats_new_115():
                  encoding="utf-8").read()
     assert notes.startswith("QuantiSheet 1.1.5\n")
     assert "quantisheet-source/tree/v1.1.5" in notes
+
+
+def test_whats_new_1118():
+    p = os.path.join(os.path.dirname(helpcenter.__file__), "data",
+                     "whats_new.json")
+    s = json.load(open(p, encoding="utf-8"))["1.1.18"]
+    for w in ("Fillable forms", "work out their own totals",
+              "Video Tutorials"):
+        assert w in s
+    for bad in ("Adobe", "Acrobat", "Bluebeam", "Planswift", "HMB",
+                "Harbor", "Metro"):
+        assert bad not in s
+    root = os.path.dirname(os.path.dirname(helpcenter.__file__))
+    notes = open(os.path.join(root, "docs", "TEAM_NOTES_1.1.18.txt"),
+                 encoding="utf-8").read()
+    assert notes.startswith("QuantiSheet 1.1.18\n")
+    assert "quantisheet-source/tree/v1.1.18" in notes
+
+
+def test_whats_new_1117():
+    p = os.path.join(os.path.dirname(helpcenter.__file__), "data",
+                     "whats_new.json")
+    s = json.load(open(p, encoding="utf-8"))["1.1.17"]
+    for w in ("Compare with Earlier Set", "Revision Log", "Bid Board",
+              "four times faster", "click into a field"):
+        assert w in s
+    for bad in ("Adobe", "Bluebeam", "Planswift", "HMB", "Harbor", "Metro"):
+        assert bad not in s
+    root = os.path.dirname(os.path.dirname(helpcenter.__file__))
+    notes = open(os.path.join(root, "docs", "TEAM_NOTES_1.1.17.txt"),
+                 encoding="utf-8").read()
+    assert notes.startswith("QuantiSheet 1.1.17\n")
+    assert "quantisheet-source/tree/v1.1.17" in notes
+
+
+def test_whats_new_1116():
+    p = os.path.join(os.path.dirname(helpcenter.__file__), "data",
+                     "whats_new.json")
+    s = json.load(open(p, encoding="utf-8"))["1.1.16"]
+    for w in ("made searchable first", "1/8", "in the estimate once"):
+        assert w in s
+    for bad in ("Adobe", "Bluebeam", "Planswift", "HMB", "Harbor", "Metro"):
+        assert bad not in s
+    root = os.path.dirname(os.path.dirname(helpcenter.__file__))
+    notes = open(os.path.join(root, "docs", "TEAM_NOTES_1.1.16.txt"),
+                 encoding="utf-8").read()
+    assert notes.startswith("QuantiSheet 1.1.16\n")
+    assert "quantisheet-source/tree/v1.1.16" in notes
 
 
 def test_whats_new_1115():

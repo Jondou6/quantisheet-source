@@ -1,0 +1,5 @@
+QuantiSheet 1.1.16
+- AI Takeoff on scanned sets: scanned sheets with no text are made searchable first, in the same step that reads the set (one Undo takes the text off again), so their sheet numbers, scales and room names are read and their rooms traced. If OCR (Tesseract) isn't installed, it says which sheets can't be read.
+- Rooms on small-scale scans (1/8"): a box drawn with an X (equipment, a refrigerator space) is no longer taken for wall, and a room's outline now reaches the floor behind a sink, a faucet line or the end of a counter. On the scanned test plans, rooms within 2% went from 77% to 80% overall and from 67% to 74% at 1/8"; break rooms from 47% to 82%.
+- Work notes are in the estimate once: Work Notes Takeoff > Add to Estimate and AI Takeoff now keep a note's total in the same place, so a count can't be added twice. Add to Estimate's lines are linked to those totals - adding the notes again updates the quantity and keeps the price you typed.
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.16 - the full source of this build. Help > About shows the same link.
