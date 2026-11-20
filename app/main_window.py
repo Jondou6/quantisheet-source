@@ -514,6 +514,14 @@ class MainWindow(QMainWindow):
         self._panel_timer.setInterval(250)
         self._panel_timer.timeout.connect(self._refresh_panels)
         self._qty_timer = self._panel_timer          # older name
+        # Nov 19: the job's watched plan folder is looked at once a minute
+        self._plan_timer = QTimer(self)
+        self._plan_timer.setInterval(60_000)
+        self._plan_timer.timeout.connect(
+            lambda: self.check_plan_folder(quiet=True))
+        if not os.environ.get("QUANTISHEET_SMOKE"):
+            self._plan_timer.start()
+        self._plan_offered = {}
 
         self.statusBar().showMessage("Open a PDF to begin (File > Open)")
         self._tools = QActionGroup(self)
@@ -1079,6 +1087,18 @@ class MainWindow(QMainWindow):
                   lambda: self.calculators(1), False)
         self._act(t, "Roofing Calculator…", None,
                   lambda: self.calculators(2), False)
+        self._act(t, "Rebar Calculator…", None,
+                  lambda: self.calculators(3), False)
+        self._act(t, "Beam and Header Calculator…", None,
+                  lambda: self.calculators(4), False)
+        self._act(t, "Column and Post Calculator…", None,
+                  lambda: self.calculators(5), False)
+        self._act(t, "Footing Size Calculator…", None,
+                  lambda: self.calculators(6), False)
+        self._act(t, "Metal Stud Framing Calculator…", None,
+                  lambda: self.calculators(7), False)
+        self._act(t, "Structural Steel Calculator…", None,
+                  lambda: self.calculators(8), False)
         self._act(t, "Date and Time Calculators…", None,
                   lambda: self.date_calculators(), False)
         self._act(t, "Bid Tabs…", None, self.bid_tabs, False)
@@ -1115,6 +1135,8 @@ class MainWindow(QMainWindow):
                   lambda: self.carry_forward())
         self._act(t, "Typical Sheet (Count This Sheet N Times)…", None,
                   lambda: self.page_multiplier())
+        self._act(t, "Wood Sheathing Helper…", None,
+                  lambda: self.sheathing_helper())
         self._act(t, "Buy Quantities (Sheets, Boxes, Rolls)…", None,
                   lambda: self.buy_quantities())
         self._act(t, "Coverage Map and Second Check…", None,
@@ -1134,6 +1156,11 @@ class MainWindow(QMainWindow):
                   lambda: self.create_proposal())
         self._act(t, "Export Bid Package…", None,
                   lambda: self.export_bid_package())
+        self._act(t, "Bid Submittal Checklist…", None,
+                  lambda: self.bid_submittal())
+        self._act(t, "Find Bid Terms…", None, lambda: self.bid_terms())
+        self._act(t, "Manufacturers in Specs…", None,
+                  lambda: self.spec_manufacturers())
         t.addSeparator()
         t.addAction(self.est_dock.toggleViewAction())
         self._act(t, "Price These…", None, lambda: self.price_these())
@@ -1285,6 +1312,10 @@ class MainWindow(QMainWindow):
                   False)
         self._act(pj, "Batch Slip Sheet…", None,
                   lambda: self.batch_slip_sheet(), False)
+        self._act(pj, "Watch Plan Folder…", None,
+                  lambda: self.watch_plan_folder())
+        self._act(pj, "Check Plan Folder Now", None,
+                  lambda: self.check_plan_folder(quiet=False))
         self._act(pj, "Search Takeoff Across Jobs…", None,
                   lambda: self.measurement_audit(1), False)
         pj.addSeparator()
@@ -1581,6 +1612,18 @@ class MainWindow(QMainWindow):
                                       "Brick & Block", "brick"),
                                      ("Roofing Calculator", "Roofing",
                                       "home"),
+                                     ("Rebar Calculator", "Rebar",
+                                      "measure_polylength"),
+                                     ("Beam and Header Calculator", "Beam",
+                                      "measure_length"),
+                                     ("Column and Post Calculator",
+                                      "Column", "walls"),
+                                     ("Footing Size Calculator", "Footing",
+                                      "measure_area"),
+                                     ("Metal Stud Framing Calculator",
+                                      "Metal Studs", "walls"),
+                                     ("Structural Steel Calculator",
+                                      "Steel", "assembly"),
                                      ("Date and Time Calculators",
                                       "Dates", "calendar")]),
         ("Estimate", "Bidding", [("Bid Tabs", "Bid Tabs", "bidtabs"),
@@ -3612,6 +3655,23 @@ class MainWindow(QMainWindow):
             return None
         return v.set_color_by(mode)
 
+    def sheathing_helper(self, show=True):
+        """Takeoff > Wood Sheathing Helper (Nov 19): the APA span rating
+        and thickness for a roof, floor or wall at its framing spacing,
+        and the 4x8 sheets for an area takeoff - added to the estimate as
+        a line that follows the area."""
+        from .sheathing_ui import SheathingDialog
+        v = self._view
+        if v is None:
+            return None
+        dlg = SheathingDialog(v.doc, self)
+        if show:
+            dlg.exec()
+            if dlg.added:
+                self._doc_edited()
+                self.estimate.refresh()
+        return dlg
+
     def buy_quantities(self, show=True):
         """Takeoff > Buy Quantities: per item, the size of one and the
         waste; the totals then show what to order."""
@@ -4817,6 +4877,116 @@ class MainWindow(QMainWindow):
                 self._open_file_external(path)
         return path
 
+    def watch_plan_folder(self, folder=None):
+        """Project > Watch Plan Folder (Nov 19): the folder this job's plan
+        sets and addenda are downloaded into, from any plan room. New PDFs
+        there are offered: log an addendum in the Addenda Gate, compare
+        with this set (then Slip Sheet), or open. Choosing the same folder
+        again, or Cancel with one set, offers to stop watching."""
+        from . import planwatch
+        v = self._view
+        if not v:
+            return None
+        cur = planwatch.folder_of(v.doc)
+        if folder is None:
+            start = cur or os.path.dirname(self._path or "") or \
+                os.path.expanduser("~")
+            folder = QFileDialog.getExistingDirectory(
+                self, "Plan Folder to Watch (where this job's sets and "
+                "addenda are downloaded)", start)
+            if not folder:
+                if cur and QMessageBox.question(
+                        self, "Watch Plan Folder",
+                        f"Stop watching {cur}?") == QMessageBox.Yes:
+                    planwatch.stop(v.doc)
+                    self._doc_edited()
+                    self._flash("Stopped watching the plan folder")
+                return None
+        try:
+            n = planwatch.watch(v.doc, folder)
+        except ValueError as e:
+            QMessageBox.warning(self, "Watch Plan Folder", str(e))
+            return None
+        self._doc_edited()
+        self._plan_offered.pop(id(v.doc), None)
+        self._flash(f"Watching {os.path.basename(folder)} for new sheets "
+                    f"and addenda ({n} PDF(s) there now)", 10000)
+        return n
+
+    def check_plan_folder(self, quiet=True, show=True):
+        """Look in the job's watched plan folder now. New files are offered
+        once (quiet: say nothing when there are none). Returns the new
+        files."""
+        from . import planwatch
+        v = self._view
+        if not v or not getattr(v, "doc", None):
+            return []
+        try:
+            if not planwatch.folder_of(v.doc):
+                if not quiet:
+                    self._flash("No plan folder is watched for this job "
+                                "(Project > Watch Plan Folder)")
+                return []
+            items = planwatch.new_files(v.doc)
+        except Exception:                                 # noqa: BLE001
+            log.info("plan folder check", exc_info=True)
+            return []
+        offered = self._plan_offered.setdefault(id(v.doc), set())
+        fresh = [it for it in items
+                 if (it["rel"], it["mtime"]) not in offered] if quiet \
+            else items
+        if not fresh:
+            if not quiet:
+                self._flash("Nothing new in the plan folder")
+            return []
+        offered |= {(it["rel"], it["mtime"]) for it in fresh}
+        if show:
+            from .planwatch_ui import NewPlansDialog
+            dlg = NewPlansDialog(self, v.doc, items)
+            self._plan_dlg = dlg
+            dlg.show()
+        return items
+
+    def bid_submittal(self, show=True):
+        """Estimate > Bid Submittal Checklist (Nov 19): signed bid forms,
+        bid bond, license, insurance and the bid reference number, ticked
+        off and attached; saved with the job."""
+        from .bidsubmittal_ui import SubmittalDialog
+        v = self._view
+        if not v:
+            return None
+        dlg = SubmittalDialog(v.doc, self)
+        if show:
+            ok = dlg.exec()
+            self._doc_edited()
+            return ok
+        return dlg
+
+    def bid_terms(self, show=True):
+        """Estimate > Find Bid Terms (Nov 19): bid bond, hold days,
+        prevailing wage, liquidated damages, pre-bid, goals, retainage,
+        contract time and alternates read from the documents, with
+        pages."""
+        from .bidterms_ui import BidTermsDialog
+        if not self._view:
+            return None
+        dlg = BidTermsDialog(self)
+        if show:
+            dlg.show()
+        return dlg
+
+    def spec_manufacturers(self, show=True):
+        """Estimate > Manufacturers in Specs (Nov 20): each section's
+        listed manufacturers and basis-of-design products, with pages,
+        for a quote-request list."""
+        from .specmfrs_ui import SpecMfrsDialog
+        if not self._view:
+            return None
+        dlg = SpecMfrsDialog(self)
+        if show:
+            dlg.show()
+        return dlg
+
     def export_bid_package(self, folder=None, ask=None):
         """Estimate > Export Bid Package: the proposal, the estimate
         summary (PDF and Excel), the estimate detail, the takeoff sheets
@@ -4829,6 +4999,13 @@ class MainWindow(QMainWindow):
         if not v:
             return None
         if folder is None:
+            # Nov 19: the bid-submittal checklist first
+            from .bidsubmittal_ui import SubmittalDialog
+            sub = SubmittalDialog(v.doc, self)
+            ok = sub.exec()
+            self._doc_edited()
+            if not ok:
+                return None
             start = os.path.dirname(self._path or "") or os.path.expanduser(
                 "~")
             folder = QFileDialog.getExistingDirectory(
@@ -4858,7 +5035,7 @@ class MainWindow(QMainWindow):
                 f", and {os.path.basename(out['zip'])} to send.")
         if out["skipped"]:
             text += "\n\nNot included:\n" + "\n".join(
-                f"- {bidpackage.LABEL[k]}: {why}" for k, why in out["skipped"])
+                f"- {bidpackage._label(k)}: {why}" for k, why in out["skipped"])
         if out["checks"]:
             text += "\n\nBefore you send it:\n" + "\n".join(
                 f"- {c}" for c in out["checks"])
@@ -5814,14 +5991,45 @@ class MainWindow(QMainWindow):
                         8000)
         return leaks
 
-    def save_as(self):
+    # Save As > Reduced Size PDF (Nov 19, Jon): a smaller copy straight
+    # from Save As - the document stays open as it is
+    REDUCED_KINDS = (("high quality", 200), ("balanced", 150),
+                     ("smallest", 96))
+    _PLAIN_FILTER = "PDF (*.pdf)"
+
+    def _reduced_filter(self, kind):
+        return f"Reduced Size PDF - {kind} (*.pdf)"
+
+    def save_as(self, path=None, kind=None, show=True):
+        """File > Save As. `kind` (or the Reduced Size PDF choice in the
+        dialog's file type list) saves a smaller copy instead and leaves
+        this document as it is. Returns True when saved."""
         if not self._view:
             return False
-        path, _ = QFileDialog.getSaveFileName(
-            self, "Save As", self._path or getattr(self._tab, "suggest", "")
-            or "", "PDF (*.pdf)")
-        if not path:
-            return False
+        if path is None:
+            filters = [self._PLAIN_FILTER] + [self._reduced_filter(k)
+                                              for k, _ in self.REDUCED_KINDS]
+            path, chosen = QFileDialog.getSaveFileName(
+                self, "Save As", self._path or getattr(self._tab, "suggest",
+                                                       "") or "",
+                ";;".join(filters))
+            if not path:
+                return False
+            kind = next((k for k, _ in self.REDUCED_KINDS
+                         if chosen == self._reduced_filter(k)), None)
+        if kind:
+            if not path.lower().endswith(".pdf"):
+                path += ".pdf"
+            if self._path and os.path.abspath(path) == \
+                    os.path.abspath(self._path):
+                QMessageBox.information(
+                    self, "Reduced Size PDF", "A reduced copy can't be "
+                    "saved over the file it is made from - pick another "
+                    "name.") if show else None
+                return False
+            dpi = dict(self.REDUCED_KINDS)[kind]
+            return self._write_reduced(path, dpi, "Reduced Size PDF",
+                                       show=show) is not None
         if not self._save_guards(path):
             return False
         try:
@@ -7308,9 +7516,10 @@ class MainWindow(QMainWindow):
         return path
 
     def calculators(self, tab=0, show=True):
-        """Concrete (0), Brick & Block (1) and Roofing (2) calculators; a
-        drawing's
-        takeoff can fill the sizes, but none is needed."""
+        """Concrete (0), Brick & Block (1), Roofing (2), Rebar (3), Beam
+        and Header (4), Column and Post (5), Footing Size (6), Metal Stud
+        Framing (7) and Structural Steel (8) calculators; a drawing's takeoff can fill the sizes, but none is
+        needed."""
         from .calculators_ui import CalculatorDialog
         doc = self._view.doc if self._view is not None else None
         dlg = CalculatorDialog(self, doc, tab)
@@ -8283,14 +8492,20 @@ class MainWindow(QMainWindow):
         return path
 
     def reduce_size(self):
-        from . import acrobat
         if not self._view:
             return None
         path = self._ask_save("Save Smaller Copy", "_reduced.pdf",
                               "PDF (*.pdf)")
         if not path:
             return None
-        from . import safeio
+        return self._write_reduced(path, 150, "Reduce File Size")
+
+    def _write_reduced(self, path, image_dpi=150, title="Reduce File Size",
+                       show=True):
+        """A smaller copy of this document at `path` (images down to
+        `image_dpi`); this document is not changed. Returns the new size,
+        or None when nothing was written."""
+        from . import acrobat, safeio
         prot = getattr(self._view, "protection", None)
         not_smaller = None
         unprotected = False
@@ -8311,7 +8526,8 @@ class MainWindow(QMainWindow):
                         self._view.doc, prot.open_pw if prot else None)
                 try:
                     after = acrobat.reduce_size(tmp, path, original=before,
-                                                   in_place=True)
+                                                   in_place=True,
+                                                   image_dpi=image_dpi)
                 except acrobat.NotSmaller as e:
                     not_smaller = e
                 finally:
@@ -8324,18 +8540,20 @@ class MainWindow(QMainWindow):
                 QApplication.restoreOverrideCursor()
             if failed is None:
                 break
-            if unprotected or not confirm_unprotected_copy(
-                    self, "Reduce File Size", str(failed)):
+            if not show or unprotected or not confirm_unprotected_copy(
+                    self, title, str(failed)):
                 return None
             unprotected = True
         if not_smaller is not None:
-            QMessageBox.information(self, "Reduce File Size",
-                                    str(not_smaller))
+            self._last_reduced = str(not_smaller)
+            if show:
+                QMessageBox.information(self, title, str(not_smaller))
             return None
-        QMessageBox.information(
-            self, "Reduce File Size",
-            f"Saved {os.path.basename(path)}\n{before / 1024:,.0f} KB → "
-            f"{after / 1024:,.0f} KB")
+        self._last_reduced = (f"Saved {os.path.basename(path)}\n"
+                              f"{before / 1024:,.0f} KB → "
+                              f"{after / 1024:,.0f} KB")
+        if show:
+            QMessageBox.information(self, title, self._last_reduced)
         return after
 
     def check_repair(self):

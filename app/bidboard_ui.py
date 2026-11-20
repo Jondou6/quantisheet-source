@@ -28,7 +28,10 @@ EDIT = [("project", "Project *"), ("gc", "GC (who invited us)"),
         ("due_time", "Bid due (time)"),
         ("job_walk", "Job walk (date and time)"),
         ("rfi_due", "Questions due (date)"), ("estimator", "Estimator"),
-        ("amount", "Our bid $")]
+        ("amount", "Our bid $"),
+        ("prebid_mandatory", "Pre-bid mandatory? (Yes / No)"),
+        ("plan_holders", "Plan holders (count)"),
+        ("bidders", "Bidders expected or at opening")]
 
 
 def _money(text):
@@ -149,11 +152,12 @@ class GoDialog(QDialog):
         self.box = {}
         old = (opp.get("go") or {}).get("answers") or {}
         hist = B.history_answer(opp["gc"], items)
+        comp = B.competition_answer(opp)
+        start = {"history": hist, "competition": comp}
         for key, label in B.FACTORS:
             c = QComboBox()
             c.addItems([""] + [a for a, _v in B.ANSWERS])
-            c.setCurrentText(old.get(key) or
-                             (hist if key == "history" else ""))
+            c.setCurrentText(old.get(key) or start.get(key, ""))
             c.currentIndexChanged.connect(lambda _i: self.refresh())
             self.box[key] = c
             f.addRow(label, c)
@@ -161,6 +165,13 @@ class GoDialog(QDialog):
         if hist:
             v.addWidget(QLabel(f"\"We win with this GC\" starts at {hist} "
                                "from your results on this board."))
+        if comp:
+            v.addWidget(QLabel(
+                f"\"Competition is manageable\" starts at {comp} from " +
+                (f"{opp['bidders']} bidders" if opp.get("bidders") else
+                 f"{opp['plan_holders']} plan holders") + "." +
+                (" The pre-bid is mandatory - go to it." if
+                 opp.get("prebid_mandatory") == "Yes" else "")))
         self.score = QLabel("")
         self.score.setWordWrap(True)
         v.addWidget(self.score)

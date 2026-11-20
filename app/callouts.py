@@ -215,7 +215,29 @@ def _free(text, action, ref, checks):
         return [_row(action, int(m.group(2)), "EA", m.group(3), ref, checks)]
     if _MEAS.search(text):
         return _measured(text, action, ref, checks)
+    if _no_item(text):
+        return []
     return [_row(action, 1, "EA", text, ref, checks + [NO_COUNT])]
+
+
+_WHERE = re.compile(r"\b(?:AT|@)?\s*STA(?:TION)?\.?\s*\d{1,3}\+\d{2}(?:\.\d+)?",
+                    re.I)
+_FILLER = {"AT", "OF", "THE", "AND", "PER", "SEE", "TO", "IN", "ON", "A",
+           "AN", "NEW", "AS", "SHOWN", "@"}
+_PIPE_ONLY = re.compile(r"^(?:\d{1,2}\s*\"\s*)?(?:RJ|MJ)?\s*(?:PVC|DIP|D\.I\.P\.|"
+                        r"HDPE|C-?900|C-?905)(?:\s+(?:PIPE|FORCE\s+MAIN|FM))?$",
+                        re.I)
+
+
+def _no_item(text):
+    """A note with nothing to count (Nov 19, civil set): 'INSTALL AT', an
+    'INSTALL' over 'AT STA 1+56', or pipe named with no length ('INSTALL'
+    over 'RJ PVC' - pipe is taken off in feet, never as 1 EA)."""
+    t = _WHERE.sub(" ", text)
+    words = [w for w in re.split(r"[\s,:;]+", t.upper()) if w]
+    if not words or all(w in _FILLER for w in words):
+        return True
+    return bool(_PIPE_ONLY.match(" ".join(words)))
 
 
 def loose_measure(lines):

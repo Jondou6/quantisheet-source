@@ -1,0 +1,5 @@
+QuantiSheet 1.1.24
+- Calculators: Add to Estimate. Concrete, Brick & Block, Roofing, Rebar, Footing Size, Metal Studs and Structural Steel put their quantities on the open drawing's estimate as lines with CSI codes (concrete in CY, units and mortar, squares and bundles, rebar in pounds, studs and track, steel in tons) - price them on the estimate. Beam and Column are checks, so they add nothing.
+- Estimate > Manufacturers in Specs: reads the project manual for each section's listed manufacturers (provide products by one of the following...) and basis-of-design products, notes no substitutions, and shows the page of each (double-click to go there). Export CSV makes a quote-request list by trade.
+- AI Takeoff on civil sets: an existing manhole marked for rehabilitation (lining or coating) is counted as work - Manhole rehabilitation (existing manhole) - instead of being left as an existing structure, including when it is only on a site or demolition plan.
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.24 - the full source of this build. Help > About shows the same link.

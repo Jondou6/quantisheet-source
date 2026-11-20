@@ -1,0 +1,8 @@
+QuantiSheet 1.1.21
+- Civil plan sets whose callouts and scales are drawn as linework (not typed text): Make Searchable now reads each sheet the way it is shown, rotated sheets included, and a quarter turn round as well, so callouts that run up a profile are read too. AI Takeoff and Auto Scale run it on those sheets for you.
+- Auto Scale reads engineering scales (1" = 20', 1" = 20' HORIZ. under a profile) and the labels of a graphic scale (20' 0 20' 40'). Scales found this way are marked Check - confirm them with a known dimension before measuring.
+- AI Takeoff on plan & profile sheets: pipe length is taken from the stations along the line (STA 0+00 to 15+41 = 1,541 LF), carried across the sheets of one line, when the traced line doesn't agree with them. Pipe labels with a restrained or mechanical joint (6" RJ PVC) and lengths with commas (1,541 LF) are read, and a size missing from a scanned label is taken from the line type tags (N6FM) when they all agree.
+- Structures: 'NEW SSMH' is counted as a new manhole, and a callout shown in the plan and again up the profile at the same station is counted once.
+- Work notes no longer add a 1 EA line for a note with nothing to count (an INSTALL with only a station after it, or pipe named with no length).
+- Takeoff > Wood Sheathing Helper: pick roof, subfloor, single-layer floor or wall and the framing spacing; it gives the APA span rating and panel thickness to look for, the 4x8 sheets for an area takeoff with waste, and adds an estimate line that follows the area.
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.21 - the full source of this build. Help > About shows the same link.

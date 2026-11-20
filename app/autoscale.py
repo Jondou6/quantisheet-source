@@ -34,10 +34,12 @@ NTS = re.compile(r"\b(N\.?T\.?S\.?|NOT\s+TO\s+SCALE)\b", re.I)
 
 
 def _ocr_text(page):
-    """OCR'd page text as lines (top to bottom, left to right), or ''."""
-    from . import ocr
+    """OCR'd page text as lines (top to bottom, left to right, as the
+    sheet is shown - Nov 19: rotated sheets were read sideways), or ''."""
+    from . import acrobat
     try:
-        words = ocr.ocr_words(page)
+        words = [{"rect": r, "text": t}
+                 for r, t in acrobat.ocr_page_words(page)]
     except Exception as e:                    # no tesseract, timeout...
         log.info("autoscale OCR skipped: %s", e)
         return ""
@@ -92,6 +94,103 @@ def _dimension_words(words):
             continue
         out.append((got[0], (w[0] + w[2]) / 2, (w[1] + w[3]) / 2))
     return out
+
+
+def _sparse(page):
+    from . import acrobat
+    return acrobat.sparse_text(page)
+
+
+# an engineering scale as OCR leaves it: SCALE: 1"=20', SCALE 1 = 20,
+# 1 20' HORIZ. (the quote marks and = are often lost or misread)
+_CIVIL = re.compile(r"SCALE\W{0,6}1\W{0,4}=?\W{0,4}(\d{1,3}0)\b"
+                    r"(?=\W{0,4}(?:'|FT|FEET|HORIZ|\W|$))", re.I)
+CIVIL_FEET = (5, 10, 20, 30, 40, 50, 60, 80, 100, 200, 300, 400, 500)
+
+
+def civil_scale(text):
+    """(label, pt per ft, 'ft') for the main engineering scale in OCR'd
+    text, or None. Horizontal scales win (a profile's 1"=20' HORIZ.,
+    1"=10' VERT. - the plan above it is at the horizontal one); then the
+    smallest feet value (the plan, not a detail)."""
+    found = []
+    for m in _CIVIL.finditer(text or ""):
+        ft = int(m.group(1))
+        if ft in CIVIL_FEET:
+            tail = text[m.end():m.end() + 12].upper()
+            found.append((0 if "HORIZ" in tail else 1, ft))
+    if not found:
+        return None
+    _h, ft = min(found)
+    return (f'1" = {ft}\'', 72.0 / ft, "ft")
+
+
+# a civil graphic scale as text: SCALE: 20' 0 20' 40' GRAPHIC SCALE (the
+# bar itself is outlines; only its labels are read - never its length)
+_GRAPHIC = re.compile(r"SCALE\W{0,3}:(.{0,60}?)GRAPHIC\W{0,3}SCALE",
+                      re.I | re.S)
+
+
+def graphic_scale(text):
+    """(label, pt per ft, 'ft') from a graphic scale's printed labels -
+    the first division N when N and 2N (or N twice) are printed, on the
+    civil convention that the first division is one inch - or None."""
+    best = None
+    for m in _GRAPHIC.finditer(text or ""):
+        nums = [int(x) for x in re.findall(r"(?<!\d)(\d{1,3})(?!\d)",
+                                            m.group(1))]
+        nums = [n for n in nums if n in CIVIL_FEET]
+        for n in sorted(set(nums)):
+            if 2 * n in nums or nums.count(n) > 1:
+                best = n if best is None else min(best, n)
+                break
+    if best is None:
+        return None
+    return (f'1" = {best}\'', 72.0 / best, "ft")
+
+
+def _near(words, box):
+    """The words whose centre is in `box`, read in lines, left to right."""
+    got = [w for w in words if box[0] <= (w[0] + w[2]) / 2 <= box[2] and
+           box[1] <= (w[1] + w[3]) / 2 <= box[3]]
+    if not got:
+        return ""
+    h = max(1.0, sorted(w[3] - w[1] for w in got)[len(got) // 2])
+    got.sort(key=lambda w: (round(w[3] / (0.8 * h)), w[0]))
+    return " ".join(w[4] for w in got)
+
+
+def scale_words(page, words=None):
+    """Scale text read by where the words sit, not by text order (an OCR
+    layer's lines come out in any order): (civil, graphic) - the words
+    just right of each SCALE word, and the words around each GRAPHIC
+    word."""
+    if words is None:
+        words = page.get_text("words")
+    civil, graphic = [], []
+    for w in words:
+        t = str(w[4]).upper()
+        h = max(1.0, w[3] - w[1])
+        if t.startswith("SCALE"):
+            civil.append(_near(words, (w[0] - 0.5 * h, w[1] - 0.6 * h,
+                                       w[2] + 22 * h, w[3] + 0.6 * h)))
+        elif t.startswith("GRAPHIC"):
+            graphic.append(_near(words, (w[0] - 9 * h, w[1] - 4.5 * h,
+                                         w[2] + 14 * h, w[3] + 3 * h)))
+    return civil, graphic
+
+
+def graphic_labels(text):
+    """1" = N' from a graphic scale's labels in `text` (words around the
+    GRAPHIC SCALE title, any order): the first division N when N and 2N
+    (or N twice) are printed - else None."""
+    nums = [int(x) for x in re.findall(r"(?<![\d.+])(\d{1,3})(?![\d.+])",
+                                        text or "")]
+    nums = [n for n in nums if n in CIVIL_FEET]
+    for n in sorted(set(nums)):
+        if 2 * n in nums or nums.count(n) > 1:
+            return (f'1" = {n}\'', 72.0 / n, "ft")
+    return None
 
 
 def dimension_scale(page, words=None):
@@ -191,10 +290,37 @@ def detect(doc, pages=None, use_ocr=True, progress=None):
         sc, src, note = info["scale"], "text" if info["scale"] else "", ""
         text = page.get_text(textpage=tp)
         has_text = bool(text.strip())
-        if sc is None and not has_text and use_ocr:
-            main = takeoff.main_scale(_ocr_text(page))
+        if sc is None and use_ocr and (not has_text or _sparse(page)):
+            # a scan - or (Nov 19) a sheet whose scales are drawn as
+            # outlines, not typed (a civil set: only its title block has
+            # text)
+            otext = _ocr_text(page)
+            main = takeoff.main_scale(otext)
             if main and takeoff.is_standard(main[1], main[2]):
                 sc, src = main, "ocr"
+            else:
+                civ = civil_scale(otext)
+                if civ:
+                    sc, src = civ, "ocr"
+        if sc is None and has_text:
+            # an engineering scale in the sheet's text as OCR left it
+            # (Nov 19: SCALE: 1 20' HORIZ. under a profile)
+            civ = civil_scale(text)
+            if civ:
+                sc, src = civ, "civil"
+            else:
+                civ = graphic_scale(text)
+                if civ:
+                    sc, src = civ, "graphic"
+        if sc is None and has_text:
+            near_civil, near_graphic = scale_words(page)
+            civ = civil_scale(" ; ".join(near_civil))
+            if civ:
+                sc, src = civ, "civil"
+            else:
+                found = [c for c in map(graphic_labels, near_graphic) if c]
+                if found:
+                    sc, src = min(found, key=lambda c: -c[1]), "graphic"
         if sc is None and info.get("odd"):
             note = f"odd scale written: {info['odd'][0]} - pick it if right"
         nts = sc is None and bool(NTS.search(text))
@@ -235,9 +361,20 @@ def detect(doc, pages=None, use_ocr=True, progress=None):
                 row["status"] = "check"
                 row["note"] = (f"dimension strings say {_c2(dims['ppu']):.2f} pt/ft, "
                                f"not {_c2(sc[1]):.2f} - sheet may be printed to fit")
+            elif src == "civil" and not agree:
+                row["status"] = "check"
+                row["note"] = ("engineering scale read from the sheet's text "
+                               "(often OCR) - check it with a known "
+                               "dimension or the graphic scale")
+            elif src == "graphic" and not agree:
+                row["status"] = "check"
+                row["note"] = ("read from the graphic scale's labels (first "
+                               "division taken as 1\") - check it against "
+                               "the bar or a known dimension")
             elif src == "ocr" and not agree:
                 row["status"] = "check"
-                row["note"] = "read by OCR - spot-check it (OCR can misread 1/4 vs 1/2)"
+                row["note"] = ("read by OCR - spot-check it (OCR can misread "
+                               "1/4 vs 1/2, or 1\"=20' vs 1\"=200')")
             else:
                 row["status"] = "ok"
         elif dims["ppu"]:

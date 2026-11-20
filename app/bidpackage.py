@@ -213,11 +213,31 @@ def make(doc, folder, when=None, parts=PARTS, comp=None, ai_rows=None,
                                     "result)"))
     else:
         do("workbook", workbook)
+    # Nov 19: the bid-submittal checklist - the attached signed forms,
+    # bond, license and insurance go in; anything not ticked is flagged
+    from . import bidsubmittal
+    sub = bidsubmittal.read(doc)
+    import shutil
+    for k, src in bidsubmittal.attachments(sub):
+        dst = os.path.join(root, os.path.basename(src))
+        if os.path.exists(dst):
+            stem, ext = os.path.splitext(os.path.basename(src))
+            dst = os.path.join(root, f"{stem} ({k}){ext}")
+        try:
+            shutil.copy2(src, dst)
+            files.append(("submittal:" + k, dst))
+        except OSError as e:
+            skipped.append(("submittal:" + k, f"couldn't be copied ({e})"))
     notes = checks(doc, ai_result)
+    gaps = bidsubmittal.missing(sub)
+    if gaps:
+        notes.append("Not checked off for the bid submittal: " +
+                     ", ".join(gaps) + ".")
     if "contents" in parts:
         path = where("contents")
         with open(path, "w", encoding="utf-8") as f:
-            f.write(contents_text(project, files, skipped, notes, when))
+            f.write(contents_text(project, files, skipped, notes, when,
+                                  submittal=bidsubmittal.lines(sub)))
         files.append(("contents", path))
     zpath = root + ".zip"
     with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED) as z:
@@ -228,14 +248,25 @@ def make(doc, folder, when=None, parts=PARTS, comp=None, ai_rows=None,
             "skipped": skipped, "checks": notes}
 
 
-def contents_text(project, files, skipped, notes, when=None):
+def _label(part):
+    if part.startswith("submittal:"):
+        from . import bidsubmittal
+        return bidsubmittal.LABEL.get(part.split(":", 1)[1], part)
+    return LABEL.get(part, part)
+
+
+def contents_text(project, files, skipped, notes, when=None,
+                  submittal=None):
     lines = [f"Bid package - {project}",
              f"Made {reportname.stamp(when)}", "", "In this package:"]
     lines += [f"  {os.path.basename(p)}" for _part, p in files]
     lines.append(f"  {file_name('contents', project, when)}")
+    if submittal:
+        lines += ["", "Bid submittal checklist:"]
+        lines += [f"  {x}" for x in submittal]
     if skipped:
         lines += ["", "Not included:"]
-        lines += [f"  {LABEL[part]}: {why}" for part, why in skipped]
+        lines += [f"  {_label(part)}: {why}" for part, why in skipped]
     lines += ["", "Before you send it:"]
     lines += [f"  - {n}" for n in notes] or ["  - Nothing flagged."]
     return "\n".join(lines) + "\n"

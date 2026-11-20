@@ -63,9 +63,53 @@ def page_has_text(page, min_chars=10):
     return len(page.get_text().strip()) >= min_chars
 
 
-def pages_needing_ocr(doc):
-    """Pages with no real text layer (scans)."""
-    return [i for i, p in enumerate(doc) if not page_has_text(p)]
+# a drawing whose words are drawn as outlines (no text behind them) still
+# has its title block typed: little text over a lot of linework (Nov 19,
+# a 31-sheet civil set: ~330 words, 5,000-28,000 drawn items a sheet)
+SPARSE_WORDS = 450
+SPARSE_DRAWINGS = 3000
+
+
+def sparse_text(page):
+    """True for a vector sheet with little real text over a lot of
+    linework - its callouts and scales are likely drawn as outlines, so
+    OCR can add what the text layer is missing."""
+    try:
+        if len(page.get_text("words")) >= SPARSE_WORDS:
+            return False
+        n = len(page.get_cdrawings()) if hasattr(page, "get_cdrawings") \
+            else len(page.get_drawings())
+        return n >= SPARSE_DRAWINGS
+    except Exception:                                  # noqa: BLE001
+        return False
+
+
+def pages_needing_ocr(doc, sparse=False):
+    """Pages with no real text layer (scans); with `sparse`, also vector
+    sheets whose words are drawn as outlines (sparse_text)."""
+    out = []
+    for i, p in enumerate(doc):
+        if not page_has_text(p) or (sparse and sparse_text(p)):
+            out.append(i)
+    return out
+
+
+def _new_words(page, words):
+    """The OCR words the text layer doesn't already have (a word whose
+    middle falls in a typed word's box is dropped)."""
+    try:
+        have = [fitz.Rect(w[:4]) + (-1, -1, 1, 1)
+                for w in page.get_text("words")]
+    except Exception:                                  # noqa: BLE001
+        have = []
+    if not have:
+        return list(words)
+    out = []
+    for r, text in words:
+        c = fitz.Point((r.x0 + r.x1) / 2, (r.y0 + r.y1) / 2)
+        if not any(h.contains(c) for h in have):
+            out.append((r, text))
+    return out
 
 
 OCR_MIN_CONF = 60          # Tesseract word confidence (0-100) to keep
@@ -195,7 +239,7 @@ def ocr_page_words(page, dpi=None, language="eng", workers=None,
 
 
 def make_searchable(doc, pages=None, dpi=None, language="eng", progress=None,
-                    skipped=None):
+                    skipped=None, vertical=None):
     """Give scanned pages an invisible text layer so they can be searched,
     selected and copied. Returns the number of pages processed.
 
@@ -220,24 +264,71 @@ def make_searchable(doc, pages=None, dpi=None, language="eng", progress=None,
             if skipped is not None:
                 skipped.append(i)
             continue
-        rot = page.rotation
-        page.set_rotation(0)
-        try:
-            words = ocr_page_words(page, dpi, language)
-            add_words(page, words)
-        finally:
-            page.set_rotation(rot)
+        # Nov 19: the sheet is read as it is shown, rotation and all (it
+        # was turned back to 0 first, so a sheet rotated 270 was read
+        # sideways - fragments and junk); the words go back where they
+        # are shown, and on a sheet that has some text only what's new
+        side = sparse_text(page) if vertical is None else vertical
+        words = ocr_page_words(page, dpi, language)
+        add_words(page, _new_words(page, words))
+        if side:
+            # a civil sheet's profile callouts run up the page (STA 15+41
+            # NEW MANHOLE): read the sheet a quarter turn round too, and
+            # write those words the same way, so they read along their
+            # own line (Nov 19)
+            rot = page.rotation
+            try:
+                page.set_rotation((rot + 90) % 360)
+                more = [(r, t) for r, t in ocr_page_words(page, dpi,
+                                                          language)
+                        if _WORDISH.search(t)]
+                add_words(page, _new_words(page, more))
+            finally:
+                page.set_rotation(rot)
         done += 1
     return done
 
 
+_WORDISH = re.compile(r"[A-Za-z0-9][A-Za-z0-9+.,'\"-]")
+
+
+def ocr_lines(words, gap=1.6):
+    """[(Rect, text)] words -> the same as printed lines: words of about
+    the same height on one baseline, closer than `gap` x their height,
+    joined left to right with spaces (Nov 19: a civil label "1,541 LF 6"
+    RJ PVC FORCE MAIN" must read as one line, not six)."""
+    ws = sorted(((fitz.Rect(r), t) for r, t in words
+                 if t.strip() and fitz.Rect(r).height > 0),
+                key=lambda w: (w[0].x0, w[0].y1))
+    lines = []                  # [rect, [texts], height]
+    for r, t in ws:
+        h = r.height
+        best = None
+        for ln in lines:
+            lr, _ts, lh = ln
+            if abs(lr.y1 - r.y1) > 0.35 * max(h, lh) or \
+                    not 0.6 <= h / lh <= 1.6:
+                continue
+            g = r.x0 - lr.x1
+            if -0.3 * h <= g <= gap * max(h, lh):
+                if best is None or g < best[0]:
+                    best = (g, ln)
+        if best is None:
+            lines.append([fitz.Rect(r), [t], h])
+        else:
+            ln = best[1]
+            ln[0] |= r
+            ln[1].append(t)
+    return [(lr, " ".join(ts)) for lr, ts, _h in lines]
+
+
 def add_words(page, words):
-    """Write [(Rect, text)] onto `page` as invisible text, each word sized
-    to cover its box."""
+    """Write [(Rect, text)] onto `page` as invisible text, a printed line
+    at a time (ocr_lines), each line sized to cover its box."""
     font = fitz.Font("helv")
     tw = fitz.TextWriter(page.rect)
     n = 0
-    for r, text in words:
+    for r, text in ocr_lines(words):
         text = "".join(ch if ord(ch) < 256 else "?" for ch in text)
         if not text.strip() or r.height <= 0:
             continue

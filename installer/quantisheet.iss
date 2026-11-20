@@ -161,6 +161,11 @@ Root: HKA; Subkey: "Software\Classes\Directory\shell\QuantiSheet.Combine\command
 Root: HKA; Subkey: "Software\Classes\Directory\Background\shell\QuantiSheet.Combine"; ValueType: string; ValueName: ""; ValueData: "Combine PDFs in QuantiSheet"; Flags: uninsdeletekey; Tasks: shellverbs
 Root: HKA; Subkey: "Software\Classes\Directory\Background\shell\QuantiSheet.Combine"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\QuantiSheet.exe,0"; Tasks: shellverbs
 Root: HKA; Subkey: "Software\Classes\Directory\Background\shell\QuantiSheet.Combine\command"; ValueType: string; ValueName: ""; ValueData: """{app}\QuantiSheet.exe"" --qs-combine-folder ""%V"""; Tasks: shellverbs
+; Nov 19: a plan room download (.zip) opens as a job - unzipped into a
+; folder beside it, sorted, the drawings combined and opened
+Root: HKA; Subkey: "Software\Classes\SystemFileAssociations\.zip\shell\QuantiSheet.OpenBid"; ValueType: string; ValueName: ""; ValueData: "Open Plan Set in QuantiSheet"; Flags: uninsdeletekey; Tasks: shellverbs
+Root: HKA; Subkey: "Software\Classes\SystemFileAssociations\.zip\shell\QuantiSheet.OpenBid"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\QuantiSheet.exe,0"; Tasks: shellverbs
+Root: HKA; Subkey: "Software\Classes\SystemFileAssociations\.zip\shell\QuantiSheet.OpenBid\command"; ValueType: string; ValueName: ""; ValueData: """{app}\QuantiSheet.exe"" --qs-open-bid ""%1"""; Tasks: shellverbs
 Root: HKA; Subkey: "Software\Classes\.qstools"; ValueType: string; ValueName: ""; ValueData: "QuantiSheet.qstools"; Flags: uninsdeletevalue
 Root: HKA; Subkey: "Software\Classes\QuantiSheet.qstools"; ValueType: string; ValueName: ""; ValueData: "QuantiSheet Tool Set"; Flags: uninsdeletekey
 Root: HKA; Subkey: "Software\Classes\QuantiSheet.qstools\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\QuantiSheet.exe,0"

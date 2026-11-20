@@ -1,0 +1,6 @@
+QuantiSheet 1.1.22
+- File > Save As > Reduced Size PDF: pick high quality, balanced or smallest in the Save As file type list to save a smaller copy straight away, with the size before and after. The document you have open stays as it is, and a copy can't be saved over its own file.
+- Estimate > Find Bid Terms: reads the bid documents for the bid bond percentage, how long the bid must hold, prevailing wage, liquidated damages, a mandatory pre-bid meeting and its date, DBE / MBE / SBE goals, retainage, contract time and alternates. Each is shown with its page (double-click to go there); nothing leaves the PC. One click puts the hold days in the Bid Submittal Checklist.
+- Bid Submittal Checklist: bid day and how many days the bid must hold its price. Estimate Error Check warns when a sub or supplier quote used in the estimate runs out before then.
+- Bid Board: whether the pre-bid is mandatory, how many plan holders and how many bidders are expected. Go / No-Go has a new question, Competition is manageable, started from those numbers (up to 4 bidders Yes, up to 8 Partly). Left blank it doesn't change the score.
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.22 - the full source of this build. Help > About shows the same link.

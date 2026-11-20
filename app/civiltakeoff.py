@@ -78,7 +78,9 @@ _SYS = (_PLANT + r"|SAN(?:ITARY)?(?:\s+SEWER)?|S\.?S\.?|SEWER|F\.?M\.?|FORCE\s*M
         r"WATER(?:\s*(?:MAIN|LINE))?|W|PW|POTABLE(?:\s+WATER)?|GM|GAS|RW|"
         r"RECLAIMED|IRR")
 PIPE_LABEL = re.compile(
-    _SIZE + r"\s*(?:Ø|DIA\.?)?\s*-?\s*(?:(?P<mat>" + _MAT +
+    _SIZE + r"\s*(?:Ø|DIA\.?)?\s*-?\s*"
+    # a joint before the material: 6" RJ PVC, 8" MJ DIP (Nov 19, civil)
+    r"(?:(?:RJ|MJ|R\.J\.|M\.J\.)\s+(?=" + _MAT + r"))?(?:(?P<mat>" + _MAT +
     r")\b\.?)?\s*(?P<cls>(?:SDR|DR)[- ]?\d+|CL(?:ASS)?\.?\s*(?:\d+|[IVX]+\b)|"
     r"SCH(?:\.|EDULE)?\s*\d+|PC\s*\d+)?\s*(?:(?P<mat2>" + _MAT +
     r")\b\.?)?\s*(?:UNKNOWN\s+|UNK\.?\s+)?(?P<sys>" + _SYS + r")?\b",
@@ -88,7 +90,7 @@ _NOT_PIPE = re.compile(r"^\W*(CONDUIT|ELEC|CABLE|TELE|FIBER|SLEEVE|"
                        r"COMM\b|CATV)", re.I)
 _SLOPE = re.compile(r"(?:@|S\s*=)\s*(-?\d*\.\d+|\d+)\s*(%|FT/FT|'/')?",
                     re.I)
-_LEN = re.compile(r"(?:(?<![\d.])(\d{1,5}(?:\.\d+)?)\s*(?:L\.?F\.?|LIN\.?\s*"
+_LEN = re.compile(r"(?:(?<![\d.,])(\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d{1,5}(?:\.\d+)?)\s*(?:L\.?F\.?|LIN\.?\s*"
                   r"FT)(?![A-Z])|(?<![\d.])(\d{1,5}(?:\.\d+)?)\s*'"
                   r"(?!\s*-?\s*\d)|L\s*=\s*(\d{1,5}(?:\.\d+)?))", re.I)
 _EXIST = re.compile(r"\b(EX\.?|EXIST(?:ING|\.)?|E\.)\s", re.I)
@@ -160,7 +162,8 @@ def parse_pipe_label(text):
                 else v * 100
         length = None
         for lm in _LEN.finditer(before + " " + rest):
-            length = float(lm.group(1) or lm.group(2) or lm.group(3))
+            length = float((lm.group(1) or lm.group(2) or
+                            lm.group(3)).replace(",", ""))
             break
         system = _system(sysx, mat)
         material = _mat(mat)
@@ -266,9 +269,122 @@ def join_split_labels(items):
     return out
 
 
+# a pipe's line type tag on a civil plan: N6FM (new 6" force main),
+# E12FM (existing), N8W, P8SS
+_LINETYPE = re.compile(r"^(?P<ex>[NEP])(?P<size>\d{1,2})(?P<sys>FM|SS|SAN|W|WM|"
+                       r"SD|STM)$", re.I)
+_LEN_ONLY = re.compile(r"^\s*(\d{1,3}(?:,\d{3})+|\d{1,5})\s*L\.?F\.?\s*$", re.I)
+_MAT_ONLY = re.compile(r"^\s*(?:(?:RJ|MJ)\s+)?(?:" + _MAT + r")\b", re.I)
+
+
+def linetype_size(items):
+    """(size, system code) the plan's new-pipe line type tags agree on
+    (N6FM on every new run -> (6, 'FM')), or None."""
+    sizes = set()
+    for t, *_ in items:
+        m = _LINETYPE.match(t.strip())
+        if m and m.group("ex").upper() in "NP":
+            sizes.add((int(m.group("size")), m.group("sys").upper()))
+    return sizes.pop() if len(sizes) == 1 else None
+
+
+_TAG_SYS = {"FM": "FORCE MAIN", "SS": "SAN", "SAN": "SAN", "W": "W",
+            "WM": "W", "SD": "STM", "STM": "STM"}
+
+
+def ocr_labels(items):
+    """An OCR layer loses the size mark of a label ('239 LF' then 'RJ PVC'
+    with the 6" dropped): join the length to the material line beside or
+    under it and take the size from the line type tags, when they agree
+    on one. [(text, rect, size, dir)] -> the joined items (size_from_tag
+    is in the text as the tag)."""
+    tag = linetype_size(items)
+    if tag is None:
+        return []
+    sz, code = tag
+    out = []
+    used = set()
+    for i, (t, r, size, dr) in enumerate(items):
+        if not _LEN_ONLY.match(t):
+            continue
+        h = max(r.height, 1.0)
+        best = None
+        for j, (t2, r2, _s2, _d2) in enumerate(items):
+            if j == i or j in used or not _MAT_ONLY.match(t2):
+                continue
+            beside = abs(r2.y1 - r.y1) < 0.6 * h and \
+                0 <= r2.x0 - r.x1 < 9 * h
+            under = 0 <= r2.y0 - r.y1 < 1.5 * h and \
+                abs(r2.x0 - r.x0) < 6 * h
+            if beside or under:
+                d = abs(r2.x0 - r.x1) + abs(r2.y0 - r.y0)
+                if best is None or d < best[0]:
+                    best = (d, j)
+        if best is None:
+            continue
+        used.add(best[1])
+        t2, r2 = items[best[1]][0], items[best[1]][1]
+        text = f'{t.strip()} {sz}" {t2.strip()}'
+        p = parse_pipe_label(text)
+        if p is None or p.get("guessed") or not p.get("system"):
+            text += " " + _TAG_SYS[code]
+        out.append((text, fitz.Rect(r) | r2, size, dr))
+    return out
+
+
+# a station: STA 15+41, 4+10.25 (an OCR'd profile axis prints 1+00 ...)
+_STATION = re.compile(r"(?<![\d.+])(\d{1,3})\+(\d{2}(?:\.\d{1,2})?)(?![\d+])")
+_STA_WORD = re.compile(r"\bSTA\.?\s*$", re.I)
+
+
+def stations(page, items=None):
+    """(labelled, all) station values in feet on a sheet: 'STA 4+10'
+    callouts, and every station printed (profile axis too)."""
+    labelled, every = [], []
+    for t, *_ in (items if items is not None else lines_sized(page)):
+        for m in _STATION.finditer(t):
+            v = int(m.group(1)) * 100 + float(m.group(2))
+            every.append(v)
+            if _STA_WORD.search(t[:m.start()]):
+                labelled.append(v)
+    return labelled, every
+
+
+def station_runs(doc, pages, titles=None):
+    """The alignments plan & profile sheets walk along: [(pages, lo, hi)]
+    - consecutive sheets join when the next one picks up where the last
+    left off (the match line), a sheet starting low again is a new
+    line. lo is the lowest station printed, hi the highest STA callout."""
+    runs = []
+    titles = titles or {}
+    for p in sorted(pages):
+        lab, every = stations(doc[p])
+        if not lab:
+            continue
+        lo, hi = min(every + lab), max(lab)
+        if runs:
+            last = runs[-1]
+            # the next sheet of the same line: same title, carrying on
+            same = bool(titles.get(p)) and \
+                titles.get(p) == titles.get(last[0][-1]) and lo >= last[1]
+            near = last[1] - 50 <= lo <= last[3] + 100
+            if (same or near) and hi > last[2]:
+                last[0].append(p)
+                last[2] = hi
+                last[3] = max(every + lab)
+                continue
+        runs.append([[p], lo, hi, max(every + lab)])
+    return [(ps, lo, hi) for ps, lo, hi, _top in runs if hi - lo >= 50]
+
+
+def fmt_station(v):
+    return f"{int(v // 100)}+{v % 100:02.0f}"
+
+
 def pipe_labels(page):
     out = []
-    for text, r, size, dr in join_split_labels(lines_sized(page)):
+    items = lines_sized(page)
+    for text, r, size, dr in join_split_labels(items) + ocr_labels(items):
         p = parse_pipe_label(text)
         if p:
             p.update(text=text, rect=r, center=_c(r), size_pt=size or 6.0,
@@ -301,7 +417,12 @@ KINDS = {
     "structure": ("STRUCT", "STRUCTURE", "S"),
 }
 _KIND_OF = {k: kind for kind, ks in KINDS.items() for k in ks}
-_PREFIX = {"manhole": "MH", "manhole 60": "MH", "storm manhole": "SDMH", "catch basin": "CB",
+# an existing manhole to be rehabilitated (lined or coated) is work to
+# count, not an existing structure to leave alone (Nov 20, civil set)
+_REHAB = re.compile(r"\b(?:REHAB\w*|COATING|RE-?COAT\w*|LIN(?:ER|ING)|"
+                    r"RESTOR\w*)\b", re.I)
+_PREFIX = {"manhole": "MH", "manhole 60": "MH", "manhole rehab": "MHR",
+           "storm manhole": "SDMH", "catch basin": "CB",
            "inlet": "INL", "junction box": "JB", "cleanout": "CO",
            "valve": "VALVE", "hydrant": "FH", "pump station": "PS",
            "vault": "VAULT", "structure": "S"}
@@ -337,11 +458,18 @@ _UNNAMED = re.compile(
     r"(?:(?P<dia>\d{1,2}(?:\.\d)?)\s*'\s*(?:-\s*0\"\s*)?(?:Ø|DIA\.?)?\s*)?"
     r"(?:(?P<vsz>\d{1,2})\s*[\"\u201d]\s*)?"
     r"(?P<kind>MANHOLE|(?:PLUG|GATE|BUTTERFLY|CHECK)\s+VALVE|"
-    r"(?:FIRE|YARD)\s+HYDRANT|CLEANOUT)\b(?!\s*(?:No\.?|#)\s*\d)",
+    r"(?:FIRE|YARD)\s+HYDRANT|CLEANOUT|"
+    # 'NEW SSMH' at the end of a force main (Nov 19): the abbreviation
+    # only with NEW / PROPOSED before it and no number after it
+    r"(?<=NEW\s)(?:SSMH|SMH|SAN(?:ITARY)?\s+MH)|"
+    r"(?<=PROPOSED\s)(?:SSMH|SMH|SAN(?:ITARY)?\s+MH))\b"
+    r"(?!\s*(?:No\.?|#)?\s*-?\s*\d)",
     re.I)
 _FIVE_FT = re.compile(r"(?<![\d.])5\s*'\s*(?:-\s*0\"\s*)?(?:Ø|DIA)|60\s*[\"\u201d]"
                       r"\s*(?:Ø|DIA)", re.I)
-_UNNAMED_KIND = {"MANHOLE": "manhole", "FIRE HYDRANT": "hydrant",
+_UNNAMED_KIND = {"MANHOLE": "manhole", "SSMH": "manhole", "SMH": "manhole",
+                 "SAN MH": "manhole", "SANITARY MH": "manhole",
+                 "FIRE HYDRANT": "hydrant",
                  "YARD HYDRANT": "hydrant", "CLEANOUT": "cleanout"}
 
 
@@ -365,10 +493,13 @@ def structure_tags(page):
                 continue
             if kind == "manhole" and _FIVE_FT.search(text):
                 kind = "manhole 60"
-            sid = f"{_PREFIX[kind]}-{m.group('id').upper()}"
             ex = (m.group("ex") or "").strip().upper()
+            existing = ex.startswith("EX")
+            if kind.startswith("manhole") and _REHAB.search(text):
+                kind, existing = "manhole rehab", False
+            sid = f"{_PREFIX[kind]}-{m.group('id').upper()}"
             out.append({"id": sid, "kind": kind,
-                        "existing": ex.startswith("EX"),
+                        "existing": existing,
                         "rect": r, "center": _c(r), "text": text})
         if numbered and _STRUCT.search(text):
             continue          # tagged above ("EX MANHOLE No. 9")
@@ -380,6 +511,9 @@ def structure_tags(page):
                 kind = "manhole 60"           # "5' Ø MANHOLE" is 60 in
             if kind == "valve" and not m.group("vsz"):
                 continue          # "VALVE BOX", "SEE VALVE SCHEDULE"
+            rehab = kind.startswith("manhole") and bool(_REHAB.search(text))
+            if rehab:
+                kind = "manhole rehab"
             c = _c(r)
             # the same structure named twice side by side ("FIRE HYDRANT"
             # at the symbol and "1 - FIRE HYDRANT ASSEMBLY PER ..." in its
@@ -396,10 +530,52 @@ def structure_tags(page):
             label = (f'{m.group("vsz")}" {word.title()}' if kind == "valve"
                      else _PREFIX[kind])
             out.append({"id": f"{label} {where}{unnamed}", "kind": kind,
-                        "existing": bool(m.group("ex")),
+                        "existing": bool(m.group("ex")) and not rehab,
                         "unnumbered": True, "dia_ft": m.group("dia"),
                         "rect": r, "center": c, "text": text})
-    return out
+    return _one_per_station(out, ls)
+
+
+def _gap(a, b):
+    """The distance between two boxes (0 when they touch)."""
+    dx = max(a.x0 - b.x1, b.x0 - a.x1, 0)
+    dy = max(a.y0 - b.y1, b.y0 - a.y1, 0)
+    return math.hypot(dx, dy)
+
+
+def _station_of(item, ls, reach=20.0):
+    """The station a callout names: in its own text ('STA 1+65 AIR
+    RELEASE VALVE & MANHOLE'), or on the 'STA 1+65:' line just by it."""
+    m = _STATION.search(item["text"])
+    if m:
+        return int(m.group(1)) * 100 + float(m.group(2))
+    best = None
+    for t, r in ls:
+        m = _STATION.search(t)
+        if not m or not _STA_WORD.search(t[:m.start()]):
+            continue
+        d = _gap(r, item["rect"])
+        if d <= reach and (best is None or d < best[0]):
+            best = (d, int(m.group(1)) * 100 + float(m.group(2)))
+    return best[1] if best else None
+
+
+def _one_per_station(out, ls):
+    """An unnumbered callout shown in the plan and again up the profile
+    at the same station is one structure (Nov 19, civil set)."""
+    seen = set()
+    keep = []
+    for o in out:
+        if o.get("unnumbered"):
+            sta = _station_of(o, ls)
+            o["station"] = sta
+            if sta is not None:
+                key = (o["kind"], round(sta))
+                if key in seen:
+                    continue
+                seen.add(key)
+        keep.append(o)
+    return keep
 
 
 UNNAMED_SAME_PT = 100.0      # two unnumbered callouts of one kind this close
@@ -1797,6 +1973,7 @@ _PIPE_ASSEMBLY = {
 _STRUCT_ASSEMBLY = {
     "manhole": 'Sanitary manhole, 48" precast, by depth',
     "manhole 60": 'Sanitary manhole, 60" precast, by depth',
+    "manhole rehab": "Manhole rehabilitation (existing manhole), by depth",
     "storm manhole": 'Storm manhole, 48" precast, by depth',
     "catch basin": "Catch basin, precast",
     "inlet": "Catch basin, precast",

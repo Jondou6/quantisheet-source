@@ -1,0 +1,9 @@
+QuantiSheet 1.1.23
+- Estimate > Calculators has four new tabs, each marked preliminary - for estimating, not an engineering design:
+- Rebar: bars for a slab by length and width (with edge cover) or straight from a takeoff area, or continuous bars along a footing or wall from a length takeoff. Laps at every stock length (40 bar diameters to start, change it), pounds, tons and 20 ft sticks with waste.
+- Beam / Header: a simple span with a uniform load and a point load - reactions, largest moment and shear, deflection, and bending, shear and deflection checked against the allowables you type (wood by nominal size and plies, or any section by A, S and I).
+- Column / Post: allowable axial load of a solid wood post (from Fc' and Emin') or a steel column (from A, r and Fy, ASD or LRFD), with a too-slender warning.
+- Footing Size: a square pad or a continuous footing sized from the load and the allowable soil pressure, counting the footing's own weight, with the concrete in CY.
+- Metal Studs: cold-formed steel framing by member name (362S162-33, 600T125-43...) - a stud wall's studs at the spacing with extras at openings and corners, top and bottom track in 10 ft pieces, rows of bridging, or floor and roof joists with rim track, and the pounds of steel worked out from the member's size.
+- Structural Steel: type the member list (W12x26, 24, 6 - shape, length, count) and get pounds and tons with an allowance for connections. W, C, WT and other rolled shapes, HSS square, rectangular and round, pipe by size and wall, angles, plate and bars.
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.23 - the full source of this build. Help > About shows the same link.

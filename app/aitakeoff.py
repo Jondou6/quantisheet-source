@@ -234,7 +234,10 @@ def ocr_needed(doc, pages=None):
     for i in (range(doc.page_count) if pages is None else pages):
         try:
             page = doc[i]
-            if raster_only(page) and not acrobat.page_has_text(page):
+            if (raster_only(page) and not acrobat.page_has_text(page)) \
+                    or acrobat.sparse_text(page):
+                # Nov 19: also a vector sheet whose callouts and scales are
+                # drawn as outlines (only its title block is typed)
                 out.append(i)
         except Exception:                                # noqa: BLE001
             log.info("ocr check", exc_info=True)
@@ -792,6 +795,30 @@ def civil_rank(title):
     return 2
 
 
+def _rehab_counts(doc, pages, rows_by_page):
+    """Manhole rehabilitation callouts on the civil sheets pipe isn't
+    read from: one 'check' count per sheet."""
+    from . import civiltakeoff
+    out = []
+    for p in pages:
+        try:
+            tags = [t for t in civiltakeoff.structure_tags(doc[p])
+                    if t["kind"] == "manhole rehab"]
+        except Exception:                                 # noqa: BLE001
+            log.debug("rehab tags", exc_info=True)
+            continue
+        if tags:
+            out.append({"engine": "civil",
+                        "name": "Manhole rehabilitation (existing manhole)",
+                        "qty": len(tags), "unit": "EA", "status": "check",
+                        "page": p, "sheet": _sheet_name(rows_by_page, p),
+                        "csi": "33 01 30",
+                        "basis": "callout(s) on " +
+                                 _sheet_name(rows_by_page, p) + ": " +
+                                 "; ".join(t["text"][:40] for t in tags)})
+    return out
+
+
 def civil_pipe_pages(doc, civil_pages, rows_by_page):
     """(pages pipe is read from, message): heavy.pipe_plan_pages' pick of
     the civil sheets (no details, erosion control, covers...). The
@@ -809,6 +836,74 @@ def civil_pipe_pages(doc, civil_pages, rows_by_page):
     return pp, (f"civil pipe read from {names}; {len(left)} other civil "
                 "sheet(s) not read for pipe: " +
                 ", ".join(_sheet_name(rows_by_page, p) for p in left[:10]))
+
+
+_PROFILE_TITLE = re.compile(r"\bPROFILES?\b", re.I)
+STATION_TOL = 0.10
+
+
+def _pipe_csi(name):
+    n = name.upper()
+    if " FM" in n or "FORCE" in n:
+        return "33 34 00"
+    if "WATER" in n or n.endswith(" W"):
+        return "33 14 00"
+    if "STORM" in n or "STM" in n:
+        return "33 41 00"
+    return "33 31 00"
+
+
+def _station_lengths(doc, civil_pages, new, rows_by_page, res):
+    """Plan & profile sheets (Nov 19, civil set): the stations give the
+    length along the line (STA 0+00 to 15+41 = 1,541 LF). Where what was
+    traced on those sheets is more than 10% off, the station length is
+    taken instead - one 'check' line per run - and the traced runs there
+    are dropped. Returns the new pipes left to mark."""
+    from . import civiltakeoff
+    titles = {p: (rows_by_page.get(p) or {}).get("title") or ""
+              for p in civil_pages}
+    pp = [p for p in civil_pages if _PROFILE_TITLE.search(titles[p])]
+    if not pp:
+        return new
+    drop = set()
+    for ps, lo, hi in civiltakeoff.station_runs(doc, pp, titles):
+        span = hi - lo
+        on = [p for p in new if any(rr["page"] in ps for rr in p["runs"])]
+        got = sum(rr["length"] for p in on for rr in p["runs"]
+                  if rr["page"] in ps)
+        if span <= 0 or abs(got - span) <= STATION_TOL * span:
+            continue
+        names = sorted({p["name"] for p in on})
+        if len(names) == 1:
+            name = names[0]
+        else:
+            tag = civiltakeoff.linetype_size(
+                civiltakeoff.lines_sized(doc[ps[0]]))
+            if tag is None:
+                continue
+            name = f'{tag[0]}" ' + {"FM": "FM"}.get(tag[1], tag[1])
+        sheets = _sheet_name(rows_by_page, ps[0]) + (
+            f" to {_sheet_name(rows_by_page, ps[-1])}" if len(ps) > 1
+            else "")
+        res["quantities"].append({
+            "engine": "civil", "name": name, "qty": _c2(span), "unit": "LF",
+            "status": "check", "page": ps[0],
+            "sheet": _sheet_name(rows_by_page, ps[0]), "csi": _pipe_csi(name),
+            "basis": f"stations {civiltakeoff.fmt_station(lo)} to "
+                     f"{civiltakeoff.fmt_station(hi)} on {sheets} (plan & "
+                     f"profile) - the line traced there came to "
+                     f"{got:,.0f} LF, so the stations were used"})
+        drop.update(ps)
+    if not drop:
+        return new
+    out = []
+    for p in new:
+        runs = [rr for rr in p["runs"] if rr["page"] not in drop]
+        if runs:
+            q = dict(p)
+            q["runs"] = runs
+            out.append(q)
+    return out
 
 
 def civil_same_pipe(cres, rows_by_page):
@@ -3557,10 +3652,16 @@ def run(doc, rows, progress=None, engines=None, sheet_time_limit=None,
             # grading sheets: take it from the utility plans when the
             # set has them
             pp, msg = civil_pipe_pages(doc, civil_pages, rows_by_page)
+            others = []
             if pp:
                 if msg:
                     res["problems"].append(msg)
+                others = [p for p in civil_pages if p not in pp]
                 civil_pages = pp
+            # an existing manhole to rehabilitate is often only on a site
+            # or demolition plan, not a pipe sheet (Nov 20, civil set)
+            for q in _rehab_counts(doc, others, rows_by_page):
+                res["quantities"].append(q)
 
             def civ(i, n, text):
                 return progress(k, steps, text) if progress else True
@@ -3573,6 +3674,12 @@ def run(doc, rows, progress=None, engines=None, sheet_time_limit=None,
             for msg in civil_same_pipe(cres, rows_by_page):
                 res["problems"].append(msg)
             new = [p for p in cres["pipes"] if not p["existing"]]
+            n_q = len(res["quantities"])
+            new = _station_lengths(doc, civil_pages, new, rows_by_page, res)
+            # a label check on a trace the stations replaced is moot
+            gone = {q["name"] for q in res["quantities"][n_q:]} - \
+                {p["name"] for p in new}
+
             ms = civiltakeoff.marks(cres, unit, pipes=new)
             for m in ms:
                 m[2]["measure"]["method"] = "AI takeoff: civil"
@@ -3597,6 +3704,8 @@ def run(doc, rows, progress=None, engines=None, sheet_time_limit=None,
                             if rr["page"] == pg),
                         "unit": unit, "source": "civil"})
             res["problems"] += cres.get("checks", [])
+            res["problems"] = [x for x in res["problems"] if not any(
+                x.startswith(f"{g}: measured") for g in gone)]
             # water service fittings from callouts that state a count
             for sv in cres.get("services") or []:
                 pg = sv["pages"][0]

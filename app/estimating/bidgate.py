@@ -5,6 +5,9 @@ bid or proposal goes out, run with Estimate Error Check.
                        N days (setting "price_max_age_days", 90)
   quote_expired        a sub or supplier quote used in the estimate whose
                        valid-until day has passed
+  quote_short_hold     a quote used that runs out before the bid has to
+                       hold (bid day + the hold days in the Bid Submittal
+                       Checklist, Nov 19)
   addendum_unpriced    an addendum not marked priced (blocks the bid form
                        and proposal until it is - Addenda Gate)
   addendum_after_edit  an addendum that arrived after the estimate was
@@ -35,6 +38,7 @@ REPEAT_PT = 6.0             # two counts this close (points) are one spot
 RULES = {
     "price_old": "Unit price older than the set number of days",
     "quote_expired": "Quote used past its valid-until day",
+    "quote_short_hold": "Quote runs out before the bid has to hold",
     "addendum_unpriced": "Addendum not priced yet",
     "addendum_after_edit": "Addendum arrived after the estimate's last change",
     "placeholder": "Placeholder, plug or allowance not replaced yet",
@@ -43,6 +47,7 @@ RULES = {
     "subtotal_twice": "Lines repeated as a subtotal",
 }
 SEVERITY = {"price_old": "warning", "quote_expired": "error",
+            "quote_short_hold": "warning",
             "addendum_unpriced": "error", "addendum_after_edit": "warning",
             "placeholder": "warning", "overlap_area": "warning",
             "repeat_count": "warning", "subtotal_twice": "error"}
@@ -53,6 +58,10 @@ HOW_TO = {
                  "to keep it.",
     "quote_expired": "A quote in the estimate is past the day the bidder "
                      "said it holds to. Get it confirmed or re-quoted.",
+    "quote_short_hold": "The bid documents ask the bid to hold its price "
+                        "longer than this quote does. Ask the bidder to "
+                        "extend it to the hold date, or carry the risk "
+                        "in the price.",
     "addendum_unpriced": "Every addendum has to be priced (even at $0) "
                          "before the bid form or proposal goes out: Project "
                          "> Addenda > Mark Priced.",
@@ -114,6 +123,18 @@ def stale(doc, job=None, today=None, days=None):
         sheets = bidday._all(doc) if doc is not None else []
     except Exception:                                     # noqa: BLE001
         sheets = []
+    hold = None
+    try:
+        from .. import bidsubmittal
+        hold = bidsubmittal.hold_until(bidsubmittal.read(doc)) \
+            if doc is not None else None
+    except Exception:                                     # noqa: BLE001
+        hold = None
+
+    def short(item, who, vu):
+        out.append(_f("quote_short_hold", item,
+                      f"{who} holds until {vu.isoformat()}; the bid has to "
+                      f"hold until {hold.isoformat()}", hold=hold.isoformat()))
     for sh in sheets:
         ap = sh.get("applied") or {}
         used = ap.get("bidder")
@@ -124,6 +145,10 @@ def stale(doc, job=None, today=None, days=None):
                               f"{used}", f"{used}'s quote for "
                               f"{sh.get('package')} held until "
                               f"{vu.isoformat()}"))
+            elif used and b.get("name") == used and vu and hold and \
+                    vu < hold:
+                short(f"{sh.get('package')}: {used}",
+                      f"{used}'s quote for {sh.get('package')}", vu)
     for a in (job or {}).get("activities") or []:
         for q in a.get("quotes") or []:
             vu = _day(q.get("valid_until"))
@@ -132,6 +157,9 @@ def stale(doc, job=None, today=None, days=None):
                               f"{q.get('vendor', '')}",
                               f"{q.get('vendor', '')}'s {q.get('kind')} "
                               f"quote held until {vu.isoformat()}"))
+            elif q.get("use") and vu and hold and vu < hold:
+                short(f"{a.get('name', '')}: {q.get('vendor', '')}",
+                      f"{q.get('vendor', '')}'s {q.get('kind')} quote", vu)
     return out
 
 

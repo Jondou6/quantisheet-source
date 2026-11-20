@@ -199,7 +199,7 @@ def test_go_score_weights_are_settings():
     sc = B.go_score({"scope": "Yes", "location": "Partly",
                      "workload": "No"})
     assert sc == {"score": 59.1, "recommendation": "Look closer",
-                  "answered": 3, "of": 6}
+                  "answered": 3, "of": 7}
     assert B.go_score({k: "Yes" for k, _l in B.FACTORS})[
         "recommendation"] == "Go"
     assert B.go_score({k: "No" for k, _l in B.FACTORS})[

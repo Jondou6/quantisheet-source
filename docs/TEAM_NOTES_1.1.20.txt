@@ -1,0 +1,5 @@
+QuantiSheet 1.1.20
+- Project > Watch Plan Folder: point a job at the folder its plan sets and addenda are downloaded into, from any plan room. When new sheets or addenda arrive there, QuantiSheet offers the next step: log an addendum in the Addenda Gate (the bid waits until it is priced), compare the new sheets with this set and Slip Sheet them in, or open them. Files still downloading wait until they are finished.
+- Open Plan Set in QuantiSheet: right-click a plan room download (.zip) in File Explorer. It is unzipped into a job folder beside it, sorted into drawings, specs and addenda, and the drawings are combined and opened. (PDFs already had Open in QuantiSheet.)
+- Bid Submittal Checklist (Estimate menu, and before Export Bid Package): tick off the signed bid forms, bid bond, contractor's license, insurance certificate and the bid reference number, and attach the files. Attached files go into the bid package; anything not ticked is listed in its contents.
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.20 - the full source of this build. Help > About shows the same link.

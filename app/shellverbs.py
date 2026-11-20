@@ -2,8 +2,11 @@
 #1): the installer adds, for PDFs, "Open in QuantiSheet" and "Reduce size
 (QuantiSheet)"; for Word, Excel, PowerPoint, text and image files
 "Convert to PDF (QuantiSheet)"; and for folders "Combine PDFs in
-QuantiSheet" (every PDF in the folder, in name order, one set). They run
-QuantiSheet.exe with one of the switches below.
+QuantiSheet" (every PDF in the folder, in name order, one set); for a
+plan room download (.zip) "Open Plan Set in QuantiSheet" (Nov 19: it is
+unzipped into a job folder beside it, sorted, and the drawings combined
+and opened - File > Open Bid Download as a Job without the questions).
+They run QuantiSheet.exe with one of the switches below.
 
 Reduce size works without opening the window: it writes "<name>
 (reduced).pdf" beside the file and says how much smaller it is. The
@@ -14,7 +17,8 @@ import os
 import re
 
 REDUCE, CONVERT, COMBINE = "--qs-reduce", "--qs-convert", "--qs-combine-folder"
-SWITCHES = (REDUCE, CONVERT, COMBINE)
+OPEN_BID = "--qs-open-bid"
+SWITCHES = (REDUCE, CONVERT, COMBINE, OPEN_BID)
 CONVERT_EXT = (".doc", ".docx", ".rtf", ".odt", ".xls", ".xlsx", ".xlsm",
                ".csv", ".ods", ".ppt", ".pptx", ".odp", ".txt", ".md",
                ".html", ".htm", ".png", ".jpg", ".jpeg", ".tif", ".tiff",
@@ -87,6 +91,18 @@ def combine_folder(folder):
     return out, files
 
 
+def job_folder(zip_path):
+    """The folder a right-clicked download unpacks into: beside the zip,
+    named after it; '(2)', '(3)'... when that name is taken by a folder
+    with something in it already."""
+    base = os.path.splitext(os.path.abspath(zip_path))[0]
+    cand, k = base, 2
+    while os.path.isdir(cand) and os.listdir(cand):
+        cand = f"{base} ({k})"
+        k += 1
+    return cand
+
+
 def size_text(n):
     return f"{n / 1e6:,.1f} MB" if n >= 1e6 else f"{n / 1e3:,.0f} KB"
 
@@ -105,6 +121,9 @@ def run_in_window(win, switch, path):
                 return None
             win.open_document(doc, f"{name} - Combined.pdf")
             return doc
+        if switch == OPEN_BID:
+            rep = win.open_bid_zip(path, folder=job_folder(path))
+            return (rep or {}).get("combined")
         if switch == CONVERT:
             from . import acrobat2
             doc = acrobat2.create_pdf(path)

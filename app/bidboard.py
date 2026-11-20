@@ -32,7 +32,10 @@ STATUSES = ("Undecided", "Accepted", "Submitted", "Won", "Lost", "Declined")
 OPEN = ("Undecided", "Accepted")
 FIELDS = ("project", "gc", "location", "address", "trade", "due",
           "due_time", "job_walk", "rfi_due", "estimator", "notes",
-          "amount", "status", "plan_links", "source")
+          "amount", "status", "plan_links", "source",
+          # Nov 19: the competition - is the pre-bid mandatory, how many
+          # plan holders, how many bidders expected (or at the opening)
+          "prebid_mandatory", "plan_holders", "bidders")
 # the Estimating Dashboard's words for our own result
 RESULT = {"Won": "Won", "Lost": "Lost", "Submitted": "Pending",
           "Declined": "No bid"}
@@ -118,6 +121,13 @@ def parse_amount(v):
     return str(d.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
 
 
+def _count(v):
+    """'12', '12 bidders' -> '12'; '' when no number."""
+    import re as _re
+    m = _re.search(r"\d{1,4}", str(v or ""))
+    return str(int(m.group())) if m else ""
+
+
 def clean(o):
     """One opportunity with known fields and fixed types."""
     out = {"id": _s(o.get("id")) or uuid.uuid4().hex[:12]}
@@ -133,6 +143,12 @@ def clean(o):
     day = parse_day(first)
     out["job_walk"] = (day + (" " + rest if rest else "")) if day else jw
     out["amount"] = parse_amount(out["amount"])
+    for k in ("plan_holders", "bidders"):
+        out[k] = _count(out[k])
+    pm = out["prebid_mandatory"].lower()
+    out["prebid_mandatory"] = "Yes" if pm in ("yes", "y", "true", "1",
+                                              "mandatory") else \
+        "No" if pm in ("no", "n", "false", "0", "optional") else ""
     if out["status"] not in STATUSES:
         out["status"] = "Undecided"
     if not out["project"]:
@@ -479,9 +495,13 @@ FACTORS = (("scope", "Scope fits what we do"),
            ("relationship", "Good relationship with this GC"),
            ("history", "We win with this GC"),
            ("workload", "We have the time to price it"),
-           ("bonding", "Bonding needed is within our capacity"))
+           ("bonding", "Bonding needed is within our capacity"),
+           ("competition", "Competition is manageable"))
 DEFAULT_WEIGHTS = {"scope": 25, "location": 15, "relationship": 20,
-                   "history": 15, "workload": 15, "bonding": 10}
+                   "history": 15, "workload": 15, "bonding": 10,
+                   "competition": 10}
+# bidders expected: up to this many is "Yes", up to the next "Partly"
+FEW_BIDDERS, SOME_BIDDERS = 4, 8
 DEFAULT_GO, DEFAULT_MAYBE = 65, 45
 ANSWERS = (("Yes", 1.0), ("Partly", 0.5), ("No", 0.0))
 
@@ -543,6 +563,22 @@ def history_answer(gc, items=None):
     if r is None or r["won"] + r["lost"] < 3:
         return ""
     return "Yes" if r["rate"] >= 40 else "Partly" if r["rate"] >= 15 \
+        else "No"
+
+
+def competition_answer(o):
+    """A starting answer for "competition is manageable" from the
+    bidders expected (or, without that, plan holders / 2): Yes up to 4,
+    Partly up to 8, else No; "" when neither is known. Public work went
+    from 3 or 4 bidders to 12 on some jobs (Nov 19)."""
+    n = None
+    if (o or {}).get("bidders"):
+        n = int(o["bidders"])
+    elif (o or {}).get("plan_holders"):
+        n = int(o["plan_holders"]) / 2.0
+    if n is None:
+        return ""
+    return "Yes" if n <= FEW_BIDDERS else "Partly" if n <= SOME_BIDDERS \
         else "No"
 
 
