@@ -10,7 +10,7 @@ from PySide6.QtWidgets import (QApplication, QComboBox, QDialog,
                                QScrollArea,
                                QSpinBox, QTabWidget, QVBoxLayout, QWidget)
 
-from . import calculators as calc, structcalc as sc
+from . import calculators as calc, sitecalc as sitec, structcalc as sc
 from .dmoney import c2 as _c2
 
 # which fields each concrete shape asks for: (key, label, suffix, default)
@@ -1176,6 +1176,294 @@ class SteelTab(_Base):
                 f"{self.extra.value():g}% allowance")
 
 
+class _FormTab(_Base):
+    """A tab built from a list of (key, label, widget) rows."""
+
+    def _rows_in(self, rows):
+        self.rows = getattr(self, "rows", {})
+        for key, label, wdg in rows:
+            self.form.addRow(label, wdg)
+            self.rows[key] = wdg
+            sig = getattr(wdg, "valueChanged", None) or \
+                getattr(wdg, "textChanged", None) or \
+                wdg.currentIndexChanged
+            sig.connect(self.update)
+
+    def _show(self, keys):
+        for key, wdg in self.rows.items():
+            vis = key in keys
+            wdg.setVisible(vis)
+            lab = self.form.labelForField(wdg)
+            if lab is not None:
+                lab.setVisible(vis)
+
+    def update(self, *_):
+        try:
+            r = self.result()
+        except (ValueError, AttributeError, KeyError) as e:
+            self.out.setText(str(e))
+            return None
+        self.out.setText(self.html(r))
+        return r
+
+
+class EarthworkTab(_FormTab):
+    """A cut (L x W x D) or a pipe trench: bank, loose and compacted CY
+    and truck loads."""
+
+    def __init__(self, doc=None):
+        super().__init__(doc)
+        self.kind = _combo([("Mass excavation (L x W x D)", "cut"),
+                            ("Pipe trench", "trench")])
+        self.form.addRow("Work", self.kind)
+        self._from_takeoff_row(("area", "length"), self.use_takeoff)
+        self.length = _spin(100, " ft", 100000)
+        self.wide = _spin(50, " ft", 100000)
+        self.area = _spin(0, " sq ft (or L x W)", 10000000)
+        self.depth = _spin(3, " ft", 100)
+        self.bottom = _spin(3, " ft", 50)
+        self.slope = _spin(0, " : 1 (H:V, 0 = vertical)", 3, 2)
+        self.pipe = _spin(8, " in", 144, 0)
+        self.bedding = _spin(6, " in", 48, 1)
+        self.swell = _spin(sitec.SWELL_PCT, " %", 100, 1)
+        self.shrink = _spin(sitec.SHRINK_PCT, " %", 50, 1)
+        self.truck = _spin(sitec.TRUCK_CY, " loose CY / load", 40, 1)
+        self._rows_in((("length", "Length", self.length),
+                       ("wide", "Width", self.wide),
+                       ("area", "Area", self.area),
+                       ("depth", "Depth", self.depth),
+                       ("bottom", "Trench bottom width", self.bottom),
+                       ("slope", "Side slope", self.slope),
+                       ("pipe", "Pipe size", self.pipe),
+                       ("bedding", "Bedding depth", self.bedding),
+                       ("swell", "Swell (bank to loose)", self.swell),
+                       ("shrink", "Shrink (bank to compacted)", self.shrink),
+                       ("truck", "Truck", self.truck)))
+        self.kind.currentIndexChanged.connect(self._kind_changed)
+        self._kind_changed()
+
+    def _kind_changed(self, *_):
+        cut = self.kind.currentData() == "cut"
+        self._show(("length", "wide", "area", "depth", "swell", "shrink",
+                    "truck") if cut else
+                   ("length", "depth", "bottom", "slope", "pipe", "bedding",
+                    "swell", "truck"))
+        self.update()
+
+    def use_takeoff(self, mtype, unit, total):
+        if mtype == "area":
+            self.kind.setCurrentIndex(self.kind.findData("cut"))
+            self.area.setValue(total)
+        else:
+            self.kind.setCurrentIndex(self.kind.findData("trench"))
+            self.length.setValue(total)
+        self.update()
+
+    def result(self):
+        if self.kind.currentData() == "cut":
+            bank = self.area.value() * self.depth.value() / sitec.CY \
+                if self.area.value() else None
+            return sitec.excavation(self.length.value(), self.wide.value(),
+                                    self.depth.value(), bank,
+                                    self.swell.value(), self.shrink.value(),
+                                    self.truck.value())
+        return sitec.trench(self.length.value(), self.depth.value(),
+                            self.bottom.value(), self.slope.value(),
+                            self.pipe.value(), self.bedding.value(),
+                            self.swell.value(), self.truck.value())
+
+    def html(self, r):
+        if self.kind.currentData() == "cut":
+            return (f"<b>{_c2(r['bank_cy']):,.2f} CY bank</b> - "
+                    f"{_c2(r['loose_cy']):,.2f} CY loose to haul "
+                    f"(<b>{r['loads']:,} loads</b>), "
+                    f"{_c2(r['compacted_cy']):,.2f} CY compacted fill")
+        return (f"Top width {r['top_width_ft']:,.1f} ft - <b>"
+                f"{_c2(r['excavation_cy']):,.2f} CY excavation</b>, "
+                f"{_c2(r['bedding_cy']):,.2f} CY bedding, "
+                f"{_c2(r['backfill_cy']):,.2f} CY backfill; "
+                f"{_c2(r['loose_cy']):,.2f} CY loose ({r['loads']:,} loads)")
+
+    def estimate_rows(self):
+        r = self.result()
+        if self.kind.currentData() == "cut":
+            return [("Excavation (bank measure)", r["bank_cy"], "cy",
+                     "31 23 16"),
+                    ("Haul off (loose)", r["loose_cy"], "cy", "31 23 16")]
+        return [("Trench excavation", r["excavation_cy"], "cy", "31 23 33"),
+                ("Pipe bedding", r["bedding_cy"], "cy", "31 23 33"),
+                ("Trench backfill", r["backfill_cy"], "cy", "31 23 33")]
+
+    def text(self):
+        return "Earthwork - " + _plain(self.html(self.result()))
+
+
+class AggregateTab(_FormTab):
+    """Stone, sand, topsoil or hot-mix asphalt: CY and tons over an
+    area."""
+
+    def __init__(self, doc=None):
+        super().__init__(doc)
+        self.mat = _combo([(k, k) for k in sitec.TONS_PER_CY])
+        self.form.addRow("Material", self.mat)
+        self._from_takeoff_row(("area",), self.use_takeoff)
+        self.area = _spin(10000, " sq ft", 100000000)
+        self.thick = _spin(6, " in", 120, 2)
+        self.density = _spin(1.4, " tons / CY", 5, 2)
+        self.waste = _spin(5, " %", 50, 1)
+        self._rows_in((("area", "Area", self.area),
+                       ("thick", "Thickness (compacted)", self.thick),
+                       ("density", "Weight", self.density),
+                       ("waste", "Waste / compaction", self.waste)))
+        self.mat.currentIndexChanged.connect(self._mat_changed)
+        self._mat_changed()
+
+    def _mat_changed(self, *_):
+        self.density.setValue(sitec.TONS_PER_CY[self.mat.currentData()])
+        self.update()
+
+    def use_takeoff(self, mtype, unit, total):
+        self.area.setValue(total)
+        self.update()
+
+    def result(self):
+        return sitec.material_tons(self.area.value(), self.thick.value(),
+                                   self.density.value(), self.waste.value())
+
+    def html(self, r):
+        return (f"<b>{_c2(r['tons']):,.2f} tons</b> of "
+                f"{self.mat.currentText().lower()} - "
+                f"{_c2(r['cy_with_waste']):,.2f} CY with "
+                f"{self.waste.value():g}% ({_c2(r['cy']):,.2f} CY net)")
+
+    def estimate_rows(self):
+        r = self.result()
+        code = "32 12 16" if "Asphalt" in self.mat.currentText() else \
+            "31 05 16"
+        return [(f"{self.mat.currentText()}, {self.thick.value():g} in",
+                 r["tons"], "ton", code)]
+
+    def text(self):
+        return "Aggregate / asphalt - " + _plain(self.html(self.result()))
+
+
+class DrywallTab(_FormTab):
+    """Gypsum board, tape, joint compound and screws."""
+
+    def __init__(self, doc=None):
+        super().__init__(doc)
+        self._from_takeoff_row(("area",), self.use_takeoff)
+        self.walls = _spin(4000, " sq ft", 10000000)
+        self.ceil = _spin(0, " sq ft", 10000000)
+        self.openings = _spin(0, " sq ft", 10000000)
+        self.board = _combo([(k, k) for k in sitec.BOARD_SF])
+        self.layers = QSpinBox()
+        self.layers.setRange(1, 4)
+        self.waste = _spin(10, " %", 50, 1)
+        self.tape = _spin(sitec.TAPE_LF_PER_1000, " LF / 1,000 SF", 2000, 0)
+        self.mud = _spin(sitec.COMPOUND_LB_PER_1000, " lb / 1,000 SF", 1000,
+                         0)
+        self.screws = _spin(sitec.SCREWS_PER_1000, " / 1,000 SF", 5000, 0)
+        self._rows_in((("walls", "Wall area (one face)", self.walls),
+                       ("ceil", "Ceiling area", self.ceil),
+                       ("openings", "Less openings", self.openings),
+                       ("board", "Board size", self.board),
+                       ("layers", "Layers", self.layers),
+                       ("waste", "Waste", self.waste),
+                       ("tape", "Tape", self.tape),
+                       ("mud", "Joint compound", self.mud),
+                       ("screws", "Screws", self.screws)))
+        self.update()
+
+    def use_takeoff(self, mtype, unit, total):
+        self.walls.setValue(total)
+        self.update()
+
+    def result(self):
+        return sitec.drywall(self.walls.value(), self.ceil.value(),
+                             self.openings.value(),
+                             self.board.currentData(), self.layers.value(),
+                             self.waste.value(), self.tape.value(),
+                             self.mud.value(), self.screws.value())
+
+    def html(self, r):
+        return (f"<b>{r['boards']:,} boards</b> ({self.board.currentText()})"
+                f" for {r['net_sf']:,.0f} SF with {self.waste.value():g}% "
+                f"waste - {r['tape_lf']:,.0f} LF tape, "
+                f"{r['compound_lb']:,.0f} lb joint compound, "
+                f"{r['screws']:,} screws")
+
+    def estimate_rows(self):
+        r = self.result()
+        return [(f"Gypsum board {self.board.currentText()}", r["boards"],
+                 "ea", "09 29 00"),
+                ("Joint tape", r["tape_lf"], "lf", "09 29 00"),
+                ("Joint compound", r["compound_lb"], "lb", "09 29 00"),
+                ("Drywall screws", r["screws"], "ea", "09 29 00")]
+
+    def text(self):
+        return "Drywall - " + _plain(self.html(self.result()))
+
+
+class PaintTab(_FormTab):
+    """Gallons of paint and primer for an area."""
+
+    def __init__(self, doc=None):
+        super().__init__(doc)
+        self._from_takeoff_row(("area",), self.use_takeoff)
+        self.area = _spin(5000, " sq ft", 100000000)
+        self.coats = QSpinBox()
+        self.coats.setRange(1, 5)
+        self.coats.setValue(2)
+        self.cover = _spin(sitec.PAINT_SF_PER_GAL, " SF / gal per coat",
+                           2000, 0)
+        self.primer = QSpinBox()
+        self.primer.setRange(0, 3)
+        self.pcover = _spin(300, " SF / gal per coat", 2000, 0)
+        self.waste = _spin(10, " %", 50, 1)
+        self._rows_in((("area", "Area to paint", self.area),
+                       ("coats", "Finish coats", self.coats),
+                       ("cover", "Finish coverage", self.cover),
+                       ("primer", "Primer coats", self.primer),
+                       ("pcover", "Primer coverage", self.pcover),
+                       ("waste", "Waste", self.waste)))
+        self.update()
+
+    def use_takeoff(self, mtype, unit, total):
+        self.area.setValue(total)
+        self.update()
+
+    def result(self):
+        return sitec.paint(self.area.value(), self.coats.value(),
+                           self.cover.value(), self.primer.value(),
+                           self.pcover.value(), self.waste.value())
+
+    def html(self, r):
+        out = (f"<b>{r['finish_gal']:,} gal finish</b> "
+               f"({r['finish_pails']} five-gallon + {r['finish_extra']} gal)")
+        if r["primer_gal"]:
+            out += (f", <b>{r['primer_gal']:,} gal primer</b> "
+                    f"({r['primer_pails']} five-gallon + "
+                    f"{r['primer_extra']} gal)")
+        return out
+
+    def estimate_rows(self):
+        r = self.result()
+        rows = [(f"Paint, {self.coats.value()} coats", r["finish_gal"],
+                 "gal", "09 91 00")]
+        if r["primer_gal"]:
+            rows.append(("Primer", r["primer_gal"], "gal", "09 91 00"))
+        return rows
+
+    def text(self):
+        return "Paint - " + _plain(self.html(self.result()))
+
+
+def _plain(html):
+    import re as _re
+    return _re.sub(r"<[^>]+>", "", html)
+
+
 def _ft_in(ft):
     inches = int(round(ft * 12))
     return f"{inches // 12}'-{inches % 12}\""
@@ -1200,11 +1488,18 @@ class CalculatorDialog(QDialog):
         self.footing = FootingTab(doc)
         self.studs = MetalStudTab(doc)
         self.steel = SteelTab(doc)
+        self.earth = EarthworkTab(doc)
+        self.aggregate = AggregateTab(doc)
+        self.drywall = DrywallTab(doc)
+        self.paint = PaintTab(doc)
         for w, name in ((self.rebar, "Rebar"), (self.beam, "Beam / Header"),
                         (self.column, "Column / Post"),
                         (self.footing, "Footing Size"),
                         (self.studs, "Metal Studs"),
-                        (self.steel, "Structural Steel")):
+                        (self.steel, "Structural Steel"),
+                        (self.earth, "Earthwork"),
+                        (self.aggregate, "Aggregate / Asphalt"),
+                        (self.drywall, "Drywall"), (self.paint, "Paint")):
             # the longer forms scroll rather than stretch the window
             area = QScrollArea()
             area.setWidgetResizable(True)

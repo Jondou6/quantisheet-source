@@ -130,7 +130,7 @@ except Exception:                                         # noqa: BLE001
 
 def test_new_tabs_in_the_calculators_window(win):
     d = win.calculators(3, show=False)
-    assert d.tabs.count() == 9 and d.tabs.currentIndex() == 3
+    assert d.tabs.count() == 13 and d.tabs.currentIndex() == 3
     rb = d.rebar
     rb.length.setValue(20)
     rb.wide.setValue(20)

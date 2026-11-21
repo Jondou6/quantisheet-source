@@ -1099,6 +1099,14 @@ class MainWindow(QMainWindow):
                   lambda: self.calculators(7), False)
         self._act(t, "Structural Steel Calculator…", None,
                   lambda: self.calculators(8), False)
+        self._act(t, "Earthwork Calculator…", None,
+                  lambda: self.calculators(9), False)
+        self._act(t, "Aggregate and Asphalt Calculator…", None,
+                  lambda: self.calculators(10), False)
+        self._act(t, "Drywall Calculator…", None,
+                  lambda: self.calculators(11), False)
+        self._act(t, "Paint Calculator…", None,
+                  lambda: self.calculators(12), False)
         self._act(t, "Date and Time Calculators…", None,
                   lambda: self.date_calculators(), False)
         self._act(t, "Bid Tabs…", None, self.bid_tabs, False)
@@ -1156,11 +1164,6 @@ class MainWindow(QMainWindow):
                   lambda: self.create_proposal())
         self._act(t, "Export Bid Package…", None,
                   lambda: self.export_bid_package())
-        self._act(t, "Bid Submittal Checklist…", None,
-                  lambda: self.bid_submittal())
-        self._act(t, "Find Bid Terms…", None, lambda: self.bid_terms())
-        self._act(t, "Manufacturers in Specs…", None,
-                  lambda: self.spec_manufacturers())
         t.addSeparator()
         t.addAction(self.est_dock.toggleViewAction())
         self._act(t, "Price These…", None, lambda: self.price_these())
@@ -1249,6 +1252,16 @@ class MainWindow(QMainWindow):
         self._act(tl, "Start Relay (host on this computer)…", None,
                   self.start_relay, False)
         self._act(tl, "Live Collaboration…", None, self.open_collab)
+
+        # Nov 20 (Jon): its own menu, after Tools
+        pam = mb.addMenu("Project &Analysis")
+        self._act(pam, "Project Analysis…", None,
+                  lambda: self.project_analysis())
+        self._act(pam, "Find Bid Terms…", None, lambda: self.bid_terms())
+        self._act(pam, "Manufacturers in Specs…", None,
+                  lambda: self.spec_manufacturers())
+        self._act(pam, "Bid Submittal Checklist…", None,
+                  lambda: self.bid_submittal())
 
         r = mb.addMenu("&Review")
         self._act(r, "Revision Log…", None, lambda: self.revision_log())
@@ -1503,6 +1516,9 @@ class MainWindow(QMainWindow):
                           ("Field Mode", "Field Mode", "photo")]),
         # one Compare window (overlay / changes / text) - reviews 1 + 2,
         # Nov 4: the separate compare buttons are on the File menu only
+        # Nov 20 (Jon): one click on the specs answers the bid questions
+        ("Home", "Specs", [("Project Analysis", "Project Analysis",
+                            "checklist")]),
         ("Home", "Compare", [("Compare", "Compare", "overlay"),
                              ("Revision Log", "Revisions", "trend")]),
         ("AI", "Takeoff", [("AI Takeoff (Whole Set)", "AI Takeoff",
@@ -1624,6 +1640,14 @@ class MainWindow(QMainWindow):
                                       "Metal Studs", "walls"),
                                      ("Structural Steel Calculator",
                                       "Steel", "assembly"),
+                                     ("Earthwork Calculator", "Earthwork",
+                                      "measure_volume"),
+                                     ("Aggregate and Asphalt Calculator",
+                                      "Aggregate", "measure_area"),
+                                     ("Drywall Calculator", "Drywall",
+                                      "walls"),
+                                     ("Paint Calculator", "Paint",
+                                      "color"),
                                      ("Date and Time Calculators",
                                       "Dates", "calendar")]),
         ("Estimate", "Bidding", [("Bid Tabs", "Bid Tabs", "bidtabs"),
@@ -1795,6 +1819,12 @@ class MainWindow(QMainWindow):
                               ["Import AutoCAD DXF",
                                "Import Markups (PDF or XFDF)",
                                "Export Markups (XFDF)"]]),
+        # Nov 20 (Jon): a Project Analysis tab after Tools
+        ("Project Analysis", "Project Analysis",
+         [("Project Analysis", "Project Analysis", "checklist"),
+          ("Find Bid Terms", "Bid Terms", "find"),
+          ("Manufacturers in Specs", "Manufacturers", "list"),
+          ("Bid Submittal Checklist", "Bid Checklist", "checklist")]),
         ("Tools", "Settings", [("Command Search", "Commands", "command"),
                                ["Author Name", "Keyboard Shortcuts",
                                 "Document Properties"]]),
@@ -4962,6 +4992,21 @@ class MainWindow(QMainWindow):
             return ok
         return dlg
 
+    def project_analysis(self, show=True):
+        """Project Analysis (Nov 20, Jon): open the specs and click it -
+        project name, address, budget, substantial and final completion,
+        liquidated damages, summary, bid date, pre-bid meeting and
+        retainage, each with its page, then the other bid terms."""
+        from .bidterms_ui import ProjectAnalysisDialog
+        if not self._view:
+            self._flash("Open the project manual (specifications) first, "
+                        "then click Project Analysis.")
+            return None
+        dlg = ProjectAnalysisDialog(self)
+        if show:
+            dlg.show()
+        return dlg
+
     def bid_terms(self, show=True):
         """Estimate > Find Bid Terms (Nov 19): bid bond, hold days,
         prevailing wage, liquidated damages, pre-bid, goals, retainage,
@@ -7518,7 +7563,8 @@ class MainWindow(QMainWindow):
     def calculators(self, tab=0, show=True):
         """Concrete (0), Brick & Block (1), Roofing (2), Rebar (3), Beam
         and Header (4), Column and Post (5), Footing Size (6), Metal Stud
-        Framing (7) and Structural Steel (8) calculators; a drawing's takeoff can fill the sizes, but none is
+        Framing (7), Structural Steel (8), Earthwork (9), Aggregate and
+        Asphalt (10), Drywall (11) and Paint (12) calculators; a drawing's takeoff can fill the sizes, but none is
         needed."""
         from .calculators_ui import CalculatorDialog
         doc = self._view.doc if self._view is not None else None

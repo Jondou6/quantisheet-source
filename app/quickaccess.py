@@ -70,7 +70,8 @@ PDF_GROUPS = ("Create & Convert", "Pages", "Page Marks", "Content", "Forms",
 # left to right (Nov 5); the classic tabs fit in where they used to be
 TAB_ORDER = ("Home", "PDF Management", "Markup", "Takeoff", "Estimate",
              "Civil", "Review", "AI", "Project", "Module", "Billing",
-             "Service", "Pages", "Document", "Tools", "Help")
+             "Service", "Pages", "Document", "Tools", "Project Analysis",
+             "Help")
 S_CLASSIC = "classic_tabs"          # all 14 tabs, as before
 S_FOLLOW = "tabs_follow_file"
 S_ROLE = "role"
