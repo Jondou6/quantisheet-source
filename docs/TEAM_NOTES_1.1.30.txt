@@ -1,0 +1,12 @@
+QuantiSheet 1.1.30
+- New look: buttons, ribbon tiles, links and highlights are QuantiSheet red, the red of the logo, so QuantiSheet and its companion programs match. Done, won, ready and OK are red too instead of green; problems keep their look, and the words (OK / OVER, Won / Lost) tell them apart. Amber still marks warnings. On the Coverage Map, sheets with nothing taken off are gray. Your markup and takeoff colors don't change.
+Also new since 1.1.25 (Help > What's New has the details):
+- Help > Features & How-To Guide (PDF): every feature and how to use it, opened in a tab (also the Guide button on the Help tab and in the Help Center).
+- Auto Scale reads small scale notes close up beside a graphic scale (1" = 5', 1/2" = 1'-0"); such sheets are marked Check.
+- Civil takeoff: a structure drawn in the plan and again on the profile counts once.
+- 3D Model Quantities (new 3D Model tab): IFC model quantities by type and storey, added to the estimate.
+- Ask the Project, Draft Daily Log From Notes, Check Submittal Against Spec and Project Risk Flags (AI tab, Review menu, Project Center).
+- Project Analysis reads more spec books, writes a local-AI scope summary, and Send to Bid Board / Fill From Specs fill a Bid Board entry.
+- Fixed: password-protected PDFs open with their pages showing, and Remove Security saves a copy that opens.
+- Signature Requests show signing times in your own time.
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.30 - the full source of this build. Help > About shows the same link.

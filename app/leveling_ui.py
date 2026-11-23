@@ -141,7 +141,7 @@ class LevelingDialog(QDialog):
                         "carry, <span style='background:#c8e6ff'>&nbsp;v&nbsp;"
                         "</span> buy-in, <span style='background:#f0d2ff'>"
                         "&nbsp;*&nbsp;</span> outlier, <span style='background:"
-                        "#eef1f1'>&nbsp;PLUG&nbsp;</span> your plug. Leveled ="
+                        "#fbeae9'>&nbsp;PLUG&nbsp;</span> your plug. Leveled ="
                         " base bid + omitted items at the median (or your "
                         "plug) + adjustments.")
         lay.addWidget(legend)

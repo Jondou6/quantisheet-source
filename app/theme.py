@@ -22,7 +22,7 @@ DARK = {
     "accent": "#bd2322", "accent2": "#c9302c", "on_accent": "#ffffff",
     "accent_text": "#f2857e",
     "accent_soft": "#3d1f1e", "canvas": "#131416", "danger": "#f05252",
-    "ok": "#d3dcdc", "warn": "#e3a008", "tip": "#2b2d32",
+    "ok": "#f2857e", "warn": "#e3a008", "tip": "#2b2d32",
 }
 LIGHT = {
     "window": "#f3f4f6", "surface": "#ffffff", "surface2": "#f5f6f8",
@@ -31,14 +31,15 @@ LIGHT = {
     "accent": "#bd2322", "accent2": "#a91d1d", "on_accent": "#ffffff",
     "accent_text": "#bd2322",
     "accent_soft": "#fbeae9", "canvas": "#e4e7ec", "danger": "#d92d20",
-    "ok": "#232b2b", "warn": "#b54708", "tip": "#16181d",
+    "ok": "#bd2322", "warn": "#b54708", "tip": "#16181d",
 }
 MODES = ("system", "dark", "light")
-# Nov 23 (Jon, with Morpheus): good states (done, won, ready, OK) are no
-# longer green - the dark charcoal Morpheus uses, with its pale tint where
-# green had a pale background. Red stays for problems, amber for warnings.
-GOOD = "#232b2b"
-GOOD_SOFT = "#eef1f1"
+# Nov 23 (Jon): good states (done, won, ready, OK) are QuantiSheet red,
+# the same as QuantiLink - no green. Problems keep the look they had (their
+# own red and pink); the words (OK / OVER, Won / Lost) tell them apart.
+# Amber stays for warnings.
+GOOD = "#bd2322"
+GOOD_SOFT = "#fbeae9"
 
 
 class _Hub(QObject):

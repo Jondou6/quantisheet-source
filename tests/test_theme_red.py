@@ -42,28 +42,29 @@ def test_no_blue_or_green_accent_left():
             assert old not in src, (mod.__name__, old)
 
 
-def test_good_states_are_charcoal_not_green():
-    """Nov 23 (Jon, with Morpheus): done / won / ready / OK use the dark
-    charcoal and its pale tint; red stays for problems."""
+def test_good_states_are_red_not_green():
+    """Nov 23 (Jon): done / won / ready / OK use QuantiSheet red and its pale
+    tint, like QuantiLink; problems keep their own look."""
     import inspect
     from app import (accessibility_ui, ada_ui, betalicense, bidboard_ui,
                      prebid_ui,
                      calculators_ui, coverage_ui, exclusions_ui, fillsign_ui,
                      leveling_ui, qualify)
-    from app.pm import costui, recovery_ui
+    from app.pm import recovery_ui
     from app.service import visit_calendar_ui
-    assert theme.LIGHT["ok"] == theme.GOOD == "#232b2b"
+    assert theme.LIGHT["ok"] == theme.GOOD == ribbon.TILE_FILL.lower()
     assert _cr(theme.DARK["ok"], theme.DARK["window"]) >= 4.5
     assert _cr(theme.LIGHT["ok"], theme.LIGHT["window"]) >= 4.5
     assert bidboard_ui.STATUS_BG["Won"] == qualify.COLORS[qualify.OK] \
         == theme.GOOD_SOFT
     for mod in (accessibility_ui, ada_ui, betalicense, bidboard_ui,
                 calculators_ui, coverage_ui, exclusions_ui, fillsign_ui,
-                leveling_ui, qualify, costui, recovery_ui, visit_calendar_ui,
+                leveling_ui, qualify, recovery_ui, visit_calendar_ui,
                 prebid_ui,
                 ribbon):
         src = inspect.getsource(mod).lower()
         for old in ("#cdf0cd", "#12865a", "#2e7d32", "#3fb27f", "#1e8449",
                     "#28a745", "#2ea043", "#1b7f3b", "#d9f5e3",
-                    "222, 244, 222", "46, 160, 67", "20, 130, 50"):
+                    "222, 244, 222", "46, 160, 67", "20, 130, 50",
+                    "#232b2b", "#eef1f1", "35, 43, 43", "#d3dcdc"):
             assert old not in src, (mod.__name__, old)

@@ -971,7 +971,7 @@ class ModelStatus(QFrame):
         dark = theme.is_dark()
         p.setPen(theme.color("text") if self._state != "check"
                  else _ink(DISABLED_INK))
-        dot = {"up": "#232b2b" if not dark else "#d3dcdc",
+        dot = {"up": "#bd2322" if not dark else "#f2857e",
                "down": "#b54708" if not dark else "#e3a008",
                "off": "#6b7280",
                "check": "#6b7280"}.get(self._state, "#6b7280")

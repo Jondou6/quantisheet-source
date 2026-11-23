@@ -9,7 +9,7 @@ from PySide6.QtWidgets import QCalendarWidget, QHBoxLayout, QLabel
 
 from . import agreements, uiutil, workorder
 
-COLORS = {"done": "#232b2b", "open": "#1565c0", "due": "#c62828",
+COLORS = {"done": "#bd2322", "open": "#1565c0", "due": "#c62828",
           "upcoming": "#6d4c41"}
 
 

@@ -1,5 +1,5 @@
 QuantiSheet 1.1.29
-- New look: QuantiSheet's buttons, ribbon tiles, links and highlights are now QuantiSheet red, the red of the logo, so QuantiSheet and its companion programs match. Good states (done, won, ready, OK) are dark charcoal instead of green; red still marks problems and amber warnings. Your markup and takeoff colors don't change.
+- New look: QuantiSheet's buttons, ribbon tiles, links and highlights are now QuantiSheet red, the red of the logo, so QuantiSheet and its companion programs match. Your markup and takeoff colors don't change.
 - Help: the Features and How-To Guide (every feature and how to use it) now opens inside QuantiSheet from Help > Features & How-To Guide (PDF), the Guide button on the Help tab, or the top of the Help Center. It opens from a read-only copy, so it can't be changed by accident.
 - Auto Scale: when a sheet's scale note is too small to read at first, Auto Scale now looks again close up beside the graphic scale (for example SCALE: 1" = 5' or 1/2" = 1'-0"). The source shows close-up and the sheet is marked Check. If the reading doesn't agree with the graphic scale's labels, no scale is set.
 - Civil takeoff: a structure drawn in the plan and again on the profile is counted once, even when the profile copy's station can't be read.

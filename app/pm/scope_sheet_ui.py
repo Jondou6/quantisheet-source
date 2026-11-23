@@ -1774,7 +1774,7 @@ class ScopeSheetsPanel(QWidget):
                 it.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
             if c == 6 and var is not None:
                 it.setForeground(QBrush(NEG_FG if var > 0 else
-                                        QColor(35, 43, 43)))
+                                        QColor(189, 35, 34)))
             if c == 3 and s["math_errors"]:
                 it.setToolTip("A bidder's math check is off")
 

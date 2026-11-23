@@ -1,5 +1,5 @@
 """Pre-bid Checklist window (Estimate > Pre-bid Checklist): three checks,
-charcoal (ready) or red, a one-page printout and the bid lock."""
+ready or not, a one-page printout and the bid lock."""
 import os
 
 from PySide6.QtCore import Qt
@@ -21,7 +21,7 @@ def _report_path(doc, kind, ext):
         kind, os.path.splitext(os.path.basename(name))[0], ext=ext))
 
 
-# good is charcoal, not green (Nov 23, Jon); a lighter shade in dark mode
+# good is QuantiSheet red, not green (Nov 23, Jon); lighter in dark mode
 RED = QColor(185, 20, 20)
 
 

@@ -88,6 +88,8 @@ def main(argv):
         win.fit_page()
         for tab in ("Home", "Markup", "Takeoff", "Estimate", "Review",
                     "Project", "Pages", "Document", "Tools"):
+            if tab not in win.ribbon.pages:      # tabs move between versions
+                continue
             win.ribbon.show_page(tab)
             grab(win, f"{mode}-{tab.lower()}")
         dlg = win.command_search(show=False)
