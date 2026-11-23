@@ -692,10 +692,11 @@ class _CheckTab(_Base):
 
     @staticmethod
     def _rows(checks):
+        from . import theme
         out = []
         for name, actual, allowed, ok in checks:
             out.append(f"{name}: {actual:,.3g} vs {allowed:,.3g} allowed - "
-                       + ("<b style='color:#1b7f3b'>OK</b>" if ok else
+                       + (f"<b style='color:{theme.good_hex()}'>OK</b>" if ok else
                           "<b style='color:#b00020'>OVER</b>"))
         return "<br>".join(out)
 

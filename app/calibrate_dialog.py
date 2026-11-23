@@ -1,4 +1,4 @@
-"""Set Scale: one dialog, like Bluebeam's Calibrate."""
+"""Set Scale: one dialog to calibrate."""
 from PySide6.QtWidgets import (QButtonGroup, QComboBox, QDialog,
                                QDialogButtonBox, QFormLayout, QHBoxLayout,
                                QLabel, QLineEdit, QRadioButton, QVBoxLayout)

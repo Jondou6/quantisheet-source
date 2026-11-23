@@ -42,7 +42,7 @@ def _mark_busy():
         logging.getLogger(__name__).debug("ignored error", exc_info=True)
 
 def apply_line_setting():
-    """Acrobat's "Enhance thin lines": hairlines are drawn at least about
+    """"Enhance thin lines": hairlines are drawn at least about
     one screen pixel wide, so faint 0-width CAD lines don't break up or
     vanish when a sheet is zoomed out."""
     from . import render_opts, settings
@@ -121,7 +121,7 @@ TOOLS = {
     "esign_field": ("Signature Request Field", "rect"),
 }
 
-# tools whose points snap to the drawing (Bluebeam's "Snap to Content")
+# tools whose points snap to the drawing ("Snap to Content")
 SNAP_TOOLS = {"add_rect", "add_ellipse", "add_cloud", "add_line", "arrow",
               "add_polyline", "add_polygon", "calibrate", "measure_length",
               "measure_polylength", "measure_wall", "measure_area",
@@ -1052,7 +1052,7 @@ class PdfView(QWidget):
         self.setCursor(Qt.ArrowCursor if tool is None else
                        Qt.IBeamCursor if tool == "select_text" else
                        Qt.CrossCursor)
-        # Edit Text works in place, Acrobat-style (app/textedit.py)
+        # Edit Text works in place (app/textedit.py)
         ctl = getattr(self, "editctl", None)
         if tool == "edit_text":
             if ctl is None:
@@ -1934,7 +1934,7 @@ class PdfView(QWidget):
             if kind == "line" and not self._click_line and \
                     abs(b - a) * self.zoom < 4:
                 # a click, not a drag: the next click sets the end point
-                # (the way Bluebeam measures)
+                # (the way takeoff programs measure)
                 self._click_line = True
                 self._drag = (a, pt)
                 self.status.emit("Click the end point (Esc to cancel).")
@@ -3219,8 +3219,13 @@ class PdfView(QWidget):
         faster than re-serialising a big document."""
         d = self.doc
         try:
+            # Nov 23 (Chief, video 62): never read needs_pass here - after
+            # authenticate() that read drops MuPDF's key and the pages go
+            # blank. is_encrypted (locked) and the metadata (protected,
+            # even when unlocked) say the same without touching it.
             if (d.name and os.path.isfile(d.name) and not d.is_dirty
-                    and not d.is_encrypted and not d.needs_pass
+                    and not d.is_encrypted
+                    and not (d.metadata or {}).get("encryption")
                     and not getattr(d, "is_repaired", False)):
                 with open(d.name, "rb") as f:
                     return f.read()
@@ -3736,7 +3741,7 @@ class PdfView(QWidget):
         return best[1:] if best else None
 
     def cutout(self, ppts):
-        """Take an opening out of the area it's drawn in (PlanSwift-style
+        """Take an opening out of the area it's drawn in (a
         cutout): the area's quantity becomes the net area."""
         sc = self.scale(at=ppts)
         if not sc:

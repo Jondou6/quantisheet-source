@@ -1,4 +1,4 @@
-"""Edit PDF mode, Acrobat-style.
+"""Edit PDF mode.
 
 With the Edit Text tool on, every paragraph and picture on the page gets a
 light outline. Click in a paragraph and type right there: the text is

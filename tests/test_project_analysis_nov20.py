@@ -179,3 +179,130 @@ def test_window_ntp_and_run_again(win, tmp_path):
     assert again.from_cache
     assert again.run_again()
     assert os.path.exists(dlg.export_pdf(str(tmp_path / "pa.pdf")))
+
+
+# phrasings from a real municipal bid book (Nov 21), made-up project
+REAL = [
+    "INVITATION FOR BIDS\nSealed bids will be received until 2:00 P.M. on "
+    "December 17th, 2026, and then publicly opened and read aloud. The "
+    "work to be done consists of furnishing all materials, equipment and "
+    "labor necessary to construct the Example Lift Station Replacement.",
+    "BID FORM\nBidder agrees to fully complete the project within 180 "
+    "consecutive calendar days thereafter. Bidder further agrees to pay as "
+    "liquidated damages the sum of 500 dollars for each consecutive "
+    "calendar day thereafter.",
+    "GENERAL CONDITIONS\nThe Owner will retain a portion of each estimate "
+    "until final completion and acceptance of all work covered by this "
+    "contract in accordance with the following: 1. Retention of up to 10 "
+    "percent of payment claimed.",
+    "FEDERAL LABOR STANDARDS\nThe contractor shall be liable for liquidated "
+    "damages for each laborer or mechanic employed in violation of the "
+    "overtime clause, computed at 10 dollars for each calendar day.",
+    "a. Commercial General Liability Insurance: limits not less than the "
+    "following: General Aggregate $2,000,000.00 Each Occurrence "
+    "$1,000,000.00",
+]
+
+
+def test_real_bid_book_phrasings(tmp_path):
+    import datetime
+    from app import projanalysis as pa
+    p = tmp_path / "real.pdf"
+    _spec(str(p), REAL)
+    by = {r["key"]: r for r in pa.run(fitz.open(str(p)))}
+    assert by["bid_date"]["value"] == "December 17th, 2026, 2:00 P.M."
+    assert by["summary"]["value"].startswith(
+        "The work to be done consists of furnishing all materials")
+    assert by["final"]["value"] == "180 calendar days"
+    assert by["ld_value"]["value"] == "500 dollars per day"
+    assert by["ld_value"]["also"] == []          # not the overtime clause
+    assert by["retainage"]["value"] == "10%"
+    assert by["insurance"]["value"] == "$1,000,000.00 each occurrence"
+    assert pa.completion_dates(list(by.values()),
+                               datetime.date(2027, 1, 4))["final"] == \
+        datetime.date(2027, 7, 3)
+
+
+def test_final_falls_back_to_contract_time(tmp_path):
+    from app import projanalysis as pa
+    p = tmp_path / "ct.pdf"
+    _spec(str(p), ["The Contractor shall complete the work within 120 "
+                   "calendar days."])
+    by = {r["key"]: r for r in pa.run(fitz.open(str(p)))}
+    assert by["final"]["value"].startswith("120 days (contract time")
+    assert pa._days(by["final"]["value"]) == (120, "calendar")
+
+
+def test_same_amount_written_two_ways_is_one_answer():
+    from app import projanalysis as pa
+    assert pa._same("$500.00 per day") == pa._same("$500 per day")
+    assert pa._same("$1,000.00") != pa._same("$100")
+
+
+def test_office_address_is_not_the_project_address(tmp_path):
+    p = tmp_path / "o.pdf"
+    _spec(str(p), ["Bids will be received by the Owner in their office "
+                   "located at 12 Sample Street, Exampleville, SC 29000 "
+                   "until 2:00 PM on January 5, 2027."])
+    by = {r["key"]: r for r in bidterms.analysis(fitz.open(str(p)))}
+    assert by["address"]["value"] == "not found"
+    p2 = tmp_path / "s.pdf"
+    _spec(str(p2), ["The new building is located at 45 Demo Road, "
+                    "Exampleville, SC 29000."])
+    by = {r["key"]: r for r in bidterms.analysis(fitz.open(str(p2)))}
+    assert by["address"]["value"] == "45 Demo Road, Exampleville, SC 29000"
+
+
+def test_local_ai_summary_inside_the_window(win, tmp_path):
+    from app import projanalysis as pa
+    p = tmp_path / "spec.pdf"
+    _spec(str(p))
+    assert win.open_path(str(p))
+    dlg = win.project_analysis(show=False)
+    seen = {}
+
+    def fake(prompt):
+        seen["prompt"] = prompt
+        return "  A new single-story restroom building with site utilities. "
+    assert dlg.ai_summary(ask=fake, wait=True).startswith("A new single")
+    assert "Do not give any dollar amounts" in seen["prompt"]
+    assert "[page 3]" in seen["prompt"]            # the summary's page first
+    keys = [r["key"] for r in dlg.rows]
+    assert keys[keys.index("summary") + 1] == "ai_summary"
+    texts = [dlg.table.item(r, 0).text() for r in range(dlg.table.rowCount())]
+    assert "6. Summary (local AI)" in texts
+    assert pa.cached(win._view.doc)[keys.index("ai_summary")]["value"] == \
+        "A new single-story restroom building with site utilities."
+
+    def broken(prompt):
+        raise RuntimeError("Can't reach Ollama")
+    assert dlg.ai_summary(ask=broken, wait=True) is None
+    assert "No AI summary" in dlg.intro.text() and dlg.ai_btn.isEnabled()
+
+
+def test_questions_due_counted_back_from_bid_day(tmp_path):
+    from app import projanalysis as pa
+    p = tmp_path / "q.pdf"
+    _spec(str(p), ["Sealed bids will be received until 2:00 P.M. on "
+                   "December 17th, 2026. Each request for interpretation "
+                   "should be in writing and, to be given consideration, "
+                   "must be received at least seven (7) days prior to the "
+                   "date fixed for the opening of bids."])
+    by = {r["key"]: r for r in pa.run(fitz.open(str(p)))}
+    assert by["questions_due"]["value"] == \
+        "December 10, 2026 (7 days before bid opening)"
+    assert pa.parse_day("12/17/26") == pa.parse_day("Dec. 17, 2026")
+
+
+def test_questions_due_with_the_number_written_out(tmp_path):
+    from app import projanalysis as pa
+    p = tmp_path / "q2.pdf"
+    _spec(str(p), ["Sealed bids will be received until 2:00 P.M. on "
+                   "December 17th, 2026. To be given consideration, the "
+                   "request must be received at least ten days prior to the "
+                   "date fixed for the opening of bids."])
+    by = {r["key"]: r for r in pa.run(fitz.open(str(p)))}
+    assert by["questions_due"]["value"] == \
+        "December 7, 2026 (10 days before bid opening)"
+    f = pa.bidboard_fields(list(by.values()))
+    assert f["rfi_due"] == "2026-12-07"

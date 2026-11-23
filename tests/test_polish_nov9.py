@@ -361,11 +361,22 @@ def _slow_server(handler_sleep=5, tls=None):
 
     class Slow(http.server.BaseHTTPRequestHandler):
         def do_POST(self):
+            # read the request body first: closing a socket with unread
+            # data makes Windows reset the connection (WinError 10053 on
+            # the client) - the flaky failure of Nov 19-20
+            try:
+                n = int(self.headers.get("Content-Length") or 0)
+                if n:
+                    self.rfile.read(n)
+            except OSError:
+                pass
             time.sleep(handler_sleep)
+            body = b'{"response": "late"}'
             try:
                 self.send_response(200)
+                self.send_header("Content-Length", str(len(body)))
                 self.end_headers()
-                self.wfile.write(b'{"response": "late"}')
+                self.wfile.write(body)
             except OSError:
                 pass
 

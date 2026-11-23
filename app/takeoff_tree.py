@@ -648,7 +648,7 @@ class TakeoffTree(QWidget):
         self.changed.emit(self.current_page)
         return rec
 
-    # one strong color per item, areas see-through - the clean PlanSwift
+    # one strong color per item, areas see-through - the clean
     # look (Chief of Staff's v5 idea, done here on the existing markups)
     PALETTE = takeoff_items.PALETTE
 

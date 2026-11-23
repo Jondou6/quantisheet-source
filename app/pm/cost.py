@@ -1,7 +1,7 @@
 """Job cost: budget, commitments, change events, direct costs, owner
 billing and the forecast - all worked out from Project Center records.
 
-Numbers follow Procore / StratusVue conventions:
+Numbers follow common construction-accounting conventions:
   revised budget  = original + approved change-event costs
   committed       = commitment SOVs + approved change-event costs placed
                     with that vendor
@@ -116,7 +116,7 @@ def commitment_numbers(store, c):
 
 
 def compliance(store, rec, kind="cost", today=None):
-    """What stops paying this vendor, Sage 300 / Procore style:
+    """What stops paying this vendor, as accounting systems do:
     [text]. For a cost: its commitment's insurance and license must be
     current, a W-9 on file, and a subcontractor invoice needs a lien
     waiver. For a commitment: the same documents."""

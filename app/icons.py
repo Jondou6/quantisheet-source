@@ -238,7 +238,7 @@ def _colors():
         t = theme.tokens()
         return t["text"], t.get("accent_text", t["accent"]), t["faint"]
     except Exception:
-        return "#2d2d32", "#0e6a60", "#9aa0ab"
+        return "#2d2d32", "#bd2322", "#9aa0ab"
 
 
 _renderers = {}

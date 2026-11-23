@@ -11,8 +11,8 @@ from app.ribbon import RibbonButton, tile_contrast             # noqa: E402
 from test_gui import win, qapp                                 # noqa: E402,F401
 
 
-def test_green_tile_glyph_clears_aa(qapp):
-    """White glyphs clear 4.5:1 on the green tile, including the lighter
+def test_red_tile_glyph_clears_aa(qapp):
+    """White glyphs clear 4.5:1 on the red tile, including the lighter
     gradient end and hover. The fill is the same in light and dark mode."""
     ratios = tile_contrast()
     for key in ("fill", "top", "hover", "pressed", "disabled"):

@@ -1,4 +1,4 @@
-"""Takeoff-style legend and PlanSwift-style count markers
+"""Takeoff-style legend and count markers
 (LEGEND_MATCH_BRIEF items 1-11)."""
 import fitz
 

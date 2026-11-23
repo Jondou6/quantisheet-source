@@ -1,0 +1,4 @@
+QuantiSheet 1.1.28
+- Fixed: a password-protected PDF opened blank after the right password was typed, and Remove Security then saved a copy that wouldn't open. Protected PDFs now open with their pages showing, and Remove Security writes a copy that opens without a password.
+- Signature Requests: the Track details show when each person signed in your own time (Nov 23, 2026 11:28 AM) instead of an unlabeled UTC time.
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.28 - the full source of this build. Help > About shows the same link.

@@ -560,9 +560,28 @@ def _station_of(item, ls, reach=20.0):
     return best[1] if best else None
 
 
+_CTX_SKIP = {"STA", "MANHOLE", "THE", "AND", "NEW", "EXISTING", "SEE",
+             "DETAIL", "SHEET", "TYP", "PROPOSED"}
+CTX_REACH = 45.0
+
+
+def _context(item, ls, reach=CTX_REACH):
+    """The words of the callout and the lines right by it (the rest of a
+    stacked callout), for telling the same callout drawn twice."""
+    words = set()
+    for t, r in ls:
+        if _gap(r, item["rect"]) <= reach:
+            words |= {w for w in re.findall(r"[A-Z]{3,}", t.upper())
+                      if w not in _CTX_SKIP}
+    return words
+
+
 def _one_per_station(out, ls):
     """An unnumbered callout shown in the plan and again up the profile
-    at the same station is one structure (Nov 19, civil set)."""
+    at the same station is one structure (Nov 19, civil set). When the
+    profile copy's station can't be read (text running up the sheet), it
+    is still the same structure if it says the same thing ("AIR RELEASE
+    VALVE & MANHOLE") as a callout with a station (Nov 23)."""
     seen = set()
     keep = []
     for o in out:
@@ -575,7 +594,19 @@ def _one_per_station(out, ls):
                     continue
                 seen.add(key)
         keep.append(o)
-    return keep
+    if not any(re.search(r"\bPROFILE\b", t, re.I) for t, _r in ls):
+        return keep
+    out2 = []
+    for o in keep:
+        if o.get("unnumbered") and o.get("station") is None:
+            mine = _context(o, ls)
+            if len(mine) >= 2 and any(
+                    k is not o and k.get("unnumbered") and
+                    k["kind"] == o["kind"] and k.get("station") is not None
+                    and len(mine & _context(k, ls)) >= 2 for k in keep):
+                continue
+        out2.append(o)
+    return out2
 
 
 UNNAMED_SAME_PT = 100.0      # two unnumbered callouts of one kind this close

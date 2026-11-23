@@ -15,24 +15,30 @@ DARK = {
     "window": "#1b1c1f", "surface": "#232428", "surface2": "#2b2d32",
     "raised": "#33353b", "border": "#3a3c43", "border2": "#4a4d55",
     "text": "#e8e9ec", "muted": "#9a9da6", "faint": "#6b6e77",
-    # Nov 6 (Jon): the tile green instead of blue. Fills use the tile
-    # green itself; green text and lines on the dark background use a
-    # lighter shade of it (the tile green is 2.6:1 there, this is 7.2:1).
-    "accent": "#0e6a60", "accent2": "#1f746b", "on_accent": "#ffffff",
-    "accent_text": "#3dbba9",
-    "accent_soft": "#173430", "canvas": "#131416", "danger": "#f05252",
-    "ok": "#3fb27f", "warn": "#e3a008", "tip": "#2b2d32",
+    # Nov 23 (Jon): QuantiSheet red, the logo's red, so every program
+    # matches (was the tile green, Nov 6). Fills use the logo's dark red;
+    # red text and lines on the dark background use a lighter shade of it
+    # (6.8:1 there).
+    "accent": "#bd2322", "accent2": "#c9302c", "on_accent": "#ffffff",
+    "accent_text": "#f2857e",
+    "accent_soft": "#3d1f1e", "canvas": "#131416", "danger": "#f05252",
+    "ok": "#d3dcdc", "warn": "#e3a008", "tip": "#2b2d32",
 }
 LIGHT = {
     "window": "#f3f4f6", "surface": "#ffffff", "surface2": "#f5f6f8",
     "raised": "#eceef2", "border": "#e5e7eb", "border2": "#d1d5db",
     "text": "#16181d", "muted": "#5f6470", "faint": "#9aa0ab",
-    "accent": "#0e6a60", "accent2": "#0b5a51", "on_accent": "#ffffff",
-    "accent_text": "#0e6a60",
-    "accent_soft": "#e2f1ee", "canvas": "#e4e7ec", "danger": "#d92d20",
-    "ok": "#12865a", "warn": "#b54708", "tip": "#16181d",
+    "accent": "#bd2322", "accent2": "#a91d1d", "on_accent": "#ffffff",
+    "accent_text": "#bd2322",
+    "accent_soft": "#fbeae9", "canvas": "#e4e7ec", "danger": "#d92d20",
+    "ok": "#232b2b", "warn": "#b54708", "tip": "#16181d",
 }
 MODES = ("system", "dark", "light")
+# Nov 23 (Jon, with Morpheus): good states (done, won, ready, OK) are no
+# longer green - the dark charcoal Morpheus uses, with its pale tint where
+# green had a pale background. Red stays for problems, amber for warnings.
+GOOD = "#232b2b"
+GOOD_SOFT = "#eef1f1"
 
 
 class _Hub(QObject):
@@ -73,6 +79,11 @@ def name():
 
 def color(key):
     return QColor(tokens()[key])
+
+
+def good_hex():
+    """Good-state text colour for rich text, readable in either theme."""
+    return tokens()["ok"]
 
 
 def is_dark():

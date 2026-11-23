@@ -1,4 +1,4 @@
-"""Tests for the Acrobat-style tools."""
+"""Tests for the PDF tools."""
 import os
 import re
 import zipfile

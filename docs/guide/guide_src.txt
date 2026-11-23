@@ -1,0 +1,625 @@
+@h1 About this guide | about
+This guide lists what QuantiSheet can do and shows, step by step, how to do the main jobs. It covers QuantiSheet through version {V}. Features added in versions 1.1.17 to {V} are marked with the version that introduced them. To see which version you have, open **Help > About QuantiSheet**. If you have an earlier version, update first (see "Install and update").
+Chapter 8 lists every command in every menu and every ribbon tab, so nothing is left out. Menu paths are written like **Takeoff > Check Takeoff**. Keyboard shortcuts are written like **Ctrl+K**. Inside the program, **Help > Features & How-To Guide (PDF)** opens this guide (1.1.29), and **F1** opens the Help Center, which has a lesson with hands-on steps for most of what is in this guide, and **Help > Video Tutorials** (1.1.18) opens QuantiSheet's video channel.
+@h1 1. What QuantiSheet is | what | samepage
+QuantiSheet is a Windows desktop program for construction takeoff and estimating. You open a plan set, read the specifications, set the scale, measure, price the quantities and check the bid before it goes out. After the award, it keeps RFIs, submittals, the punch list, daily logs, the schedule and job cost in one place.
+It works on PDF drawings. Your markups and quantities are saved inside the PDF, so anyone who opens the file sees them.
+@h2 Who it is for
+The first time QuantiSheet opens, it asks "What do you mostly do?" and offers four roles: **Estimator**, **Project Manager**, **Service** and **Office**. Your choice sets which tabs and quick-bar buttons you see, so the program fits the work you do. You can skip the question and change your mind later.
+@h2 System requirements
+- Windows 10 or Windows 11, 64-bit (x64).
+- 8 GB of RAM.
+- Nothing else has to be installed. The drawing tools are built into the program.
+- Optional extras, each a separate download: **Tesseract OCR** (to make scanned drawings searchable) and **Ollama** with the llama3.2 model (for the optional local AI helpers). Everything else works without them.
+@h2 Install and update
+1. Open QuantiSheet's page in the Microsoft Store: [[https://apps.microsoft.com/detail/9MZM8WD6CS7W]] and install it from there.
+1. To check for a newer version, use **Help > Check for Updates Now**. In the Microsoft Store copy, updates come through the Store; if the Store does not answer, QuantiSheet offers to open its Store page, where you can update.
+1. **Help > About QuantiSheet** shows your version and when the last check happened. **Help > Check for Updates Automatically** turns the automatic check on or off on copies that check for updates.
+QuantiSheet is open source under the GNU AGPL-3.0 license. **Help > About** shows the link to the source code of your version.
+
+@h1 2. Features at a glance | glance
+@h2 Open, view and navigate
+- Fast zoom and paging: fit width, fit page, actual size, marquee zoom, previous view and go-to-page.
+- Big plan sets (hundreds of sheets): pages ahead of you are drawn in the background, text search works across the whole set, and sheets open without the window freezing.
+- Auto Bookmark Sheets (bookmarks every sheet by number and title) and Link Sheet References (callouts such as 3/A-501 become clickable links).
+- Ctrl+K command search finds commands, sheets, takeoff items, Tool Chest tools, RFIs and service records.
+- One window by default, with **File > New Window** when you want a second one.
+- Role-based tabs, a quick bar you can pin your own commands to, and a right-click page menu.
+- Open Plan Set in QuantiSheet: right-click a plan room download (.zip) in Windows and it is unzipped into a job folder, sorted and opened (1.1.20).
+- Watch Plan Folder: new sheets and addenda that land in a job's download folder are offered to you as the next step (1.1.20).
+@h2 Scale
+- Auto Scale reads the scale printed on every sheet at once; choose a preset; or calibrate to a dimension you know.
+- Engineering scales (1" = 20', 1" = 20' HORIZ.) and the labels of a graphic scale are read too, and marked Check until you confirm them (1.1.21).
+- Warnings for half-size prints and unusual sheet sizes; a scale read from a title block stays marked until you confirm it.
+- Viewports give a detail at a different scale its own scale.
+- A "Check Against Dimensions" option confirms a scale from the drawing's own dimension strings.
+@h2 Manual takeoff
+- Length, polylength, area, cutout, volume, count and wall area (length x height less openings), with totals by group in the Quantities panel.
+- Rise/drop, convert between measurement types, show volume in cubic feet, yards or inches, copy several times, add more to a count.
+- Trace Length, Trace Outline and snap to line ends and corners.
+- Reshape outlines by dragging corners, select several markups at once, bulk edit, join and split runs, and draw arcs.
+- Copy takeoff from one sheet to another; it is re-measured at the new sheet's scale.
+- Typical sheets (count a sheet more than once), colour by item, and show only one item.
+- Buy Quantities turns totals into sheets, boxes or rolls with waste; Wood Sheathing Helper gives the span rating, panel thickness and 4x8 sheets for an area (1.1.21).
+- Tool Chest and tool sets you can share with your team as a file, including a metric set; live legends.
+- Takeoff Standard checklist for your office's way of doing takeoff.
+@h2 Automatic takeoff
+- Auto Area traces a room with one click; Auto Takeoff Rooms measures every tagged room and checks each against its tag's square footage.
+- Auto Takeoff Walls and Doors measures wall centerlines by thickness and counts doors by width; Walls by Role sorts walls into Exterior, Corridor, Demising, Shaft, Restroom and Interior.
+- Count Symbol counts every copy of a symbol, including turned ones; Count Several Symbols, Count From a Picture and a Count Library you can reuse on every job; Show Uncounted Copies finds missed ones.
+- Count by Label finds tags such as P-1 or WH-2, with wildcards for whole families, and lists every hit before anything is counted.
+- Check Takeoff steps you through every automatic result so a person accepts or deletes it before it counts.
+@h2 Trade and civil takeoff
+- 3D Model Quantities (1.1.27): elements by kind, type and storey with their lengths, areas and volumes from an IFC building model, to the estimate.
+- Roof Plan Takeoff: true sloped quantities and squares from the roof you drew. Aerial Photo Page: measure a site on a scaled public aerial photo, and export its markups to mapping programs. Import DXF drawings for takeoff.
+- Trade Takeoff: pipe and conduit, ductwork, fixtures and devices, structural steel, drywall and paint, roofing, rebar and earthwork.
+- Civil and utilities: sewer, storm and water pipe by size and depth band, manholes and structures, with trench assemblies.
+- Plan and profile sheets: pipe length from the stations along the line (STA 0+00 to 15+41 = 1,541 LF), callouts drawn as linework read, NEW SSMH counted, and a structure shown in plan and profile counted once (1.1.21). Existing manholes marked for rehabilitation are counted as work (1.1.24).
+- Work Notes Takeoff reads quantities that drawings state in words (for example, "INSTALL: 2 - 6-INCH PLUG VALVE"), plus fence, keyed notes and electrical one-line feeder tags. Compare with Earlier Set lists what a new issue changed, and notes are read about four times faster (1.1.17).
+@h2 AI Takeoff (runs on your PC)
+- Reads a whole plan set (sheet numbers, titles, disciplines and scales), then takes off rooms, pipe, manholes, structures and fixtures.
+- AI results are drawn dashed with an "AI" badge and stay out of every total until you accept them. Anything it is not sure of goes to a Review Queue, least sure first.
+- Zones tell it where to work or what to leave out, and it learns your item names.
+- It reads the work notes, traces rooms on scanned floor plans and makes scanned sheets searchable first. On civil sets drawn as linework, it reads the callouts for you, rotated sheets included (1.1.21).
+- Ask the Project, Draft Daily Log From Notes, Check Submittal Against Spec and Project Risk Flags (1.1.27).
+- Optional local AI helpers (with Ollama installed): scope summary, find RFIs, translate markups and more. Nothing is sent to the internet.
+- Voice commands for hands-free use.
+@h2 Specifications and bid documents
+- **Project Analysis** (1.1.25): open the specifications and click one button. It answers the bid questions (project name, address, budget, substantial and final completion, liquidated damages, summary of work, bid date, pre-bid meeting, retainage) and more, each with its section and page. It reads more ways of writing them from 1.1.26.
+- Summarize with Local AI writes a short scope summary on your PC, and Send to Bid Board makes a Bid Board entry from the answers (1.1.26).
+- Find Bid Terms: bid bond, how long the bid must hold, prevailing wage, liquidated damages, pre-bid meeting, DBE / MBE / SBE goals, retainage, contract time and alternates (1.1.22).
+- Manufacturers in Specs: each section's listed manufacturers and basis-of-design products, with a quote-request list by trade (1.1.24).
+- Bid Submittal Checklist: signed bid forms, bid bond, license, insurance certificate and the bid reference number, with bid day and hold days (1.1.20, 1.1.22).
+- All four are on their own **Project Analysis** ribbon tab and menu, after Tools.
+@h2 Estimating and bidding
+- Price takeoff with assemblies, cost books, labor rates and crews you can edit; add overhead, profit, bond and markups; make a proposal PDF.
+- **Calculators** (1.1.23 to 1.1.25): Concrete, Brick & Block, Roofing, Rebar, Beam / Header, Column / Post, Footing Size, Metal Studs, Structural Steel, Earthwork, Aggregate / Asphalt, Drywall and Paint, with Add to Estimate.
+- Civil estimating by crew and production rate, with the owner's bid schedule, haul calculator, prevailing wage import, saved bid versions, quotes, crew schedule and cash flow.
+- The Estimate panel follows AI Takeoff and the Work Notes list; a work note's total is kept in one place, so a count cannot be added twice.
+- Estimate Error Check and the bid gate: old prices, expired quotes (including quotes that run out before the bid stops holding, 1.1.22), unpriced addenda, placeholders and double counts.
+- Pre-bid Checklist and Lock Bid; Missed-Item Report.
+- Bid Tabs, Bid Leveling, Leveling Board, Scope Sheets with a math check, exclusions side by side, and Variance against your own estimate.
+- Bid Board for invitations, Go / No-Go scoring (with a competition question from 1.1.22), win-rate results; Bid Form Autopilot and Bid Form Workbook (spreadsheet) with addenda checking; Builder's Risk Quote Request.
+- Job Cost Feedback: bring in actual costs and get suggested prices from closed jobs.
+- Quick $/SF and Model Estimates from your job history, the Estimating Dashboard, Time Log, a price database, location factors and your own price lists.
+- Estimating Tools: estimate templates, material order list, supplier price lists, rate matching, assembly rules and wall-type assemblies, crew hours by pay item, bid-day quote comparison, estimate vs actual and a planning cost model.
+- Bid packages to subs: Company Directory, prequalification, sealed bids, leveling, award letters and bidding reports.
+- Coverage Map and Second Check, and Lock Bid Set.
+- Export Bid Package: proposal, estimate summary, estimate detail and takeoff sheets in one folder and one zip; it offers to mark the bid Submitted on the Bid Board (1.1.17).
+@h2 Revisions
+- Compare Revisions: Overlay, Changes or Text; Cloud Changes; Revision Changes lists what changed in quantities and dollars.
+- Slip Sheet and Batch Slip Sheet swap in new sheets and carry your markups and takeoff over; takeoff on a changed area is flagged "Check - drawing revised".
+- The Revision Log counts AI Takeoff's worked-out quantities and the work notes' totals too (1.1.17).
+- Drawing Register and Transmittals.
+@h2 Project management
+- Project Center: RFIs, submittals, punch list, daily logs, meetings, with numbered items and "ball in court".
+- Schedule with critical path, Gantt chart, 3-week lookahead, baselines, and import and export of XML and XER schedule files; Project Calendar; Master Schedule for monthly subcontractor updates.
+- Cost: budget, prime contract, commitments, change events, direct costs and invoices, owner pay apps, cost summary, forecast and cash flow.
+- Scheduler (Gantt) without a drawing open, Build Schedule From Plans, Submittal Log from the spec book, Spec Book Sections, Weekly Owner Report, punch list and three-phase inspections.
+- Contract & Billing: contract, schedule of values, change orders, pay applications and lien waivers.
+- Back Office: crew board, job cost report, payables with duplicate checks, approvals, payroll key, safety meetings, incidents, pre-task plans, equipment and warranty calls.
+- Logins and roles on a shared project.
+- Live collaboration on the same drawing.
+- Package Tracker for the major parcel carriers.
+@h2 Service tab
+- Work orders, dispatch board, signed time-and-material tags, customer history, service agreements, visit calendar, tune-up planner and handover, warranty registrations, refrigerant log, backflow test report, maintenance checklists, flat-rate pricebook, good / better / best quotes, recommendations and truck stock, changeout proposals and load reports, equipment and service records, and customer quotes with options.
+@h2 Codes, accessibility and claims
+- ADA Standards (2010) and ADA Checker, Code Check (occupant load, egress, accessibility, plumbing), climate zone by county, your code library, and an accessibility check and fixer for PDFs. ClaimIT for insurance claim estimates.
+@h2 Generate a starter set
+- A short brief becomes a ten-sheet starter set with a quantity summary for the estimate.
+@h2 PDF tools
+- Edit text and pictures on the page; organize, combine, split, extract and replace pages; booklet and N-up.
+- Fillable forms: click into a field and type, Tab to the next one, drop-downs open on the field, and forms work out their own totals as you fill them (1.1.17, 1.1.18).
+- Fill & Sign, signature requests, digital signatures and verification.
+- Markups, Tool Chest, the Markups List with custom columns and statuses; RFIs from markups.
+- Make Searchable (OCR), copy text and schedules from a drawing, redaction, remove hidden information, reduce file size, check and repair.
+- **File > Save As > Reduced Size PDF** saves a smaller copy straight away (1.1.22).
+- Create PDFs from other files and from any program (the QuantiSheet printer); headers, footers, page and Bates numbers, watermarks, crop; password protection; search and redact; flatten; layers; preflight and PDF/X; the Action Wizard for many files at once; auto-markup by rules.
+- Export to documents (.docx), spreadsheets (.xlsx), slides (.pptx), web page, text, DXF (CAD), PDF/A, PNG and JPEG; export markups (XFDF); external issue with pricing stripped.
+@h2 Safety net
+- AutoSave, crash recovery and version history; weekly automatic backup; warnings before a save would break a signature; a newer file is opened read-only for saving.
+
+@h1 3. Getting started: your first job | start
+This walk-through takes about ten minutes and uses the practice drawings that come with QuantiSheet, so nothing you do matters. For a quick look at what each part of the window is, use **Help > Welcome Tour**.
+1. **Open the practice drawings.** Choose **Help > Open Practice Drawings**. A small sample set opens in its own tab.
+1. **Go to the floor plan.** Press **PgDn** or click the page in the Pages panel. Zoom with **Ctrl+mouse wheel**; **Ctrl+0** fits the page.
+1. **Check the scale.** Look at the scale chip at the bottom right. If it says no scale, click **Set Scale**, click both ends of a dimension you can read, and type its length.
+1. **Measure a room.** Press **Shift+A** (Area), click each corner, then press **Enter** to finish. The square feet show on the plan and in the Markups List.
+1. **Measure a wall and count doors.** Press **Shift+L** (Length) and click both ends of a wall. Press **Shift+C** (Count) and click each of three doors.
+1. **Cloud something.** Press **C**, drag a box around it, then type a note in the Properties panel's Subject or Comment.
+1. **Edit it.** Press **V** (Select) and click your area. Change its colour or label in Properties. **Delete** removes it and **Ctrl+Z** brings it back.
+1. **Search every sheet.** Press **Ctrl+F**, type DOOR and press Enter. Matches light up; press Enter again to go to the next.
+1. **Read the Markups List** on the right side: every cloud and measurement you made, with totals. Click a row to jump to it.
+1. **Save** with **Ctrl+S**. Everything is kept inside the PDF.
+Good to know from the first minutes:
+- Lost? Press **Ctrl+K** and type what you want to do.
+- **Esc** always takes you back to the Select tool.
+- AutoSave (bottom right) saves your open files every couple of minutes. After a crash, QuantiSheet offers to recover your work, or use **File > Recover Unsaved Files**.
+@h2 Starting a real job
+- **File > Open** (Ctrl+O) opens a PDF. **File > Open Project Folder** lists every PDF of a job in the Documents panel.
+- **Project > New Set From Files** turns the PDFs of a job into one set with a sheet list; open it any time with **Project > Open Set**.
+- **File > Open Bid Download (.zip) as a Job** unpacks a plan room's zip into Drawings, Specs, Addenda and Other, combines the drawings, opens them, reads sheet names and scales, and makes the folder a Project Center job. In Windows, right-click the zip and choose **Open Plan Set in QuantiSheet** to do the same (1.1.20).
+- **Project > Watch Plan Folder** (1.1.20) points the job at the folder its plan sets and addenda download into, so new files are offered to you as they arrive.
+- Open the specifications and click **Project Analysis** (Home tab or the Project Analysis tab) for the bid date, pre-bid meeting, bonds, completion times and the rest, then **Send to Bid Board** (1.1.25, 1.1.26).
+- Then run **Takeoff > Auto Scale (Read Sheets)** to set the scale on every sheet at once.
+
+@h1 4. How-to guides | howto
+@h2 4.1 Move around a drawing | h41
+1. **Ctrl+2** fits the width, **Ctrl+0** fits the page and **Ctrl+1** is actual size (Fit Width and Fit Page are also on the Home tab).
+1. **Ctrl+mouse wheel** zooms where the pointer is. Drag a box with the right mouse button, or press **Z**, to zoom to a box.
+1. Hold the wheel button and drag to pan.
+1. **PgDn / PgUp** turn pages; **Ctrl+G** goes to a page number.
+1. **Alt+Left** goes back to where you were, after a zoom or after following a sheet link.
+1. **Pages > Link Sheet References** turns callouts like 3/A-501 into links.
+1. **View > Enhance Thin Lines** keeps hairlines visible when zoomed out.
+@h2 4.2 Set the scale | h42
+Every measurement depends on the scale, so set it first.
+1. On the Takeoff tab, choose **Auto Scale (Read Sheets)** to read the scale printed on each sheet and set them all.
+1. Or pick a preset from the scale box on the Takeoff tab (for example 1/4" = 1'-0"). **Takeoff > Scale Presets** asks which pages: this one, every page, pages the same size, or a list such as 1-4, 7.
+1. Or calibrate: drag along a dimension you know and type its length.
+1. A written scale is only right on a full-size print. If a sheet says HALF SIZE, is a small sheet (11x17) or is a different size from most of the set, you are warned. Check a known dimension.
+1. For a detail at a different scale, use **Viewport (Scale Region)** to draw a box with its own scale.
+1. The status bar at the bottom right shows the scale of the page you are on. When QuantiSheet reads a scale from a title block, the status bar says "(read from title block - click to confirm)". Check a known dimension, click the scale and choose **Scale Looks Right (Confirm)**.
+1. Civil sheets (1.1.21): Auto Scale also reads engineering scales such as 1" = 20' (and 1" = 20' HORIZ. under a profile) and the labels of a graphic scale (20' 0 20' 40'), including scales drawn as linework rather than typed. A scale found this way is marked **Check**: confirm it with a known dimension before measuring.
+1. Small print (1.1.29): when a sheet has a graphic scale but its scale note is too small to read at first, Auto Scale looks again close up beside the graphic scale (for example SCALE: 1" = 5' or 1/2" = 1'-0"). The source column shows **close-up** and the sheet is marked **Check**. If the close-up reading doesn't agree with the graphic scale's labels, no scale is set.
+Tip: always check one known dimension before trusting quantities.
+@h2 4.3 Measure by hand | h43
+1. Type a group name in the Properties panel's **Subject** box ("Interior Wall", "Carpet"). Every measurement you take goes into that group.
+1. **Length** (Shift+L): click, click. **Polylength** (Shift+P): click each corner, double-click to finish.
+1. **Area** (Shift+A): click the corners, double-click to close. **Cutout** (Shift+X) deducts an opening.
+1. **Count** (Shift+C): click each item.
+1. **Wall Area** (Shift+W): click along the wall, double-click, then type its height (9') and any openings (3x7 x2, 6x4). The quantity is length x height less the openings, in square feet.
+1. Turn on snap with **Shift+F9**: the cursor snaps to line ends and corners.
+1. **Trace Length** (Shift+T): click a drawn line and its whole run is measured.
+1. The **Quantities** panel totals everything by group. A tool stays on after each measurement until you press **Esc**.
+Useful right-click options on a measurement: **Set Typical Count**, **Wall Height and Openings**, **Rise / Drop** (conduit dropping 8' to a switch measures plan length + 8'), **Convert To** (an area's outline becomes its perimeter, a run becomes an area, volume or wall area), **Show Volume In**, **Copy Several Times**, and **Add More** on a count.
+Also: **Takeoff > Radius** measures a circle from its centre. **Takeoff > Show Side Lengths** shows each side's length on screen (for the selection or all measurements on the page), and **Takeoff > Captions** shows the name and quantity, the quantity only or the name only on every page at once. **Takeoff > Convert Selected To** changes the measurement type of a selection.
+@h2 4.4 Fix and organise your takeoff | h44
+- **Reshape:** press V, click an area or a line, drag a corner to move it, drag the dot in the middle of a side to add a corner, **Ctrl+click** a corner to remove it. The quantity follows. **Ctrl+Z** undoes it.
+- **Select several:** drag a box on empty space or Ctrl+click markups. The status bar shows their combined total. Right-click for **Move Selected to Item**, **Status** or **Delete**.
+- **Bulk Edit Selected:** set wall height, rise/drop, status or item name on many at once; a blank box keeps what each one has.
+- **Join Runs Into One** and **Split Run at This Corner** (right-click).
+- **Arcs:** while drawing a run or an area, press **Tab**, click a point on the curve, then its end. Press Tab again for straight segments.
+- **Copy to another sheet:** select the measurements, press Ctrl+C, go to the other sheet and press Ctrl+V (or right-click the page > **Paste Here**). Each is worked out again at that sheet's scale. Set the scale on the target sheet first; a measurement pasted onto a sheet with no scale is left out and the status bar says so.
+- **Typical sheet: Takeoff > Typical Sheet (Count This Sheet N Times)**, for example 5 for floors 2 to 6. A "Typical sheet x5" badge shows and the multiplier is used in the totals.
+- **Color Takeoff By: View > Color Takeoff By > Item** outlines each item in its own colour with a legend. Right-click a measurement > **Show Only This Item** fades everything else; Esc shows everything again.
+- Where two cutouts overlap, the shared part is deducted once.
+- Alt+1 to Alt+9 set the status of the selected markup.
+- **Edit > Undo History** lists the steps you can go back to, and **Edit > Undo Steps** sets how many steps Undo keeps (0 keeps them all).
+@h2 4.5 Automatic takeoff for rooms, walls, doors and symbols | h45
+1. **Auto Area** (Shift+R): click inside a room and its floor area is traced along the walls.
+1. **Takeoff > Auto Takeoff Rooms on This Sheet** (Ctrl+Shift+R) measures every tagged room and checks each against its tag's square footage.
+1. **Takeoff > Auto Takeoff Walls & Doors** (Ctrl+Shift+W) measures wall centerlines by thickness and counts doors by width.
+1. **Count Symbol**: drag a box around one symbol and every copy on the sheet (or the set) is counted, turned ones too.
+1. **Takeoff > Count Several Symbols**: box one sample of each symbol, name them and choose **Find All**. You get one review list per symbol.
+1. **Trace Outline** (Shift+O): click along an irregular slab or paving edge. Each click lands on the drawn corner or edge, and corners between clicks on the same line are added for you (Ctrl+click for a straight cut).
+1. **Takeoff > Walls by Role** sorts walls into Exterior, Corridor, Demising, Shaft, Restroom and Interior groups from the room names on the sheet.
+1. Then use **Check Takeoff** to look over what the automatic tools did.
+@h2 4.6 Find missed counts and reuse symbols | h46
+1. Count a symbol with **Count Symbol**. Its picture is kept in the PDF.
+1. Right-click one of its counts > **Show Uncounted Copies of ...** to outline copies with no count mark in orange. **Count the Uncounted Copies** adds them in one step.
+1. Right-click a count > **Add ... to the Count Library** to keep its symbol for every job.
+1. On the next plan set, choose **Takeoff > Try the Count Library**, tick the symbols and pages and choose **Find**. What it finds comes in as counts in review, and copies already counted are left alone.
+1. **Takeoff > Count From a Picture** counts a symbol from a picture of it (a legend snip, a cut sheet, a photo of a printed sheet). Results are checked in the review list before anything counts.
+@h2 4.7 Count by label | h47
+1. **Takeoff > Count by Label**. Type the tag and press **Find**.
+1. Wildcards find a family: **#** is a number (P-# finds P-1 to P-12), **?** is one letter (D? finds D1 and DA, not D10), ***** is any letters (WH-* finds WH-2 and WH-2B). Without a wildcard, a tag matches whole words only.
+1. Hits are grouped by tag. Hits in the title block, a schedule, a legend or notes are listed but not ticked. Untick anything wrong; double-click a hit to go to its page.
+1. Choose **One item per tag** or **All as one item** with a name you type, then **Count**.
+**Tags vs Schedule Check** (Review tab) compares tags on the plans with the schedule: type the tags to look for, such as D-#, and choose **Check**. **Make an RFI** turns the gaps into an RFI.
+@h2 4.8 Trade Takeoff | h48
+1. **Takeoff > Trade Takeoff** (Ctrl+Alt+T). Each tab is a trade.
+1. **Pipe & Conduit**: **Find on This Sheet** lists each line style as a system, named from tags like 4" CW. Tick what is in scope, type over a name to rename it, then **Add to Takeoff**.
+1. **Ductwork**: duct sizes from tags (24x12) with sheet metal and weight.
+1. **Fixtures & Devices**: **Count Legend Symbols** counts every symbol in the legend on every sheet.
+1. **Structural Steel**: members tagged W12X26, with weight and tons.
+1. **Drywall & Paint**, **Roofing**, **Rebar** and **Earthwork** work from your takeoff (walls, roof areas, footings and slabs, contours).
+1. **Civil & Utilities > Find** (tick "Every sheet with a scale" for the whole set): pipe is traced along its line and named from its label (8" PVC SDR-35), with lengths running manhole centre to centre. Manholes, cleanouts, inlets and valves are counted once each by tag, with depth from their RIM and INV callouts. Each pipe size is split into depth bands and gets a trench assembly (excavation, bedding, backfill, haul-off and shoring).
+1. Every result is an ordinary measurement. Edit it, delete it, or press **Ctrl+Z** to undo the whole add.
+@h2 4.9 Check Takeoff: review automatic work | h49
+1. **Takeoff > Check Takeoff** (Ctrl+Alt+K). It zooms to each automatic measurement in turn.
+1. **A** accepts it, **D** deletes it, **S** skips. **Accept Rest of Group** accepts the rest of the same kind.
+1. It shows how many are checked. Accepted items show as Accepted in the Markups List and the Measurement Audit.
+Only accepted items go into the takeoff and estimate.
+@h2 4.10 AI Takeoff: a whole plan set in one go | h410
+The takeoff runs on your PC. Nothing is sent to the internet.
+1. Open the plan set and choose **AI tab > AI Takeoff** (Ctrl+Shift+A).
+1. **Step 1, Read the Set**: every sheet's number, title, discipline and scale are read. Details, sections and schedules are skipped. Sheets with no usable scale are listed; set those with Auto Scale or Calibrate and read again.
+1. Untick any sheet you do not want, then **Step 2, Run AI Takeoff**: rooms on floor plans; pipe by size and depth, manholes and structures on civil sheets; pipe runs and legend fixtures on MEP sheets.
+1. Read the summary: totals and anything that needs a person. AI marks are dashed with an "AI" badge, and anything it was not sure of stays out of every total until you accept it.
+1. Open the **Review Queue**, which lists everything still waiting, least sure first. Choose **Accept**, **Deny**, **Undo** or **Report Missed**. Or decide on the drawing: select a dashed markup and press **A** or **D**. **Ctrl+Z** takes the whole run off again.
+1. Each sheet's scale gets a confidence score and a picture of the printed scale. A doubtful one is held until you confirm it.
+1. Run it again after changes. What is already on the drawing (accepted, in review or measured by hand) is never added twice, and your earlier decisions are kept.
+@h3 What it reads
+- **Work notes.** The counts the notes state ("INSTALL: 2 - MANUAL TRANSFER SWITCH", keyed notes, one-line feeder tags) come out as quantities in the same run. A plain count is taken off. A length, a note with something to check, or a count another step of the takeoff already made waits in review, so nothing is counted twice without a look.
+- **Scanned sets.** Scanned sheets with no text are made searchable in the same step that reads the set, so their sheet numbers, scales and room names are read and their rooms traced. One **Undo** takes the added text off again. If OCR (Tesseract) is not installed, AI Takeoff says which sheets cannot be read. Small-scale scans (1/8") are still the weakest case, so check those rooms.
+- **The Estimate panel follows AI Takeoff.** Quantities it works out rather than draws (steel weight, wall area, finishes, door frames, work-note counts) show as takeoff lines with their CSI code. A work note's total is kept in one place, so a count cannot be added twice.
+@h3 New in 1.1.21 and 1.1.24: civil plan and profile sets
+- **Callouts drawn as linework.** On civil sets whose callouts and scales are drawn as lines rather than typed text, the sheets are made searchable the way they are shown, rotated sheets included, and a quarter turn round as well, so callouts that run up a profile are read too.
+- **Pipe length from the stations.** When the traced line does not agree with the stations along it, the length comes from the stations (STA 0+00 to 15+41 = 1,541 LF), carried across the sheets of one line. Labels with a restrained or mechanical joint (6" RJ PVC) and lengths with commas (1,541 LF) are read, and a size missing from a scanned label is taken from the line type tags (N6FM) when they all agree.
+- **Structures.** NEW SSMH is counted as a new manhole, and a callout shown in the plan and again up the profile at the same station is counted once.
+- **Manhole rehabilitation (1.1.24).** An existing manhole marked for lining or coating is counted as work, Manhole rehabilitation (existing manhole), instead of being left as an existing structure, including when it is only on a site or demolition plan.
+@h3 Zones and learned names
+- **AI tab > AI Takeoff Zones > Draw a Zone: Only Here** draws a green dashed zone; AI Takeoff keeps only what it finds inside it. **Leave Out** draws a red zone; nothing found inside is added. **Clear Zones on This Page** removes them.
+- Rename an item AI Takeoff made (Takeoff panel > Rename), or move its pieces to your own item, and the next AI Takeoff uses your name. Rooms are matched without their number, so renaming OFFICE 101 to "Office - ACT" names every office. **Takeoff > Item Names Learned** lists every pair so you can forget one or turn the renaming off.
+The Markups List's **Origin** column shows which is which: manual, AI not checked, AI accepted, or AI, edited.
+**Optional local AI.** Some helpers (such as Write Scope Summary and Project Analysis's Summarize with Local AI) need Ollama:
+1. Install Ollama, the free program that runs AI models on your own PC.
+1. Start it, open a Command Prompt and type `ollama pull llama3.2`.
+1. Go back to QuantiSheet and try the AI command again. On a PC without a graphics card, the first answer can take a minute while the model loads.
+If Ollama is not installed or running, QuantiSheet says so in one line and carries on.
+**Voice commands.** **AI tab > Voice** (Ctrl+Shift+V) turns listening on. Say a command such as "next page", "go to page twelve", "zoom in", "fit width", "measure length", "count", "auto scale", "AI takeoff", "check takeoff", "undo" or "save". It uses the speech recognition built into Windows, offline. Say "stop listening" or press Ctrl+Shift+V again to turn it off.
+@h2 4.11 Work Notes Takeoff: what the sheets say | h411
+Rehab and upfit drawings often state quantities in words rather than linework. Work Notes Takeoff reads them into a list.
+1. Open the drawing set, then choose **Civil > Work Notes Takeoff** and **Read the Drawings**. **Totals** adds the same item up across the sheets; **Every row** lists each one with its sheet. Double-click a row to go to that sheet.
+1. The **From** column says where a row came from: a sheet note, the summary table, a numbered or keyed note, the fence line measured as drawn, an electrical one-line diagram, or worked out (the removal half of a "remove and replace").
+1. Choose **Specification** to work out fence posts and barbed wire strands from the specification's own rules (post spacing, number of strands). A rule the specification does not give is not applied.
+1. Yellow rows need a look, and **Check** says why: no number in the note (counted as 1), marked approximate, the same note twice on a sheet, a count taken from symbols, or a measured length that differs from the note.
+1. **Export** writes the totals and every row to a spreadsheet.
+1. **Add to Estimate** puts the totals in the Estimate panel as lines to price, each with a note saying which sheets it came from and what to check. The lines are linked to the same totals AI Takeoff uses, so a note's count is never added twice, and adding again updates the quantity and keeps the price you typed.
+1. **Compare with Earlier Set** (1.1.17): pick the earlier issue of the drawings. A **Changes** tab lists every total the new set changed (new, gone or a different count) and the sheets where it changed, for example +12 LF of fence on C-7, or a gate gone.
+What it reads:
+- **One-line diagrams:** feeder tags such as 4 #2, #8G., 1 1/4"C. give the conduit, wire and ground sizes of each feeder, listed once per feeder. The length shows as "measure" because the route is not drawn.
+- **TYP keyed notes:** a keyed note whose symbol is marked TYP means one symbol stands for every one like it. The count follows the note's leader to the symbol it points at and counts every symbol like it on the sheet with the same label beside it. The row says how it was counted.
+- **Fences:** a gate whose width the notes give (16-FOOT WIDE GATE) comes out of the measured fence line as a Gate Openings row, and posts and barbed wire are worked out on the line without it. A note that replaces only the barbed wire (SITE FENCING BARBED WIRE) gets the strands alone, as Strand Barbed Wire Replaced, with no fence posts.
+- **Nothing to count (1.1.21):** a note such as an INSTALL with only a station after it, or pipe named with no length, no longer adds a 1 EA line.
+- **Speed (1.1.17):** notes are read about four times faster (on a 32-sheet set, 31 seconds down to 8), here and in AI Takeoff.
+It reads what is written. Conduit and wire routes that are not drawn, and sizes that are on a standard detail outside the set, are not in the list. A length shown as "measure" has its make-up from the notes but no length, so measure the run yourself.
+@h2 4.12 Tool sets, legends and your takeoff standard | h412
+1. **Tool Chest > Tool Sets > New Set**. Right-click a markup on the page > **Add to Tool Chest**, then right-click the tool > **Edit** to set unit cost, column values, the unit it keeps (metric), rise/drop, wall height and volume depth.
+1. **Tool Chest > Tool Sets > Save Sets as a File**. Others double-click the .qstools file (or use **Open a Tool Set File**) and get the same sets, statuses and Markups List columns.
+1. The **Takeoff (Metric)** set keeps quantities in m, m² and m³ even on a sheet scaled in feet.
+1. A tool with a unit cost adds Unit Cost and Total Cost columns to the Markups List.
+1. **Draw a Legend** on the Markup tab for this page or every page, limited to chosen tool sets, kept up to date.
+1. **Takeoff > Takeoff Standard** lists your office's steps (setup, columns, tools, takeoff, legends, revisions, update, report). Steps the drawing shows are ticked for you, and you can add your own.
+1. **Restore Default Tools** (Tool Sets menu) brings back any default tool or set you removed.
+The number keys **1** to **9** run the first nine Tool Chest tools, and **Space** repeats the last tool (from Select).
+@h2 4.13 Buy quantities and wood sheathing | h413
+1. **Takeoff > Buy Quantities (Sheets, Boxes, Rolls)**. Each takeoff item is a row with its total.
+1. Type the **Size of one** (for example 32 for a 32 sf sheet), the **Buy unit** and the **Waste %**.
+1. The **Buy** column is the total plus waste, divided by the size of one, rounded up to whole units. Click **Save**. The rules are kept with the job by item name.
+**Wood Sheathing Helper** (1.1.21): choose **Takeoff > Wood Sheathing Helper**, pick roof, subfloor, single-layer floor or wall and the framing spacing. It gives the APA span rating and panel thickness to look for and, for an area takeoff, the 4x8 sheets with waste. **Add to Estimate** adds a line that follows the area. Check the drawings' structural notes, which come first.
+@h2 4.14 Roof plans, aerial photos, CAD drawings and 3D models | hroof
+- **Roof Plan Takeoff** (Takeoff menu): tag the areas, lengths and counts you drew on a scaled roof plan with a roof type and pitch, then see the true (sloped) quantities, the squares with waste (simple, moderate or complex roof) and the roof summary. You draw every facet and line (**Show Roof Plan Tools** puts the roof tools on screen); it never reads aerial photos.
+- **Aerial Photo Page** (Civil tab, or Ctrl+K "aerial"): **From the Plans** reads the project address or latitude and longitude off the open set, or type an address or "33.78, -79.09". Pick the area to show (500 ft for a pad up to 4,000 ft for a corridor) and click **Preview**: a quick overview appears first, then the sharp public aerial photo (it can take 20 to 80 seconds; the timer shows it and Cancel stops it). Drag, zoom and use **Wider / Closer** to fit the site in the yellow box, then **OK**. The photo is added after the sheet you are on with its scale set, so Area, Length and Count read real feet. Check the scale against something you know before you rely on it.
+- Have a county GIS or drone photo? Use the **Photo file** tab; a world file (.jgw, .pgw, .tfw) gives the ground size of each pixel. Photos are kept, so reopening the same site is instant.
+- **File > Export To > KML** and **GIS (GeoJSON)** write the markups on an aerial photo page in their real place on the map, for mapping programs.
+- **File > Import > Import DXF**: a DXF drawing becomes a PDF ready for takeoff, either model space on one sheet at a standard scale with its layers, or the paper space sheets as plotted with each viewport's scale.
+- **3D Model Quantities** (1.1.27; the **3D Model** tab, or **Takeoff > 3D Model Quantities (IFC)**): open an IFC building model, the open format most design programs export. Its elements are listed by kind (walls, slabs, doors, windows, columns, beams, framing, roofs, stairs, railings, coverings, rooms, fixtures, pipe, duct and more), type and storey, with the lengths, areas and volumes the model carries in its quantity sets, in feet, square feet and cubic yards. Pick a storey to see only that floor. Tick the rows and **Add Ticked to Estimate** puts them on the open drawing's estimate with CSI codes (cubic yards for footings, square feet for walls, slabs and coverings, linear feet for framing, pipe and duct, each for the rest); adding again updates the quantities and keeps your prices. **Export CSV** writes the list. A model exported without quantity sets still gives counts, and the window says so: export it again with base quantities for lengths, areas and volumes.
+- **Viewports on This Page** (Takeoff menu) lists and edits the scale regions on a sheet. **Show Scale** shows the scale of each area.
+@h2 4.15 From quantities to an estimate | h414
+1. **Estimate tab > Assembly Library**: pick an assembly (strip footing, metal stud wall, TPO roof ...) for each takeoff group. Assemblies turn quantities into materials, labor and equipment with formulas you can edit.
+1. **Cost Books** holds your prices; **Labor Rates & Crews** holds your crews and burden.
+1. The **Estimate** panel shows the priced lines. **Export Assembly Estimate** makes a spreadsheet, and **Link Quantities to a Spreadsheet** keeps a workbook updated as the takeoff changes.
+1. **Bid Build-up** adds overhead, profit, bond and markups. **Create Proposal** makes the client PDF. On the proposal's Scope & Terms tab, **Qualifications** can list what the takeoff assumed (AI items not checked and left out, wall heights, rise/drop allowances, typical units).
+1. **Show Unpriced Markups** lists takeoff that is not in the estimate yet so nothing slips through, and **Price These** (Estimate tab) lists every takeoff line with a quantity but no price in one place to price.
+1. **Export Quantities (CSV)** is on the Takeoff tab. **Export Estimate (CSV)** and **Export My Estimate** (totals by CSI division and cost type, to PDF, spreadsheet or CSV) are on the Estimate tab.
+**Take Off Into Assembly** (Takeoff menu): pick the CSI division, then the assembly, then measure. What you measure goes into a group already bound to that assembly, so it is priced as you go.
+**Add From Cost Book** (Estimate tab): tick cost book items by CSI division and they become Estimate panel lines, linked to a takeoff group if you choose.
+**Award: Budget & Commitments in the Job** (Estimate tab): when you win, the estimate becomes the Project Center job's budget by cost code, with draft commitments for the subs.
+**Export Bid Package.** **Estimate > Export Bid Package** puts everything for the bid in one folder and one zip to send: the proposal, the estimate summary (PDF and spreadsheet), the estimate detail, the takeoff sheets with their measurements and, after AI Takeoff, the estimate workbook. Files attached in the Bid Submittal Checklist go in too (1.1.20). A contents list says what is in the package and what still needs a look: an unlocked bid, lines with no price, AI items not checked, checklist items not ticked. When the job is on the Bid Board, it offers to mark that bid Submitted and notes the package's folder on it (1.1.17).
+@h2 4.16 Quick estimates, cost data and the dashboard | hquick
+- **Quick $/SF Estimate** (Estimate tab): a building priced from your own past jobs' cost per square foot, as allowance lines by CSI division.
+- **Model Estimate** (Estimate tab): a building priced from its type, square feet and options, from your job history and from a Generate Set plan's quantities side by side, with allowance lines by division.
+- **Price Database** holds unit prices to look up and use. **Location Factors** keeps your regions and their factors; with a drawing open, **Use for This Job** picks the job's region. **Import Your Own Price List** brings in your own prices as a cost book that stays on this PC.
+- **Estimating Dashboard** (Estimate tab): cost per square foot, hit rate, margin and sub prices across every job. On the **Jobs** tab, **Low Bid** records the low number and **Bid Results (CSV)** lists your number, the low and the gap. Hit rate can be grouped by job size, markup or the GC you bid to, and each job shows its estimating hours from the Time Log.
+- **Tools > Time Log**: active time per job and sheet (takeoff and review), paused when you step away. **Export CSV** writes it.
+- **Project > Search Takeoff Across Jobs** (the Measurement Audit's **Search All Jobs** tab) finds takeoff items in every job in the shared database. The **This Document** tab shows who took off what, when, how and at what scale.
+- **Estimating Tools** (Takeoff > Estimating Tools and Estimate tab), each with its own How To button and a one-page Takeoff to Quote walkthrough:
+  - **Estimate Templates**: reusable sets of items whose quantities come from your takeoff; apply one to the drawing, then fill in the blank prices.
+  - **Material Order List**: what to order, grouped by supplier, from every priced item; export it for the purchase orders.
+  - **Supplier Price List Import**: turn a supplier's price list (CSV or spreadsheet) into a price list file.
+  - **Match Rates & Price a Workbook**: price the unpriced takeoff groups from your own cost books in one go (exact matches ticked, loose ones shown unticked with the reason), or price an AI Takeoff estimate workbook into a new file.
+  - **Assembly Rules & Wall-Type Assemblies**: turn takeoff groups into assemblies by rules you write, and build stud, track, board, screw, tape and compound assemblies for each wall type from the set's wall-type legend.
+  - **Crew Hours by Pay Item**: crew hours, crew days and direct cost for each pay item of a civil estimate.
+  - **Bid-Day Quote Comparison**: level sub and supplier quotes for a package and put the one you pick in the estimate.
+  - **Estimate vs Actual**: what each estimate item really took, with waste, quantity and price variance; add the finished job to your history file.
+  - **Planning Cost Model**: a planning-level estimate from your own process list and cost curves, with contingency, engineering and operating present worth.
+- **Date and Time Calculators** (Estimate tab): days between dates, a date plus a duration, adding or taking away days or workdays (skipping the project's holidays), the weekday and the week number.
+@h2 4.17 Calculators | h415
+The **Calculators** group on the Estimate tab opens one window with a tab for each calculator; the same calculators are on the Takeoff menu. Every rule of thumb is a field you can change. The structural tabs are marked preliminary: they are for estimating, not an engineering design.
+- **Concrete, Brick & Block, Roofing:** cubic yards, units and mortar, squares and bundles.
+- **Rebar** (1.1.23): bars for a slab by length and width (with edge cover) or straight from a takeoff area, or continuous bars along a footing or wall from a length takeoff. Laps at every stock length (40 bar diameters to start), pounds, tons and 20 ft sticks with waste.
+- **Beam / Header** (1.1.23): a simple span with a uniform load and a point load: reactions, largest moment and shear, deflection, and bending, shear and deflection checked against the allowables you type (wood by nominal size and plies, or any section by A, S and I).
+- **Column / Post** (1.1.23): allowable axial load of a solid wood post (from Fc' and Emin') or a steel column (from A, r and Fy, ASD or LRFD), with a too-slender warning.
+- **Footing Size** (1.1.23): a square pad or a continuous footing sized from the load and the allowable soil pressure, counting the footing's own weight, with the concrete in CY.
+- **Metal Studs** (1.1.23): cold-formed steel framing by member name (362S162-33, 600T125-43 ...): studs at the spacing with extras at openings and corners, top and bottom track in 10 ft pieces, rows of bridging, or floor and roof joists with rim track, and the pounds of steel.
+- **Structural Steel** (1.1.23): type the member list (W12x26, 24, 6 for shape, length, count) and get pounds and tons with an allowance for connections. W, C, WT and other rolled shapes, HSS, pipe, angles, plate and bars.
+- **Earthwork** (1.1.25): a cut or a pipe trench, with bank, loose and compacted CY, truck loads, bedding and backfill.
+- **Aggregate / Asphalt** (1.1.25): tons of stone, sand, topsoil or hot mix over an area.
+- **Drywall** (1.1.25): boards, tape, joint compound and screws. **Paint** (1.1.25): gallons of finish and primer, in five-gallon pails.
+**Add to Estimate** (1.1.24) puts a calculator's quantities on the open drawing's estimate as lines with CSI codes (concrete in CY, rebar in pounds, studs and track, steel in tons and so on); price them on the estimate. Beam / Header and Column / Post are checks, so they add nothing.
+@h2 4.18 Check the bid before it goes out | h416
+**Pre-bid Checklist.** It must pass (shown in charcoal, not red) before you lock the bid.
+1. **Estimate > Pre-bid Checklist** runs three checks: every sheet reviewed; every markup priced, excluded or sent as an RFI; every revision cloud accounted for.
+1. Right-click any markup on the drawing > **Pre-bid Scope**: Priced, Link to Estimate Line, Excluded (with a reason), or Sent as an RFI.
+1. **Takeoff > Show Unpriced Markups** outlines everything still open in red.
+1. Use **Missed-Item Report** (spreadsheet or PDF) and **Print One Page** for the bid file, then **Lock Bid**, which records the total and the estimate as bid. **Create Proposal** warns you when the bid is not locked.
+**Bid Submittal Checklist** (1.1.20, on the Project Analysis tab, and before Export Bid Package): tick off the signed bid forms, bid bond, contractor's license, insurance certificate and the bid reference number, and attach the files. Type the **bid day** and how many days the **bid must hold** its price (1.1.22), or let Project Analysis or Find Bid Terms put the hold days in for you.
+**Lock Bid Set** (Takeoff menu): while the bid is locked, the takeoff is read-only (no new measurements, counts, scale changes or edits); notes, clouds and status changes still work. Unlock it to change the takeoff.
+**Coverage Map and Second Check** (Takeoff menu): each sheet is shown charcoal (reviewed, and checked when a second check is required), amber (has takeoff but is not reviewed or is waiting for its check) or red (nothing taken off and not reviewed). A different estimator checks each reviewed sheet; the checker cannot be the person who reviewed it. With **second check required** turned on (for every bid, or only bids over an amount), the bid cannot be locked until every sheet is checked.
+**The bid gate.** **Estimate > Estimate Error Check** also flags prices older than 90 days, quotes past their valid-until day, a sub or supplier quote that runs out before the bid stops holding (1.1.22), addenda not marked priced, placeholders and allowances still in the bid, two areas of the same item on top of each other, a count clicked twice, and a subtotal typed in as a line.
+- **Project > Addenda > Mark Priced** records an addendum's cost impact and the estimate line it went into. Until every addendum is priced, the bid form will not fill and the proposal warns.
+- Right-click an estimate line > **Price Still Good (Today)** when a supplier confirms an old price.
+- **Estimate > Placeholders & Allowances** lists everything still to replace.
+- **Estimate > Escalation to Buy Date** adds a rise for the time between bid day and buy day. **Estimate > Bid Gate Settings** sets the price age.
+@h2 4.19 Compare subcontractor bids | h417
+- **Estimate > Bid Tabs** shows unit prices from public bids (low, median, high).
+- **Estimate > Bid Leveling**: enter each sub's bid and scope. Omissions are filled with your own number so totals compare fairly.
+- **Estimate > Scope Sheets**: your Scope Sheet for one trade at a time, with budget, each bidder's company, bid price, YES/NO checklist, scope amounts, TOTAL PRICE and a **Math Check** that turns red when a sub's lines do not add up to the price. Paste blocks straight from a spreadsheet; export with live formulas or as a PDF.
+- **Estimate > Leveling Board > New From Trade**: pick the trade (CSI division) and, if you have it, the spec book. **Add Sub Quote PDF** for each quote; lines are matched to your scope rows (confirmed, unclear or a gap, each with its own color). A gap is plugged with your quantity x your unit price. **Use Low in Estimate** puts the leveled low into the estimate. Scanned quotes and phone photos are read with OCR, so check the numbers.
+- **Compare Exclusions** shows who excludes what, one row per exclusion and one column per bidder.
+- **Variance** compares each bidder with your own estimate line by line and marks rows HIGH or LOW at a percentage you set.
+- Right-click a price to **Show Source**: the quote opens with the words boxed.
+- **Qualification at a glance:** each bidder shows insurance, license, bonding against this bid and prequalification from the Company Directory, on the Leveling window, Leveling Board, Scope Sheets and the Bid-Day sheet. Awarding to a bidder with expired insurance or license, or a bid over the bonding or approved limit, asks for a reason first, and the reason is kept.
+- **Read with AI**, for a proposal that could not be read in full: **Read a Proposal with AI** (Leveling window), **Read a Quote with AI** (Leveling Board) or **Import with AI** (Scope Sheets). The AI on your PC reads it, only values that are in the quote word for word are offered, and each is marked "AI, check" and added only when you tick it.
+@h2 4.20 Bid packages: invite, prequalify, open, level and award | hpkg
+Run a bid day from your Company Directory to the award letters.
+1. **Project > Company Directory**: star your favourite subs and record certifications (MBE, WBE, DBE ...), insurance and license dates and bonding. Expiring insurance and prequalification are flagged at the top. The directory stays on this computer.
+1. **Send Prequal Form** emails a fillable PDF. When it comes back, **Read Returned Prequal** scores it (EMR, years in business, safety, bonding, history) and you approve it with a dollar limit.
+1. In a **Bid Package**, **Add Bidders from Company Directory** can take only prequalified subs or your favourites. Set **Sealed bids** to keep every number hidden until the due time. **Project > Bid Invites Send As** sets the company mailbox that invitations and follow-ups go out from.
+1. Bid forms: each line can be a price, a unit price or a **Scope item** that the bidder marks Included or Excluded, and bidders list their inclusions, exclusions and clarifications one per line. Lines you ask on every package (bid bond, addenda, schedule) can be kept once per project as **Project-wide lines**. **Print Bid Form** saves the form as a PDF in the project's Bid Forms folder.
+1. After the deadline, **Open Sealed Bids** (the opening is logged and cannot happen before the due time), then **Level Bids**. Right-click a cell to plug a missing item, mark it included or correct a price; right-click a bidder for an adjustment. On a Scope Sheet, the from-package button brings in each bidder's answers without retyping.
+1. **Award** makes the draft subcontract and the award and regret letters (PDFs on the package; open them to edit), then **Send Award Letters**. **Bidding Reports** exports package status, bidder coverage, buyout against budget and bidder history.
+@h2 4.21 Project Analysis: read the specifications first | h418
+When a bid comes in, open the specifications (the project manual) and let QuantiSheet answer the questions you would otherwise read for. Nothing leaves the PC, and nothing is guessed: an answer the specifications do not give says **not found**.
+1. Open the specifications PDF and click **Project Analysis** on the Home tab (Specs group) or on the **Project Analysis** tab. The same command is in the **Project Analysis** menu, after Tools.
+1. The window lists each question with its **Answer**, its **Section / page** and **Where it says so**. Double-click a row to go to that page and check it. The first nine are the bid questions: project name, project address, budget (most specifications do not list it), substantial and final completion, liquidated damages, summary of work, bid date, pre-bid meeting (mandatory or optional) and retainage.
+1. Below them: bid, performance and payment bonds, general liability insurance, the last day for questions, how bids are delivered, prevailing wage, DBE / MBE / SBE goals, alternates, unit prices, the number of addenda, the Owner and the Architect, how long the bid must hold and the contract time.
+1. Where an addendum changes something, the newest addendum wins and the earlier answer is shown as also stated. Where the specifications count the last day for questions back from the bid opening ("at least ten days prior"), the date is worked out for you (1.1.26).
+1. Tick **Notice to proceed** and pick the date to see the substantial and final completion dates. **LD exposure if late by** shows the liquidated damages for the days you type.
+1. The answers are kept in the PDF, so they open straight away next time. After adding an addendum, click **Run Again**. **Copy** puts the answers on the clipboard; **Export PDF** makes a one-page summary.
+1. **Put Hold Days in the Bid Checklist** sends how long the bid must hold to the Bid Submittal Checklist.
+1. **Summarize with Local AI** (1.1.26) writes a short scope summary from the first pages of the specifications, using the AI on your PC (Ollama). It is marked as written by the AI, so check it against the specifications, and it is kept with the answers.
+1. **Send to Bid Board** (1.1.26) opens a new Bid Board entry filled from the answers (see 4.22). Check it, then **Save**.
+**Find Bid Terms** (1.1.22, Project Analysis tab) is the shorter list for the bid documents alone: bid bond percentage, how long the bid must hold, prevailing wage, liquidated damages, a mandatory pre-bid meeting and its date, DBE / MBE / SBE goals, retainage, contract time and alternates, each with its page.
+**Manufacturers in Specs** (1.1.24, Project Analysis tab) reads each section's listed manufacturers ("provide products by one of the following ...") and basis-of-design products, notes where no substitutions are allowed, and shows the page of each. **Export CSV** makes a quote-request list by trade.
+Project Analysis reads the text of the PDF. A scanned project manual needs **Make Searchable (OCR)** first.
+@h2 4.22 Bid Board, bid forms and addenda | h419
+**Bid Board** (Estimate > Bid Board) keeps every invitation to bid in one list: when it is due, who is pricing it, whether to go after it and how it came out.
+1. Add an invitation by typing it in, or use **From Email** to read a saved invitation email (.eml). Check each field, then **Save**. Nothing is sent and the email is not changed. A .msg file is not read: save the email as .eml or use **Paste Email Text**.
+1. From the specifications (1.1.26): in Project Analysis, **Send to Bid Board** makes a new entry. For an entry you already have, open it and click **Fill From Specs** while the specifications are open. Both fill the project name, address, city and state, bid due date and time, job walk, whether the pre-bid is mandatory, the last day for questions and the specifications' summary of work. Only empty fields are filled; nothing you typed is replaced.
+1. If the invitation looks like a project already on the board, you are told why before saving.
+1. Record whether the pre-bid is mandatory, how many plan holders there are and how many bidders are expected (1.1.22).
+1. **Go / No-Go** asks about scope, location, the GC, your results with them, workload, bonding and competition, then gives a score and recommendation. **Competition is manageable** (1.1.22) starts from the bidder count: up to 4 bidders Yes, up to 8 Partly; left blank, it does not change the score. You decide and give the reason, which is kept.
+1. Set the status as it moves: Accepted, Submitted, then Won or Lost (or Declined). The **Calendar** tab lists dates and exports an .ics file; **Results** shows win rate by GC.
+**Bid Form Autopilot** (Estimate > Bid Form Autopilot) fills the owner's bid form from the estimate: base bid, the amount in words and the addenda, then checks the bid bond, the signature and the deadline.
+**Bid Form Workbook** (Estimate > Bid Form Workbook): pick the spec book or the bid form PDF and choose **Make Workbook**. Type unit prices and alternate amounts in the yellow cells only; the rest are formulas. Save the workbook, then **Transfer to PDF**. When an addendum comes in, **Check an Addendum** shows what changed and builds a new workbook with prices kept for unchanged items.
+**Watch Plan Folder** (1.1.20, Project menu): point a job at the folder its plan sets and addenda are downloaded into, from any plan room. When new sheets or addenda arrive, QuantiSheet offers the next step: log an addendum in the Addenda Gate (the bid waits until it is priced), compare the new sheets with this set and Slip Sheet them in, or open them. Files still downloading wait until they are finished.
+**Spec Book Risk Scanner** (Review tab) lists bonds, liquidated damages, prevailing wage, insurance limits, long warranties and testing you pay for, on one page with the section and page of each. **Estimate > Builder's Risk Quote Request** puts the project, address, summary of work and estimated amount on one page with the spec's builder's risk pages; check the fields, type the agent's email and choose **Email to Insurance**.
+@h2 4.23 Job cost feedback | h420
+1. **Estimate > Job Cost Feedback > Add This PDF's Bid as a Job**.
+1. Bring in actual costs with **Actuals from Project Center** or **Import Actual Costs (CSV)** (from your accounting program).
+1. **Bid vs Actual** shows every cost code; over 10% off is red.
+1. **Close Job** records its unit costs. **Suggested Prices** shows a weighted median of your recent jobs next to the book price. Tick the ones you agree with and **Apply**. Nothing changes until you apply, and the change is logged.
+@h2 4.24 Civil estimate | h421
+On the **Civil** tab (found on the Estimate tab): set up **Equipment** (own or rent, fuel), **Labor** (base, fringe, taxes, comp) and **Crews**. The starting rates are samples, so replace them with yours.
+1. **Crew Estimate > Add From Takeoff Group**: pick a crew and a production rate. Crew hours = quantity / rate. Add material per unit or a sub price.
+1. Add **Indirects** (super, trailer, traffic control and so on) and markup and bond on the **Bid Schedule** tab.
+1. **Import Owner Bid Schedule** (CSV or spreadsheet), type each activity's pay item, and the indirects and markup spread over the items. Quantities 10% off the owner's are red. **Export Priced Bid Schedule** when done.
+1. **Haul Calculator**, **Import Prevailing Wages** (reads a wage determination CSV into your labor rates), **Save Bid Version** (and compare two), **Quotes**, **Crew Schedule**, **Resources** and **Export Cash Flow** are on the same tab.
+1. **Save to Library** keeps an activity for the next bid; **Save Estimate as Master** and **Start From Master** reuse a whole estimate.
+1. While the job runs, the **Forecast** tab (Civil > Cost to Complete) compares the budget with the project's time cards and costs. **Time Cards** and **Civil Job Cost (Bid vs Actual)** are on the same menu.
+More on the Civil menu: **Estimate From Takeoff (All Groups)** makes crew activities for every takeoff group at once; **Add From Activity Library**; **Equipment Rates**, **Labor Burden & Wages** and **Material & Sub Quotes**; **Owner Bid Schedule**, **Indirects** and **Bid Versions**; **Production History** (what your crews really produced) and **Production by Depth** (how much a pipe crew slows down in deeper trench, as a share of its 0-6 ft rate, used when activities are made from the takeoff).
+**Cost-coded assemblies** (Civil > Cost-Coded Assemblies): load your assembly library with its cost codes, **Bind Takeoff Group to Assembly**, **Insert Assembly Line**, and see the **Bid Summary**. **Revision Change Report** compares the open set with an earlier set of the same job, priced with the saved library. **Export to Civil Estimating (.xlsx)** (Civil menu) writes the bid items, activities and resources from the civil takeoff (pipe by depth band, structures, trench excavation, bedding, backfill and haul) as workbooks ready to import into a civil estimating program.
+@h2 4.25 Compare revisions and slip sheets | h422
+1. Press **Ctrl+Alt+C**, click **Compare** on the Home or Review tab, or use **File > Compare**. The other revision box starts with the newest PDF in the same folder whose name starts the same way; **Browse** picks another.
+1. Choose **Overlay** (old in red, new in green, lined up sheet by sheet), **Changes** (changed areas outlined on the new set) or **Text** (words added and removed, as a report), then **Compare**.
+1. **Cloud Changes** draws clouds around what changed. **Revision Changes (Old > New)** lists what changed in quantities and dollars. The Revision Log counts AI Takeoff's worked-out quantities and the work notes' totals too, so a revision that changes a note's count or a wall's height shows there with the rest (1.1.17).
+1. **Slip Sheet** puts the new sheet under your markups and takeoff. Measurements on changed areas are flagged "Check - drawing revised".
+1. **Project > Batch Slip Sheet** swaps a whole set at once, matching sheets by number and logging each revision. Sheets it cannot match are listed so you can place them by hand.
+1. **Takeoff > Carry Takeoff Forward to a Revised Set** opens Compare Revisions and carries your takeoff forward.
+1. **Project > Drawing Register** keeps the current revision of every sheet; **Transmittals** records what was sent to whom.
+1. **Billing > Change Order From Revision** opens a change order proposal with the priced changes and the revised sheet clouded as backup.
+**File > Compare** also has **Compare Text With** (the words of two PDFs) and **Quick Compare (Same Sheets)** for two versions of the same sheets. **Review > Revision Log** lists every revision and what it changed.
+With **Project > Watch Plan Folder** (1.1.20), new sheets that arrive in the job's download folder are offered for comparing and slip sheeting as soon as they are finished downloading.
+@h2 4.26 Project Center | h423
+1. **Project > Project Center** (Ctrl+Shift+P); open or create the job folder.
+1. The left side has **Home** (what is waiting on you), then each tool: RFIs, Submittals, Punch List, Daily Log, Meetings and more.
+1. Click **+ New** on any list, fill in the few fields shown and click **Create**. The number is given for you (RFI-007).
+1. Buttons on each item move it along (Send RFI, Close with Response, Send for Review ...), and RFIs and submittals can be emailed from your email program. **Ball in court** shows who has to act next.
+1. **Share** (top right) puts the project on your server so the team and the phone page see the same lists. Press **Ctrl+K** inside Project Center to jump to any item by number.
+1. To give people their own logins, share the project, then use the project menu > **Users and roles > Turn On Logins**. Roles are Admin, Project manager, Estimator, Subcontractor and Viewer.
+1. Right-click a markup > **Create RFI** to turn a question into a numbered RFI with the markup attached.
+**Schedule.** In Project Center > Schedule, **+ New** adds an activity with duration in workdays and predecessors. The **Gantt Chart** shows the critical path in red; drag a bar to move it. **3-Week Lookahead** makes a PDF for the field meeting. **More > Set Baseline** saves today's dates, and you can import XML and XER schedule files and export XML.
+**Scheduler.** **Project > Scheduler (Gantt)** (or **New Schedule**) builds a schedule in a grid and Gantt chart, with or without a drawing open. **Review > Build Schedule From Plans** reads the drawing set and its spec book into a draft schedule to check.
+**Master Schedule (monthly sub updates)** (Module > Master Schedule (Sub Updates)). Set it up once (inbox folder with a subfolder per sub, update day, which sub owns each activity). Each cycle, **Prepare update packets** writes each sub a spreadsheet with only their activities and a reminder email draft. Subs send back the sheet, an XML or XER schedule file, or a PDF printout. A file with any error is rejected with every reason listed. Progress-only updates that move nothing later are accepted on their own; everything else waits in the **Review queue** with its impact on the finish date, where you **Approve**, **Approve lines**, **Edit and approve** or **Decline**. **To Delay Log** records an approved update that made work finish later, and the **Baseline** tab can lock the baseline.
+**Submittals and specs.** **Review > RFI / Submittal Log** lists the job's RFIs and submittals beside the drawing, with **New RFI** and **New Submittal**. **Project > Submittal Log** lists submittals by spec section, makes packages for the architect and engineers, and builds the log **From Spec Book**, with the drawing sheets each item's work is on. **Document > Spec Book Sections** lists the sections of a project manual with their pages. **Review > Submittal Review Stamp** stamps a reviewed submittal.
+**Assistants (1.1.27).** The Daily Log page has **Draft From Notes & Photos**, each submittal has **Check Against Spec**, and Home lists the job's **Risk flags** (see 4.31).
+**Documents.** **Project > Drawing Register**, **Transmittals** and **New Transmittal**, and **Addenda** (log each addendum, mark it priced).
+**Calendar.** **Project Center > Project > Calendar** shows schedule activities, milestones, inspections, meetings and expected deliveries by month or week. Drag a meeting, inspection or delivery to another day to move it.
+**Cost.** **Project Center > Cost** covers Budget by cost code, Prime Contract schedule of values, Commitments, Change Events, Direct Costs & Invoices, Owner Pay Apps (which print the application for payment), Cost Summary and Forecast, and Cash Flow.
+@h2 4.27 Contract, billing and owner reports | hbill
+**Billing > Contract & Billing** opens one window for the job's money with the owner, with a tab for each part:
+- **Contract:** the contract details (owner, project, amount, retainage) that forms and pay applications fill from.
+- **Schedule of Values:** the lines you bill against.
+- **Change Orders:** each change with its amount and status. **Billing > Change Order From Selected Markup** starts one from a cloud on the drawing, and **Change Order From Revision** prices a revised sheet with the clouded sheet as backup.
+- **Pay Applications:** enter progress and the application for payment is printed with each line's retainage adding up to the summary.
+- **Lien Waivers:** the waivers that go with each payment.
+**Punch list and inspections.** **Project > Punch List** and **New Punch Item** (placed on the drawing), and **Three-Phase Inspections** for quality control, each feature of work moved through its phases with **Start Next Phase**.
+**Project > Weekly Owner Report**: a cover page, photos, and the RFI, submittal and weather logs as one PDF for the owner, filled from the job's Project Center.
+**Project > Code Check**: occupant load, egress, accessibility and plumbing fixture checks for the building on the drawing.
+@h2 4.28 Back Office | hoffice
+Back Office is the office side of the company: crews, job cost, payables, approvals, safety and warranty. On the Project tab, click **Back Office** (Office group); it is also on the **Module** menu. The button shows only when Back Office is installed. Each part is a page in the list on the left.
+- **Crew Board:** type the date, cost code and hours, then drag a crew onto a job. **Copy Yesterday's Crews** copies the most recent earlier board. **Fill daily logs and time cards** writes each job's daily-log manpower and draft time cards (running it again does not add a second copy). **Print crew board** writes the PDF.
+- **Checklist Templates:** pick or name a checklist and type one check per line; **Save checklist** replaces its lines.
+- **Job Cost Report:** **Import Job Cost Report** reads a job cost report PDF into a grid of codes, estimate, committed, job-to-date cost, variance and overrun. **Publish to Job Cost** makes the job cost view use it; **Unpublish** puts the books figures back.
+- **Payables:** set the invoice folder and **Scan invoice folder**. A PDF with a vendor, invoice number, date and total is saved as a draft; nothing is moved or deleted. A possible duplicate (same vendor and invoice number, same vendor and amount within 7 days, or the same file) is held back until someone chooses **Allow This Duplicate** and says why.
+- **Waiting on Me:** the invoices whose current step is you. **Approve** stamps a copy of the invoice PDF with job, cost code, amount, approver and date, and remembers that vendor's coding for next time. **Reject** needs a reason.
+- **A separate approver:** whoever entered or coded a record cannot approve or reject it, unless an Admin turns on **Self-Approval** (with a reason, and every self-approval is logged).
+- **Payroll Key & Approvals:** **Rotate Payroll Key** makes a new key and re-locks the payroll and HR fields; **Back Up Payroll Key** writes a copy locked with a password you choose; **Restore Payroll Key** puts it back.
+- **Safety Meetings** (topic, attendees signing on the pad, a one-page sign-in sheet), **Incidents**, **Pre-Task Plans** (copy yesterday's plan for the job), **Equipment** (service and inspection reminders) and **Warranty & Service Calls** on closed jobs.
+Nothing in Back Office is filed, sent or dispatched off this computer.
+@h2 4.29 Service tab | h424
+The Service tab is organised in groups: Calls, Agreements, Logs & Tests, Pricing, Replacement, Settings, Records and Quotes. The same windows are on the **Service** menu, and Ctrl+K finds them.
+- **Calls:** open **Service Work Order**, type the customer, site, unit, complaint and technician, add time and parts (or flat-rate tasks), then print the work order or close and invoice. Invoices carry sales tax, a member discount and a card fee, each on its own line. The **Dispatch Board** assigns tickets to technicians by day. **T&M Tag** builds and prints a signed time-and-material tag. **Customer History** shows a customer's sites, units, work orders, invoices and refrigerant entries, newest first, with totals. A work order can carry its **permit and inspections**, and a **leave-behind report** for the customer (work done, readings and how they moved since earlier visits, photos, and work recommended, with no costs).
+- **Agreements:** record the price, visits per year and renewal date; renewals are warned at 90, 60 and 30 days. **Create due visits** opens a planned-maintenance work order for each visit that is due. The **Agreement Visit Calendar** shows a month of planned visits (done, work order open, due with no work order yet, or upcoming). The **Tune-up Planner** spreads every spring or fall agreement visit over the workdays for the techs you pick, then makes the work orders or saves a calendar file. **Build-to-Service Handover** turns closeout equipment into service records and offers a maintenance agreement. **Warranty Registrations** counts down each unit's register-by date.
+- **Logs & Tests:** a **Refrigerant Log** (with a leak-rate check, and recovery and cylinder records), a **Backflow Test Report** (on your water district's own form once you use **Map the Form**) and a **Maintenance Checklist** for each visit. The built-in refrigerant rules have not been reviewed against the regulations: check their thresholds and dates before you rely on them.
+- **Pricing:** a **Flat-Rate Pricebook**, **Good / Better / Best Quotes** (pricebook tasks for each choice; when the customer signs one, it becomes a flat-rate work order), **Tech Recommendations** and **Truck Stock**. No prices ship with the program.
+- **Replacement:** a **Changeout Proposal** for the unit being replaced, with Good / Better / Best equipment, the permit fee and duct changes on every option; when the customer signs, the choice becomes a work order. The **Load Report** sends the room takeoff to the outside designer and brings the designer's report back in; QuantiSheet does not calculate loads.
+- **Settings:** **Service Settings** holds the card fee, the default sales tax, invoice terms, the member discount and agreement visits.
+- **Records and Quotes:** **Equipment & Service Records** (properties, equipment, recurring service coming due) and **Customer Quote With Options** (base scope, Good / Better / Best and optional lines, prices only, never cost).
+@h2 4.30 Codes, accessibility and insurance claims | hcode
+- **Module > ADA Standards (2010)**: the 2010 ADA Standards, searchable, and **ADA Standards PDF** opens the standards themselves in a tab to search with Ctrl+F, figures and all.
+- **Module > ADA Checker** (commercial projects, 2010 ADA Standards chapter 2 scoping): give the counts (parking, entrances, stories, toilet rooms, seats, guest rooms) and it says what the Standards require, what you have, and the section for each line. Its answers are saved in the PDF. It is a screening aid: alterations, historic buildings, exceptions and the code your jurisdiction adopted decide the real answer.
+- **Module > Climate Zone by County**, **Code Library** (your own code books in one place) and **Read the Energy Code Online**.
+- **Project > Code Check**: occupant load, egress, accessibility and plumbing fixture counts.
+- **Document > Accessibility Check** checks a PDF for accessibility (tagged structure, title, language, real text rather than pictures of text, bookmarks, tab order, form field and markup descriptions, link text, security settings and embedded fonts), fixes what can be fixed safely, including tagging the structure, and says plainly what needs a person. Each automatic fix is its own Undo step.
+- **Module > ClaimIT (Insurance Claim Estimate)** starts ClaimIT, QuantiSheet's separate program for insurance claim estimates, with the open drawing's takeoff when there is one. It works without a drawing too.
+@h2 4.31 Local AI helpers | hai
+These run on your PC with Ollama (see 4.10, Optional local AI). Nothing leaves the computer, each can be stopped, and what they write is a draft to check.
+- **Ask the Project** (1.1.27; AI tab, Review menu and the Project Analysis tab): type a question in plain words ("What is the warranty on the roofing?"). The best passages from the open specifications or drawings and from the job's RFIs, submittals, daily logs, meetings and issues are listed with where each one is (double-click a page to go there). This search works without the AI. When the AI on this PC is running, it also writes a short answer from those passages only, citing them like [1], and says when the documents don't answer the question.
+- **Draft Daily Log From Notes** (1.1.27; the Daily Log page in Project Center, the AI tab and the Review menu): type or paste the day's notes, one item per line ("Example Plumbing 4 men 8 hrs rough-in level 2", "Concrete delivered from ... 10:30", "Rained 2 hrs"), and add photos. Manpower, work performed, deliveries, visitors, safety, delays (with their cause) and inspections are sorted into a draft daily log; the photos are listed with the time they were taken and attached. Tick **Tidy the work wording** to have the AI on this PC rewrite the work as short sentences, keeping every fact. **Save as Draft Daily Log** saves it to check and submit on the Daily Log page.
+- **Check Submittal Against Spec** (1.1.27; the Submittals page in Project Center, the AI tab and the Review menu): pick the submittal (its spec section and attached PDF are taken from it), the spec book and the submittal PDF, then **Check**. The spec section's listed manufacturers, every standard it names (ASTM, UL, BHMA and so on), its warranty term and the submittal items it asks for (product data, shop drawings, samples, certificates and more) are each checked against the submittal, marked OK or Check. It is a first look, not the architect's review.
+- **Project Risk Flags** (1.1.27; Project Center Home, the Project tab and menu, and the AI tab): RFI answers that are late, RFIs open a long time, RFIs with a cost impact but no change event or a schedule impact, submittals not submitted by their date or that can't arrive in time for the lead and review time, submittals sent back, late review steps, activities past their baseline finish or not started on time, overdue issues, change events pending over 30 days, and hours lost to delays in the last two weeks. Each comes with its reason, worst first. They are rules, not predictions: check each one.
+- **Review > AI: Summarize** writes a scope summary of the open drawings or specifications.
+- **Review > AI: Find RFIs & Questions** checks the whole set for pipe runs, rims and inverts, slopes, callouts, spec sections, schedules, sheet index entries with no sheet, spec references to drawings that are not in the set and open scope. No AI model is needed to find them; one click makes the RFI.
+- **Review > AI: Redline** proposes edits to a document for you to tick and mark up. **AI: Spec-Check** checks the drawings against the specifications. Both say exactly which pages were reviewed.
+- **Review > AI: Translate Markups** translates markup comments.
+- **Review > Local AI Models** shows what the local AI has installed and the model size that fits this PC. It never downloads anything.
+- **Review > Build Schedule From Plans** (see 4.26), **Summarize with Local AI** in Project Analysis (see 4.21) and **Read with AI** for sub quotes (see 4.19) use the same AI.
+@h2 4.32 Live collaboration | h425
+1. **Tools > Live Collaboration**: start a session and share the code, or join with a code.
+1. Everyone sees each other's markups and cursors as they work. Conflicting edits are merged, not lost.
+1. The relay runs on one office PC (**Start Relay**) or on a hosted server for people outside the office.
+@h2 4.33 Edit, organise, fill and sign PDFs | h426
+- **Edit text and pictures:** **PDF Management tab > Edit Text**. Click inside a paragraph and type; it keeps the paragraph's own font. Use the bar above it for font, size, bold, italic, colour and alignment. Click outside (or Ctrl+Enter) to keep the change; Esc cancels. Click a picture to move or resize it; right-click > **Replace Image**.
+- **Organize Pages** (Pages > Organize Pages, Ctrl+Shift+G): drag thumbnails to reorder; rotate, duplicate, delete or reverse; click **Apply**. Each sheet keeps its scale. **File > Combine Files** joins PDFs and images; **Pages > Split Document** and **Extract Pages** break one apart; **Replace Pages** swaps in a revised sheet.
+- **Make Searchable (OCR)** (Document tab): reads only pages without text. After that, Ctrl+F, Auto Bookmark Sheets and Link Sheet References work on scanned pages too. From 1.1.21 it reads each sheet the way it is shown, rotated sheets included, and a quarter turn round as well, so text that runs up a sheet is read. OCR needs Tesseract installed on the PC.
+- **Copy text and schedules:** **Home > Select Text** (press I), drag across the words and press Ctrl+C. For a schedule, box it and press **Ctrl+Shift+C** to paste it into a spreadsheet with each column in its own cells.
+- **Fillable forms** (1.1.17, 1.1.18): with the Select, Select Text or Fill & Sign tool, click into a field and type. **Enter** keeps what you typed, **Tab** and **Shift+Tab** move through the fields and on to the next page, and **Esc** leaves a field as it was. A check box ticks with one click and a drop-down opens as a list on the field. Fields are tinted light blue, and a note says when a document has fields to fill. Forms work out their own totals (line totals, subtotals, overhead, profit, contract sums) and show amounts in the money format the form's maker set. Only a form's calculations and number formats run, and only when you fill a field; nothing in a PDF runs when it is opened.
+- **Fill and sign:** the Fill & Sign tab has Signature, Initials, Fill Text, Check Mark and Date. **Document > Prepare Form** turns blanks in a flat form into fields. **Document > Request Signatures** sends a PDF out for signature: add signers in order, place their boxes and Send. Signers get an email link and sign in any browser, no account needed. **Document > Signature Requests** shows who has signed and gets the signed PDF with its certificate of completion. **File > Verify Signatures** checks signatures on a PDF you received.
+- **Markups and the Markups List:** the Markup tab has Cloud (C), Rectangle (R), Arrow (A), Text Box (T), Callout (Q), Highlight (H), Pen (P), sticky note (N), Strikeout, Ellipse, Polygon, Date Stamp and more. **Markup > Legend Style** picks a takeoff legend (quantities only) or the classic one. The Markups List lists every markup; filter, set statuses, add columns, group by a column to see each group's total, and **Export Summary** to CSV, spreadsheet or XML.
+- **Print Preview:** **File > Print Preview** shows each page on its paper before it prints; pick all pages, this page or a list such as 1-4, 7.
+@h2 4.34 More PDF tools | hpdf
+- **Create:** **File > Create > Create PDF From File** (an image, document or spreadsheet), **Combine Files**, and **New From Form Library** (a copy of a saved blank form, optionally filled from the job). **Help > Add the QuantiSheet Printer** adds a "QuantiSheet" printer, so printing from any program opens the result here.
+- **Pages menu:** Rotate Right, Rotate Left and Rotate All Pages Right; Insert Blank Page, Insert Pages From PDF, Duplicate Page, Replace Pages, Delete Pages; **Crop Pages**; **Header & Footer**, **Page Numbers** and **Bates Numbering**; **Watermark**; **Booklet / N-up**; Auto Bookmark Sheets, Link Sheet References and **Remove Sheet Links**.
+- **Security:** **File > Protect & Repair > Password Protect** and **Remove Security**. Protected PDFs stay protected through Reduce File Size, Watermark and batch actions.
+- **Redaction:** **Document > Search & Redact** finds words or patterns (such as card numbers) across the document and redacts them all; **Redact Area** removes what is under a box.
+- **Forms:** **Edit > Add Text Field**, **Add Checkbox**, **Add Dropdown** and **Add Image** place fields and pictures by hand; **Document > Prepare Form (detect fields)**, **Clear Form**, **Fill Form From Job** (Project, Owner, Contractor and other fields filled from the job's contract details and your company), and **Flatten Markups & Fields** so they can no longer be changed.
+- **Fill From the Job and Sign** (Fill & Sign menu), for forms that come back to be filled and signed: each field is listed with the value it would get and where that value comes from. Fields it is sure of start ticked; ones it is unsure of are marked to check. Tax IDs, Social Security numbers and bank details are never kept or filled. **Fill Ticked** writes a new file, and **Sign Selected Box** puts your saved signature in one box and records who signed and when. **Change Signature** and **Change Initials** redraw them; they are stored encrypted for your Windows account.
+- **Signing:** **File > Sign > Signing Timestamp Server** gives each digital signature a trusted time from a server you set (off until you set one).
+- **Print and archive:** **Document > Preflight / PDF/X** checks a PDF for print (fonts, resolution, colour, page boxes) and exports PDF/X. **Document > Check Scan Quality** shows which scanned pages will read badly (coarse, tilted, blank) before anyone trusts their text.
+- **Batch:** **Tools > Action Wizard (Batch Process)** runs the same actions (make searchable, page numbers, watermark, flatten, remove hidden information, reduce file size, password protect) on many files at once, into a folder you choose. **Tools > Macros** replays saved steps, and checks a macro before it runs.
+- **Markup styles:** **Markup > Markup Color**, **Default Style**, **Line Styles**, **Hatch Patterns**, **Layers** (show or hide each layer) and **Refresh Legends**. **Review > Auto-Markup by Rules** highlights, underlines or strikes words such as "shall" or "fire rating" by rules you set in **Edit Auto-Markup Rules**.
+- **Document > Attachments** saves a file attached to the PDF (allowed types only, never opened or run). **File > Document Properties** shows and edits the title, author and other properties; **Edit > Author Name** sets the name on your markups.
+@h2 4.35 Export and smaller files | h427
+- **File > Export To**: document (.docx), workbook (.xlsx), slides (.pptx), web page, text, DXF (this page), PDF/A, PNG or JPEG images.
+- The **Export** button at the right end of the quick bar remembers what you chose last: click its arrow to pick any export, then click the button to run the same export again.
+- **File > Export Markups (XFDF)** for another PDF program; **Import Markups** reads them back.
+- **File > Export > External Issue (strip pricing)** keeps markups and removes prices, margins and job data for people outside the company.
+- **Remove Hidden Information** (PDF Management) removes metadata, scripts, attachments and hidden text before you send a file.
+- **Reduced Size PDF** (1.1.22): choose **File > Save As** and pick **Reduced Size PDF** (high quality, balanced or smallest) in the file type list. A smaller copy is saved straight away, with the size before and after. The document you have open stays as it is, and a copy cannot be saved over its own file.
+- **Reduce File Size** makes big scanned sets easier to email and only writes a copy when it is smaller.
+- **File > Protect & Repair > Check / Repair PDF** repairs a damaged file into a copy.
+- **Takeoff > Export to Job Cost (CSV)** writes the takeoff's coded lines as a job cost budget import for your accounting program. It shows a preview first and writes the import file plus a reversal file.
+@h2 4.36 Keep your files safe | h428
+- Before a save would change a signed PDF, QuantiSheet asks first and says whether the signatures stay valid.
+- **Redact Area** (right-click the page) removes the text, line art and picture under the box and checks that nothing is left. If the check fails, the redaction is undone and you are told.
+- If a PDF comes back without its QuantiSheet data (email and some PDF tools strip it), QuantiSheet offers to put back the copy this computer kept at the last save.
+- A file saved by a newer version of QuantiSheet opens to look at, but saving is turned off so nothing in it is lost.
+- On a shared file, the status bar names who has it open, and if someone saved after you opened it, Save offers **Save a Copy**, **Overwrite** or **Cancel**.
+- **Tools > Back Up My QuantiSheet Data** and **Tools > Restore QuantiSheet Data From a Backup**. A backup also runs once a week on its own, to Documents\QuantiSheet Backups, keeping the last four. A backup holds your signing key, so keep it private.
+- **File > Version History** lists earlier saved versions to compare or restore.
+- **File > Copies & Cloud > Work on a Local Copy**: for a file on a shared drive or a cloud folder, it saves the file, copies it to this PC and you keep working on the copy. **Copy Back to the Original** puts it back, and is refused if someone changed the original in the meantime. The same menu can open from and save to your cloud storage account (set it up once in its settings).
+- **Tools > Macros > Load & Replay** checks a macro before it runs.
+@h2 4.37 Customise QuantiSheet | h429
+- **Roles and tabs:** **View > Ribbon Tabs > Choose My Role** picks again. **Show All Tabs** brings back every tab. **Tabs Follow the Open File** can be turned off.
+- **Quick bar:** right-click a ribbon button > **Pin to Quick Bar**; drag a pin to reorder; right-click a pin to unpin, move it or restore default pins.
+- **Help > Customize Shortcuts** lists every command; click a shortcut and press the new keys.
+- Right-click the page for Set Scale, Length, Area and Count, Edit Text Here, Redact Area, Snapshot, New RFI Here, Rotate This Page, Insert Pages From PDF Here and Paste Here / Paste in Place.
+- **Ctrl+K** (View > Command Search) finds commands, sheets (for example A2.1), takeoff items, Tool Chest tools, RFIs and service records. Press **Shift+Enter** on a command and its ribbon tab opens with the button lit.
+- **F10**, or pressing and releasing **Alt**, opens the menus from the keyboard.
+- **View > Snap Modes** picks what the cursor snaps to (ends, corners, perpendicular and more) and **Snap to Content** turns snapping to the drawing on or off. **View > Color Takeoff By > Priced / Not Priced** shows at a glance what still needs a price. **View > Double-Click Edits PDF Text** turns double-click text editing on or off. **View > Ribbon Tabs > Classic Tabs** brings back all the tabs as they were before roles (at the next start).
+- **View > Field Mode** for a tablet on site: bigger touch targets, larger text, the ribbon hidden and the dark theme. **Density** (compact, comfortable or touch) and **Theme** (light, dark or follow Windows) also work on their own (both themes use QuantiSheet red for buttons and tiles, and dark charcoal for done, ready and OK, 1.1.29), and **View > Layout** offers Modern or Full Ribbon + Tool Rail. **View > Show Ribbon** and **Bottom Panels** (F9) show or hide them.
+@h2 4.38 Track deliveries | h430
+**Tools > Package Tracker**: type or paste tracking numbers, or paste a whole shipping email and the numbers are picked out. Add what it is, who it is from, the job and the expected day. Select a package and click **Track** to open the carrier's own tracking page; a package past its expected day shows LATE in red.
+
+@h2 4.39 Generate a starter set | hgen
+**File > Create > Generate Set** turns a short brief into a ten-sheet starter set: cover, notes, site plan, floor plan, roof plan, elevations, section, schedules and a quantity summary for the estimate (eleven sheets for a two-story house).
+1. Type a brief such as "3 bed 2 bath ranch, about 1,600 sf, new". The fields below the brief win over it: building type, new or existing, gross area (400 to 8,000 SF), occupancy, name, address and firm.
+1. A sketch (PDF or image) is optional; its outline proportions and any typed room names are read.
+1. Add a 1-, 2- or 3-car garage, a covered porch or a rear deck, two stories, and the lot and setbacks for the site plan. Anything missing is marked ASSUMED.
+1. Pick where to save. The set opens when it is done. Its quantities are saved as a .quantities.csv beside the PDF and travel inside it, so the Quantities panel lists them ready for a unit cost and waste.
+Every sheet says FOR REVIEW - NOT FOR SEALING. It is a starting point for a licensed design professional, not a permit set.
+@h1 5. Keyboard shortcuts | keys
+@table
+To do this | Press
+Find any command, sheet, takeoff item, RFI or service record | Ctrl+K
+Show where a command lives (in Ctrl+K) | Shift+Enter
+Open / Save | Ctrl+O / Ctrl+S
+Undo / Redo | Ctrl+Z / Ctrl+Y or Ctrl+Shift+Z
+Find text | Ctrl+F
+Fit page / width / actual size | Ctrl+0 / Ctrl+2 / Ctrl+1
+Previous view | Alt+Left
+Go to page | Ctrl+G
+Next / previous page | PgDn / PgUp
+Select tool | V
+Marquee zoom | Z
+Pan | Hold the wheel button and drag
+Select Text tool | I
+Copy text from the drawing | Select Text, drag, Ctrl+C (or double-click a word)
+Copy a schedule for a spreadsheet | Select Text, box it, Ctrl+Shift+C
+Select all text on the page | Ctrl+A
+Snap on or off | Shift+F9
+Bottom panels | F9
+Cloud / Rectangle / Arrow / Text box | C / R / A / T
+Callout / Highlight / Pen / Sticky note | Q / H / P / N
+Length / Polylength / Area | Shift+L / Shift+P / Shift+A
+Cutout / Volume / Count | Shift+X / Shift+V / Shift+C
+Wall Area (length x height) | Shift+W
+Auto Area / Trace Length | Shift+R / Shift+T
+Trace Outline | Shift+O
+Auto takeoff rooms / walls and doors | Ctrl+Shift+R / Ctrl+Shift+W
+Trade Takeoff / Check Takeoff | Ctrl+Alt+T / Ctrl+Alt+K
+AI Takeoff | Ctrl+Shift+A
+Voice commands on / off | Ctrl+Shift+V
+Accept / deny a selected AI markup | A / D
+Select several markups | Ctrl+click, or drag a box
+Reshape: remove a corner | Ctrl+click the corner
+The first nine Tool Chest tools | 1 through 9
+Repeat the last tool (from Select) | Space
+Status of the selected markup | Alt+1 through Alt+9
+Arc while drawing a run or an area | Tab
+Next / previous form field | Tab / Shift+Tab
+Compare | Ctrl+Alt+C
+Organize Pages | Ctrl+Shift+G
+Project Center | Ctrl+Shift+P
+Open the menus from the keyboard | F10, or Alt on its own
+Help Center | F1
+Finish a polyline or area | Enter or double-click
+Back to Select / cancel | Esc
+@endtable
+You can change any shortcut with **Help > Customize Shortcuts**. Every command is also in Ctrl+K command search, with its shortcut shown.
+
+@h1 6. Tips, FAQ and troubleshooting | faq
+**Do I need an internet connection or an AI model to use QuantiSheet?** No. Everything works without the optional local AI helpers. AI Takeoff and Project Analysis run on your PC, and nothing is sent to the internet. The optional text helpers, such as Summarize with Local AI, use Ollama running on your PC.
+**Why is an AI result not in my totals?** AI results are dashed with an "AI" badge until you accept them. Select one and press A to accept it or D to deny it, or work through the Review Queue. Only accepted items go into the takeoff and estimate. The bid check warns while AI items are still waiting for review.
+**My quantities look wrong.** Check the scale first. Click the scale in the status bar, measure a dimension you know, and confirm or re-set it. Sheets marked HALF SIZE, 11x17 sheets and sheets of a different size from the rest of the set can make a written scale wrong.
+**A scale says Check (1.1.21).** Engineering scales and graphic scales read from civil sheets are marked Check because they are read from the drawing rather than typed. Measure a dimension you know, then confirm the scale.
+**A scanned plan will not search, or AI Takeoff cannot read a scanned sheet.** Run **Document > Make Searchable (OCR)**. AI Takeoff does this for scanned sheets with no text as part of reading the set (one Undo takes the text off again). OCR needs Tesseract installed on the PC; if it is missing, AI Takeoff says which sheets it cannot read. Scans with small scales (such as 1/8" = 1'-0") and rooms beside casework are still the weakest case, so check those rooms.
+**Project Analysis says not found.** It only answers what the specifications say, and it never guesses. Double-click any answer to check its page. A budget is often not in the specifications at all. If the whole list is not found, the PDF is probably scanned: run **Make Searchable (OCR)** first, then **Run Again**. After adding an addendum to the PDF, Run Again so the newest addendum wins.
+**Send to Bid Board or Fill From Specs left a field empty.** Only answers found in the specifications are filled, and Fill From Specs never replaces what you typed. Type the rest yourself before you save.
+**A form's total does not change.** A form works out only the totals its maker set up, and only when you fill a field. A total with no calculation behind it stays as typed, so type it yourself.
+**Can I use the calculators for design?** No. The structural calculators are marked preliminary: they are for estimating. The engineer of record's drawings and calculations come first.
+**I pasted takeoff on another sheet and it is missing.** A measurement pasted onto a sheet with no scale is left out, and the status bar says so. Set the scale on that sheet first, then paste again.
+**I made a mistake.** Ctrl+Z undoes it; the Undo command says what it takes back. A whole AI Takeoff run can be undone in one step. A redaction can be undone until you save.
+**QuantiSheet closed unexpectedly.** The next start offers to recover your work, or use **File > Recover Unsaved Files**. **File > Version History** lists earlier saved versions.
+**The window stopped responding.** If the window stops responding for 10 seconds, QuantiSheet writes what it was doing to crash.log in your .quantisheet folder. You can attach it when you contact support. After a freeze, the next start asks if you want to tell support about it (**Don't Ask About Freezes** turns that off).
+**A saved estimate layout or tag could not be read.** Saving a layout or a tag then offers **Keep a Copy** and **Start Fresh**. The unreadable data stays in the PDF under another name, unchanged, and the job starts with no layouts or tags of its own.
+**Check for Updates does not work in the Microsoft Store copy.** If the Store does not answer, QuantiSheet offers to open its page in the Store, where Update works. A copy installed from a package file instead of the Store says the Store cannot update it.
+**A big plan set is slow.** Scales and sheet names are read in the background so a large set opens without freezing, and setting a scale, rotating pages and undoing them are fast on large files. To email a big set, use **File > Save As > Reduced Size PDF**.
+@h2 Tips
+- Use Ctrl+K whenever you cannot find a button.
+- Run **Project Analysis** on the specifications as soon as they arrive, then **Send to Bid Board**.
+- Give every measurement a group name in the Subject box before you start.
+- Run Check Takeoff after every automatic tool.
+- Save a styled markup to the Tool Chest (right-click > Add to Tool Chest) to reuse it with one click.
+- Use Show Unpriced Markups and the Bid Submittal Checklist before you lock a bid.
+- For big sets: Auto Bookmark Sheets and Link Sheet References give you a sheet index and clickable callouts.
+
+@h1 7. Help and support | help
+**In the program:** **F1** opens the Help Center with step-by-step lessons and a **Show Me** button that opens the practice drawings and starts the command for you. **Help > Welcome Tour** gives a short tour, and **Help > Video Tutorials** opens QuantiSheet's video channel (1.1.18). **Help > Features & How-To Guide (PDF)** (1.1.29) opens this guide in a tab; it is also a **Guide** button on the Help tab and at the top of the Help Center. It opens from a read-only copy, so it can't be changed by accident, and the install keeps it in its help folder.
+**Report a problem:** **Help > Report an Issue**. Say what you were doing, what you expected and what happened, check the screenshot (keep it, retake it or leave it out) and click **Open the Email**. Your email program opens addressed to support with everything attached. Nothing is sent until you click Send. Facts about the open drawing (page count, sheet sizes, how many markups, file size) go with it, never the drawing's content, and you choose whether to attach the drawing itself. Logs that go along have names, emails and network paths taken out.
+**Help menu:** **Help Center & Tutorials** (F1), **Features & How-To Guide (PDF)**, **Practice Job (10 Minutes)** (a whole first job on a made-up plan: open, scale, measure, price, export), **Keyboard Shortcuts**, **Customize Shortcuts**, **Recent Problems (Log)** (the last warnings and errors, with Copy), **Support Bundle for IT** (a zip for your help desk with versions, settings that IT set, what is working and the logs; no keys, passwords or email addresses), **Add the QuantiSheet Printer**, **Enter License Key**, **Terms of Service**, **Privacy** and **Third-Party Licenses** (the open source parts QuantiSheet uses and their licenses).
+**Version and source code:** **Help > About QuantiSheet** shows your version and the link to the source code (GNU AGPL-3.0).

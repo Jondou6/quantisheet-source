@@ -1,4 +1,4 @@
-"""Takeoff items, PlanSwift-style: make "Outlets (count)" or "Wall Type A
+"""Takeoff items: make "Outlets (count)" or "Wall Type A
 (length)" first, with its own color, then click it in the Takeoff panel
 and every click adds to it - no "What are you counting?" each time.
 

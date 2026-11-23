@@ -50,7 +50,7 @@ def test_whats_new_111():
         assert w in s
     assert "Adobe" not in s and "Bluebeam" not in s
     from app import __version__
-    assert __version__ == "1.1.25"
+    assert __version__ == "1.1.29"
 
 
 def test_whats_new_112():
@@ -431,3 +431,67 @@ def test_whats_new_1125():
     notes = open(os.path.join(root, "docs", "TEAM_NOTES_1.1.25.txt"),
                  encoding="utf-8").read()
     assert notes.startswith("QuantiSheet 1.1.25\n")
+
+
+def test_whats_new_1126():
+    p = os.path.join(os.path.dirname(helpcenter.__file__), "data",
+                     "whats_new.json")
+    s = json.load(open(p, encoding="utf-8"))["1.1.26"]
+    for w in ("Project Analysis", "Local AI", "Send to Bid Board",
+              "Fill From Specs", "Only empty fields"):
+        assert w in s
+    for bad in ("Repro", "Adobe", "Acrobat", "Bluebeam", "Planswift", "HMB",
+                "PlanHub", "Calcs.com", "Dillon", "AECOM", "Harbor", "Metro"):
+        assert bad not in s
+    root = os.path.dirname(os.path.dirname(helpcenter.__file__))
+    notes = open(os.path.join(root, "docs", "TEAM_NOTES_1.1.26.txt"),
+                 encoding="utf-8").read()
+    assert notes.startswith("QuantiSheet 1.1.26\n")
+
+
+def test_whats_new_1127():
+    p = os.path.join(os.path.dirname(helpcenter.__file__), "data",
+                     "whats_new.json")
+    s = json.load(open(p, encoding="utf-8"))["1.1.27"]
+    for w in ("3D Model Quantities", "IFC", "Ask the Project",
+              "Draft Daily Log", "Check Submittal", "Risk Flags"):
+        assert w in s
+    for bad in ("Repro", "Adobe", "Acrobat", "Bluebeam", "Planswift", "HMB",
+                "PlanHub", "Calcs.com", "Dillon", "AECOM", "Harbor", "Metro"):
+        assert bad not in s
+    root = os.path.dirname(os.path.dirname(helpcenter.__file__))
+    notes = open(os.path.join(root, "docs", "TEAM_NOTES_1.1.27.txt"),
+                 encoding="utf-8").read()
+    assert notes.startswith("QuantiSheet 1.1.27\n")
+
+
+def test_whats_new_1128():
+    p = os.path.join(os.path.dirname(helpcenter.__file__), "data",
+                     "whats_new.json")
+    s = json.load(open(p, encoding="utf-8"))["1.1.28"]
+    for w in ("password-protected", "Remove Security",
+              "Signature Requests", "your own time"):
+        assert w in s
+    for bad in ("Repro", "Adobe", "Acrobat", "Bluebeam", "Planswift", "HMB",
+                "PlanHub", "Calcs.com", "Dillon", "AECOM", "Harbor", "Metro"):
+        assert bad not in s
+    root = os.path.dirname(os.path.dirname(helpcenter.__file__))
+    notes = open(os.path.join(root, "docs", "TEAM_NOTES_1.1.28.txt"),
+                 encoding="utf-8").read()
+    assert notes.startswith("QuantiSheet 1.1.28\n")
+
+
+def test_whats_new_1129():
+    p = os.path.join(os.path.dirname(helpcenter.__file__), "data",
+                     "whats_new.json")
+    s = json.load(open(p, encoding="utf-8"))["1.1.29"]
+    for w in ("Features and How-To Guide", "read-only", "Auto Scale",
+              "close up", "counted once", "QuantiSheet red", "charcoal"):
+        assert w in s
+    for bad in ("Repro", "Adobe", "Acrobat", "Bluebeam", "Planswift", "HMB",
+                "PlanHub", "Calcs.com", "Dillon", "AECOM", "Harbor", "Metro"):
+        assert bad not in s
+    root = os.path.dirname(os.path.dirname(helpcenter.__file__))
+    notes = open(os.path.join(root, "docs", "TEAM_NOTES_1.1.29.txt"),
+                 encoding="utf-8").read()
+    assert notes.startswith("QuantiSheet 1.1.29\n")

@@ -1,4 +1,4 @@
-"""Acrobat-style in-place editing (app/textedit.py) and sharp rendering on
+"""In-place editing (app/textedit.py) and sharp rendering on
 scaled displays."""
 import base64
 import os

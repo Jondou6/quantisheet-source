@@ -24,11 +24,12 @@ def clean(text):
 
 
 # ---- ribbon --------------------------------------------------------------------
-# One tile colour: a solid teal-green square, lighter at the top, white
+# One tile colour: a solid QuantiSheet-red square (the logo's red, Nov 23;
+# teal-green before), lighter at the top, white
 # glyph. The fill does not change between light and dark mode. Labels sit
 # on the frosted panel (CAPTION_INK / DISABLED_INK).
 
-GREEN_FILL = "#0E6A60"
+TILE_FILL = "#BD2322"
 GLYPH = "#FFFFFF"
 GLYPH_STROKE = 3.0          # heavier than the 1.7 menu-icon stroke
 # How far the top of the tile lifts toward white. Small enough that a
@@ -163,11 +164,11 @@ def contrast_ratio(a, b):
 
 
 def tile_contrast():
-    """White-glyph contrast for the green tile. Same in light and dark.
+    """White-glyph contrast for the red tile. Same in light and dark.
 
     Keys: fill, top (lighter end of the gradient), hover, pressed, disabled.
     """
-    fill = QColor(GREEN_FILL)
+    fill = QColor(TILE_FILL)
     white = QColor("#FFFFFF")
     top = _mix(fill, white, GRADIENT_LIFT)
     hover = _mix(_mix(fill, white, HOVER_LIFT), white, GRADIENT_LIFT)
@@ -389,8 +390,8 @@ class RibbonButton(QToolButton):
         return disabled, hover, pressed, focus, checked
 
     def _colors(self, disabled, hover, pressed, checked=False):
-        """(tile fill, white glyph, stroke) . Same green in light and dark."""
-        base = QColor(GREEN_FILL)
+        """(tile fill, white glyph, stroke) . Same red in light and dark."""
+        base = QColor(TILE_FILL)
         ink = QColor(GLYPH)
         if disabled:
             base = _mix(base, QColor("#9CA3AF"), 0.35)
@@ -401,7 +402,7 @@ class RibbonButton(QToolButton):
         return base, ink, GLYPH_STROKE
 
     def _paint_tile(self, p, rect, radius, base, dark):
-        """Green fill, lighter at the top, with a thin inner highlight."""
+        """Red fill, lighter at the top, with a thin inner highlight."""
         top = _mix(base, QColor("#FFFFFF"), GRADIENT_LIFT)
         bot = _mix(base, QColor("#000000"), 0.06)
         grad = QLinearGradient(rect.topLeft(), rect.bottomLeft())
@@ -970,7 +971,7 @@ class ModelStatus(QFrame):
         dark = theme.is_dark()
         p.setPen(theme.color("text") if self._state != "check"
                  else _ink(DISABLED_INK))
-        dot = {"up": "#12865a" if not dark else "#3fb27f",
+        dot = {"up": "#232b2b" if not dark else "#d3dcdc",
                "down": "#b54708" if not dark else "#e3a008",
                "off": "#6b7280",
                "check": "#6b7280"}.get(self._state, "#6b7280")

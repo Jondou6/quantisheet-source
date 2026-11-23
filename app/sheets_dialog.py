@@ -1,4 +1,4 @@
-"""Sheet Setup: Auto Scale and Auto Bookmark (PlanSwift's Takeoff Boost)."""
+"""Sheet Setup: Auto Scale and Auto Bookmark."""
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog,
                                QDialogButtonBox, QHBoxLayout, QHeaderView,

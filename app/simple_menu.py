@@ -298,7 +298,7 @@ class SimpleMenus:
                     if tool and icons.has(tool):
                         a.setIcon(icons.icon(tool))
                 acts.append(a)
-            # first three big, the rest small (calm, like PlanSwift's ribbon)
+            # first three big, the rest small (calm)
             for a in acts[:3]:
                 g.large(a, short_label(a))
             if acts[3:]:

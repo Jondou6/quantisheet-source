@@ -236,6 +236,23 @@ class RequestDialog(QDialog):
         self.close()
 
 
+def local_time(stamp):
+    """A signing time from the relay or service (UTC, ISO) in this PC's
+    own time, e.g. 'Nov 23, 2026 11:28 AM' (Chief, Nov 23: the Track
+    details showed UTC with no label)."""
+    import datetime as _dt
+    t = str(stamp or "").strip()
+    try:
+        d = _dt.datetime.fromisoformat(t.replace("Z", "+00:00"))
+    except ValueError:
+        return t[:16].replace("T", " ")
+    if d.tzinfo is None:
+        d = d.replace(tzinfo=_dt.timezone.utc)
+    d = d.astimezone()
+    return f"{d:%b} {d.day}, {d.year} {d.hour % 12 or 12}:{d:%M} " + \
+        ("AM" if d.hour < 12 else "PM")
+
+
 class TrackerDialog(QDialog):
     COLS = ["Document", "Status", "Signed", "Sent", "Waiting on", "With"]
 
@@ -309,7 +326,7 @@ class TrackerDialog(QDialog):
             rows.append(f"<b>{html.escape(s['name'])}</b> "
                         f"&lt;{html.escape(s['email'])}&gt; - "
                         f"{html.escape(s.get('status', 'sent'))}"
-                        + (f", signed {s['signed'][:16].replace('T', ' ')}"
+                        + (f", signed {local_time(s['signed'])}"
                            if s.get("signed") else ""))
         if e.get("signed_path"):
             rows.append(f"Signed copy: <a href='{QUrl.fromLocalFile(e['signed_path']).toString()}'>"

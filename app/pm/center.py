@@ -753,6 +753,30 @@ class ToolPage(QWidget):
         self.center.toast(f"Made {len(made)} bid package(s).")
         return made
 
+    def draft_from_notes(self, show=True):
+        """Daily Log page: a draft log from the day's notes and photos
+        (pmassist_ui.py); the list refreshes when it is saved."""
+        from ..pmassist_ui import DailyDraftDialog
+        dlg = DailyDraftDialog(self, self.store)
+        dlg.finished.connect(lambda _r: self.refresh())
+        if show:
+            dlg.show()
+        return dlg
+
+    def check_against_spec(self, show=True):
+        """Submittals page: check the selected submittal against its spec
+        section (the main window's open PDF is offered as the spec
+        book)."""
+        from ..pmassist_ui import SubmittalCheckDialog
+        win = getattr(self.center, "main", None)
+        view = getattr(win, "_view", None) if win is not None else None
+        doc = getattr(view, "doc", None) if view is not None else None
+        dlg = SubmittalCheckDialog(self, self.store, doc,
+                                   self.form.current or None)
+        if show:
+            dlg.show()
+        return dlg
+
     def from_spec_book(self, path=None, accept=None):
         """The submittal register from the spec book: pick the project
         manual, tick the ones to add. accept(proposals) -> chosen (tests)."""
@@ -924,6 +948,22 @@ class ToolPage(QWidget):
                           "the late ones - PDF or Excel")
             la.clicked.connect(lambda: self.look_ahead())
             r1.addWidget(la)
+        # Nov 23 (Jon): project assistants inside Project Center
+        if key == "submittal":
+            chk = QPushButton("Check Against Spec…")
+            chk.setIcon(icons.icon("checklist"))
+            chk.setToolTip("Check the selected submittal's PDF against its "
+                           "spec section: manufacturers, standards, "
+                           "warranty and the items the spec asks for")
+            chk.clicked.connect(lambda: self.check_against_spec())
+            r1.addWidget(chk)
+        if key == "daily":
+            dd = QPushButton("Draft From Notes && Photos…")
+            dd.setIcon(icons.icon("calendar"))
+            dd.setToolTip("Type or paste the day's notes and add photos; "
+                          "they are sorted into a draft daily log")
+            dd.clicked.connect(lambda: self.draft_from_notes())
+            r1.addWidget(dd)
         if key == "bidpkg":
             many = QPushButton("Packages from Trades…")
             many.setIcon(icons.icon("bidtabs"))
@@ -1255,6 +1295,31 @@ class HomePage(QWidget):
         self.v.addLayout(cards)
         self._list("Waiting on you", mine,
                    "Nothing is waiting on you. Nice.")
+        # Nov 23 (Jon): risk flags on Home
+        try:
+            from ..pmassist import risk_flags
+            flags = risk_flags(self.store)
+        except Exception:                                 # noqa: BLE001
+            flags = []
+        self.risk = flags
+        h = QLabel(f"Risk flags ({len(flags)})")
+        h.setObjectName("pcH2")
+        self.v.addWidget(h)
+        if not flags:
+            e = QLabel("Nothing flagged.")
+            e.setObjectName("muted")
+            self.v.addWidget(e)
+        else:
+            lw = QListWidget()
+            lw.setObjectName("pcHomeList")
+            for f in flags[:8]:
+                lw.addItem(f"{f['level']}: {f['item']} - {f['reason']}")
+            lw.setMaximumHeight(min(8, len(flags)) * 26 + 8)
+            self.v.addWidget(lw)
+            if len(flags) > 8:
+                more = QPushButton(f"See all {len(flags)} flags…")
+                more.clicked.connect(lambda: self.all_flags())
+                self.v.addWidget(more)
         self._list("Overdue", overdue, "Nothing overdue.")
         self._list("Recent changes", recent[:12], "No activity yet.",
                    show_who=True)
@@ -1266,6 +1331,13 @@ class HomePage(QWidget):
             tip.setWordWrap(True)
             self.v.addWidget(tip)
         self.v.addStretch()
+
+    def all_flags(self, show=True):
+        from ..pmassist_ui import RiskFlagsDialog
+        dlg = RiskFlagsDialog(self, self.store)
+        if show:
+            dlg.show()
+        return dlg
 
     def _list(self, title, items, empty, show_who=False):
         h = QLabel(title)

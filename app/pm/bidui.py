@@ -136,7 +136,7 @@ class TradesDialog(QDialog):
 
 
 KIND_COLOR = {"Bids due": "#d92d20", "Pre-bid meeting": "#2563eb",
-              "Questions due": "#b54708", "Site visit": "#12865a"}
+              "Questions due": "#b54708", "Site visit": "#232b2b"}
 
 
 class BidCalendarPage(QWidget):

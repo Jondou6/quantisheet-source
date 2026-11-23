@@ -15,7 +15,7 @@ from PySide6.QtWidgets import (
 from . import ada_check, ada_ref, ada_takeoff
 
 log = logging.getLogger(__name__)
-STATUS = {"ok": ("OK", QColor(222, 244, 222)),
+STATUS = {"ok": ("OK", QColor(238, 241, 241)),
           "short": ("Short", QColor(255, 220, 220)),
           "check": ("Check", QColor(255, 244, 214)),
           "info": ("Need", None)}

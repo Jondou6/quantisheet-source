@@ -15,7 +15,7 @@ from . import subdir
 
 OK, WARN, BAD, NONE = "ok", "warn", "bad", "none"
 SOON_DAYS = 30
-COLORS = {OK: "#cdf0cd", WARN: "#ffe1aa", BAD: "#ffcdcd", NONE: "#e6e6e6"}
+COLORS = {OK: "#eef1f1", WARN: "#ffe1aa", BAD: "#ffcdcd", NONE: "#e6e6e6"}
 
 
 def find(company, contacts=None):

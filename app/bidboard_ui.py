@@ -20,7 +20,7 @@ COLS = [("project", "Project"), ("gc", "GC"), ("trade", "Trade"),
         ("rfi_due", "Questions due"), ("estimator", "Estimator"),
         ("status", "Status"), ("amount", "Our bid"), ("_go", "Go / no-go"),
         ("_same", "Same project?")]
-STATUS_BG = {"Won": "#cdf0cd", "Lost": "#ffcdcd", "Declined": "#e6e6e6",
+STATUS_BG = {"Won": "#eef1f1", "Lost": "#ffcdcd", "Declined": "#e6e6e6",
              "Submitted": "#c8e6ff", "Accepted": "#fff1bd"}
 EDIT = [("project", "Project *"), ("gc", "GC (who invited us)"),
         ("trade", "Trade / scope"), ("address", "Address"),
@@ -45,7 +45,8 @@ class OpportunityDialog(QDialog):
     """Add or edit one opportunity. `found`: fields read from an email,
     shown so the user knows what to check."""
 
-    def __init__(self, parent=None, opp=None, found=None, items=None):
+    def __init__(self, parent=None, opp=None, found=None, items=None,
+                 where="the email"):
         super().__init__(parent)
         self.opp = dict(opp or {"status": "Undecided"})
         self.items = items
@@ -57,11 +58,11 @@ class OpportunityDialog(QDialog):
             names = dict(EDIT)
             names["plan_links"] = "Plan links"
             v.addWidget(QLabel(
-                "<b>Read from the email - check every field before you "
+                f"<b>Read from {where} - check every field before you "
                 "save.</b> Found: " + (", ".join(
                     names.get(k, k).rstrip(" *") for k in found) or
-                    "nothing") + ". Nothing was sent, and the email was "
-                "not changed."))
+                    "nothing") + ". Nothing was sent, and nothing in "
+                f"{where} was changed."))
         f = QFormLayout()
         self.w = {}
         for key, label in EDIT:
@@ -88,11 +89,77 @@ class OpportunityDialog(QDialog):
         v.addWidget(self.warn)
         bb = QDialogButtonBox(QDialogButtonBox.Save |
                               QDialogButtonBox.Cancel)
+        # Nov 23 (Jon: both places): the open specs' Project Analysis
+        # fills the empty fields
+        self.specs_btn = bb.addButton("Fill From Specs",
+                                      QDialogButtonBox.ActionRole)
+        self.specs_btn.clicked.connect(lambda: self.fill_from_specs())
         bb.accepted.connect(self.save)
         bb.rejected.connect(self.reject)
         v.addWidget(bb)
         self.saved = None
         self._warned = None
+
+    def _main_window(self):
+        w = self.parent()
+        while w is not None and getattr(w, "_view", None) is None:
+            w = w.parent()
+        return w
+
+    def fill_fields(self, fields):
+        """Put `fields` in the empty boxes only; returns the keys filled."""
+        filled = []
+        for k, val in (fields or {}).items():
+            if not val:
+                continue
+            if k in self.w:
+                if not self.w[k].text().strip():
+                    self.w[k].setText(str(val))
+                    filled.append(k)
+            elif k == "notes":
+                if not self.notes.toPlainText().strip():
+                    self.notes.setPlainText(str(val))
+                    filled.append(k)
+            elif not str(self.opp.get(k) or "").strip():
+                self.opp[k] = str(val)
+                filled.append(k)
+        return filled
+
+    def fill_from_specs(self, rows=None, source=None):
+        """Fill the empty fields from the Project Analysis of the open
+        specifications (the kept answers, or a fresh read)."""
+        import os
+        from . import projanalysis as pa
+        if rows is None:
+            win = self._main_window()
+            view = getattr(win, "_view", None) if win is not None else None
+            doc = getattr(view, "doc", None) if view is not None else None
+            if doc is None:
+                self.warn.setText("Open the specifications first, then "
+                                  "click Fill From Specs.")
+                return []
+            rows = pa.cached(doc)
+            if rows is None:
+                rows = pa.run(doc)
+                try:
+                    pa.save(doc, rows)
+                    win._doc_edited()
+                except Exception:                         # noqa: BLE001
+                    pass
+            if source is None:
+                source = os.path.basename(getattr(doc, "name", "") or "")
+        filled = self.fill_fields(pa.bidboard_fields(rows, source or ""))
+        names = dict(EDIT)
+        names["notes"] = "Notes"
+        names["source"] = "Source"
+        shown = [names.get(k, k).rstrip(" *") for k in filled
+                 if k != "source"]
+        self.warn.setText(
+            ("<b>Filled from the specs - check them before you save:</b> "
+             + ", ".join(shown) + ".") if shown else
+            "Nothing new to fill from the specs (only empty fields are "
+            "filled).")
+        return filled
 
     def values(self):
         o = dict(self.opp)

@@ -1,4 +1,4 @@
-"""XFDF: the markup exchange format Acrobat and Bluebeam read and write.
+"""XFDF: the markup exchange format other PDF programs read and write.
 
 export(doc, path) writes every markup; import_marks(doc, path) turns an
 XFDF file into "import_annots" marks (one undoable step when applied).

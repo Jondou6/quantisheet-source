@@ -1,4 +1,4 @@
-"""Assemblies panel and editor (PlanSwift-style estimating)."""
+"""Assemblies panel and editor (estimating from takeoff)."""
 import copy
 
 from PySide6.QtCore import Qt, Signal

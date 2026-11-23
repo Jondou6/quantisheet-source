@@ -155,7 +155,9 @@ def test_tabs_fold_into_their_parents(win):
     for gone in ("Module", "Civil"):
         assert gone not in tabs
     assert "AI" in tabs
-    assert len(tabs) <= 13                 # folded tabs + Service, Billing, AI
+    # folded tabs + Service, Billing, AI; Project Analysis (Nov 20) and
+    # 3D Model (Nov 23) are tabs Jon asked for
+    assert len(tabs) <= 14
     assert w._ribbon_missing == []
     # Nov 5: Billing split back out of Project, and sits right after it
     assert QA.fold("Billing", "Contract") == ("Billing", "Contract")

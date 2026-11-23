@@ -1,5 +1,5 @@
 """Write QuantiSheet's scales as the PDF standard's measuring viewports
-(ISO 32000 §12.9: /VP with a rectilinear /Measure), so Acrobat, Bluebeam
+(ISO 32000 §12.9: /VP with a rectilinear /Measure), so other PDF programs
 and other PDF tools measure our scaled sheets in real units too.
 
 QuantiSheet's own copy (the job-data file read by annotate.read_scales) stays

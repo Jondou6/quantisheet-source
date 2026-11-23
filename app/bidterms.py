@@ -60,12 +60,33 @@ _BUDGET = re.compile(r"\b(?:estimated\s+(?:construction\s+|project\s+)?"
 _SUBST = re.compile(r"\bsubstantial(?:ly)?\s+complet\w*\b[^.;]{0,120}?\(?\b"
                     r"(\d{2,4})\)?\s*(?:\(\d+\)\s*)?(?:consecutive\s+)?"
                     r"(calendar|working)\s+days\b", re.I)
-_FINAL = re.compile(r"\bfinal(?:ly)?\s+complet\w*\b[^.;]{0,120}?\(?\b"
+_FINAL = re.compile(r"\b(?:final(?:ly)?\s+complet\w*|fully\s+complete\s+"
+                    r"the\s+(?:project|work))\b[^.;]{0,120}?\(?\b"
                     r"(\d{2,4})\)?\s*(?:\(\d+\)\s*)?(?:consecutive\s+)?"
                     r"(calendar|working)\s+days\b", re.I)
 _LDV = re.compile(r"\bliquidated\s+damages\b[^.]{0,220}?" + _MONEY +
-                  r"[^.]{0,60}?\b(?:per|each|for\s+each|a)\s+(?:calendar\s+|"
-                  r"working\s+|consecutive\s+)?(day|week)", re.I)
+                  r"[^.]{0,60}?\b(?:per|each|for\s+each|a)\s+(?:(?:calendar|"
+                  r"working|consecutive)\s+)*(day|week)", re.I)
+# the federal overtime clause's per-worker penalty is not the project's
+# liquidated damages (Nov 21, a CDBG spec book)
+_LD_NOT = re.compile(r"laborer|mechanic|overtime|Contract\s+Work\s+Hours",
+                     re.I)
+# "The work to be done consists of ..." (an invitation to bid) says it
+# best; a heading's paragraph is next
+_CONSISTS = re.compile(r"\b((?:The\s+)?work\s+(?:to\s+be\s+done\s+|covered\s+by"
+                       r"\s+this\s+contract\s+)?(?:consists|shall\s+consist)\s+of"
+                       r"\s+.{20,600})", re.I | re.S)
+
+
+def _sentence(txt, limit=400):
+    """The first sentence of `txt` (a period before a capital, or the
+    end), cut at a word near `limit` when it runs on."""
+    txt = re.sub(r"\s+", " ", txt).strip()
+    m = re.search(r"[.](?=\s+[A-Z0-9(]|\s*$)", txt)
+    if m and m.end() <= limit:
+        return txt[:m.end()]
+    cut = txt[:limit].rsplit(" ", 1)[0]
+    return cut + "..."
 _SUMMARY = re.compile(r"\b(?:SUMMARY\s+OF\s+(?:THE\s+)?WORK|PROJECT\s+"
                       r"DESCRIPTION|WORK\s+COVERED\s+BY\s+CONTRACT\s+"
                       r"DOCUMENTS|DESCRIPTION\s+OF\s+(?:THE\s+)?WORK|"
@@ -100,15 +121,16 @@ _PREBID = re.compile(r"\b(mandatory|non[\s-]*mandatory|optional)\b[^.;]{0,30}?"
                      r"\bpre[\s-]*(?:bid|proposal)\b", re.I)
 _GOAL = re.compile(r"\b(DBE|MBE|WBE|SBE|SLBE|M/WBE|MWBE|DBE/MBE|HUB)\b"
                    r"[^.;]{0,100}?" + _PCT, re.I)
-_RET = re.compile(r"\bretain(?:age|ed|ing)?\b[^.;]{0,100}?" + _PCT, re.I)
+_RET = re.compile(r"\b(?:retain(?:age|ed|ing)?|retention)\b[^.;]{0,100}?" +
+                  _PCT, re.I)
 _TIME = re.compile(r"\b(?:substantial(?:ly)?\s+complet\w*|final(?:ly)?\s+"
                    r"complet\w*|complete[ds]?|contract\s+time)\b[^.;]{0,100}?\(?\b(\d{2,4})\)?\s*(?:\(\d+\)\s*)?"
                    r"(?:consecutive\s+)?(?:calendar|working)\s+days\b", re.I)
 _ALT = re.compile(r"\b(?:add(?:itive)?\s+|deduct(?:ive)?\s+)?alternate\s+"
                   r"(?:no\.?\s*|number\s+|#\s*)?(\d{1,2})\b", re.I)
 _DATE = re.compile(r"\b(?:\d{1,2}/\d{1,2}/\d{2,4}|(?:jan|feb|mar|apr|may|jun|"
-                   r"jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+\d{1,2},?\s+\d{4})",
-                   re.I)
+                   r"jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+\d{1,2}(?:st|nd|rd|th)?"
+                   r",?\s+\d{4})", re.I)
 
 
 def _snip(t, m, pad=70):
@@ -169,7 +191,16 @@ def find(doc, pages=None, extra=False):
                                   re.I):
                 put("project_name", m.group(1).strip(" .,;"), m)
         if "address" not in found:
-            m = _ADDR.search(t) or _ADDR2.search(t)
+            m = _ADDR.search(t)
+            if not m:
+                # "located at" an office is where bids go, not the site
+                for m2 in _ADDR2.finditer(t):
+                    if not re.search(r"\boffices?\b|\bcity\s+hall\b|"
+                                     r"\btown\s+hall\b",
+                                     t[max(0, m2.start() - 60):m2.start()],
+                                     re.I):
+                        m = m2
+                        break
             if m:
                 put("address", m.group(1).strip(" .,;"), m)
         m = _BUDGET.search(t)
@@ -189,9 +220,17 @@ def find(doc, pages=None, extra=False):
         m = _FINAL.search(t)
         if m:
             put("final", f"{int(m.group(1))} {m.group(2).lower()} days", m)
-        m = _LDV.search(t)
-        if m:
+        for m in _LDV.finditer(t):
+            if _LD_NOT.search(t[max(0, m.start() - 300):m.end() + 100]):
+                continue
             put("ld_value", f"{m.group(1)} per {m.group(2).lower()}", m)
+            break
+        m = _CONSISTS.search(t)
+        if m and (found.get("summary") or {}).get("kind") != "consists":
+            txt = _sentence(m.group(1))
+            found["summary"] = {"key": "summary", "label": LABEL["summary"],
+                                "value": txt[:400], "page": p,
+                                "text": txt[:400], "kind": "consists"}
         if "summary" not in found:
             m = _SUMMARY.search(t)
             if m:

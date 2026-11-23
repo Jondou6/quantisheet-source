@@ -1,4 +1,4 @@
-"""The page bar floating over the bottom of the drawing, as in Acrobat:
+"""The page bar floating over the bottom of the drawing:
 first, previous, the page number (type one and press Enter), next, last;
 zoom out, the zoom, zoom in; fit width and fit page."""
 from PySide6.QtCore import QEvent, QSize, Qt

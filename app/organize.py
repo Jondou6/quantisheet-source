@@ -1,4 +1,4 @@
-"""Organize Pages (as in Acrobat): every page as a big thumbnail. Drag to
+"""Organize Pages: every page as a big thumbnail. Drag to
 reorder, select several with Ctrl/Shift, rotate, duplicate or delete
 them, then Apply - one undoable step.
 

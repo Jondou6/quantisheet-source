@@ -1,4 +1,4 @@
-"""Everyday Acrobat-style document tools (no Qt here, so easy to test):
+"""Everyday PDF document tools (no Qt here, so easy to test):
 OCR to a searchable PDF, export to Word / Excel / text / images, combine
 files, password protection, headers & footers, search-and-redact patterns,
 form field detection, flattening and file-size reduction."""
@@ -140,14 +140,16 @@ def is_photo(page):
         return False
 
 
-def _tess_tile(exe, png, language, tessdata):
-    """[(x0, y0, x1, y1, text, conf)] in the tile's pixels."""
+def _tess_tile(exe, png, language, tessdata, psm=11):
+    """[(x0, y0, x1, y1, text, conf)] in the tile's pixels. psm 11 finds
+    scattered text (a drawing); 6 reads one block (a small close-up)."""
     import subprocess
     env = dict(os.environ, OMP_THREAD_LIMIT="1")
     if tessdata:
         env["TESSDATA_PREFIX"] = tessdata
-    out = subprocess.run([exe, png, "stdout", "-l", language, "--psm", "11",
-                          "tsv"], capture_output=True, timeout=600, env=env,
+    out = subprocess.run([exe, png, "stdout", "-l", language,
+                          "--psm", str(psm), "tsv"],
+                         capture_output=True, timeout=600, env=env,
                          creationflags=getattr(subprocess,
                                                "CREATE_NO_WINDOW", 0))
     if out.returncode != 0:

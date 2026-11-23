@@ -1,4 +1,4 @@
-"""Takeoff items, PlanSwift-style: make an item in the Takeoff panel, click
+"""Takeoff items: make an item in the Takeoff panel, click
 it, and every click on the drawing adds to it - no "What are you
 counting?" dialog. Items live in the PDF, even with no markups."""
 import os

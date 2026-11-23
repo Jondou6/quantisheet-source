@@ -54,7 +54,9 @@ def convert_doc(doc):
     """Rename the old-named job data in an open PDF (in memory; the next
     save keeps it). Returns the number of files renamed."""
     try:
-        if not getattr(doc, "is_pdf", False) or doc.needs_pass or \
+        # is_encrypted, not needs_pass: reading needs_pass on a document
+        # already unlocked with its password blanks its pages (Nov 23)
+        if not getattr(doc, "is_pdf", False) or doc.is_encrypted or \
                 not doc.embfile_count():
             return 0
     except Exception:                                    # noqa: BLE001

@@ -1,5 +1,5 @@
 """The Takeoff panel on the left: sheets, items with color and total, and
-an eye to hide them (PlanSwift-style)."""
+an eye to hide them."""
 import os
 
 import fitz

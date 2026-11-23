@@ -473,7 +473,7 @@ class MainWindow(QMainWindow):
         self.tabifyDockWidget(self.takeoff_dock, self.bm_dock)
         self.tabifyDockWidget(self.bm_dock, self.docs_dock)
         self.tabifyDockWidget(self.docs_dock, self.sets_dock)
-        self.takeoff_dock.raise_()       # what's taken off, like PlanSwift
+        self.takeoff_dock.raise_()       # what's taken off
         self.chest_dock = self._dock("Tool Chest", self.chest,
                                      Qt.RightDockWidgetArea)
         self.props_dock = self._dock("Properties", self.properties,
@@ -540,7 +540,7 @@ class MainWindow(QMainWindow):
         self._install_studio()
         self._fit_status_bar()
         self._build_start_page()
-        from . import modern_ui            # Acrobat-style layout (stage 2)
+        from . import modern_ui            # the modern layout (stage 2)
         modern_ui.install(self)
         self._empty_state_tips()
         self._enable_doc_actions(False)
@@ -1065,6 +1065,10 @@ class MainWindow(QMainWindow):
         a.setCheckable(True)
         a.setChecked(on)
         a.toggled.connect(self._show_roof_tools)
+        # Nov 23 (Jon): quantities from a 3D (IFC) model - its own 3D Model
+        # tab after AI, and here in the Takeoff menu
+        self._act(t, "3D Model Quantities (IFC)…", None,
+                  lambda: self.model_quantities(), False)
         t.addSeparator()
         self._act(t, "Assembly Library…", "Ctrl+Shift+L",
                   self.assemblies.open_library)
@@ -1287,6 +1291,13 @@ class MainWindow(QMainWindow):
         self._act(r, "Voice Commands", "Ctrl+Shift+V",
                   lambda: self.voice_commands())
         self._act(r, "AI: Summarize…", None, self.ai_summary)
+        # Nov 23 (Jon): project assistants, also on the AI tab
+        self._act(r, "Ask the Project…", None, lambda: self.ask_project(),
+                  False)
+        self._act(r, "Draft Daily Log From Notes…", None,
+                  lambda: self.daily_draft(), False)
+        self._act(r, "Check Submittal Against Spec…", None,
+                  lambda: self.submittal_check(), False)
         self._act(r, "AI: Redline…", None, self.ai_redline)
         self._act(r, "AI: Spec-Check…", None, self.ai_spec_check)
         self._act(r, "Spec Book Risk Scanner…", None,
@@ -1346,6 +1357,8 @@ class MainWindow(QMainWindow):
                   lambda: self.quality(1))
         pj.addSeparator()
         self._act(pj, "Code Check…", None, self.code_check)
+        self._act(pj, "Project Risk Flags…", None,
+                  lambda: self.risk_flags(), False)
         pj.addSeparator()
         self._act(pj, "Submittal Log…", None, self.submittal_log, False)
 
@@ -1451,6 +1464,8 @@ class MainWindow(QMainWindow):
         self._help_menu = h
         self._act(h, "Help Center && Tutorials…", "F1", self.help_center,
                   False)
+        self._act(h, "Features && How-To Guide (PDF)", None,
+                  lambda: self.open_guide(), False)
         self._act(h, "Video Tutorials", None,
                   lambda: self.video_tutorials(), False)
         self._act(h, "Welcome Tour", None, self.welcome_tour, False)
@@ -1534,6 +1549,13 @@ class MainWindow(QMainWindow):
         ("AI", "Schedule", [("Build Schedule From Plans",
                               "Schedule From Plans", "gantt")]),
         ("AI", "Voice", [("Voice Commands", "Voice", "mic")]),
+        # Nov 23 (Jon): project assistants
+        ("AI", "Project", [("Ask the Project", "Ask", "ai"),
+                           ("Draft Daily Log From Notes", "Daily Log",
+                            "calendar"),
+                           ("Check Submittal Against Spec", "Submittal "
+                            "Check", "checklist"),
+                           ("Project Risk Flags", "Risk Flags", "flag")]),
         ("AI", "Review", [("AI: Find RFIs & Questions", "Find RFIs", "ai"),
                           ["AI: Summarize", "AI: Spec-Check",
                            "AI: Redline"],
@@ -1749,6 +1771,7 @@ class MainWindow(QMainWindow):
         ("Project", "Submittals", [("Submittal Log", "Submittals",
                                     "submittal")]),
         ("Project", "Check", [("Code Check", "Code Check", "code"),
+                              ("Project Risk Flags", "Risk Flags", "flag"),
                               ("Search Takeoff Across Jobs", "All Jobs",
                                "database")]),
         ("Module", "ADA", [("ADA Standards PDF", "ADA PDF", "book"),
@@ -1819,16 +1842,22 @@ class MainWindow(QMainWindow):
                               ["Import AutoCAD DXF",
                                "Import Markups (PDF or XFDF)",
                                "Export Markups (XFDF)"]]),
+        # Nov 23 (Jon): a 3D Model tab after AI
+        ("3D Model", "IFC Model",
+         [("3D Model Quantities (IFC)", "Model Quantities", "assembly")]),
         # Nov 20 (Jon): a Project Analysis tab after Tools
         ("Project Analysis", "Project Analysis",
          [("Project Analysis", "Project Analysis", "checklist"),
           ("Find Bid Terms", "Bid Terms", "find"),
           ("Manufacturers in Specs", "Manufacturers", "list"),
-          ("Bid Submittal Checklist", "Bid Checklist", "checklist")]),
+          ("Bid Submittal Checklist", "Bid Checklist", "checklist"),
+          ("Ask the Project", "Ask the Project", "ai")]),
         ("Tools", "Settings", [("Command Search", "Commands", "command"),
                                ["Author Name", "Keyboard Shortcuts",
                                 "Document Properties"]]),
         ("Help", "Learn", [("Help Center & Tutorials", "Tutorials", "info"),
+                           ("Features & How-To Guide (PDF)", "Guide",
+                            "book"),
                            ("Video Tutorials", "Videos", "info"),
                            ("Welcome Tour", "Tour", "home"),
                            ("Open Practice Drawings", "Practice", "open"),
@@ -2891,7 +2920,7 @@ class MainWindow(QMainWindow):
 
     def take_off_item(self, item):
         """Takeoff panel: click an item and each click on the drawing adds
-        to it, in its color - no "What are you counting?" (PlanSwift)."""
+        to it, in its color - no "What are you counting?" question."""
         v = self._view
         if not v:
             return
@@ -4025,7 +4054,7 @@ class MainWindow(QMainWindow):
         QTimer.singleShot(0, lambda: bar.setValue(top))
 
     def eventFilter(self, obj, ev):
-        """Ctrl + wheel zooms at the cursor (like Acrobat and Bluebeam);
+        """Ctrl + wheel zooms at the cursor (as PDF readers do);
         scrolling past the top/bottom of a page turns the page."""
         if (ev.type() == QEvent.Wheel and self._view and self._tab
                 and obj is self._tab.viewport()
@@ -4585,7 +4614,7 @@ class MainWindow(QMainWindow):
             v.history.snapshot()
             v.mark_dirty()
 
-    # ---- Bluebeam-gap features ---------------------------------------------------
+    # ---- markup and layer features ---------------------------------------------------
     def _column_edit(self, key, column, value):
         from . import columns
         v = self._view
@@ -4692,7 +4721,7 @@ class MainWindow(QMainWindow):
         return n
 
     def export_xfdf(self, path=None):
-        """Markups to XFDF, for Acrobat, Bluebeam and others."""
+        """Markups to XFDF, for other PDF programs."""
         from . import xfdf
         v = self._view
         if not v:
@@ -4991,6 +5020,80 @@ class MainWindow(QMainWindow):
             self._doc_edited()
             return ok
         return dlg
+
+    # ---- project assistants (Nov 23, Jon) ------------------------------
+    def _job_store(self, pick=False, title="Project"):
+        """The open drawing's Project Center job (its folder or the one
+        above it); with pick, ask which job when there isn't one."""
+        from .pm.store import ProjectStore, open_store
+        if self._path:
+            d = os.path.dirname(os.path.abspath(self._path))
+            for folder in (d, os.path.dirname(d)):
+                try:
+                    if ProjectStore.exists(folder):
+                        return open_store(folder)
+                except Exception:                         # noqa: BLE001
+                    continue
+        if pick:
+            from .pm import scheduler as sch
+            return sch.choose_schedule(
+                self, title, "Which project? Pick one or open its folder:",
+                "New Project…")
+        return None
+
+    def ask_project(self, store=None, show=True):
+        """Ask the Project: a question answered from the open PDF and the
+        job's RFIs, submittals, daily logs, meetings and issues
+        (askproject_ui.py)."""
+        from . import askproject_ui
+        doc = self._view.doc if self._view is not None else None
+        store = store if store is not None else self._job_store()
+        dlg = askproject_ui.AskDialog(self, doc, store)
+        if show:
+            dlg.setAttribute(Qt.WA_DeleteOnClose)
+            dlg.show()
+        return dlg
+
+    def daily_draft(self, store=None, show=True):
+        """Draft a daily log from the day's notes and photos."""
+        from . import pmassist_ui
+        store = store if store is not None else self._job_store(
+            True, "Draft Daily Log")
+        if store is None:
+            return None
+        dlg = pmassist_ui.DailyDraftDialog(self, store)
+        return pmassist_ui._show(dlg) if show else dlg
+
+    def submittal_check(self, store=None, show=True):
+        """Check a submittal against its spec section (the open PDF is
+        taken as the spec book)."""
+        from . import pmassist_ui
+        store = store if store is not None else self._job_store(
+            True, "Check Submittal")
+        doc = self._view.doc if self._view is not None else None
+        dlg = pmassist_ui.SubmittalCheckDialog(self, store, doc)
+        return pmassist_ui._show(dlg) if show else dlg
+
+    def risk_flags(self, store=None, show=True):
+        """Project Risk Flags: what in the job looks likely to cost time
+        or money, with the reason."""
+        from . import pmassist_ui
+        store = store if store is not None else self._job_store(
+            True, "Project Risk Flags")
+        if store is None:
+            return None
+        dlg = pmassist_ui.RiskFlagsDialog(self, store)
+        return pmassist_ui._show(dlg) if show else dlg
+
+    def model_quantities(self, path=None, show=True):
+        """3D Model Quantities (Nov 23): an IFC model's elements by kind,
+        type and storey with the quantities it carries; ticked rows go on
+        the open drawing's estimate (ifcmodel_ui.py). Works with no PDF
+        open."""
+        from . import ifcmodel_ui
+        if show:
+            return ifcmodel_ui.show(self, path)
+        return ifcmodel_ui.IfcDialog(self, path)
 
     def project_analysis(self, show=True):
         """Project Analysis (Nov 20, Jon): open the specs and click it -
@@ -5475,7 +5578,7 @@ class MainWindow(QMainWindow):
 
     def create_proposal(self, data=None, comp=None):
         """Build a client proposal PDF from the assembly estimate and open
-        it in a new tab (PlanSwift-style bid). Returns the new document."""
+        it in a new tab (a priced bid). Returns the new document."""
         from . import proposal
         v = self._view
         if not v:
@@ -6687,7 +6790,7 @@ class MainWindow(QMainWindow):
 
     # ---- pages -------------------------------------------------------------------
     def organize_pages(self, dialog=None):
-        """Acrobat's Organize Pages: big thumbnails to drag into order,
+        """Organize Pages: big thumbnails to drag into order,
         rotate, duplicate and delete; applied as one undoable step."""
         from .organize import OrganizeDialog, apply_plan
         v = self._view
@@ -6707,7 +6810,7 @@ class MainWindow(QMainWindow):
 
     def batch_link(self, remove=False):
         """Hyperlink every sheet reference (A-501, 3/A-501 ...) in the set
-        to its sheet, like Bluebeam's Batch Link. One undoable step."""
+        to its sheet. One undoable step."""
         from . import batchlink
         v = self._view
         if not v or self._collab_blocked("Linking sheets"):
@@ -8360,6 +8463,25 @@ class MainWindow(QMainWindow):
         self._practice_job = practice_job_ui.open_window(self, show)
         return self._practice_job
 
+    def open_guide(self, show=True):
+        """Help > Features & How-To Guide (PDF): every feature and how to
+        use it, opened in a tab from a read-only copy."""
+        from .helpcenter import guide_copy
+        try:
+            path = guide_copy()
+        except OSError as e:
+            path, why = None, str(e)
+        else:
+            why = "This install doesn't have the guide."
+        if not path:
+            if show:
+                QMessageBox.information(
+                    self, "Features & How-To Guide",
+                    "Couldn't open the guide. " + why)
+            return None
+        self.open_path(path)
+        return path
+
     def open_practice(self):
         from . import practice
         from .helpcenter import practice_path
@@ -8385,7 +8507,7 @@ class MainWindow(QMainWindow):
             dlg.exec()
         return dlg
 
-    # ---- Acrobat-style tools ------------------------------------------------------
+    # ---- PDF tools ------------------------------------------------------
     def _ask_save(self, title, suffix, filt):
         base = os.path.splitext(self._path or "document")[0]
         path, _ = QFileDialog.getSaveFileName(self, title, base + suffix, filt)
@@ -8825,7 +8947,7 @@ class MainWindow(QMainWindow):
                           "Flattened markups and fields")
 
 
-    # ---- more Acrobat tools ---------------------------------------------------------
+    # ---- more PDF tools ---------------------------------------------------------
     def new_from_form(self, choice=None):
         """Open a copy of a form from the Form Library (the blank stays
         blank), optionally cleared and filled from the current job."""

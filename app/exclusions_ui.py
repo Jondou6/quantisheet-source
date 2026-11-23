@@ -9,7 +9,7 @@ from PySide6.QtWidgets import (QDialog, QDialogButtonBox, QFileDialog,
 
 from . import exclusions as ex
 
-COLORS = {ex.EXCLUDED: QColor("#ffcdcd"), ex.INCLUDED: QColor("#cdf0cd"),
+COLORS = {ex.EXCLUDED: QColor("#ffcdcd"), ex.INCLUDED: QColor("#eef1f1"),
           ex.NOT_STATED: QColor("#f2f2f2")}
 ONLY = QColor("#ff9d9d")
 INK = QColor("#111111")
@@ -43,7 +43,7 @@ class ExclusionsPanel(QWidget):
             "<span style='background:#ffcdcd;color:#111'>&nbsp;Excluded"
             "&nbsp;</span> <span style='background:#ff9d9d;color:#111'>"
             "&nbsp;<b>ONLY this bidder excludes it</b>&nbsp;</span> "
-            "<span style='background:#cdf0cd;color:#111'>&nbsp;Included"
+            "<span style='background:#eef1f1;color:#111'>&nbsp;Included"
             "&nbsp;</span> <span style='background:#f2f2f2;color:#111'>"
             "&nbsp;Not stated&nbsp;</span>  Each cell shows the bidder's "
             "own words; double-click an excluded cell to see it in "

@@ -1,4 +1,4 @@
-"""Modern layout (stage 2): an Acrobat-style window.
+"""Modern layout (stage 2): a clean document window.
 
     top bar     Menu (every menu) · All tools · Open Save Print Undo Redo ·
                 search box (Ctrl+K) · Help
@@ -796,7 +796,7 @@ class Layouts:
 
 
 class AllToolsPane(QWidget):
-    """Every command by category, Acrobat-style: type to filter, click to
+    """Every command by category: type to filter, click to
     run, right-click to pin to the tool rail."""
 
     def __init__(self, lay):

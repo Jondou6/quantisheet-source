@@ -1,5 +1,5 @@
 """Pre-bid Checklist window (Estimate > Pre-bid Checklist): three checks,
-green or red, a one-page printout and the bid lock."""
+charcoal (ready) or red, a one-page printout and the bid lock."""
 import os
 
 from PySide6.QtCore import Qt
@@ -21,7 +21,13 @@ def _report_path(doc, kind, ext):
         kind, os.path.splitext(os.path.basename(name))[0], ext=ext))
 
 
-GREEN, RED = QColor(20, 130, 50), QColor(185, 20, 20)
+# good is charcoal, not green (Nov 23, Jon); a lighter shade in dark mode
+RED = QColor(185, 20, 20)
+
+
+def _good():
+    from . import theme
+    return theme.color("ok")
 
 
 class PrebidDialog(QDialog):
@@ -95,7 +101,7 @@ class PrebidDialog(QDialog):
         c = rep.counts()
         self.verdict.setText("✔ Ready to lock" if rep.ok else
                              "✘ Not ready")
-        self.verdict.setStyleSheet(f"color: {(GREEN if rep.ok else RED).name()}")
+        self.verdict.setStyleSheet(f"color: {(_good() if rep.ok else RED).name()}")
         groups = [
             ("Sheets reviewed", rep.unreviewed_sheets,
              c["sheets"] - c["unreviewed_sheets"], c["sheets"], "sheet"),
@@ -106,7 +112,7 @@ class PrebidDialog(QDialog):
         for title, items, done, tot, kind in groups:
             top = QTreeWidgetItem([f"{'✔' if not items else '✘'}  {title}",
                                    "", f"{done} of {tot}"])
-            top.setForeground(0, GREEN if not items else RED)
+            top.setForeground(0, _good() if not items else RED)
             f = top.font(0)
             f.setBold(True)
             top.setFont(0, f)

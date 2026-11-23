@@ -1,4 +1,4 @@
-"""PlanSwift-style features: assemblies, Auto Scale, Auto Bookmark."""
+"""Takeoff features: assemblies, Auto Scale, Auto Bookmark."""
 import os
 import zipfile
 

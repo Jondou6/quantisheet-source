@@ -523,7 +523,9 @@ def snapshot(doc, prefix="quantisheet_"):
     """{name: bytes} of QuantiSheet's job data files, for checking a save
     (an encrypted file is not checked: {})."""
     try:
-        if doc.needs_pass or doc.is_encrypted:
+        # not needs_pass: on an unlocked document that read drops the key
+        # (blank pages after a password - Nov 23)
+        if doc.is_encrypted or (doc.metadata or {}).get("encryption"):
             return {}
     except Exception:                                # noqa: BLE001
         return {}

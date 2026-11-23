@@ -1,4 +1,4 @@
-"""Assemblies: PlanSwift-style estimating from takeoff.
+"""Assemblies: estimating from takeoff.
 
 An assembly turns one measurement into a full list of parts with material
 and labor. Measure 40 ft of "Interior Wall - 2x4 @ 16\" O.C." and you get

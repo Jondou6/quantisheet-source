@@ -1282,6 +1282,41 @@ def practice_path():
     return os.path.join(settings.DIR, "Practice Drawings.pdf")
 
 
+# the Features and How-To Guide ships in the install's help folder
+# (app/data/help); it opens from a read-only copy so it can't be changed
+# by accident (Jon, Nov 23)
+GUIDE_NAME = "QuantiSheet-Features-and-How-To.pdf"
+
+
+def guide_source():
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), "data",
+                        "help", GUIDE_NAME)
+
+
+def guide_copy(src=None, folder=None):
+    """The guide's read-only copy to open (refreshed when the install's
+    guide is newer or different), or None when the install has none."""
+    import shutil
+    import stat
+    src = src or guide_source()
+    if not os.path.isfile(src):
+        return None
+    folder = folder or os.path.join(settings.DIR, "Help")
+    os.makedirs(folder, exist_ok=True)
+    dst = os.path.join(folder, GUIDE_NAME)
+    try:
+        same = (os.path.getsize(dst) == os.path.getsize(src) and
+                int(os.path.getmtime(dst)) == int(os.path.getmtime(src)))
+    except OSError:
+        same = False
+    if not same:
+        if os.path.exists(dst):
+            os.chmod(dst, stat.S_IREAD | stat.S_IWRITE)
+        shutil.copy2(src, dst)
+    os.chmod(dst, stat.S_IREAD)
+    return dst
+
+
 class HelpCenter(QDialog):
     def __init__(self, win, start="first"):
         super().__init__(win)
@@ -1296,7 +1331,9 @@ class HelpCenter(QDialog):
                                        "RFI, overlay)")
         self.search.textChanged.connect(self.filter)
         top.addWidget(self.search, 1)
-        for label, fn in (("Keyboard Shortcuts", self.show_shortcuts),
+        for label, fn in (("Features && How-To Guide (PDF)",
+                           self.open_guide),
+                          ("Keyboard Shortcuts", self.show_shortcuts),
                           ("Open Practice Drawings", self.open_practice)):
             b = QPushButton(label)
             b.setAutoDefault(False)
@@ -1409,6 +1446,9 @@ class HelpCenter(QDialog):
         self.tree.setCurrentItem(None)
         self.body.setHtml(shortcuts_html())
         self.current = self.current if hasattr(self, "current") else T[0]
+
+    def open_guide(self):
+        return self.win.open_guide()
 
     def open_practice(self):
         from . import practice

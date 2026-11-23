@@ -1,5 +1,5 @@
 """Form calculations and number formats, like other PDF readers (Nov 17,
-Jon: "I want it to work like Adobe").
+Jon: forms should fill in their own totals).
 
 A fillable form often works out its own totals - a line total from its
 labor, material and equipment, a subtotal, overhead, profit, the new

@@ -151,6 +151,16 @@ class ProjectAnalysisDialog(QDialog):
         self.hold_btn = bb.addButton("Put Hold Days in the Bid Checklist",
                                      QDialogButtonBox.ActionRole)
         self.hold_btn.clicked.connect(lambda: self.use_hold())
+        # Nov 21 (Jon: inside Project Analysis): a scope summary written by
+        # the AI on this PC
+        self.ai_btn = bb.addButton("Summarize with Local AI",
+                                   QDialogButtonBox.ActionRole)
+        self.ai_btn.clicked.connect(lambda: self.ai_summary())
+        # Nov 23 (Jon: both places): a new Bid Board entry from these
+        # answers, for the user to check and save
+        self.board_btn = bb.addButton("Send to Bid Board",
+                                      QDialogButtonBox.ActionRole)
+        self.board_btn.clicked.connect(lambda: self.send_to_board())
         bb.rejected.connect(self.reject)
         v.addWidget(bb)
         self.fill()
@@ -207,6 +217,45 @@ class ProjectAnalysisDialog(QDialog):
             self.win._go_page(page)
         return page
 
+    def ai_summary(self, ask=None, wait=False):
+        """Ask the local AI (Ollama) for a 3-5 sentence scope summary and
+        add it as a row, marked as AI-written. `ask` and `wait` are for
+        tests (no thread)."""
+        from . import bg, projanalysis as pa
+        self.ai_btn.setEnabled(False)
+        self.intro.setText("Asking the AI on this PC for a scope summary... "
+                           "(nothing leaves the PC)")
+
+        def ok(text):
+            self.ai_btn.setEnabled(True)
+            if not text:
+                self.intro.setText("The local AI gave no summary.")
+                return None
+            self.rows = pa.with_ai_summary(self.rows, text)
+            try:
+                pa.save(self.doc, self.rows)
+                self.win._doc_edited()
+            except Exception:                             # noqa: BLE001
+                pass
+            self.intro.setText("Summary added (local AI) - check it against "
+                               "the specs.")
+            self.fill()
+            return text
+
+        def bad(msg):
+            self.ai_btn.setEnabled(True)
+            self.intro.setText(f"No AI summary: {msg}")
+            return None
+
+        if wait:
+            try:
+                return ok(pa.ai_summary(self.doc, self.rows, ask))
+            except Exception as e:                        # noqa: BLE001
+                return bad(str(e))
+        bg.run(lambda: pa.ai_summary(self.doc, self.rows, ask), ok, bad,
+               self)
+        return None
+
     def run_again(self):
         from . import projanalysis as pa
         self.rows = pa.run(self.doc)
@@ -252,3 +301,24 @@ class ProjectAnalysisDialog(QDialog):
         self.win._doc_edited()
         self.hold_btn.setText(f"Bid Checklist: holds {n} days")
         return n
+
+    def send_to_board(self, show=True):
+        """A new Bid Board entry filled from these answers. Nothing is
+        saved until the user checks it and clicks Save."""
+        import os
+        from . import bidboard as B, bidboard_ui, projanalysis as pa
+        source = os.path.basename(getattr(self.doc, "name", "") or "")
+        fields = pa.bidboard_fields(self.rows, source)
+        opp, found = pa.fill_empty({"status": "Undecided"}, fields)
+        dlg = bidboard_ui.OpportunityDialog(
+            self, opp, [k for k in found if k not in ("source", "notes")],
+            B.load(), where="the specifications")
+        if not show:
+            return dlg
+        if dlg.exec() == QDialog.Accepted and dlg.saved:
+            self.board_btn.setText("On the Bid Board")
+            from PySide6.QtWidgets import QApplication
+            for w in QApplication.topLevelWidgets():   # an open Bid Board
+                if isinstance(w, bidboard_ui.BidBoard):
+                    w.refresh(dlg.saved["id"])
+        return dlg.saved

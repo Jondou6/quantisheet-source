@@ -1,4 +1,4 @@
-"""Stage 2: the Acrobat-style layout - top bar, tool rail, tool strip and
+"""Stage 2: the modern layout - top bar, tool rail, tool strip and
 the All Tools panel - with the ribbon and simple menus one click away."""
 import os
 

@@ -606,7 +606,7 @@ def _measure_label(page, pts, text, color):
 
 # How takeoff markups look. "takeoff" (0.12.29, the default): counts are
 # colored dots with the number on them, lengths are thick see-through lines
-# and areas are see-through fills, the way PlanSwift-style takeoff sheets
+# and areas are see-through fills, the way takeoff sheets usually
 # read. "classic": the 0.12.28 look (numbers in a cream box, thin lines).
 LOOK = "takeoff"
 
@@ -1065,7 +1065,7 @@ def _add(doc, page, kind, p, oid):
     elif kind == "add_polygon":
         a = page.add_polygon_annot(pts)
         _style_shape(a, color, p, kind)
-        if _takeoff_look(p):              # a see-through fill, as PlanSwift
+        if _takeoff_look(p):              # a see-through fill
             fill = _color(p, kind, "fill") if p.get("fill") is not None \
                 else color
             a.set_colors(stroke=color, fill=fill)
@@ -1841,7 +1841,7 @@ def kind_of(doc, annot):
 
 
 def friendly_type(a, subj="", doc=None):
-    """What Bluebeam-style lists call the markup."""
+    """What markup lists call the markup."""
     t = a.type[1]
     if subj.startswith(TAKEOFF + ":"):
         return {"length": "Length", "area": "Area", "count": "Count",

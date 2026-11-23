@@ -1,4 +1,4 @@
-"""Bluebeam-style panels: Markups List, Properties, Tool Chest, Estimate,
+"""Side panels: Markups List, Properties, Tool Chest, Estimate,
 Documents (project folder) and Bookmarks."""
 import html
 import logging

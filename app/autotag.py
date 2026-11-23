@@ -1,4 +1,4 @@
-"""Automatic accessibility tagging (Acrobat's "Autotag Document").
+"""Automatic accessibility tagging (tags the document's structure).
 
 Builds the structure tree screen readers need from the page content:
 every piece of text is wrapped in marked content and grouped into

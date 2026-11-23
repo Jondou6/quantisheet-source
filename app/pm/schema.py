@@ -1,5 +1,5 @@
 """What each Project Center tool holds: its fields, list columns, statuses
-and who has the ball. Modelled on Procore's workflows, with fewer fields
+and who has the ball. Modelled on common construction workflows, with fewer fields
 shown up front: only fields marked ``quick`` appear when creating an item;
 the rest sit under "More details".
 
@@ -860,7 +860,7 @@ def is_closed(key, rec):
 
 
 def ball_in_court(key, rec):
-    """Who must act next (Procore's "ball in court"), always as text: a
+    """Who must act next ("ball in court"), always as text: a
     "to" with several people (a list) used to break the callers (#41)."""
     v = _ball(key, rec)
     if isinstance(v, (list, tuple)):

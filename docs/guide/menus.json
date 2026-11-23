@@ -1,0 +1,5233 @@
+{
+ "menus": [
+  {
+   "text": "File",
+   "keys": "",
+   "tip": "",
+   "menu": [
+    {
+     "text": "Open…",
+     "keys": "Ctrl+O",
+     "tip": "Open"
+    },
+    {
+     "text": "New Window",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Open Recent",
+     "keys": "",
+     "tip": "",
+     "menu": []
+    },
+    {
+     "text": "Open Bid Download (.zip) as a Job…",
+     "keys": "",
+     "tip": "Open Bid Download (.zip) as a Job"
+    },
+    {
+     "text": "Open Project Folder…",
+     "keys": "",
+     "tip": "Open Project Folder"
+    },
+    {
+     "text": "Close Tab",
+     "keys": "Ctrl+F4",
+     "tip": ""
+    },
+    {
+     "text": "Save",
+     "keys": "Ctrl+S",
+     "tip": ""
+    },
+    {
+     "text": "Save As…",
+     "keys": "Ctrl+Shift+S",
+     "tip": "Save As"
+    },
+    {
+     "text": "AutoSave",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Recover Unsaved Files…",
+     "keys": "",
+     "tip": "Recover Unsaved Files"
+    },
+    {
+     "text": "Copies & Cloud",
+     "keys": "",
+     "tip": "Copies & Cloud",
+     "menu": [
+      {
+       "text": "Work on a Local Copy",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Copy Back to the Original",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Open from Dropbox…",
+       "keys": "",
+       "tip": "Open from Dropbox"
+      },
+      {
+       "text": "Save to Dropbox",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Save to Dropbox As…",
+       "keys": "",
+       "tip": "Save to Dropbox As"
+      },
+      {
+       "text": "Dropbox Settings…",
+       "keys": "",
+       "tip": "Dropbox Settings"
+      },
+      {
+       "text": "Version History…",
+       "keys": "",
+       "tip": "Version History"
+      }
+     ]
+    },
+    {
+     "text": "Create",
+     "keys": "",
+     "tip": "",
+     "menu": [
+      {
+       "text": "New From Form Library…",
+       "keys": "Ctrl+Shift+N",
+       "tip": "New From Form Library"
+      },
+      {
+       "text": "Generate Set…",
+       "keys": "",
+       "tip": "Generate Set"
+      },
+      {
+       "text": "Create PDF From File…",
+       "keys": "",
+       "tip": "Create PDF From File"
+      },
+      {
+       "text": "Combine Files…",
+       "keys": "",
+       "tip": "Combine Files"
+      }
+     ]
+    },
+    {
+     "text": "Import",
+     "keys": "",
+     "tip": "",
+     "menu": [
+      {
+       "text": "Import AutoCAD DXF…",
+       "keys": "",
+       "tip": "Import AutoCAD DXF"
+      },
+      {
+       "text": "Import Markups (PDF or XFDF)…",
+       "keys": "",
+       "tip": "Import Markups (PDF or XFDF)"
+      }
+     ]
+    },
+    {
+     "text": "Export To",
+     "keys": "",
+     "tip": "",
+     "menu": [
+      {
+       "text": "Word Document (.docx)…",
+       "keys": "",
+       "tip": "Word Document (.docx)"
+      },
+      {
+       "text": "Excel Workbook (.xlsx)…",
+       "keys": "",
+       "tip": "Excel Workbook (.xlsx)"
+      },
+      {
+       "text": "PowerPoint (.pptx)…",
+       "keys": "",
+       "tip": "PowerPoint (.pptx)"
+      },
+      {
+       "text": "Web Page (.html)…",
+       "keys": "",
+       "tip": "Web Page (.html)"
+      },
+      {
+       "text": "Text (.txt)…",
+       "keys": "",
+       "tip": "Text (.txt)"
+      },
+      {
+       "text": "AutoCAD DXF (this page)…",
+       "keys": "",
+       "tip": "AutoCAD DXF (this page)"
+      },
+      {
+       "text": "Google Earth (KML, aerial page markups)…",
+       "keys": "",
+       "tip": "Google Earth (KML, aerial page markups)"
+      },
+      {
+       "text": "GIS (GeoJSON, aerial page markups)…",
+       "keys": "",
+       "tip": "GIS (GeoJSON, aerial page markups)"
+      },
+      {
+       "text": "PDF/A (archival)…",
+       "keys": "",
+       "tip": "PDF/A (archival)"
+      },
+      {
+       "text": "External Issue (strip pricing)…",
+       "keys": "",
+       "tip": "External Issue (strip pricing)"
+      },
+      {
+       "text": "Images (PNG)…",
+       "keys": "",
+       "tip": "Images (PNG)"
+      },
+      {
+       "text": "Images (JPEG)…",
+       "keys": "",
+       "tip": "Images (JPEG)"
+      },
+      {
+       "text": "Export Markups (XFDF)…",
+       "keys": "",
+       "tip": "Export Markups (XFDF)"
+      }
+     ]
+    },
+    {
+     "text": "Compare",
+     "keys": "",
+     "tip": "",
+     "menu": [
+      {
+       "text": "Compare…",
+       "keys": "Ctrl+Alt+C",
+       "tip": "Show what changed between two versions of a sheet: overlay, a list of changes, or the text."
+      },
+      {
+       "text": "Compare Text With…",
+       "keys": "",
+       "tip": "Compare Text With"
+      },
+      {
+       "text": "Compare Revisions (Overlay)…",
+       "keys": "Ctrl+Alt+O",
+       "tip": "Compare Revisions (Overlay)"
+      },
+      {
+       "text": "Quick Compare (Same Sheets)…",
+       "keys": "",
+       "tip": "Overlay the same sheet from two sets in one click."
+      }
+     ]
+    },
+    {
+     "text": "Protect & Repair",
+     "keys": "",
+     "tip": "Protect & Repair",
+     "menu": [
+      {
+       "text": "Password Protect…",
+       "keys": "",
+       "tip": "Password Protect"
+      },
+      {
+       "text": "Remove Security…",
+       "keys": "",
+       "tip": "Remove Security"
+      },
+      {
+       "text": "Remove Hidden Information…",
+       "keys": "",
+       "tip": "Remove Hidden Information"
+      },
+      {
+       "text": "Reduce File Size…",
+       "keys": "",
+       "tip": "Make the PDF smaller to email. Your takeoff and markups stay."
+      },
+      {
+       "text": "Check / Repair PDF…",
+       "keys": "",
+       "tip": "Check / Repair PDF"
+      }
+     ]
+    },
+    {
+     "text": "Sign",
+     "keys": "",
+     "tip": "",
+     "menu": [
+      {
+       "text": "Sign…",
+       "keys": "",
+       "tip": "Add a signature. Saving afterwards in a way that changes the page breaks the signature, so QuantiSheet warns you first."
+      },
+      {
+       "text": "Verify Signatures…",
+       "keys": "",
+       "tip": "Check who signed and whether the file changed after signing."
+      },
+      {
+       "text": "Signing Timestamp Server…",
+       "keys": "",
+       "tip": "Signing Timestamp Server"
+      }
+     ]
+    },
+    {
+     "text": "Print…",
+     "keys": "Ctrl+P",
+     "tip": "Print"
+    },
+    {
+     "text": "Print Preview…",
+     "keys": "",
+     "tip": "Print Preview"
+    },
+    {
+     "text": "Document Properties…",
+     "keys": "Ctrl+D",
+     "tip": "Document Properties"
+    },
+    {
+     "text": "Attachments…",
+     "keys": "",
+     "tip": "Attachments"
+    },
+    {
+     "text": "Help",
+     "keys": "",
+     "tip": "",
+     "menu": [
+      {
+       "text": "Help Center & Tutorials…",
+       "keys": "F1",
+       "tip": "Help Center & Tutorials"
+      },
+      {
+       "text": "Features & How-To Guide (PDF)",
+       "keys": "",
+       "tip": "Features & How-To Guide (PDF)"
+      },
+      {
+       "text": "Video Tutorials",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Welcome Tour",
+       "keys": "",
+       "tip": "A short walk around the screen."
+      },
+      {
+       "text": "Open Practice Drawings",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Practice Job (10 Minutes)…",
+       "keys": "",
+       "tip": "Practice Job (10 Minutes)"
+      },
+      {
+       "text": "Keyboard Shortcuts",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Customize Shortcuts…",
+       "keys": "",
+       "tip": "Pick your own keys for any command."
+      },
+      {
+       "text": "Report an Issue…",
+       "keys": "",
+       "tip": "Report an Issue"
+      },
+      {
+       "text": "Support Bundle for IT…",
+       "keys": "",
+       "tip": "Support Bundle for IT"
+      },
+      {
+       "text": "Recent Problems (Log)…",
+       "keys": "",
+       "tip": "Recent Problems (Log)"
+      },
+      {
+       "text": "Add the QuantiSheet Printer…",
+       "keys": "",
+       "tip": "Add the QuantiSheet Printer"
+      },
+      {
+       "text": "Terms of Service",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Privacy",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Third-Party Licenses",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Enter License Key…",
+       "keys": "",
+       "tip": "Enter License Key"
+      },
+      {
+       "text": "About QuantiSheet",
+       "keys": "",
+       "tip": ""
+      }
+     ]
+    },
+    {
+     "text": "Layout",
+     "keys": "",
+     "tip": "",
+     "menu": [
+      {
+       "text": "Modern",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Full Ribbon + Tool Rail",
+       "keys": "",
+       "tip": ""
+      }
+     ]
+    },
+    {
+     "text": "Exit",
+     "keys": "",
+     "tip": ""
+    }
+   ]
+  },
+  {
+   "text": "Edit",
+   "keys": "",
+   "tip": "",
+   "menu": [
+    {
+     "text": "Undo",
+     "keys": "Ctrl+Z",
+     "tip": "Undo"
+    },
+    {
+     "text": "Redo",
+     "keys": "Ctrl+Y",
+     "tip": "Redo"
+    },
+    {
+     "text": "Copy Text",
+     "keys": "Ctrl+C",
+     "tip": ""
+    },
+    {
+     "text": "Copy as Table (for Excel)",
+     "keys": "Ctrl+Shift+C",
+     "tip": "Copy the selected area as rows and columns for Excel."
+    },
+    {
+     "text": "Select All Text on Page",
+     "keys": "Ctrl+A",
+     "tip": ""
+    },
+    {
+     "text": "Copy All Text on This Page",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Paste",
+     "keys": "Ctrl+V",
+     "tip": ""
+    },
+    {
+     "text": "Paste Image",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Delete Selected Markup",
+     "keys": "Del",
+     "tip": ""
+    },
+    {
+     "text": "Add Selected Markup to Tool Chest…",
+     "keys": "",
+     "tip": "Add Selected Markup to Tool Chest"
+    },
+    {
+     "text": "Find…",
+     "keys": "Ctrl+F",
+     "tip": "Find"
+    },
+    {
+     "text": "Author Name…",
+     "keys": "",
+     "tip": "Author Name"
+    },
+    {
+     "text": "Select Text",
+     "keys": "I",
+     "tip": "Select Text (I)"
+    },
+    {
+     "text": "Snapshot",
+     "keys": "G",
+     "tip": "Snapshot (G)"
+    },
+    {
+     "text": "Edit Text",
+     "keys": "Ctrl+E",
+     "tip": "Edit Text (Ctrl+E)"
+    },
+    {
+     "text": "Add Image",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Add Text Field",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Add Checkbox",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Add Dropdown",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Crop Pages",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Undo History…",
+     "keys": "",
+     "tip": "Undo History"
+    },
+    {
+     "text": "Undo Steps…",
+     "keys": "",
+     "tip": "Undo Steps"
+    }
+   ]
+  },
+  {
+   "text": "View",
+   "keys": "",
+   "tip": "",
+   "menu": [
+    {
+     "text": "Pages",
+     "keys": "",
+     "tip": "Small pictures of each page in the open PDF show up here. Open a PDF with File > Open, then click a page to jump to it."
+    },
+    {
+     "text": "Takeoff",
+     "keys": "",
+     "tip": "The items you measure show up here, with a total for each one. Open a PDF, set the scale, then click + New Item and measure on the drawing."
+    },
+    {
+     "text": "Bookmarks",
+     "keys": "",
+     "tip": "Bookmarks in the PDF show up here. Open a PDF. Click Add to bookmark the page you are on, or click a bookmark to jump to it."
+    },
+    {
+     "text": "Documents",
+     "keys": "",
+     "tip": "The PDFs in the job folder show up here. Click Choose Folder and pick the folder for this job. Double-click a file to open it."
+    },
+    {
+     "text": "Tool Chest",
+     "keys": "",
+     "tip": "Saved tools show up here. Right-click a markup on the page and choose Add to Tool Chest. Click a tool here to draw with it."
+    },
+    {
+     "text": "Properties",
+     "keys": "",
+     "tip": "The color, line, and comment for the selected markup show up here. Click a markup on the page. Before you select one, this shows the style the next markup will use."
+    },
+    {
+     "text": "Markups List",
+     "keys": "",
+     "tip": "Every markup and measurement in the PDF shows up here. Open a PDF and draw or measure. Double-click a row to jump to it on the page."
+    },
+    {
+     "text": "Assemblies",
+     "keys": "",
+     "tip": "Assemblies for this job show up here, with material and labor. Open a PDF, then click Assembly Library to pick an assembly and take it off."
+    },
+    {
+     "text": "Estimate",
+     "keys": "",
+     "tip": "Prices for what you measured show up here. Measure something on the drawing, then type a unit cost in this table."
+    },
+    {
+     "text": "Quantities",
+     "keys": "",
+     "tip": "Totals for what you measured show up here. Open a PDF and measure on the drawing. Export CSV saves the list."
+    },
+    {
+     "text": "Bottom Panels (Markups, Estimate…)",
+     "keys": "F9",
+     "tip": "Bottom Panels (Markups, Estimate)"
+    },
+    {
+     "text": "Next Page",
+     "keys": "PgDown",
+     "tip": ""
+    },
+    {
+     "text": "Previous Page",
+     "keys": "PgUp",
+     "tip": ""
+    },
+    {
+     "text": "Go to Page…",
+     "keys": "Ctrl+G",
+     "tip": "Go to Page"
+    },
+    {
+     "text": "First Page",
+     "keys": "Ctrl+Home",
+     "tip": ""
+    },
+    {
+     "text": "Last Page",
+     "keys": "Ctrl+End",
+     "tip": ""
+    },
+    {
+     "text": "Zoom In",
+     "keys": "Ctrl++",
+     "tip": ""
+    },
+    {
+     "text": "Zoom Out",
+     "keys": "Ctrl+-",
+     "tip": ""
+    },
+    {
+     "text": "Fit Width",
+     "keys": "Ctrl+2",
+     "tip": ""
+    },
+    {
+     "text": "Fit Page",
+     "keys": "Ctrl+0",
+     "tip": ""
+    },
+    {
+     "text": "Previous View",
+     "keys": "Alt+Left",
+     "tip": ""
+    },
+    {
+     "text": "Actual Size",
+     "keys": "Ctrl+1",
+     "tip": ""
+    },
+    {
+     "text": "Snap to Content",
+     "keys": "Shift+F9",
+     "tip": "Snap drawing and measuring to line ends, corners and intersections (Shift+F9)"
+    },
+    {
+     "text": "Enhance Thin Lines",
+     "keys": "",
+     "tip": "Draw hairlines at least one screen pixel wide, so drawings stay crisp when zoomed out"
+    },
+    {
+     "text": "Theme",
+     "keys": "",
+     "tip": "",
+     "menu": [
+      {
+       "text": "Follow Windows",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Dark",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Light",
+       "keys": "",
+       "tip": ""
+      }
+     ]
+    },
+    {
+     "text": "Command Search…",
+     "keys": "Ctrl+K",
+     "tip": "Type to find any command, sheet, takeoff item or RFI. Shift+Enter shows where the button lives."
+    },
+    {
+     "text": "Show Ribbon",
+     "keys": "Ctrl+F1",
+     "tip": ""
+    },
+    {
+     "text": "Snap Modes",
+     "keys": "",
+     "tip": "",
+     "menu": [
+      {
+       "text": "END",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "MID",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "EDGE",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "INT",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "PERP",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "GRID",
+       "keys": "",
+       "tip": ""
+      }
+     ]
+    },
+    {
+     "text": "Field Mode",
+     "keys": "Ctrl+5",
+     "tip": ""
+    },
+    {
+     "text": "Density",
+     "keys": "",
+     "tip": "",
+     "menu": [
+      {
+       "text": "Compact",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Comfortable",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Touch",
+       "keys": "",
+       "tip": ""
+      }
+     ]
+    },
+    {
+     "text": "Color Takeoff By",
+     "keys": "",
+     "tip": "",
+     "menu": [
+      {
+       "text": "Off",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Item",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Status",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Priced / Not Priced",
+       "keys": "",
+       "tip": ""
+      }
+     ]
+    },
+    {
+     "text": "Ribbon Tabs",
+     "keys": "",
+     "tip": "",
+     "menu": [
+      {
+       "text": "Show All Tabs",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Tabs Follow the Open File",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Classic Tabs (all 14, next start)",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Choose My Role (Estimator, PM, Service, Office)…",
+       "keys": "",
+       "tip": "Set up tabs and the quick bar for the work you do most."
+      }
+     ]
+    },
+    {
+     "text": "Double-Click Edits PDF Text",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Marquee Zoom",
+     "keys": "Z",
+     "tip": "Marquee Zoom (Z)"
+    },
+    {
+     "text": "Layout",
+     "keys": "",
+     "tip": "",
+     "menu": [
+      {
+       "text": "Modern",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Full Ribbon + Tool Rail",
+       "keys": "",
+       "tip": ""
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "text": "Markup",
+   "keys": "",
+   "tip": "",
+   "menu": [
+    {
+     "text": "Select",
+     "keys": "V",
+     "tip": "Select (V)"
+    },
+    {
+     "text": "Highlight",
+     "keys": "H",
+     "tip": "Highlight (H)"
+    },
+    {
+     "text": "Underline",
+     "keys": "U",
+     "tip": "Underline (U)"
+    },
+    {
+     "text": "Strikeout",
+     "keys": "K",
+     "tip": "Strikeout (K)"
+    },
+    {
+     "text": "Rectangle",
+     "keys": "R",
+     "tip": "Rectangle (R)"
+    },
+    {
+     "text": "Ellipse",
+     "keys": "E",
+     "tip": "Ellipse (E)"
+    },
+    {
+     "text": "Cloud",
+     "keys": "C",
+     "tip": "Cloud (C)"
+    },
+    {
+     "text": "Line",
+     "keys": "L",
+     "tip": "Line (L)"
+    },
+    {
+     "text": "Arrow",
+     "keys": "A",
+     "tip": "Arrow (A)"
+    },
+    {
+     "text": "Polyline",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Polygon",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Pen",
+     "keys": "P",
+     "tip": "Pen (P)"
+    },
+    {
+     "text": "Sticky Note",
+     "keys": "N",
+     "tip": "Sticky Note (N)"
+    },
+    {
+     "text": "Text Box",
+     "keys": "T",
+     "tip": "Text Box (T)"
+    },
+    {
+     "text": "Stamp",
+     "keys": "S",
+     "tip": "Stamp (S)"
+    },
+    {
+     "text": "Date Stamp",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Callout",
+     "keys": "Q",
+     "tip": "Callout (Q)"
+    },
+    {
+     "text": "Legend",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Redact",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Markup Color…",
+     "keys": "",
+     "tip": "Markup Color"
+    },
+    {
+     "text": "Default Style",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Refresh Legends",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Legend Style",
+     "keys": "",
+     "tip": "",
+     "menu": [
+      {
+       "text": "Takeoff (quantities only)",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Classic (counts + 2 decimals)",
+       "keys": "",
+       "tip": ""
+      }
+     ]
+    },
+    {
+     "text": "Line Styles…",
+     "keys": "",
+     "tip": "Line Styles"
+    },
+    {
+     "text": "Hatch Patterns…",
+     "keys": "",
+     "tip": "Hatch Patterns"
+    },
+    {
+     "text": "Layers…",
+     "keys": "",
+     "tip": "Layers"
+    }
+   ]
+  },
+  {
+   "text": "Fill & Sign",
+   "keys": "",
+   "tip": "Fill & Sign",
+   "menu": [
+    {
+     "text": "Signature",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Initials",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Fill Text",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Check Mark",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Date",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Fill From the Job and Sign…",
+     "keys": "",
+     "tip": "Fill From the Job and Sign"
+    },
+    {
+     "text": "Change Signature…",
+     "keys": "",
+     "tip": "Change Signature"
+    },
+    {
+     "text": "Change Initials…",
+     "keys": "",
+     "tip": "Change Initials"
+    }
+   ]
+  },
+  {
+   "text": "Takeoff",
+   "keys": "",
+   "tip": "",
+   "menu": [
+    {
+     "text": "Calibrate (Set Scale)",
+     "keys": "Shift+S",
+     "tip": "Calibrate (Set Scale) (Shift+S)"
+    },
+    {
+     "text": "Length",
+     "keys": "Shift+L",
+     "tip": "Length (Shift+L)"
+    },
+    {
+     "text": "Polylength",
+     "keys": "Shift+P",
+     "tip": "Polylength (Shift+P)"
+    },
+    {
+     "text": "Wall Area (Length x Height)",
+     "keys": "Shift+W",
+     "tip": "Wall Area (Length x Height) (Shift+W)"
+    },
+    {
+     "text": "Area",
+     "keys": "Shift+A",
+     "tip": "Area (Shift+A)"
+    },
+    {
+     "text": "Cutout (Deduct)",
+     "keys": "Shift+X",
+     "tip": "Cutout (Deduct) (Shift+X)"
+    },
+    {
+     "text": "Volume",
+     "keys": "Shift+V",
+     "tip": "Volume (Shift+V)"
+    },
+    {
+     "text": "Angle",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Radius",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Diameter",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Auto Area (Click a Room)",
+     "keys": "Shift+R",
+     "tip": "Auto Area (Click a Room) (Shift+R)"
+    },
+    {
+     "text": "Trace Length (Click a Line)",
+     "keys": "Shift+T",
+     "tip": "Trace Length (Click a Line) (Shift+T)"
+    },
+    {
+     "text": "Trace Outline (Snap to Drawing)",
+     "keys": "Shift+O",
+     "tip": "Trace Outline (Snap to Drawing) (Shift+O)"
+    },
+    {
+     "text": "Viewport (Scale Region)",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Count",
+     "keys": "Shift+C",
+     "tip": "Count (Shift+C)"
+    },
+    {
+     "text": "Count Symbol",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Count From a Picture…",
+     "keys": "",
+     "tip": "Count From a Picture"
+    },
+    {
+     "text": "Scale Presets",
+     "keys": "",
+     "tip": "",
+     "menu": [
+      {
+       "text": "Architectural",
+       "keys": "",
+       "tip": "",
+       "menu": [
+        {
+         "text": "1/16\" = 1'-0\"",
+         "keys": "",
+         "tip": ""
+        },
+        {
+         "text": "3/32\" = 1'-0\"",
+         "keys": "",
+         "tip": ""
+        },
+        {
+         "text": "1/8\" = 1'-0\"",
+         "keys": "",
+         "tip": ""
+        },
+        {
+         "text": "3/16\" = 1'-0\"",
+         "keys": "",
+         "tip": ""
+        },
+        {
+         "text": "1/4\" = 1'-0\"",
+         "keys": "",
+         "tip": ""
+        },
+        {
+         "text": "3/8\" = 1'-0\"",
+         "keys": "",
+         "tip": ""
+        },
+        {
+         "text": "1/2\" = 1'-0\"",
+         "keys": "",
+         "tip": ""
+        },
+        {
+         "text": "3/4\" = 1'-0\"",
+         "keys": "",
+         "tip": ""
+        },
+        {
+         "text": "1\" = 1'-0\"",
+         "keys": "",
+         "tip": ""
+        },
+        {
+         "text": "1-1/2\" = 1'-0\"",
+         "keys": "",
+         "tip": ""
+        },
+        {
+         "text": "3\" = 1'-0\"",
+         "keys": "",
+         "tip": ""
+        }
+       ]
+      },
+      {
+       "text": "Engineering",
+       "keys": "",
+       "tip": "",
+       "menu": [
+        {
+         "text": "1\" = 10'",
+         "keys": "",
+         "tip": ""
+        },
+        {
+         "text": "1\" = 20'",
+         "keys": "",
+         "tip": ""
+        },
+        {
+         "text": "1\" = 30'",
+         "keys": "",
+         "tip": ""
+        },
+        {
+         "text": "1\" = 40'",
+         "keys": "",
+         "tip": ""
+        },
+        {
+         "text": "1\" = 50'",
+         "keys": "",
+         "tip": ""
+        },
+        {
+         "text": "1\" = 60'",
+         "keys": "",
+         "tip": ""
+        },
+        {
+         "text": "1\" = 100'",
+         "keys": "",
+         "tip": ""
+        },
+        {
+         "text": "1\" = 200'",
+         "keys": "",
+         "tip": ""
+        }
+       ]
+      },
+      {
+       "text": "Metric",
+       "keys": "",
+       "tip": "",
+       "menu": [
+        {
+         "text": "1:20",
+         "keys": "",
+         "tip": ""
+        },
+        {
+         "text": "1:50",
+         "keys": "",
+         "tip": ""
+        },
+        {
+         "text": "1:100",
+         "keys": "",
+         "tip": ""
+        },
+        {
+         "text": "1:200",
+         "keys": "",
+         "tip": ""
+        },
+        {
+         "text": "1:250",
+         "keys": "",
+         "tip": ""
+        },
+        {
+         "text": "1:500",
+         "keys": "",
+         "tip": ""
+        },
+        {
+         "text": "1:1000",
+         "keys": "",
+         "tip": ""
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "text": "Auto Scale (Read Sheets)…",
+     "keys": "",
+     "tip": "Read each sheet's scale from its title block. Check it before you measure."
+    },
+    {
+     "text": "Auto Scale (Check Against Dimensions)…",
+     "keys": "",
+     "tip": "Check the scale against a dimension written on the sheet."
+    },
+    {
+     "text": "Auto Takeoff (Review)…",
+     "keys": "Ctrl+Alt+R",
+     "tip": "Auto Takeoff (Review)"
+    },
+    {
+     "text": "Show Scale",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Show Side Lengths",
+     "keys": "",
+     "tip": "",
+     "menu": [
+      {
+       "text": "Off",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Selected Markup",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "All Measurements on the Page",
+       "keys": "",
+       "tip": ""
+      }
+     ]
+    },
+    {
+     "text": "Captions",
+     "keys": "",
+     "tip": "",
+     "menu": [
+      {
+       "text": "Name and Quantity",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Quantity Only",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Name Only",
+       "keys": "",
+       "tip": ""
+      }
+     ]
+    },
+    {
+     "text": "Viewports on This Page…",
+     "keys": "",
+     "tip": "Viewports on This Page"
+    },
+    {
+     "text": "Takeoff Standard…",
+     "keys": "",
+     "tip": "Takeoff Standard"
+    },
+    {
+     "text": "Count by Label…",
+     "keys": "",
+     "tip": "Find every tag like D-1 or W* on the plans and count them."
+    },
+    {
+     "text": "Count Several Symbols…",
+     "keys": "",
+     "tip": "Count several kinds of symbols in one pass."
+    },
+    {
+     "text": "Try the Count Library…",
+     "keys": "",
+     "tip": "Try the Count Library"
+    },
+    {
+     "text": "Item Names Learned…",
+     "keys": "",
+     "tip": "Item Names Learned"
+    },
+    {
+     "text": "Auto Takeoff Rooms on This Sheet…",
+     "keys": "Ctrl+Shift+R",
+     "tip": "Auto Takeoff Rooms on This Sheet"
+    },
+    {
+     "text": "Rooms: Use Tag Area When the Trace Differs",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Auto Takeoff Walls & Doors on This Sheet…",
+     "keys": "Ctrl+Shift+W",
+     "tip": "Auto Takeoff Walls & Doors on This Sheet"
+    },
+    {
+     "text": "Walls by Role…",
+     "keys": "",
+     "tip": "Walls by Role"
+    },
+    {
+     "text": "Change Wall Role of Selection…",
+     "keys": "",
+     "tip": "Change Wall Role of Selection"
+    },
+    {
+     "text": "Trace Outline: Follow Drawn Lines",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Trade Takeoff (Pipe, Duct, Devices, Roof, Rebar, Earthwork)…",
+     "keys": "Ctrl+Alt+T",
+     "tip": "Trade Takeoff (Pipe, Duct, Devices, Roof, Rebar, Earthwork)"
+    },
+    {
+     "text": "Check Takeoff…",
+     "keys": "Ctrl+Alt+K",
+     "tip": "Check Takeoff"
+    },
+    {
+     "text": "Roof Plan Takeoff…",
+     "keys": "",
+     "tip": "Roof Plan Takeoff"
+    },
+    {
+     "text": "Show Roof Plan Tools",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "3D Model Quantities (IFC)…",
+     "keys": "",
+     "tip": "3D Model Quantities (IFC)"
+    },
+    {
+     "text": "Assembly Library…",
+     "keys": "Ctrl+Shift+L",
+     "tip": "Assembly Library"
+    },
+    {
+     "text": "Take Off Into Assembly…",
+     "keys": "",
+     "tip": "Pick a CSI division and an assembly; the matching tool starts and what you trace is priced by it"
+    },
+    {
+     "text": "Assemblies",
+     "keys": "",
+     "tip": "Assemblies for this job show up here, with material and labor. Open a PDF, then click Assembly Library to pick an assembly and take it off."
+    },
+    {
+     "text": "Labor Rates & Crews…",
+     "keys": "",
+     "tip": "Labor Rates & Crews"
+    },
+    {
+     "text": "Cost Books…",
+     "keys": "",
+     "tip": "Cost Books"
+    },
+    {
+     "text": "Add From Cost Book…",
+     "keys": "",
+     "tip": "Add From Cost Book"
+    },
+    {
+     "text": "Quick $/SF Estimate…",
+     "keys": "",
+     "tip": "Quick $/SF Estimate"
+    },
+    {
+     "text": "Model Estimate…",
+     "keys": "",
+     "tip": "Model Estimate"
+    },
+    {
+     "text": "Concrete Calculator…",
+     "keys": "",
+     "tip": "Concrete Calculator"
+    },
+    {
+     "text": "Brick and Block Calculator…",
+     "keys": "",
+     "tip": "Brick and Block Calculator"
+    },
+    {
+     "text": "Roofing Calculator…",
+     "keys": "",
+     "tip": "Roofing Calculator"
+    },
+    {
+     "text": "Rebar Calculator…",
+     "keys": "",
+     "tip": "Rebar Calculator"
+    },
+    {
+     "text": "Beam and Header Calculator…",
+     "keys": "",
+     "tip": "Beam and Header Calculator"
+    },
+    {
+     "text": "Column and Post Calculator…",
+     "keys": "",
+     "tip": "Column and Post Calculator"
+    },
+    {
+     "text": "Footing Size Calculator…",
+     "keys": "",
+     "tip": "Footing Size Calculator"
+    },
+    {
+     "text": "Metal Stud Framing Calculator…",
+     "keys": "",
+     "tip": "Metal Stud Framing Calculator"
+    },
+    {
+     "text": "Structural Steel Calculator…",
+     "keys": "",
+     "tip": "Structural Steel Calculator"
+    },
+    {
+     "text": "Earthwork Calculator…",
+     "keys": "",
+     "tip": "Earthwork Calculator"
+    },
+    {
+     "text": "Aggregate and Asphalt Calculator…",
+     "keys": "",
+     "tip": "Aggregate and Asphalt Calculator"
+    },
+    {
+     "text": "Drywall Calculator…",
+     "keys": "",
+     "tip": "Drywall Calculator"
+    },
+    {
+     "text": "Paint Calculator…",
+     "keys": "",
+     "tip": "Paint Calculator"
+    },
+    {
+     "text": "Date and Time Calculators…",
+     "keys": "",
+     "tip": "Date and Time Calculators"
+    },
+    {
+     "text": "Bid Tabs…",
+     "keys": "",
+     "tip": "Bid Tabs"
+    },
+    {
+     "text": "Bid Leveling…",
+     "keys": "",
+     "tip": "Bid Leveling"
+    },
+    {
+     "text": "Scope Sheets…",
+     "keys": "",
+     "tip": "Compare sub bids for one trade at a time on your Scope Sheet: budget, bidders, checklist, scope lines, math check, award"
+    },
+    {
+     "text": "Price Database…",
+     "keys": "",
+     "tip": "Price Database"
+    },
+    {
+     "text": "Location Factors…",
+     "keys": "",
+     "tip": "Location Factors"
+    },
+    {
+     "text": "Import Your Own Price List…",
+     "keys": "",
+     "tip": "Import Your Own Price List"
+    },
+    {
+     "text": "Export Assembly Estimate (Excel)…",
+     "keys": "",
+     "tip": "Export Assembly Estimate (Excel)"
+    },
+    {
+     "text": "Bid Build-up…",
+     "keys": "",
+     "tip": "Bid Build-up"
+    },
+    {
+     "text": "Pre-bid Checklist…",
+     "keys": "",
+     "tip": "Pre-bid Checklist"
+    },
+    {
+     "text": "Leveling Board…",
+     "keys": "",
+     "tip": "Leveling Board"
+    },
+    {
+     "text": "Bid Form Autopilot…",
+     "keys": "",
+     "tip": "Bid Form Autopilot"
+    },
+    {
+     "text": "Bid Form Workbook…",
+     "keys": "",
+     "tip": "Bid Form Workbook"
+    },
+    {
+     "text": "Builder's Risk Quote Request…",
+     "keys": "",
+     "tip": "Builder's Risk Quote Request"
+    },
+    {
+     "text": "Placeholders & Allowances…",
+     "keys": "",
+     "tip": "Placeholders & Allowances"
+    },
+    {
+     "text": "Escalation to Buy Date…",
+     "keys": "",
+     "tip": "Escalation to Buy Date"
+    },
+    {
+     "text": "Bid Gate Settings…",
+     "keys": "",
+     "tip": "Bid Gate Settings"
+    },
+    {
+     "text": "Carry Takeoff Forward to a Revised Set…",
+     "keys": "",
+     "tip": "Move your takeoff onto a new revision of the drawings."
+    },
+    {
+     "text": "Typical Sheet (Count This Sheet N Times)…",
+     "keys": "",
+     "tip": "Count this sheet's takeoff more than once, e.g. 4 identical floors."
+    },
+    {
+     "text": "Wood Sheathing Helper…",
+     "keys": "",
+     "tip": "Wood Sheathing Helper"
+    },
+    {
+     "text": "Buy Quantities (Sheets, Boxes, Rolls)…",
+     "keys": "",
+     "tip": "Turn measured totals into what to order, with waste, rounded up."
+    },
+    {
+     "text": "Coverage Map and Second Check…",
+     "keys": "",
+     "tip": "Coverage Map and Second Check"
+    },
+    {
+     "text": "Revision Changes (Old → New)…",
+     "keys": "",
+     "tip": "Revision Changes (Old → New)"
+    },
+    {
+     "text": "Job Cost Feedback (Bid vs Actual)…",
+     "keys": "",
+     "tip": "Job Cost Feedback (Bid vs Actual)"
+    },
+    {
+     "text": "Estimating Dashboard…",
+     "keys": "",
+     "tip": "Estimating Dashboard"
+    },
+    {
+     "text": "Bid Board…",
+     "keys": "",
+     "tip": "Bid Board"
+    },
+    {
+     "text": "Show Unpriced Markups",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Create Proposal…",
+     "keys": "Ctrl+Shift+B",
+     "tip": "Create Proposal"
+    },
+    {
+     "text": "Export Bid Package…",
+     "keys": "",
+     "tip": "Export Bid Package"
+    },
+    {
+     "text": "Estimate",
+     "keys": "",
+     "tip": "Prices for what you measured show up here. Measure something on the drawing, then type a unit cost in this table."
+    },
+    {
+     "text": "Price These…",
+     "keys": "",
+     "tip": "Price These"
+    },
+    {
+     "text": "Award: Budget & Commitments in the Job…",
+     "keys": "",
+     "tip": "Award: Budget & Commitments in the Job"
+    },
+    {
+     "text": "Export Estimate (CSV)…",
+     "keys": "",
+     "tip": "Export Estimate (CSV)"
+    },
+    {
+     "text": "Export My Estimate…",
+     "keys": "",
+     "tip": "Export My Estimate"
+    },
+    {
+     "text": "Export Quantities (CSV)…",
+     "keys": "",
+     "tip": "Export Quantities (CSV)"
+    },
+    {
+     "text": "Export to Sage 300 Job Cost (CSV)…",
+     "keys": "",
+     "tip": "Preview the rows, then save the import file and an undo (reversal) file next to it."
+    },
+    {
+     "text": "Link Quantities to Excel…",
+     "keys": "",
+     "tip": "Keep an Excel workbook up to date with your quantities."
+    },
+    {
+     "text": "Estimating Tools",
+     "keys": "",
+     "tip": "",
+     "menu": [
+      {
+       "text": "Estimate Error Check…",
+       "keys": "",
+       "tip": "Estimate Error Check"
+      },
+      {
+       "text": "Estimate Templates…",
+       "keys": "",
+       "tip": "Estimate Templates"
+      },
+      {
+       "text": "Customer Quote With Options…",
+       "keys": "",
+       "tip": "Customer Quote With Options"
+      },
+      {
+       "text": "Material Order List…",
+       "keys": "",
+       "tip": "Material Order List"
+      },
+      {
+       "text": "Supplier Price List Import…",
+       "keys": "",
+       "tip": "Supplier Price List Import"
+      },
+      {
+       "text": "Match Rates & Price a Workbook…",
+       "keys": "",
+       "tip": "Match Rates & Price a Workbook"
+      },
+      {
+       "text": "Assembly Rules & Wall-Type Assemblies…",
+       "keys": "",
+       "tip": "Assembly Rules & Wall-Type Assemblies"
+      },
+      {
+       "text": "Crew Hours by Pay Item…",
+       "keys": "",
+       "tip": "Crew Hours by Pay Item"
+      },
+      {
+       "text": "Bid-Day Quote Comparison…",
+       "keys": "",
+       "tip": "Bid-Day Quote Comparison"
+      },
+      {
+       "text": "Estimate vs Actual…",
+       "keys": "",
+       "tip": "Estimate vs Actual"
+      },
+      {
+       "text": "Equipment & Service Records…",
+       "keys": "",
+       "tip": "Equipment & Service Records"
+      },
+      {
+       "text": "Planning Cost Model…",
+       "keys": "",
+       "tip": "Planning Cost Model"
+      }
+     ]
+    },
+    {
+     "text": "Lock Bid Set",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Selected Measurement",
+     "keys": "",
+     "tip": "",
+     "menu": [
+      {
+       "text": "Show Only This Item",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Set Typical Count…",
+       "keys": "",
+       "tip": "Set Typical Count"
+      },
+      {
+       "text": "Bulk Edit Selected…",
+       "keys": "",
+       "tip": "Bulk Edit Selected"
+      },
+      {
+       "text": "Copy Several Times…",
+       "keys": "",
+       "tip": "Copy Several Times"
+      },
+      {
+       "text": "Add More to This Count",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Show Uncounted Copies",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Add This Count to the Count Library",
+       "keys": "",
+       "tip": ""
+      }
+     ]
+    },
+    {
+     "text": "Convert Selected To",
+     "keys": "",
+     "tip": ""
+    }
+   ]
+  },
+  {
+   "text": "Pages",
+   "keys": "",
+   "tip": "",
+   "menu": [
+    {
+     "text": "Rotate Right",
+     "keys": "Ctrl+Shift+=",
+     "tip": ""
+    },
+    {
+     "text": "Rotate Left",
+     "keys": "Ctrl+Shift+-",
+     "tip": ""
+    },
+    {
+     "text": "Rotate All Pages Right",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Insert Blank Page",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Insert Pages From PDF…",
+     "keys": "",
+     "tip": "Add pages from another PDF here."
+    },
+    {
+     "text": "Duplicate Page",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Replace Pages…",
+     "keys": "",
+     "tip": "Replace Pages"
+    },
+    {
+     "text": "Organize Pages…",
+     "keys": "Ctrl+Shift+G",
+     "tip": "Organize Pages"
+    },
+    {
+     "text": "Split Document…",
+     "keys": "",
+     "tip": "Break this PDF into smaller files."
+    },
+    {
+     "text": "Booklet / N-up…",
+     "keys": "",
+     "tip": "Booklet / N-up"
+    },
+    {
+     "text": "Extract Pages…",
+     "keys": "",
+     "tip": "Save chosen pages as a new PDF."
+    },
+    {
+     "text": "Delete Pages…",
+     "keys": "",
+     "tip": "Delete Pages"
+    },
+    {
+     "text": "Header & Footer…",
+     "keys": "",
+     "tip": "Header & Footer"
+    },
+    {
+     "text": "Auto Bookmark Sheets…",
+     "keys": "",
+     "tip": "Auto Bookmark Sheets"
+    },
+    {
+     "text": "Link Sheet References",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Remove Sheet Links",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Page Numbers…",
+     "keys": "",
+     "tip": "Page Numbers"
+    },
+    {
+     "text": "Crop Pages",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Bates Numbering…",
+     "keys": "",
+     "tip": "Bates Numbering"
+    },
+    {
+     "text": "Watermark…",
+     "keys": "",
+     "tip": "Watermark"
+    }
+   ]
+  },
+  {
+   "text": "Document",
+   "keys": "",
+   "tip": "",
+   "menu": [
+    {
+     "text": "Edit PDF",
+     "keys": "",
+     "tip": "Edit PDF: change the text and images on the page (Ctrl+E). The arrow has the other editing tools."
+    },
+    {
+     "text": "Make Searchable (OCR)…",
+     "keys": "",
+     "tip": "Read the text on scanned pages so search and Count by Label work."
+    },
+    {
+     "text": "Check Scan Quality…",
+     "keys": "",
+     "tip": "Check Scan Quality"
+    },
+    {
+     "text": "Preflight / PDF/X…",
+     "keys": "",
+     "tip": "Preflight / PDF/X"
+    },
+    {
+     "text": "Request Signatures…",
+     "keys": "",
+     "tip": "Request Signatures"
+    },
+    {
+     "text": "Signature Requests…",
+     "keys": "",
+     "tip": "Signature Requests"
+    },
+    {
+     "text": "Accessibility Check…",
+     "keys": "",
+     "tip": "Accessibility Check"
+    },
+    {
+     "text": "Spec Book Sections…",
+     "keys": "",
+     "tip": "Spec Book Sections"
+    },
+    {
+     "text": "Search & Redact…",
+     "keys": "",
+     "tip": "Search & Redact"
+    },
+    {
+     "text": "Prepare Form (detect fields)",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Clear Form",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Fill Form From Job",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Flatten Markups & Fields…",
+     "keys": "",
+     "tip": "Burn markups into the page. Job data and takeoff can't be edited afterwards."
+    },
+    {
+     "text": "Auto Bookmark (Link Details)…",
+     "keys": "",
+     "tip": "Auto Bookmark (Link Details)"
+    }
+   ]
+  },
+  {
+   "text": "Tools",
+   "keys": "",
+   "tip": "",
+   "menu": [
+    {
+     "text": "Action Wizard (Batch Process)…",
+     "keys": "",
+     "tip": "Action Wizard (Batch Process)"
+    },
+    {
+     "text": "Macros…",
+     "keys": "",
+     "tip": "Run a saved list of steps. QuantiSheet checks it first and tells you what it will change."
+    },
+    {
+     "text": "Package Tracker…",
+     "keys": "",
+     "tip": "Package Tracker"
+    },
+    {
+     "text": "Back Up My QuantiSheet Data…",
+     "keys": "",
+     "tip": "Save your settings, libraries and job lists to one file."
+    },
+    {
+     "text": "Restore QuantiSheet Data From a Backup…",
+     "keys": "",
+     "tip": "Put back a data backup. What you have now is saved first."
+    },
+    {
+     "text": "Time Log…",
+     "keys": "",
+     "tip": "Time Log"
+    },
+    {
+     "text": "Start Relay (host on this computer)…",
+     "keys": "",
+     "tip": "Start Relay (host on this computer)"
+    },
+    {
+     "text": "Live Collaboration…",
+     "keys": "",
+     "tip": "Live Collaboration"
+    }
+   ]
+  },
+  {
+   "text": "Project Analysis",
+   "keys": "",
+   "tip": "",
+   "menu": [
+    {
+     "text": "Project Analysis…",
+     "keys": "",
+     "tip": "Project Analysis"
+    },
+    {
+     "text": "Find Bid Terms…",
+     "keys": "",
+     "tip": "Find Bid Terms"
+    },
+    {
+     "text": "Manufacturers in Specs…",
+     "keys": "",
+     "tip": "Manufacturers in Specs"
+    },
+    {
+     "text": "Bid Submittal Checklist…",
+     "keys": "",
+     "tip": "Bid Submittal Checklist"
+    }
+   ]
+  },
+  {
+   "text": "Review",
+   "keys": "",
+   "tip": "",
+   "menu": [
+    {
+     "text": "Revision Log…",
+     "keys": "",
+     "tip": "Revision Log"
+    },
+    {
+     "text": "Tags vs Schedule Check…",
+     "keys": "",
+     "tip": "List tags drawn on the plans but not in the schedule, and the other way round."
+    },
+    {
+     "text": "Measurement Audit…",
+     "keys": "",
+     "tip": "Measurement Audit"
+    },
+    {
+     "text": "Auto-Markup by Rules",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Edit Auto-Markup Rules…",
+     "keys": "",
+     "tip": "Edit Auto-Markup Rules"
+    },
+    {
+     "text": "AI Takeoff (Whole Set)…",
+     "keys": "Ctrl+Shift+A",
+     "tip": "AI Takeoff (Whole Set)"
+    },
+    {
+     "text": "AI Takeoff Zones",
+     "keys": "",
+     "tip": "",
+     "menu": [
+      {
+       "text": "Draw a Zone: Only Here",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Draw a Zone: Leave Out",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Clear Zones on This Page",
+       "keys": "",
+       "tip": ""
+      }
+     ]
+    },
+    {
+     "text": "Build Schedule From Plans…",
+     "keys": "",
+     "tip": "Build Schedule From Plans"
+    },
+    {
+     "text": "Voice Commands",
+     "keys": "Ctrl+Shift+V",
+     "tip": ""
+    },
+    {
+     "text": "AI: Summarize…",
+     "keys": "",
+     "tip": "AI: Summarize"
+    },
+    {
+     "text": "Ask the Project…",
+     "keys": "",
+     "tip": "Ask the Project"
+    },
+    {
+     "text": "Draft Daily Log From Notes…",
+     "keys": "",
+     "tip": "Draft Daily Log From Notes"
+    },
+    {
+     "text": "Check Submittal Against Spec…",
+     "keys": "",
+     "tip": "Check Submittal Against Spec"
+    },
+    {
+     "text": "AI: Redline…",
+     "keys": "",
+     "tip": "AI: Redline"
+    },
+    {
+     "text": "AI: Spec-Check…",
+     "keys": "",
+     "tip": "AI: Spec-Check"
+    },
+    {
+     "text": "Spec Book Risk Scanner…",
+     "keys": "",
+     "tip": "Spec Book Risk Scanner"
+    },
+    {
+     "text": "AI: Translate Markups…",
+     "keys": "",
+     "tip": "AI: Translate Markups"
+    },
+    {
+     "text": "AI: Find RFIs & Questions…",
+     "keys": "",
+     "tip": "AI: Find RFIs & Questions"
+    },
+    {
+     "text": "Local AI Models…",
+     "keys": "",
+     "tip": "Local AI Models"
+    },
+    {
+     "text": "RFI / Submittal Log",
+     "keys": "",
+     "tip": "RFIs and submittals for this job show up here. Open a PDF, then click New RFI or New Submittal."
+    },
+    {
+     "text": "New RFI…",
+     "keys": "",
+     "tip": "Start an RFI linked to this spot on the drawing."
+    },
+    {
+     "text": "New Submittal…",
+     "keys": "",
+     "tip": "New Submittal"
+    },
+    {
+     "text": "Submittal Review Stamp",
+     "keys": "",
+     "tip": ""
+    }
+   ]
+  },
+  {
+   "text": "Project",
+   "keys": "",
+   "tip": "",
+   "menu": [
+    {
+     "text": "Project Center…",
+     "keys": "Ctrl+Shift+P",
+     "tip": "Project Center"
+    },
+    {
+     "text": "Company Directory…",
+     "keys": "",
+     "tip": "Company Directory"
+    },
+    {
+     "text": "Bid Invites Send As…",
+     "keys": "",
+     "tip": "Bid Invites Send As"
+    },
+    {
+     "text": "Scheduler (Gantt)…",
+     "keys": "Ctrl+Shift+J",
+     "tip": "Scheduler (Gantt)"
+    },
+    {
+     "text": "New Schedule…",
+     "keys": "",
+     "tip": "New Schedule"
+    },
+    {
+     "text": "Weekly Owner Report…",
+     "keys": "",
+     "tip": "Weekly Owner Report"
+    },
+    {
+     "text": "Date and Time Calculators…",
+     "keys": "",
+     "tip": "Date and Time Calculators"
+    },
+    {
+     "text": "New Set From Files…",
+     "keys": "",
+     "tip": "New Set From Files"
+    },
+    {
+     "text": "Open Set…",
+     "keys": "",
+     "tip": "Open Set"
+    },
+    {
+     "text": "Batch Slip Sheet…",
+     "keys": "",
+     "tip": "Swap in revised sheets across a set and keep your takeoff."
+    },
+    {
+     "text": "Watch Plan Folder…",
+     "keys": "",
+     "tip": "Watch Plan Folder"
+    },
+    {
+     "text": "Check Plan Folder Now",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Search Takeoff Across Jobs…",
+     "keys": "",
+     "tip": "Find an item in every job's takeoff."
+    },
+    {
+     "text": "Drawing Register…",
+     "keys": "",
+     "tip": "Drawing Register"
+    },
+    {
+     "text": "Transmittals…",
+     "keys": "",
+     "tip": "Transmittals"
+    },
+    {
+     "text": "New Transmittal…",
+     "keys": "",
+     "tip": "New Transmittal"
+    },
+    {
+     "text": "Addenda…",
+     "keys": "",
+     "tip": "Addenda"
+    },
+    {
+     "text": "Punch List…",
+     "keys": "Ctrl+Shift+U",
+     "tip": "Punch List"
+    },
+    {
+     "text": "New Punch Item…",
+     "keys": "",
+     "tip": "New Punch Item"
+    },
+    {
+     "text": "Three-Phase Inspections…",
+     "keys": "",
+     "tip": "Three-Phase Inspections"
+    },
+    {
+     "text": "Code Check…",
+     "keys": "",
+     "tip": "Code Check"
+    },
+    {
+     "text": "Project Risk Flags…",
+     "keys": "",
+     "tip": "Project Risk Flags"
+    },
+    {
+     "text": "Submittal Log…",
+     "keys": "",
+     "tip": "Submittal Log"
+    }
+   ]
+  },
+  {
+   "text": "Module",
+   "keys": "",
+   "tip": "",
+   "menu": [
+    {
+     "text": "ADA Standards PDF…",
+     "keys": "",
+     "tip": "ADA Standards PDF"
+    },
+    {
+     "text": "ADA Standards (2010)…",
+     "keys": "",
+     "tip": "ADA Standards (2010)"
+    },
+    {
+     "text": "ADA Checker…",
+     "keys": "",
+     "tip": "ADA Checker"
+    },
+    {
+     "text": "Climate Zone by County…",
+     "keys": "",
+     "tip": "Climate Zone by County"
+    },
+    {
+     "text": "Code Library…",
+     "keys": "",
+     "tip": "Code Library"
+    },
+    {
+     "text": "Read the Energy Code Online…",
+     "keys": "",
+     "tip": "Read the Energy Code Online"
+    },
+    {
+     "text": "ClaimIT (Insurance Claim Estimate)…",
+     "keys": "",
+     "tip": "ClaimIT (Insurance Claim Estimate)"
+    },
+    {
+     "text": "QuantiSheet Back Office…",
+     "keys": "",
+     "tip": "QuantiSheet Back Office"
+    },
+    {
+     "text": "Master Schedule (Sub Updates)…",
+     "keys": "",
+     "tip": "Master Schedule (Sub Updates)"
+    }
+   ]
+  },
+  {
+   "text": "Billing",
+   "keys": "",
+   "tip": "",
+   "menu": [
+    {
+     "text": "Contract & Billing…",
+     "keys": "Ctrl+Shift+M",
+     "tip": "Contract & Billing"
+    },
+    {
+     "text": "Schedule of Values…",
+     "keys": "",
+     "tip": "Schedule of Values"
+    },
+    {
+     "text": "Change Order From Selected Markup…",
+     "keys": "",
+     "tip": "Change Order From Selected Markup"
+    },
+    {
+     "text": "Change Order From Revision…",
+     "keys": "",
+     "tip": "Change Order From Revision"
+    },
+    {
+     "text": "Change Orders…",
+     "keys": "",
+     "tip": "Change Orders"
+    },
+    {
+     "text": "Pay Applications…",
+     "keys": "",
+     "tip": "Pay Applications"
+    },
+    {
+     "text": "Lien Waivers…",
+     "keys": "",
+     "tip": "Lien Waivers"
+    }
+   ]
+  },
+  {
+   "text": "Civil",
+   "keys": "",
+   "tip": "",
+   "menu": [
+    {
+     "text": "Civil Takeoff (Trades)…",
+     "keys": "",
+     "tip": "Civil Takeoff (Trades)"
+    },
+    {
+     "text": "Work Notes Takeoff…",
+     "keys": "",
+     "tip": "Work Notes Takeoff"
+    },
+    {
+     "text": "Haul Calculator…",
+     "keys": "",
+     "tip": "Haul Calculator"
+    },
+    {
+     "text": "Export to CivilBid (Excel)…",
+     "keys": "",
+     "tip": "Export to CivilBid (Excel)"
+    },
+    {
+     "text": "CivilBid-Coded Assemblies",
+     "keys": "",
+     "tip": "",
+     "menu": [
+      {
+       "text": "Assembly Library (CivilBid codes)…",
+       "keys": "",
+       "tip": "Assembly Library (CivilBid codes)"
+      },
+      {
+       "text": "Bind Takeoff Group to Assembly…",
+       "keys": "",
+       "tip": "Bind Takeoff Group to Assembly"
+      },
+      {
+       "text": "Insert Assembly Line…",
+       "keys": "",
+       "tip": "Insert Assembly Line"
+      },
+      {
+       "text": "Bid Summary (Coded Assemblies)…",
+       "keys": "",
+       "tip": "Bid Summary (Coded Assemblies)"
+      },
+      {
+       "text": "Revision Change Report…",
+       "keys": "",
+       "tip": "Revision Change Report"
+      }
+     ]
+    },
+    {
+     "text": "Aerial Photo Page…",
+     "keys": "",
+     "tip": "Aerial Photo Page"
+    },
+    {
+     "text": "Production by Depth…",
+     "keys": "",
+     "tip": "Production by Depth"
+    },
+    {
+     "text": "Crew Estimate (Activities)…",
+     "keys": "",
+     "tip": "Crew Estimate (Activities)"
+    },
+    {
+     "text": "Estimate From Takeoff (All Groups)",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Add From Activity Library…",
+     "keys": "",
+     "tip": "Add From Activity Library"
+    },
+    {
+     "text": "Start From Master Estimate…",
+     "keys": "",
+     "tip": "Start From Master Estimate"
+    },
+    {
+     "text": "Crews…",
+     "keys": "",
+     "tip": "Crews"
+    },
+    {
+     "text": "Equipment Rates…",
+     "keys": "",
+     "tip": "Equipment Rates"
+    },
+    {
+     "text": "Labor Burden & Wages…",
+     "keys": "",
+     "tip": "Labor Burden & Wages"
+    },
+    {
+     "text": "Import Prevailing Wages (Davis-Bacon)…",
+     "keys": "",
+     "tip": "Import Prevailing Wages (Davis-Bacon)"
+    },
+    {
+     "text": "Material & Sub Quotes…",
+     "keys": "",
+     "tip": "Material & Sub Quotes"
+    },
+    {
+     "text": "Crew Schedule…",
+     "keys": "",
+     "tip": "Crew Schedule"
+    },
+    {
+     "text": "Resources (Hours by Class & Equipment)…",
+     "keys": "",
+     "tip": "Resources (Hours by Class & Equipment)"
+    },
+    {
+     "text": "Export Cash Flow…",
+     "keys": "",
+     "tip": "Export Cash Flow"
+    },
+    {
+     "text": "Owner Bid Schedule…",
+     "keys": "",
+     "tip": "Owner Bid Schedule"
+    },
+    {
+     "text": "Import Owner Bid Schedule…",
+     "keys": "",
+     "tip": "Import Owner Bid Schedule"
+    },
+    {
+     "text": "Export Priced Bid Schedule…",
+     "keys": "",
+     "tip": "Export Priced Bid Schedule"
+    },
+    {
+     "text": "Indirects…",
+     "keys": "",
+     "tip": "Indirects"
+    },
+    {
+     "text": "Bid Versions…",
+     "keys": "",
+     "tip": "Bid Versions"
+    },
+    {
+     "text": "Save Bid Version…",
+     "keys": "",
+     "tip": "Save Bid Version"
+    },
+    {
+     "text": "Time Cards…",
+     "keys": "",
+     "tip": "Time Cards"
+    },
+    {
+     "text": "Production History…",
+     "keys": "",
+     "tip": "Production History"
+    },
+    {
+     "text": "Cost to Complete (Forecast)…",
+     "keys": "",
+     "tip": "Cost to Complete (Forecast)"
+    },
+    {
+     "text": "Civil Job Cost (Bid vs Actual)…",
+     "keys": "",
+     "tip": "Civil Job Cost (Bid vs Actual)"
+    }
+   ]
+  },
+  {
+   "text": "Help",
+   "keys": "",
+   "tip": "",
+   "menu": [
+    {
+     "text": "Help Center & Tutorials…",
+     "keys": "F1",
+     "tip": "Help Center & Tutorials"
+    },
+    {
+     "text": "Features & How-To Guide (PDF)",
+     "keys": "",
+     "tip": "Features & How-To Guide (PDF)"
+    },
+    {
+     "text": "Video Tutorials",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Welcome Tour",
+     "keys": "",
+     "tip": "A short walk around the screen."
+    },
+    {
+     "text": "Open Practice Drawings",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Practice Job (10 Minutes)…",
+     "keys": "",
+     "tip": "Practice Job (10 Minutes)"
+    },
+    {
+     "text": "Keyboard Shortcuts",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Customize Shortcuts…",
+     "keys": "",
+     "tip": "Pick your own keys for any command."
+    },
+    {
+     "text": "Report an Issue…",
+     "keys": "",
+     "tip": "Report an Issue"
+    },
+    {
+     "text": "Support Bundle for IT…",
+     "keys": "",
+     "tip": "Support Bundle for IT"
+    },
+    {
+     "text": "Recent Problems (Log)…",
+     "keys": "",
+     "tip": "Recent Problems (Log)"
+    },
+    {
+     "text": "Add the QuantiSheet Printer…",
+     "keys": "",
+     "tip": "Add the QuantiSheet Printer"
+    },
+    {
+     "text": "Terms of Service",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Privacy",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Third-Party Licenses",
+     "keys": "",
+     "tip": ""
+    },
+    {
+     "text": "Enter License Key…",
+     "keys": "",
+     "tip": "Enter License Key"
+    },
+    {
+     "text": "About QuantiSheet",
+     "keys": "",
+     "tip": ""
+    }
+   ]
+  },
+  {
+   "text": "Service",
+   "keys": "",
+   "tip": "",
+   "menu": [
+    {
+     "text": "Service Work Order…",
+     "keys": "",
+     "tip": "Service Work Order"
+    },
+    {
+     "text": "Service Agreements…",
+     "keys": "",
+     "tip": "Service Agreements"
+    },
+    {
+     "text": "Maintenance Checklist…",
+     "keys": "",
+     "tip": "Maintenance Checklist"
+    },
+    {
+     "text": "Agreement Visit Calendar…",
+     "keys": "",
+     "tip": "Agreement Visit Calendar"
+    },
+    {
+     "text": "Refrigerant Log…",
+     "keys": "",
+     "tip": "Refrigerant Log"
+    },
+    {
+     "text": "Backflow Test Report…",
+     "keys": "",
+     "tip": "Backflow Test Report"
+    },
+    {
+     "text": "Flat-Rate Pricebook…",
+     "keys": "",
+     "tip": "Flat-Rate Pricebook"
+    },
+    {
+     "text": "Truck Stock…",
+     "keys": "",
+     "tip": "Truck Stock"
+    },
+    {
+     "text": "Tech Recommendations…",
+     "keys": "",
+     "tip": "Tech Recommendations"
+    },
+    {
+     "text": "T&M Tag…",
+     "keys": "",
+     "tip": "T&M Tag"
+    },
+    {
+     "text": "Build-to-Service Handover…",
+     "keys": "",
+     "tip": "Build-to-Service Handover"
+    },
+    {
+     "text": "Dispatch Board…",
+     "keys": "",
+     "tip": "Dispatch Board"
+    },
+    {
+     "text": "Customer History…",
+     "keys": "",
+     "tip": "Customer History"
+    },
+    {
+     "text": "Good / Better / Best Quotes…",
+     "keys": "",
+     "tip": "Good / Better / Best Quotes"
+    },
+    {
+     "text": "Tune-up Planner…",
+     "keys": "",
+     "tip": "Tune-up Planner"
+    },
+    {
+     "text": "Warranty Registrations…",
+     "keys": "",
+     "tip": "Warranty Registrations"
+    },
+    {
+     "text": "Changeout Proposal…",
+     "keys": "",
+     "tip": "Changeout Proposal"
+    },
+    {
+     "text": "Load Report…",
+     "keys": "",
+     "tip": "Load Report"
+    },
+    {
+     "text": "Service Settings…",
+     "keys": "",
+     "tip": "Service Settings"
+    }
+   ]
+  }
+ ],
+ "ribbon": {
+  "Home": {
+   "File": [
+    {
+     "label": "Open",
+     "action": "Open…",
+     "tip": "Open"
+    },
+    {
+     "label": "Save",
+     "action": "Save",
+     "tip": "Save"
+    },
+    {
+     "label": "Print",
+     "action": "Print…",
+     "tip": "Print"
+    },
+    {
+     "label": "Generate Set",
+     "action": "Generate Set…",
+     "tip": "Generate Set"
+    },
+    {
+     "label": "Print Preview",
+     "action": "Print Preview…",
+     "tip": "Print Preview"
+    },
+    {
+     "label": "Save As",
+     "action": "Save As…",
+     "tip": "Save As"
+    },
+    {
+     "label": "Recover",
+     "action": "Recover Unsaved Files…",
+     "tip": "Recover Unsaved Files"
+    },
+    {
+     "label": "Dropbox",
+     "action": "Open from Dropbox…",
+     "tip": "Open from Dropbox",
+     "menu": [
+      {
+       "text": "Open from Dropbox…",
+       "keys": "",
+       "tip": "Open from Dropbox"
+      },
+      {
+       "text": "Save to Dropbox",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Save to Dropbox As…",
+       "keys": "",
+       "tip": "Save to Dropbox As"
+      },
+      {
+       "text": "Dropbox Settings…",
+       "keys": "",
+       "tip": "Dropbox Settings"
+      }
+     ]
+    },
+    {
+     "label": "Export",
+     "action": "Word Document (.docx)…",
+     "tip": "Word Document (.docx)",
+     "menu": [
+      {
+       "text": "Word Document (.docx)…",
+       "keys": "",
+       "tip": "Word Document (.docx)"
+      },
+      {
+       "text": "Excel Workbook (.xlsx)…",
+       "keys": "",
+       "tip": "Excel Workbook (.xlsx)"
+      },
+      {
+       "text": "PowerPoint (.pptx)…",
+       "keys": "",
+       "tip": "PowerPoint (.pptx)"
+      },
+      {
+       "text": "Web Page (.html)…",
+       "keys": "",
+       "tip": "Web Page (.html)"
+      },
+      {
+       "text": "Text (.txt)…",
+       "keys": "",
+       "tip": "Text (.txt)"
+      },
+      {
+       "text": "AutoCAD DXF (this page)…",
+       "keys": "",
+       "tip": "AutoCAD DXF (this page)"
+      },
+      {
+       "text": "Google Earth (KML, aerial page markups)…",
+       "keys": "",
+       "tip": "Google Earth (KML, aerial page markups)"
+      },
+      {
+       "text": "GIS (GeoJSON, aerial page markups)…",
+       "keys": "",
+       "tip": "GIS (GeoJSON, aerial page markups)"
+      },
+      {
+       "text": "PDF/A (archival)…",
+       "keys": "",
+       "tip": "PDF/A (archival)"
+      },
+      {
+       "text": "External Issue (strip pricing)…",
+       "keys": "",
+       "tip": "External Issue (strip pricing)"
+      },
+      {
+       "text": "Images (PNG)…",
+       "keys": "",
+       "tip": "Images (PNG)"
+      },
+      {
+       "text": "Images (JPEG)…",
+       "keys": "",
+       "tip": "Images (JPEG)"
+      },
+      {
+       "text": "Export Markups (XFDF)…",
+       "keys": "",
+       "tip": "Export Markups (XFDF)"
+      }
+     ]
+    }
+   ],
+   "Edit": [
+    {
+     "label": "Undo",
+     "action": "Undo",
+     "tip": "Undo"
+    },
+    {
+     "label": "Redo",
+     "action": "Redo",
+     "tip": "Redo"
+    },
+    {
+     "label": "Find",
+     "action": "Find…",
+     "tip": "Find"
+    },
+    {
+     "label": "Undo History",
+     "action": "Undo History…",
+     "tip": "Undo History"
+    }
+   ],
+   "Tools": [
+    {
+     "label": "Select",
+     "action": "Select",
+     "tip": "Select (V)"
+    },
+    {
+     "label": "Text",
+     "action": "Select Text",
+     "tip": "Select Text (I)"
+    },
+    {
+     "label": "Zoom",
+     "action": "Marquee Zoom",
+     "tip": "Marquee Zoom (Z)"
+    },
+    {
+     "label": "Snapshot",
+     "action": "Snapshot",
+     "tip": "Snapshot (G)"
+    }
+   ],
+   "View": [
+    {
+     "label": "Fit Width",
+     "action": "Fit Width",
+     "tip": "Fit Width"
+    },
+    {
+     "label": "Fit Page",
+     "action": "Fit Page",
+     "tip": "Fit Page"
+    },
+    {
+     "label": "Zoom In",
+     "action": "Zoom In",
+     "tip": "Zoom In"
+    },
+    {
+     "label": "Zoom Out",
+     "action": "Zoom Out",
+     "tip": "Zoom Out"
+    },
+    {
+     "label": "Previous View",
+     "action": "Previous View",
+     "tip": "Previous View"
+    },
+    {
+     "label": "Snap",
+     "action": "Snap to Content",
+     "tip": "Snap drawing and measuring to line ends, corners and intersections (Shift+F9)"
+    },
+    {
+     "label": "Field Mode",
+     "action": "Field Mode",
+     "tip": "Field Mode"
+    }
+   ],
+   "Specs": [
+    {
+     "label": "Project Analysis",
+     "action": "Project Analysis…",
+     "tip": "Project Analysis"
+    }
+   ],
+   "Compare": [
+    {
+     "label": "Compare",
+     "action": "Compare…",
+     "tip": "Compare  (Ctrl+Alt+C)\nShow what changed between two versions of a sheet: overlay, a list of changes, or the text."
+    },
+    {
+     "label": "Revisions",
+     "action": "Revision Log…",
+     "tip": "Revision Log"
+    }
+   ]
+  },
+  "PDF Management": {
+   "Create & Convert": [
+    {
+     "label": "Edit PDF",
+     "action": "Edit PDF",
+     "tip": "Edit PDF: change the text and images on the page (Ctrl+E). The arrow has the other editing tools.",
+     "menu": [
+      {
+       "text": "Edit Text",
+       "keys": "Ctrl+E",
+       "tip": "Edit Text (Ctrl+E)"
+      },
+      {
+       "text": "Add Image",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Search & Redact…",
+       "keys": "",
+       "tip": "Search & Redact"
+      },
+      {
+       "text": "Organize Pages…",
+       "keys": "Ctrl+Shift+G",
+       "tip": "Organize Pages"
+      },
+      {
+       "text": "Crop Pages",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Header & Footer…",
+       "keys": "",
+       "tip": "Header & Footer"
+      },
+      {
+       "text": "Watermark…",
+       "keys": "",
+       "tip": "Watermark"
+      },
+      {
+       "text": "Add Text Field",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Add Checkbox",
+       "keys": "",
+       "tip": ""
+      },
+      {
+       "text": "Add Dropdown",
+       "keys": "",
+       "tip": ""
+      }
+     ]
+    },
+    {
+     "label": "Create PDF",
+     "action": "Create PDF From File…",
+     "tip": "Create PDF From File"
+    },
+    {
+     "label": "Combine",
+     "action": "Combine Files…",
+     "tip": "Combine Files"
+    },
+    {
+     "label": "Import AutoCAD DXF",
+     "action": "Import AutoCAD DXF…",
+     "tip": "Import AutoCAD DXF"
+    },
+    {
+     "label": "Import Markups (PDF or XFDF)",
+     "action": "Import Markups (PDF or XFDF)…",
+     "tip": "Import Markups (PDF or XFDF)"
+    },
+    {
+     "label": "Export Markups (XFDF)",
+     "action": "Export Markups (XFDF)…",
+     "tip": "Export Markups (XFDF)"
+    },
+    {
+     "label": "Export PDF",
+     "action": "Word Document (.docx)…",
+     "tip": "Word Document (.docx)",
+     "menu": [
+      {
+       "text": "Word Document (.docx)…",
+       "keys": "",
+       "tip": "Word Document (.docx)"
+      },
+      {
+       "text": "Excel Workbook (.xlsx)…",
+       "keys": "",
+       "tip": "Excel Workbook (.xlsx)"
+      },
+      {
+       "text": "PowerPoint (.pptx)…",
+       "keys": "",
+       "tip": "PowerPoint (.pptx)"
+      },
+      {
+       "text": "Web Page (.html)…",
+       "keys": "",
+       "tip": "Web Page (.html)"
+      },
+      {
+       "text": "Text (.txt)…",
+       "keys": "",
+       "tip": "Text (.txt)"
+      },
+      {
+       "text": "AutoCAD DXF (this page)…",
+       "keys": "",
+       "tip": "AutoCAD DXF (this page)"
+      },
+      {
+       "text": "Google Earth (KML, aerial page markups)…",
+       "keys": "",
+       "tip": "Google Earth (KML, aerial page markups)"
+      },
+      {
+       "text": "GIS (GeoJSON, aerial page markups)…",
+       "keys": "",
+       "tip": "GIS (GeoJSON, aerial page markups)"
+      },
+      {
+       "text": "PDF/A (archival)…",
+       "keys": "",
+       "tip": "PDF/A (archival)"
+      },
+      {
+       "text": "External Issue (strip pricing)…",
+       "keys": "",
+       "tip": "External Issue (strip pricing)"
+      },
+      {
+       "text": "Images (PNG)…",
+       "keys": "",
+       "tip": "Images (PNG)"
+      },
+      {
+       "text": "Images (JPEG)…",
+       "keys": "",
+       "tip": "Images (JPEG)"
+      },
+      {
+       "text": "Export Markups (XFDF)…",
+       "keys": "",
+       "tip": "Export Markups (XFDF)"
+      }
+     ]
+    },
+    {
+     "label": "Compare",
+     "action": "Compare…",
+     "tip": "Compare  (Ctrl+Alt+C)\nShow what changed between two versions of a sheet: overlay, a list of changes, or the text."
+    },
+    {
+     "label": "Print",
+     "action": "Print…",
+     "tip": "Print"
+    }
+   ],
+   "Pages": [
+    {
+     "label": "Organize",
+     "action": "Organize Pages…",
+     "tip": "Organize Pages"
+    },
+    {
+     "label": "Insert",
+     "action": "Insert Pages From PDF…",
+     "tip": "Insert Pages From PDF\nAdd pages from another PDF here."
+    },
+    {
+     "label": "Replace",
+     "action": "Replace Pages…",
+     "tip": "Replace Pages"
+    },
+    {
+     "label": "Rotate Right",
+     "action": "Rotate Right",
+     "tip": "Rotate Right"
+    },
+    {
+     "label": "Rotate Left",
+     "action": "Rotate Left",
+     "tip": "Rotate Left"
+    },
+    {
+     "label": "Insert Blank Page",
+     "action": "Insert Blank Page",
+     "tip": "Insert Blank Page"
+    },
+    {
+     "label": "Duplicate Page",
+     "action": "Duplicate Page",
+     "tip": "Duplicate Page"
+    },
+    {
+     "label": "Extract Pages",
+     "action": "Extract Pages…",
+     "tip": "Extract Pages\nSave chosen pages as a new PDF."
+    },
+    {
+     "label": "Delete Pages",
+     "action": "Delete Pages…",
+     "tip": "Delete Pages"
+    },
+    {
+     "label": "Split Document",
+     "action": "Split Document…",
+     "tip": "Split Document\nBreak this PDF into smaller files."
+    },
+    {
+     "label": "Crop Pages",
+     "action": "Crop Pages",
+     "tip": "Crop Pages"
+    },
+    {
+     "label": "Booklet",
+     "action": "Booklet / N-up…",
+     "tip": "Booklet / N-up"
+    },
+    {
+     "label": "Rotate All",
+     "action": "Rotate All Pages Right",
+     "tip": "Rotate All Pages Right"
+    },
+    {
+     "label": "Unlink Sheets",
+     "action": "Remove Sheet Links",
+     "tip": "Remove Sheet Links"
+    }
+   ],
+   "Page Marks": [
+    {
+     "label": "Header && Footer",
+     "action": "Header & Footer…",
+     "tip": "Header & Footer"
+    },
+    {
+     "label": "Page Numbers",
+     "action": "Page Numbers…",
+     "tip": "Page Numbers"
+    },
+    {
+     "label": "Bates Numbering",
+     "action": "Bates Numbering…",
+     "tip": "Bates Numbering"
+    },
+    {
+     "label": "Watermark",
+     "action": "Watermark…",
+     "tip": "Watermark"
+    },
+    {
+     "label": "Auto Bookmark Sheets",
+     "action": "Auto Bookmark Sheets…",
+     "tip": "Auto Bookmark Sheets"
+    },
+    {
+     "label": "Spec Book Sections",
+     "action": "Spec Book Sections…",
+     "tip": "Spec Book Sections"
+    },
+    {
+     "label": "Link Sheets",
+     "action": "Link Sheet References",
+     "tip": "Link Sheet References"
+    }
+   ],
+   "Content": [
+    {
+     "label": "Edit Text",
+     "action": "Edit Text",
+     "tip": "Edit Text (Ctrl+E)"
+    },
+    {
+     "label": "OCR",
+     "action": "Make Searchable (OCR)…",
+     "tip": "Make Searchable (OCR)\nRead the text on scanned pages so search and Count by Label work."
+    },
+    {
+     "label": "Add Image",
+     "action": "Add Image",
+     "tip": "Add Image"
+    },
+    {
+     "label": "Search && Redact",
+     "action": "Search & Redact…",
+     "tip": "Search & Redact"
+    },
+    {
+     "label": "Attachments",
+     "action": "Attachments…",
+     "tip": "Attachments"
+    },
+    {
+     "label": "Scan Quality",
+     "action": "Check Scan Quality…",
+     "tip": "Check Scan Quality"
+    },
+    {
+     "label": "Link Details",
+     "action": "Auto Bookmark (Link Details)…",
+     "tip": "Auto Bookmark (Link Details)"
+    }
+   ],
+   "Forms": [
+    {
+     "label": "Prepare",
+     "action": "Prepare Form (detect fields)",
+     "tip": "Prepare Form (detect fields)"
+    },
+    {
+     "label": "Add Text Field",
+     "action": "Add Text Field",
+     "tip": "Add Text Field"
+    },
+    {
+     "label": "Add Checkbox",
+     "action": "Add Checkbox",
+     "tip": "Add Checkbox"
+    },
+    {
+     "label": "Add Dropdown",
+     "action": "Add Dropdown",
+     "tip": "Add Dropdown"
+    },
+    {
+     "label": "Clear Form",
+     "action": "Clear Form",
+     "tip": "Clear Form"
+    },
+    {
+     "label": "Fill Form From Job",
+     "action": "Fill Form From Job",
+     "tip": "Fill Form From Job"
+    },
+    {
+     "label": "Flatten Markups && Fields",
+     "action": "Flatten Markups & Fields…",
+     "tip": "Flatten Markups & Fields\nBurn markups into the page. Job data and takeoff can't be edited afterwards."
+    },
+    {
+     "label": "Form Library",
+     "action": "New From Form Library…",
+     "tip": "New From Form Library"
+    }
+   ],
+   "Sign": [
+    {
+     "label": "Signature",
+     "action": "Signature",
+     "tip": "Signature"
+    },
+    {
+     "label": "Initials",
+     "action": "Initials",
+     "tip": "Initials"
+    },
+    {
+     "label": "Fill Text",
+     "action": "Fill Text",
+     "tip": "Fill Text"
+    },
+    {
+     "label": "Check Mark",
+     "action": "Check Mark",
+     "tip": "Check Mark"
+    },
+    {
+     "label": "Date",
+     "action": "Date",
+     "tip": "Date"
+    },
+    {
+     "label": "Sign",
+     "action": "Sign…",
+     "tip": "Sign\nAdd a signature. Saving afterwards in a way that changes the page breaks the signature, so QuantiSheet warns you first."
+    },
+    {
+     "label": "Verify Signatures",
+     "action": "Verify Signatures…",
+     "tip": "Verify Signatures\nCheck who signed and whether the file changed after signing."
+    }
+   ],
+   "E-Sign": [
+    {
+     "label": "Request",
+     "action": "Request Signatures…",
+     "tip": "Request Signatures"
+    },
+    {
+     "label": "Track",
+     "action": "Signature Requests…",
+     "tip": "Signature Requests"
+    }
+   ],
+   "Protect": [
+    {
+     "label": "Protect",
+     "action": "Password Protect…",
+     "tip": "Password Protect"
+    },
+    {
+     "label": "Remove Security",
+     "action": "Remove Security…",
+     "tip": "Remove Security"
+    },
+    {
+     "label": "Remove Hidden Information",
+     "action": "Remove Hidden Information…",
+     "tip": "Remove Hidden Information"
+    },
+    {
+     "label": "Reduce File Size",
+     "action": "Reduce File Size…",
+     "tip": "Reduce File Size\nMake the PDF smaller to email. Your takeoff and markups stay."
+    },
+    {
+     "label": "Check / Repair",
+     "action": "Check / Repair PDF…",
+     "tip": "Check / Repair PDF"
+    }
+   ],
+   "Standards": [
+    {
+     "label": "Accessibility",
+     "action": "Accessibility Check…",
+     "tip": "Accessibility Check"
+    },
+    {
+     "label": "PDF/A",
+     "action": "PDF/A (archival)…",
+     "tip": "PDF/A (archival)"
+    },
+    {
+     "label": "Preflight",
+     "action": "Preflight / PDF/X…",
+     "tip": "Preflight / PDF/X"
+    }
+   ]
+  },
+  "Markup": {
+   "Text": [
+    {
+     "label": "Highlight",
+     "action": "Highlight",
+     "tip": "Highlight (H)"
+    },
+    {
+     "label": "Underline",
+     "action": "Underline",
+     "tip": "Underline (U)"
+    },
+    {
+     "label": "Strikeout",
+     "action": "Strikeout",
+     "tip": "Strikeout (K)"
+    }
+   ],
+   "Shapes": [
+    {
+     "label": "Rectangle",
+     "action": "Rectangle",
+     "tip": "Rectangle (R)"
+    },
+    {
+     "label": "Ellipse",
+     "action": "Ellipse",
+     "tip": "Ellipse (E)"
+    },
+    {
+     "label": "Cloud",
+     "action": "Cloud",
+     "tip": "Cloud (C)"
+    },
+    {
+     "label": "Line",
+     "action": "Line",
+     "tip": "Line (L)"
+    },
+    {
+     "label": "Arrow",
+     "action": "Arrow",
+     "tip": "Arrow (A)"
+    },
+    {
+     "label": "Polyline",
+     "action": "Polyline",
+     "tip": "Polyline"
+    },
+    {
+     "label": "Polygon",
+     "action": "Polygon",
+     "tip": "Polygon"
+    },
+    {
+     "label": "Pen",
+     "action": "Pen",
+     "tip": "Pen (P)"
+    }
+   ],
+   "Notes": [
+    {
+     "label": "Text Box",
+     "action": "Text Box",
+     "tip": "Text Box (T)"
+    },
+    {
+     "label": "Callout",
+     "action": "Callout",
+     "tip": "Callout (Q)"
+    },
+    {
+     "label": "Sticky Note",
+     "action": "Sticky Note",
+     "tip": "Sticky Note (N)"
+    },
+    {
+     "label": "Stamp",
+     "action": "Stamp",
+     "tip": "Stamp (S)"
+    },
+    {
+     "label": "Date Stamp",
+     "action": "Date Stamp",
+     "tip": "Date Stamp"
+    }
+   ],
+   "Style": [
+    {
+     "label": "Color",
+     "action": "Markup Color…",
+     "tip": "Markup Color"
+    },
+    {
+     "label": "Line Styles",
+     "action": "Line Styles…",
+     "tip": "Line Styles"
+    },
+    {
+     "label": "Hatch Patterns",
+     "action": "Hatch Patterns…",
+     "tip": "Hatch Patterns"
+    },
+    {
+     "label": "Default Style",
+     "action": "Default Style",
+     "tip": "Default Style"
+    },
+    {
+     "label": "Layers",
+     "action": "Layers…",
+     "tip": "Layers"
+    }
+   ],
+   "Organize": [
+    {
+     "label": "Legend",
+     "action": "Legend",
+     "tip": "Legend"
+    },
+    {
+     "label": "Refresh Legends",
+     "action": "Refresh Legends",
+     "tip": "Refresh Legends"
+    },
+    {
+     "label": "Add Selected Markup to Tool Chest",
+     "action": "Add Selected Markup to Tool Chest…",
+     "tip": "Add Selected Markup to Tool Chest"
+    },
+    {
+     "label": "Redact",
+     "action": "Redact",
+     "tip": "Redact"
+    }
+   ]
+  },
+  "Takeoff": {
+   "AI Takeoff": [
+    {
+     "label": "AI Takeoff",
+     "action": "AI Takeoff (Whole Set)…",
+     "tip": "AI Takeoff (Whole Set)"
+    },
+    {
+     "label": "Trades",
+     "action": "Trade Takeoff (Pipe, Duct, Devices, Roof, Rebar, Earthwork)…",
+     "tip": "Trade Takeoff (Pipe, Duct, Devices, Roof, Rebar, Earthwork)"
+    },
+    {
+     "label": "Check",
+     "action": "Check Takeoff…",
+     "tip": "Check Takeoff"
+    },
+    {
+     "label": "Review Takeoff",
+     "action": "Auto Takeoff (Review)…",
+     "tip": "Auto Takeoff (Review)"
+    },
+    {
+     "label": "Auto Scale (Read Sheets)",
+     "action": "Auto Scale (Read Sheets)…",
+     "tip": "Auto Scale (Read Sheets)\nRead each sheet's scale from its title block. Check it before you measure."
+    },
+    {
+     "label": "Auto Takeoff Rooms on This Sheet",
+     "action": "Auto Takeoff Rooms on This Sheet…",
+     "tip": "Auto Takeoff Rooms on This Sheet"
+    },
+    {
+     "label": "Count by Label",
+     "action": "Count by Label…",
+     "tip": "Count by Label\nFind every tag like D-1 or W* on the plans and count them."
+    }
+   ],
+   "Scale": [
+    {
+     "label": "Calibrate (Set Scale)",
+     "action": "Calibrate (Set Scale)",
+     "tip": "Calibrate (Set Scale) (Shift+S)"
+    },
+    {
+     "label": "Auto Scale (Read Sheets)",
+     "action": "Auto Scale (Read Sheets)…",
+     "tip": "Auto Scale (Read Sheets)\nRead each sheet's scale from its title block. Check it before you measure."
+    },
+    {
+     "label": "Viewport (Scale Region)",
+     "action": "Viewport (Scale Region)",
+     "tip": "Viewport (Scale Region)"
+    },
+    {
+     "label": "Auto Scale (Check Against Dimensions)",
+     "action": "Auto Scale (Check Against Dimensions)…",
+     "tip": "Auto Scale (Check Against Dimensions)\nCheck the scale against a dimension written on the sheet."
+    }
+   ],
+   "Measure": [
+    {
+     "label": "Length",
+     "action": "Length",
+     "tip": "Length (Shift+L)"
+    },
+    {
+     "label": "Polylength",
+     "action": "Polylength",
+     "tip": "Polylength (Shift+P)"
+    },
+    {
+     "label": "Area",
+     "action": "Area",
+     "tip": "Area (Shift+A)"
+    },
+    {
+     "label": "Cutout",
+     "action": "Cutout (Deduct)",
+     "tip": "Cutout (Deduct) (Shift+X)"
+    },
+    {
+     "label": "Volume",
+     "action": "Volume",
+     "tip": "Volume (Shift+V)"
+    },
+    {
+     "label": "Wall Area (Length x Height)",
+     "action": "Wall Area (Length x Height)",
+     "tip": "Wall Area (Length x Height) (Shift+W)"
+    },
+    {
+     "label": "Angle",
+     "action": "Angle",
+     "tip": "Angle"
+    },
+    {
+     "label": "Radius",
+     "action": "Radius",
+     "tip": "Radius"
+    },
+    {
+     "label": "Diameter",
+     "action": "Diameter",
+     "tip": "Diameter"
+    }
+   ],
+   "Count": [
+    {
+     "label": "Count",
+     "action": "Count",
+     "tip": "Count (Shift+C)"
+    },
+    {
+     "label": "Symbol",
+     "action": "Count Symbol",
+     "tip": "Count Symbol"
+    },
+    {
+     "label": "From Picture",
+     "action": "Count From a Picture…",
+     "tip": "Count From a Picture"
+    },
+    {
+     "label": "Several",
+     "action": "Count Several Symbols…",
+     "tip": "Count Several Symbols\nCount several kinds of symbols in one pass."
+    },
+    {
+     "label": "Library",
+     "action": "Try the Count Library…",
+     "tip": "Try the Count Library"
+    },
+    {
+     "label": "By Label",
+     "action": "Count by Label…",
+     "tip": "Count by Label\nFind every tag like D-1 or W* on the plans and count them."
+    }
+   ],
+   "Automatic": [
+    {
+     "label": "Auto Area",
+     "action": "Auto Area (Click a Room)",
+     "tip": "Auto Area (Click a Room) (Shift+R)"
+    },
+    {
+     "label": "Trace",
+     "action": "Trace Length (Click a Line)",
+     "tip": "Trace Length (Click a Line) (Shift+T)"
+    },
+    {
+     "label": "Outline",
+     "action": "Trace Outline (Snap to Drawing)",
+     "tip": "Trace Outline (Snap to Drawing) (Shift+O)"
+    },
+    {
+     "label": "All Rooms",
+     "action": "Auto Takeoff Rooms on This Sheet…",
+     "tip": "Auto Takeoff Rooms on This Sheet"
+    },
+    {
+     "label": "Walls && Doors",
+     "action": "Auto Takeoff Walls & Doors on This Sheet…",
+     "tip": "Auto Takeoff Walls & Doors on This Sheet"
+    },
+    {
+     "label": "Wall Roles",
+     "action": "Walls by Role…",
+     "tip": "Walls by Role"
+    },
+    {
+     "label": "Trades",
+     "action": "Trade Takeoff (Pipe, Duct, Devices, Roof, Rebar, Earthwork)…",
+     "tip": "Trade Takeoff (Pipe, Duct, Devices, Roof, Rebar, Earthwork)"
+    },
+    {
+     "label": "Check",
+     "action": "Check Takeoff…",
+     "tip": "Check Takeoff"
+    }
+   ],
+   "Site": [
+    {
+     "label": "Aerial Photo",
+     "action": "Aerial Photo Page…",
+     "tip": "Aerial Photo Page"
+    }
+   ],
+   "Plan Set": [
+    {
+     "label": "Buy Qty",
+     "action": "Buy Quantities (Sheets, Boxes, Rolls)…",
+     "tip": "Buy Quantities (Sheets, Boxes, Rolls)\nTurn measured totals into what to order, with waste, rounded up."
+    },
+    {
+     "label": "Typical Sheet",
+     "action": "Typical Sheet (Count This Sheet N Times)…",
+     "tip": "Typical Sheet (Count This Sheet N Times)\nCount this sheet's takeoff more than once, e.g. 4 identical floors."
+    },
+    {
+     "label": "Carry Forward",
+     "action": "Carry Takeoff Forward to a Revised Set…",
+     "tip": "Carry Takeoff Forward to a Revised Set\nMove your takeoff onto a new revision of the drawings."
+    },
+    {
+     "label": "Tags Check",
+     "action": "Tags vs Schedule Check…",
+     "tip": "Tags vs Schedule Check\nList tags drawn on the plans but not in the schedule, and the other way round."
+    },
+    {
+     "label": "Standard",
+     "action": "Takeoff Standard…",
+     "tip": "Takeoff Standard"
+    },
+    {
+     "label": "Coverage",
+     "action": "Coverage Map and Second Check…",
+     "tip": "Coverage Map and Second Check"
+    }
+   ],
+   "Output": [
+    {
+     "label": "Quantities",
+     "action": "Quantities",
+     "tip": "Totals for what you measured show up here. Open a PDF and measure on the drawing. Export CSV saves the list."
+    },
+    {
+     "label": "Export Quantities (CSV)",
+     "action": "Export Quantities (CSV)…",
+     "tip": "Export Quantities (CSV)"
+    },
+    {
+     "label": "Link Quantities to Excel",
+     "action": "Link Quantities to Excel…",
+     "tip": "Link Quantities to Excel\nKeep an Excel workbook up to date with your quantities."
+    },
+    {
+     "label": "Show Scale",
+     "action": "Show Scale",
+     "tip": "Show Scale"
+    }
+   ],
+   "Roof": [
+    {
+     "label": "Roof Plan",
+     "action": "Roof Plan Takeoff…",
+     "tip": "Roof Plan Takeoff"
+    }
+   ],
+   "Selected": [
+    {
+     "label": "Only This",
+     "action": "Show Only This Item",
+     "tip": "Show Only This Item"
+    },
+    {
+     "label": "Typical x",
+     "action": "Set Typical Count…",
+     "tip": "Set Typical Count"
+    },
+    {
+     "label": "Bulk Edit",
+     "action": "Bulk Edit Selected…",
+     "tip": "Bulk Edit Selected"
+    },
+    {
+     "label": "Copy N",
+     "action": "Copy Several Times…",
+     "tip": "Copy Several Times"
+    },
+    {
+     "label": "Add More",
+     "action": "Add More to This Count",
+     "tip": "Add More to This Count"
+    },
+    {
+     "label": "Uncounted",
+     "action": "Show Uncounted Copies",
+     "tip": "Show Uncounted Copies"
+    },
+    {
+     "label": "To Library",
+     "action": "Add This Count to the Count Library",
+     "tip": "Add This Count to the Count Library"
+    },
+    {
+     "label": "Convert To",
+     "action": "Convert Selected To",
+     "tip": "Convert Selected To",
+     "menu": []
+    }
+   ]
+  },
+  "Estimate": {
+   "Assemblies": [
+    {
+     "label": "Library",
+     "action": "Assembly Library…",
+     "tip": "Assembly Library"
+    },
+    {
+     "label": "Panel",
+     "action": "Assemblies",
+     "tip": "Assemblies for this job show up here, with material and labor. Open a PDF, then click Assembly Library to pick an assembly and take it off."
+    },
+    {
+     "label": "Take Off Into Assembly",
+     "action": "Take Off Into Assembly…",
+     "tip": "Take Off Into Assembly"
+    },
+    {
+     "label": "Wall Assemblies",
+     "action": "Assembly Rules & Wall-Type Assemblies…",
+     "tip": "Assembly Rules & Wall-Type Assemblies"
+    }
+   ],
+   "Pricing": [
+    {
+     "label": "Cost Books",
+     "action": "Cost Books…",
+     "tip": "Cost Books"
+    },
+    {
+     "label": "Labor",
+     "action": "Labor Rates & Crews…",
+     "tip": "Labor Rates & Crews"
+    },
+    {
+     "label": "Database",
+     "action": "Price Database…",
+     "tip": "Price Database"
+    },
+    {
+     "label": "Add From Cost Book",
+     "action": "Add From Cost Book…",
+     "tip": "Add From Cost Book"
+    },
+    {
+     "label": "Quick $/SF Estimate",
+     "action": "Quick $/SF Estimate…",
+     "tip": "Quick $/SF Estimate"
+    },
+    {
+     "label": "Model",
+     "action": "Model Estimate…",
+     "tip": "Model Estimate"
+    },
+    {
+     "label": "Location",
+     "action": "Location Factors…",
+     "tip": "Location Factors"
+    },
+    {
+     "label": "Price List",
+     "action": "Import Your Own Price List…",
+     "tip": "Import Your Own Price List"
+    },
+    {
+     "label": "Cost Model",
+     "action": "Planning Cost Model…",
+     "tip": "Planning Cost Model"
+    },
+    {
+     "label": "Templates",
+     "action": "Estimate Templates…",
+     "tip": "Estimate Templates"
+    },
+    {
+     "label": "Supplier Prices",
+     "action": "Supplier Price List Import…",
+     "tip": "Supplier Price List Import"
+    },
+    {
+     "label": "Match Rates",
+     "action": "Match Rates & Price a Workbook…",
+     "tip": "Match Rates & Price a Workbook"
+    },
+    {
+     "label": "Crew Hours",
+     "action": "Crew Hours by Pay Item…",
+     "tip": "Crew Hours by Pay Item"
+    }
+   ],
+   "Calculators": [
+    {
+     "label": "Concrete",
+     "action": "Concrete Calculator…",
+     "tip": "Concrete Calculator"
+    },
+    {
+     "label": "Brick && Block",
+     "action": "Brick and Block Calculator…",
+     "tip": "Brick and Block Calculator"
+    },
+    {
+     "label": "Roofing",
+     "action": "Roofing Calculator…",
+     "tip": "Roofing Calculator"
+    },
+    {
+     "label": "Rebar",
+     "action": "Rebar Calculator…",
+     "tip": "Rebar Calculator"
+    },
+    {
+     "label": "Beam",
+     "action": "Beam and Header Calculator…",
+     "tip": "Beam and Header Calculator"
+    },
+    {
+     "label": "Column",
+     "action": "Column and Post Calculator…",
+     "tip": "Column and Post Calculator"
+    },
+    {
+     "label": "Footing",
+     "action": "Footing Size Calculator…",
+     "tip": "Footing Size Calculator"
+    },
+    {
+     "label": "Metal Studs",
+     "action": "Metal Stud Framing Calculator…",
+     "tip": "Metal Stud Framing Calculator"
+    },
+    {
+     "label": "Steel",
+     "action": "Structural Steel Calculator…",
+     "tip": "Structural Steel Calculator"
+    },
+    {
+     "label": "Earthwork",
+     "action": "Earthwork Calculator…",
+     "tip": "Earthwork Calculator"
+    },
+    {
+     "label": "Aggregate",
+     "action": "Aggregate and Asphalt Calculator…",
+     "tip": "Aggregate and Asphalt Calculator"
+    },
+    {
+     "label": "Drywall",
+     "action": "Drywall Calculator…",
+     "tip": "Drywall Calculator"
+    },
+    {
+     "label": "Paint",
+     "action": "Paint Calculator…",
+     "tip": "Paint Calculator"
+    },
+    {
+     "label": "Dates",
+     "action": "Date and Time Calculators…",
+     "tip": "Date and Time Calculators"
+    }
+   ],
+   "Bidding": [
+    {
+     "label": "Bid Tabs",
+     "action": "Bid Tabs…",
+     "tip": "Bid Tabs"
+    },
+    {
+     "label": "Board",
+     "action": "Leveling Board…",
+     "tip": "Leveling Board"
+    },
+    {
+     "label": "Leveling",
+     "action": "Bid Leveling…",
+     "tip": "Bid Leveling"
+    },
+    {
+     "label": "Scope Sheets",
+     "action": "Scope Sheets…",
+     "tip": "Scope Sheets"
+    },
+    {
+     "label": "Build-up",
+     "action": "Bid Build-up…",
+     "tip": "Bid Build-up"
+    },
+    {
+     "label": "Checklist",
+     "action": "Pre-bid Checklist…",
+     "tip": "Pre-bid Checklist"
+    },
+    {
+     "label": "Lock Bid",
+     "action": "Lock Bid Set",
+     "tip": "Lock Bid Set"
+    },
+    {
+     "label": "Revision Changes (Old → New)",
+     "action": "Revision Changes (Old → New)…",
+     "tip": "Revision Changes (Old → New)"
+    },
+    {
+     "label": "Placeholders && Allowances",
+     "action": "Placeholders & Allowances…",
+     "tip": "Placeholders & Allowances"
+    },
+    {
+     "label": "Escalation to Buy Date",
+     "action": "Escalation to Buy Date…",
+     "tip": "Escalation to Buy Date"
+    },
+    {
+     "label": "Bid Gate",
+     "action": "Bid Gate Settings…",
+     "tip": "Bid Gate Settings"
+    },
+    {
+     "label": "Award",
+     "action": "Award: Budget & Commitments in the Job…",
+     "tip": "Award: Budget & Commitments in the Job"
+    },
+    {
+     "label": "Error Check",
+     "action": "Estimate Error Check…",
+     "tip": "Estimate Error Check"
+    },
+    {
+     "label": "Bid Day",
+     "action": "Bid-Day Quote Comparison…",
+     "tip": "Bid-Day Quote Comparison"
+    },
+    {
+     "label": "Vs Actual",
+     "action": "Estimate vs Actual…",
+     "tip": "Estimate vs Actual"
+    },
+    {
+     "label": "Job Cost",
+     "action": "Job Cost Feedback (Bid vs Actual)…",
+     "tip": "Job Cost Feedback (Bid vs Actual)"
+    }
+   ],
+   "Output": [
+    {
+     "label": "Price",
+     "action": "Price These…",
+     "tip": "Price These"
+    },
+    {
+     "label": "Proposal",
+     "action": "Create Proposal…",
+     "tip": "Create Proposal"
+    },
+    {
+     "label": "Bid Form",
+     "action": "Bid Form Autopilot…",
+     "tip": "Bid Form Autopilot"
+    },
+    {
+     "label": "Workbook",
+     "action": "Bid Form Workbook…",
+     "tip": "Bid Form Workbook"
+    },
+    {
+     "label": "Builder's Risk",
+     "action": "Builder's Risk Quote Request…",
+     "tip": "Builder's Risk Quote Request"
+    },
+    {
+     "label": "Export Assembly Estimate (Excel)",
+     "action": "Export Assembly Estimate (Excel)…",
+     "tip": "Export Assembly Estimate (Excel)"
+    },
+    {
+     "label": "Export Estimate (CSV)",
+     "action": "Export Estimate (CSV)…",
+     "tip": "Export Estimate (CSV)"
+    },
+    {
+     "label": "Estimate",
+     "action": "Estimate",
+     "tip": "Prices for what you measured show up here. Measure something on the drawing, then type a unit cost in this table."
+    },
+    {
+     "label": "Export My Estimate",
+     "action": "Export My Estimate…",
+     "tip": "Export My Estimate"
+    },
+    {
+     "label": "Materials",
+     "action": "Material Order List…",
+     "tip": "Material Order List"
+    },
+    {
+     "label": "Dashboard",
+     "action": "Estimating Dashboard…",
+     "tip": "Estimating Dashboard"
+    },
+    {
+     "label": "Bid Board",
+     "action": "Bid Board…",
+     "tip": "Bid Board"
+    },
+    {
+     "label": "Sage 300",
+     "action": "Export to Sage 300 Job Cost (CSV)…",
+     "tip": "Export to Sage 300 Job Cost (CSV)\nPreview the rows, then save the import file and an undo (reversal) file next to it."
+    }
+   ],
+   "Civil Takeoff": [
+    {
+     "label": "Takeoff",
+     "action": "Civil Takeoff (Trades)…",
+     "tip": "Civil Takeoff (Trades)"
+    },
+    {
+     "label": "Notes",
+     "action": "Work Notes Takeoff…",
+     "tip": "Work Notes Takeoff"
+    },
+    {
+     "label": "Haul",
+     "action": "Haul Calculator…",
+     "tip": "Haul Calculator"
+    },
+    {
+     "label": "Aerial",
+     "action": "Aerial Photo Page…",
+     "tip": "Aerial Photo Page"
+    },
+    {
+     "label": "CivilBid",
+     "action": "Export to CivilBid (Excel)…",
+     "tip": "Export to CivilBid (Excel)"
+    }
+   ],
+   "Civil Estimate": [
+    {
+     "label": "Estimate",
+     "action": "Crew Estimate (Activities)…",
+     "tip": "Crew Estimate (Activities)"
+    },
+    {
+     "label": "Crews",
+     "action": "Crews…",
+     "tip": "Crews"
+    },
+    {
+     "label": "Equipment",
+     "action": "Equipment Rates…",
+     "tip": "Equipment Rates"
+    },
+    {
+     "label": "Library",
+     "action": "Add From Activity Library…",
+     "tip": "Add From Activity Library"
+    },
+    {
+     "label": "Estimate From Takeoff (All Groups)",
+     "action": "Estimate From Takeoff (All Groups)",
+     "tip": "Estimate From Takeoff (All Groups)"
+    },
+    {
+     "label": "Start From Master Estimate",
+     "action": "Start From Master Estimate…",
+     "tip": "Start From Master Estimate"
+    },
+    {
+     "label": "Labor Burden && Wages",
+     "action": "Labor Burden & Wages…",
+     "tip": "Labor Burden & Wages"
+    },
+    {
+     "label": "Import Prevailing Wages (Davis-Bacon)",
+     "action": "Import Prevailing Wages (Davis-Bacon)…",
+     "tip": "Import Prevailing Wages (Davis-Bacon)"
+    },
+    {
+     "label": "CivilBid Library",
+     "action": "Assembly Library (CivilBid codes)…",
+     "tip": "Assembly Library (CivilBid codes)"
+    },
+    {
+     "label": "Bind Group",
+     "action": "Bind Takeoff Group to Assembly…",
+     "tip": "Bind Takeoff Group to Assembly"
+    },
+    {
+     "label": "Insert Line",
+     "action": "Insert Assembly Line…",
+     "tip": "Insert Assembly Line"
+    },
+    {
+     "label": "Coded Summary",
+     "action": "Bid Summary (Coded Assemblies)…",
+     "tip": "Bid Summary (Coded Assemblies)"
+    },
+    {
+     "label": "Code Changes",
+     "action": "Revision Change Report…",
+     "tip": "Revision Change Report"
+    }
+   ],
+   "Civil Plan": [
+    {
+     "label": "Quotes",
+     "action": "Material & Sub Quotes…",
+     "tip": "Material & Sub Quotes"
+    },
+    {
+     "label": "Schedule",
+     "action": "Crew Schedule…",
+     "tip": "Crew Schedule"
+    },
+    {
+     "label": "Resources",
+     "action": "Resources (Hours by Class & Equipment)…",
+     "tip": "Resources (Hours by Class & Equipment)"
+    },
+    {
+     "label": "Export Cash Flow",
+     "action": "Export Cash Flow…",
+     "tip": "Export Cash Flow"
+    }
+   ],
+   "Civil Bid": [
+    {
+     "label": "Bid Schedule",
+     "action": "Owner Bid Schedule…",
+     "tip": "Owner Bid Schedule"
+    },
+    {
+     "label": "Indirects",
+     "action": "Indirects…",
+     "tip": "Indirects"
+    },
+    {
+     "label": "Versions",
+     "action": "Bid Versions…",
+     "tip": "Bid Versions"
+    },
+    {
+     "label": "Import Owner Bid Schedule",
+     "action": "Import Owner Bid Schedule…",
+     "tip": "Import Owner Bid Schedule"
+    },
+    {
+     "label": "Export Priced Bid Schedule",
+     "action": "Export Priced Bid Schedule…",
+     "tip": "Export Priced Bid Schedule"
+    },
+    {
+     "label": "Save Bid Version",
+     "action": "Save Bid Version…",
+     "tip": "Save Bid Version"
+    }
+   ],
+   "Civil Field": [
+    {
+     "label": "Time Cards",
+     "action": "Time Cards…",
+     "tip": "Time Cards"
+    },
+    {
+     "label": "Production",
+     "action": "Production History…",
+     "tip": "Production History"
+    },
+    {
+     "label": "Forecast",
+     "action": "Cost to Complete (Forecast)…",
+     "tip": "Cost to Complete (Forecast)"
+    },
+    {
+     "label": "Job Cost",
+     "action": "Civil Job Cost (Bid vs Actual)…",
+     "tip": "Civil Job Cost (Bid vs Actual)"
+    },
+    {
+     "label": "By Depth",
+     "action": "Production by Depth…",
+     "tip": "Production by Depth"
+    }
+   ]
+  },
+  "Review": {
+   "Compare": [
+    {
+     "label": "Compare",
+     "action": "Compare…",
+     "tip": "Compare  (Ctrl+Alt+C)\nShow what changed between two versions of a sheet: overlay, a list of changes, or the text."
+    },
+    {
+     "label": "Revision Log",
+     "action": "Revision Log…",
+     "tip": "Revision Log"
+    },
+    {
+     "label": "Batch Slip",
+     "action": "Batch Slip Sheet…",
+     "tip": "Batch Slip Sheet\nSwap in revised sheets across a set and keep your takeoff."
+    },
+    {
+     "label": "Audit",
+     "action": "Measurement Audit…",
+     "tip": "Measurement Audit"
+    },
+    {
+     "label": "Version History",
+     "action": "Version History…",
+     "tip": "Version History"
+    }
+   ],
+   "Automate": [
+    {
+     "label": "Auto-Markup",
+     "action": "Auto-Markup by Rules",
+     "tip": "Auto-Markup by Rules"
+    },
+    {
+     "label": "Edit Auto-Markup Rules",
+     "action": "Edit Auto-Markup Rules…",
+     "tip": "Edit Auto-Markup Rules"
+    }
+   ],
+   "AI": [
+    {
+     "label": "Find RFIs",
+     "action": "AI: Find RFIs & Questions…",
+     "tip": "AI: Find RFIs & Questions"
+    },
+    {
+     "label": "AI: Summarize",
+     "action": "AI: Summarize…",
+     "tip": "AI: Summarize"
+    },
+    {
+     "label": "AI: Spec-Check",
+     "action": "AI: Spec-Check…",
+     "tip": "AI: Spec-Check"
+    },
+    {
+     "label": "AI: Redline",
+     "action": "AI: Redline…",
+     "tip": "AI: Redline"
+    },
+    {
+     "label": "AI: Translate Markups",
+     "action": "AI: Translate Markups…",
+     "tip": "AI: Translate Markups"
+    }
+   ],
+   "RFIs": [
+    {
+     "label": "New RFI",
+     "action": "New RFI…",
+     "tip": "New RFI\nStart an RFI linked to this spot on the drawing."
+    },
+    {
+     "label": "Submittal",
+     "action": "New Submittal…",
+     "tip": "New Submittal"
+    },
+    {
+     "label": "Submittal Review Stamp",
+     "action": "Submittal Review Stamp",
+     "tip": "Submittal Review Stamp"
+    },
+    {
+     "label": "RFI / Submittal Log",
+     "action": "RFI / Submittal Log",
+     "tip": "RFIs and submittals for this job show up here. Open a PDF, then click New RFI or New Submittal."
+    }
+   ]
+  },
+  "AI": {
+   "Project": [
+    {
+     "label": "Ask",
+     "action": "Ask the Project…",
+     "tip": "Ask the Project"
+    },
+    {
+     "label": "Daily Log",
+     "action": "Draft Daily Log From Notes…",
+     "tip": "Draft Daily Log From Notes"
+    },
+    {
+     "label": "Submittal Check",
+     "action": "Check Submittal Against Spec…",
+     "tip": "Check Submittal Against Spec"
+    },
+    {
+     "label": "Risk Flags",
+     "action": "Project Risk Flags…",
+     "tip": "Project Risk Flags"
+    }
+   ],
+   "Review": [
+    {
+     "label": "Find RFIs",
+     "action": "AI: Find RFIs & Questions…",
+     "tip": "AI: Find RFIs & Questions"
+    },
+    {
+     "label": "AI: Summarize",
+     "action": "AI: Summarize…",
+     "tip": "AI: Summarize"
+    },
+    {
+     "label": "AI: Spec-Check",
+     "action": "AI: Spec-Check…",
+     "tip": "AI: Spec-Check"
+    },
+    {
+     "label": "AI: Redline",
+     "action": "AI: Redline…",
+     "tip": "AI: Redline"
+    },
+    {
+     "label": "AI: Translate Markups",
+     "action": "AI: Translate Markups…",
+     "tip": "AI: Translate Markups"
+    },
+    {
+     "label": "Make Searchable (OCR)",
+     "action": "Make Searchable (OCR)…",
+     "tip": "Make Searchable (OCR)\nRead the text on scanned pages so search and Count by Label work."
+    },
+    {
+     "label": "Spec Risk",
+     "action": "Spec Book Risk Scanner…",
+     "tip": "Spec Book Risk Scanner"
+    }
+   ],
+   "Takeoff": [
+    {
+     "label": "AI Takeoff",
+     "action": "AI Takeoff (Whole Set)…",
+     "tip": "AI Takeoff (Whole Set)"
+    },
+    {
+     "label": "Only Here",
+     "action": "Draw a Zone: Only Here",
+     "tip": "Draw a Zone: Only Here"
+    },
+    {
+     "label": "Leave Out",
+     "action": "Draw a Zone: Leave Out",
+     "tip": "Draw a Zone: Leave Out"
+    },
+    {
+     "label": "Clear Zones",
+     "action": "Clear Zones on This Page",
+     "tip": "Clear Zones on This Page"
+    },
+    {
+     "label": "Review Takeoff",
+     "action": "Auto Takeoff (Review)…",
+     "tip": "Auto Takeoff (Review)"
+    },
+    {
+     "label": "Check",
+     "action": "Check Takeoff…",
+     "tip": "Check Takeoff"
+    },
+    {
+     "label": "Trades",
+     "action": "Trade Takeoff (Pipe, Duct, Devices, Roof, Rebar, Earthwork)…",
+     "tip": "Trade Takeoff (Pipe, Duct, Devices, Roof, Rebar, Earthwork)"
+    },
+    {
+     "label": "All Rooms",
+     "action": "Auto Takeoff Rooms on This Sheet…",
+     "tip": "Auto Takeoff Rooms on This Sheet"
+    },
+    {
+     "label": "Walls && Doors",
+     "action": "Auto Takeoff Walls & Doors on This Sheet…",
+     "tip": "Auto Takeoff Walls & Doors on This Sheet"
+    },
+    {
+     "label": "Names Learned",
+     "action": "Item Names Learned…",
+     "tip": "Item Names Learned"
+    }
+   ],
+   "Schedule": [
+    {
+     "label": "Schedule From Plans",
+     "action": "Build Schedule From Plans…",
+     "tip": "Build Schedule From Plans"
+    }
+   ],
+   "Voice": [
+    {
+     "label": "Voice",
+     "action": "Voice Commands",
+     "tip": "Voice Commands"
+    }
+   ],
+   "Model": [
+    {
+     "label": "Models",
+     "action": "Local AI Models…",
+     "tip": "Local AI Models"
+    }
+   ]
+  },
+  "3D Model": {
+   "IFC Model": [
+    {
+     "label": "Model Quantities",
+     "action": "3D Model Quantities (IFC)…",
+     "tip": "3D Model Quantities (IFC)"
+    }
+   ]
+  },
+  "Project": {
+   "Schedule": [
+    {
+     "label": "Schedule From Plans",
+     "action": "Build Schedule From Plans…",
+     "tip": "Build Schedule From Plans"
+    },
+    {
+     "label": "Master Schedule",
+     "action": "Master Schedule (Sub Updates)…",
+     "tip": "Master Schedule (Sub Updates)"
+    },
+    {
+     "label": "New Schedule",
+     "action": "New Schedule…",
+     "tip": "New Schedule"
+    }
+   ],
+   "Manage": [
+    {
+     "label": "Project Center",
+     "action": "Project Center…",
+     "tip": "Project Center"
+    },
+    {
+     "label": "Scheduler",
+     "action": "Scheduler (Gantt)…",
+     "tip": "Scheduler (Gantt)"
+    },
+    {
+     "label": "Owner Report",
+     "action": "Weekly Owner Report…",
+     "tip": "Weekly Owner Report"
+    },
+    {
+     "label": "Directory",
+     "action": "Company Directory…",
+     "tip": "Company Directory"
+    },
+    {
+     "label": "Bid Invites",
+     "action": "Bid Invites Send As…",
+     "tip": "Bid Invites Send As"
+    }
+   ],
+   "Sets": [
+    {
+     "label": "Sets",
+     "action": "Sets",
+     "tip": "Every sheet in a drawing set shows up here. Start a set from your PDF files, or open a set you already saved. The buttons along the top do both."
+    },
+    {
+     "label": "Batch Slip",
+     "action": "Batch Slip Sheet…",
+     "tip": "Batch Slip Sheet\nSwap in revised sheets across a set and keep your takeoff."
+    },
+    {
+     "label": "New Set From Files",
+     "action": "New Set From Files…",
+     "tip": "New Set From Files"
+    },
+    {
+     "label": "Open Set",
+     "action": "Open Set…",
+     "tip": "Open Set"
+    },
+    {
+     "label": "Bid Download",
+     "action": "Open Bid Download (.zip) as a Job…",
+     "tip": "Open Bid Download (.zip) as a Job"
+    }
+   ],
+   "Documents": [
+    {
+     "label": "Register",
+     "action": "Drawing Register…",
+     "tip": "Drawing Register"
+    },
+    {
+     "label": "Transmittals",
+     "action": "Transmittals…",
+     "tip": "Transmittals"
+    },
+    {
+     "label": "Addenda",
+     "action": "Addenda…",
+     "tip": "Addenda"
+    },
+    {
+     "label": "New Transmittal",
+     "action": "New Transmittal…",
+     "tip": "New Transmittal"
+    },
+    {
+     "label": "Open Project Folder",
+     "action": "Open Project Folder…",
+     "tip": "Open Project Folder"
+    },
+    {
+     "label": "Submittals",
+     "action": "Submittal Log…",
+     "tip": "Submittal Log"
+    }
+   ],
+   "Field": [
+    {
+     "label": "Punch List",
+     "action": "Punch List…",
+     "tip": "Punch List"
+    },
+    {
+     "label": "Inspections",
+     "action": "Three-Phase Inspections…",
+     "tip": "Three-Phase Inspections"
+    },
+    {
+     "label": "New Punch Item",
+     "action": "New Punch Item…",
+     "tip": "New Punch Item"
+    }
+   ],
+   "Check": [
+    {
+     "label": "Code Check",
+     "action": "Code Check…",
+     "tip": "Code Check"
+    },
+    {
+     "label": "Risk Flags",
+     "action": "Project Risk Flags…",
+     "tip": "Project Risk Flags"
+    },
+    {
+     "label": "All Jobs",
+     "action": "Search Takeoff Across Jobs…",
+     "tip": "Search Takeoff Across Jobs\nFind an item in every job's takeoff."
+    }
+   ],
+   "ADA": [
+    {
+     "label": "ADA PDF",
+     "action": "ADA Standards PDF…",
+     "tip": "ADA Standards PDF"
+    },
+    {
+     "label": "Look Up",
+     "action": "ADA Standards (2010)…",
+     "tip": "ADA Standards (2010)"
+    },
+    {
+     "label": "ADA Checker",
+     "action": "ADA Checker…",
+     "tip": "ADA Checker"
+    }
+   ],
+   "Energy Code": [
+    {
+     "label": "Climate Zone",
+     "action": "Climate Zone by County…",
+     "tip": "Climate Zone by County"
+    },
+    {
+     "label": "Code Library",
+     "action": "Code Library…",
+     "tip": "Code Library"
+    },
+    {
+     "label": "Read the Energy Code Online",
+     "action": "Read the Energy Code Online…",
+     "tip": "Read the Energy Code Online"
+    }
+   ],
+   "ClaimIT": [
+    {
+     "label": "ClaimIT",
+     "action": "ClaimIT (Insurance Claim Estimate)…",
+     "tip": "ClaimIT (Insurance Claim Estimate)"
+    }
+   ],
+   "Office": [
+    {
+     "label": "Back Office",
+     "action": "QuantiSheet Back Office…",
+     "tip": "QuantiSheet Back Office"
+    }
+   ]
+  },
+  "Billing": {
+   "Contract": [
+    {
+     "label": "Contract",
+     "action": "Contract & Billing…",
+     "tip": "Contract & Billing"
+    },
+    {
+     "label": "SOV",
+     "action": "Schedule of Values…",
+     "tip": "Schedule of Values"
+    }
+   ],
+   "Changes": [
+    {
+     "label": "Change Orders",
+     "action": "Change Orders…",
+     "tip": "Change Orders"
+    },
+    {
+     "label": "Change Order From Selected Markup",
+     "action": "Change Order From Selected Markup…",
+     "tip": "Change Order From Selected Markup"
+    },
+    {
+     "label": "From Revision",
+     "action": "Change Order From Revision…",
+     "tip": "Change Order From Revision"
+    }
+   ],
+   "Payment": [
+    {
+     "label": "Pay Apps",
+     "action": "Pay Applications…",
+     "tip": "Pay Applications"
+    },
+    {
+     "label": "Waivers",
+     "action": "Lien Waivers…",
+     "tip": "Lien Waivers"
+    }
+   ]
+  },
+  "Service": {
+   "Calls": [
+    {
+     "label": "Work Order",
+     "action": "Service Work Order…",
+     "tip": "Service Work Order"
+    },
+    {
+     "label": "Dispatch",
+     "action": "Dispatch Board…",
+     "tip": "Dispatch Board"
+    },
+    {
+     "label": "T&&M Tag",
+     "action": "T&M Tag…",
+     "tip": "T&M Tag"
+    },
+    {
+     "label": "History",
+     "action": "Customer History…",
+     "tip": "Customer History"
+    }
+   ],
+   "Agreements": [
+    {
+     "label": "Agreements",
+     "action": "Service Agreements…",
+     "tip": "Service Agreements"
+    },
+    {
+     "label": "Visit Calendar",
+     "action": "Agreement Visit Calendar…",
+     "tip": "Agreement Visit Calendar"
+    },
+    {
+     "label": "Tune-ups",
+     "action": "Tune-up Planner…",
+     "tip": "Tune-up Planner"
+    },
+    {
+     "label": "Handover",
+     "action": "Build-to-Service Handover…",
+     "tip": "Build-to-Service Handover"
+    },
+    {
+     "label": "Warranty",
+     "action": "Warranty Registrations…",
+     "tip": "Warranty Registrations"
+    }
+   ],
+   "Logs & Tests": [
+    {
+     "label": "Refrigerant",
+     "action": "Refrigerant Log…",
+     "tip": "Refrigerant Log"
+    },
+    {
+     "label": "Backflow",
+     "action": "Backflow Test Report…",
+     "tip": "Backflow Test Report"
+    },
+    {
+     "label": "Checklist",
+     "action": "Maintenance Checklist…",
+     "tip": "Maintenance Checklist"
+    }
+   ],
+   "Pricing": [
+    {
+     "label": "Pricebook",
+     "action": "Flat-Rate Pricebook…",
+     "tip": "Flat-Rate Pricebook"
+    },
+    {
+     "label": "GBB Quote",
+     "action": "Good / Better / Best Quotes…",
+     "tip": "Good / Better / Best Quotes"
+    },
+    {
+     "label": "Recommend",
+     "action": "Tech Recommendations…",
+     "tip": "Tech Recommendations"
+    },
+    {
+     "label": "Truck Stock",
+     "action": "Truck Stock…",
+     "tip": "Truck Stock"
+    }
+   ],
+   "Replacement": [
+    {
+     "label": "Changeout",
+     "action": "Changeout Proposal…",
+     "tip": "Changeout Proposal"
+    },
+    {
+     "label": "Load Report",
+     "action": "Load Report…",
+     "tip": "Load Report"
+    }
+   ],
+   "Settings": [
+    {
+     "label": "Service Settings",
+     "action": "Service Settings…",
+     "tip": "Service Settings"
+    }
+   ],
+   "Records": [
+    {
+     "label": "Service Records",
+     "action": "Equipment & Service Records…",
+     "tip": "Equipment & Service Records"
+    }
+   ],
+   "Quotes": [
+    {
+     "label": "Customer Quote",
+     "action": "Customer Quote With Options…",
+     "tip": "Customer Quote With Options"
+    }
+   ]
+  },
+  "Tools": {
+   "Voice": [
+    {
+     "label": "Voice",
+     "action": "Voice Commands",
+     "tip": "Voice Commands"
+    }
+   ],
+   "Automate": [
+    {
+     "label": "Batch",
+     "action": "Action Wizard (Batch Process)…",
+     "tip": "Action Wizard (Batch Process)"
+    },
+    {
+     "label": "Macros",
+     "action": "Macros…",
+     "tip": "Macros\nRun a saved list of steps. QuantiSheet checks it first and tells you what it will change."
+    },
+    {
+     "label": "Packages",
+     "action": "Package Tracker…",
+     "tip": "Package Tracker"
+    }
+   ],
+   "Collaborate": [
+    {
+     "label": "Live",
+     "action": "Live Collaboration…",
+     "tip": "Live Collaboration"
+    },
+    {
+     "label": "Relay",
+     "action": "Start Relay (host on this computer)…",
+     "tip": "Start Relay (host on this computer)"
+    }
+   ],
+   "Settings": [
+    {
+     "label": "Commands",
+     "action": "Command Search…",
+     "tip": "Command Search  (Ctrl+K)\nType to find any command, sheet, takeoff item or RFI. Shift+Enter shows where the button lives."
+    },
+    {
+     "label": "Author Name",
+     "action": "Author Name…",
+     "tip": "Author Name"
+    },
+    {
+     "label": "Keyboard Shortcuts",
+     "action": "Keyboard Shortcuts",
+     "tip": "Keyboard Shortcuts"
+    },
+    {
+     "label": "Document Properties",
+     "action": "Document Properties…",
+     "tip": "Document Properties"
+    },
+    {
+     "label": "Shortcuts",
+     "action": "Customize Shortcuts…",
+     "tip": "Customize Shortcuts\nPick your own keys for any command."
+    },
+    {
+     "label": "Back Up",
+     "action": "Back Up My QuantiSheet Data…",
+     "tip": "Back Up My QuantiSheet Data\nSave your settings, libraries and job lists to one file."
+    },
+    {
+     "label": "Restore",
+     "action": "Restore QuantiSheet Data From a Backup…",
+     "tip": "Restore QuantiSheet Data From a Backup\nPut back a data backup. What you have now is saved first."
+    },
+    {
+     "label": "Time Log",
+     "action": "Time Log…",
+     "tip": "Time Log"
+    }
+   ]
+  },
+  "Project Analysis": {
+   "Project Analysis": [
+    {
+     "label": "Project Analysis",
+     "action": "Project Analysis…",
+     "tip": "Project Analysis"
+    },
+    {
+     "label": "Bid Terms",
+     "action": "Find Bid Terms…",
+     "tip": "Find Bid Terms"
+    },
+    {
+     "label": "Manufacturers",
+     "action": "Manufacturers in Specs…",
+     "tip": "Manufacturers in Specs"
+    },
+    {
+     "label": "Bid Checklist",
+     "action": "Bid Submittal Checklist…",
+     "tip": "Bid Submittal Checklist"
+    },
+    {
+     "label": "Ask the Project",
+     "action": "Ask the Project…",
+     "tip": "Ask the Project"
+    }
+   ]
+  },
+  "Help": {
+   "Learn": [
+    {
+     "label": "Tutorials",
+     "action": "Help Center & Tutorials…",
+     "tip": "Help Center & Tutorials"
+    },
+    {
+     "label": "Guide",
+     "action": "Features & How-To Guide (PDF)",
+     "tip": "Features & How-To Guide (PDF)"
+    },
+    {
+     "label": "Videos",
+     "action": "Video Tutorials",
+     "tip": "Video Tutorials"
+    },
+    {
+     "label": "Tour",
+     "action": "Welcome Tour",
+     "tip": "Welcome Tour\nA short walk around the screen."
+    },
+    {
+     "label": "Practice",
+     "action": "Open Practice Drawings",
+     "tip": "Open Practice Drawings"
+    },
+    {
+     "label": "Shortcuts",
+     "action": "Keyboard Shortcuts",
+     "tip": "Keyboard Shortcuts"
+    },
+    {
+     "label": "Practice Job",
+     "action": "Practice Job (10 Minutes)…",
+     "tip": "Practice Job (10 Minutes)"
+    }
+   ],
+   "About": [
+    {
+     "label": "About",
+     "action": "About QuantiSheet",
+     "tip": "About QuantiSheet"
+    },
+    {
+     "label": "Report Issue",
+     "action": "Report an Issue…",
+     "tip": "Report an Issue"
+    },
+    {
+     "label": "Terms of Service",
+     "action": "Terms of Service",
+     "tip": "Terms of Service"
+    },
+    {
+     "label": "Privacy",
+     "action": "Privacy",
+     "tip": "Privacy"
+    },
+    {
+     "label": "Third-Party Licenses",
+     "action": "Third-Party Licenses",
+     "tip": "Third-Party Licenses"
+    },
+    {
+     "label": "Support Bundle",
+     "action": "Support Bundle for IT…",
+     "tip": "Support Bundle for IT"
+    },
+    {
+     "label": "Problems",
+     "action": "Recent Problems (Log)…",
+     "tip": "Recent Problems (Log)"
+    },
+    {
+     "label": "Printer",
+     "action": "Add the QuantiSheet Printer…",
+     "tip": "Add the QuantiSheet Printer"
+    },
+    {
+     "label": "License",
+     "action": "Enter License Key…",
+     "tip": "Enter License Key"
+    }
+   ]
+  }
+ }
+}

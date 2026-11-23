@@ -6,7 +6,7 @@ number ("3" over "A-501", or "3/A-501" on one line). For each callout:
   the page's own number (its title block / its own detail titles);
 - on the target sheet the detail's title bubble (same number over the
   same sheet number) gives the exact spot, so a click lands on the detail,
-  not just the page (the PlanSwift 1.0.22 fix: "jump to the section
+  not just the page (the 1.0.22 fix: "jump to the section
   actually called out");
 - loose references ("SEE A-501") become page-level links with lower
   confidence.

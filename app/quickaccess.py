@@ -69,7 +69,8 @@ PDF_GROUPS = ("Create & Convert", "Pages", "Page Marks", "Content", "Forms",
               "Sign", "E-Sign", "Protect", "Standards")
 # left to right (Nov 5); the classic tabs fit in where they used to be
 TAB_ORDER = ("Home", "PDF Management", "Markup", "Takeoff", "Estimate",
-             "Civil", "Review", "AI", "Project", "Module", "Billing",
+             "Civil", "Review", "AI", "3D Model", "Project", "Module",
+             "Billing",
              "Service", "Pages", "Document", "Tools", "Project Analysis",
              "Help")
 S_CLASSIC = "classic_tabs"          # all 14 tabs, as before
@@ -1855,8 +1856,8 @@ def make_chip_clickable(win):
 #
 # - Takeoff keys: single keys for takeoff tools (L length, P polylength,
 #   A area, X cutout, V volume, R auto area, T trace, C count, S set scale).
-#   QuantiSheet's single keys already belong to markup tools (Bluebeam
-#   style), so this is a mode: F8 or the status-bar chip flips between
+#   QuantiSheet's single keys already belong to markup tools, so this
+#   is a mode: F8 or the status-bar chip flips between
 #   "Keys: Markup" and "Keys: Takeoff"; the displaced markup keys are
 #   parked and come back when the mode is turned off. Esc / Enter /
 #   Backspace already work in the viewer (cancel / finish / last vertex).

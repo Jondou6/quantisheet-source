@@ -1,7 +1,7 @@
 """The "QuantiSheet" printer's helper (0.12.26 - runs as you).
 
 Print from any program to the printer named "QuantiSheet" and the pages
-open in QuantiSheet as a new PDF - like "Adobe PDF" or "Microsoft Print to
+open in QuantiSheet as a new PDF - like other PDF printers ("Microsoft Print to
 PDF", without a Save dialog.
 
 How it works (no driver of our own):

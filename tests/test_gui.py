@@ -380,7 +380,7 @@ def test_freetext_edit(win):
     assert info["content"] == "Changed"
 
 
-# ---- Bluebeam-style features -------------------------------------------------------
+# ---- markup features ----------------------------------------------------
 
 def test_markups_list_status_filter_export(win, tmp_path):
     v = win._view
@@ -539,7 +539,7 @@ def test_tabs_documents_bookmarks(win, tmp_path):
     assert win.tabs.count() == 1
 
 
-# ---- Acrobat-style tools in the app ---------------------------------------------
+# ---- PDF tools in the app -------------------------------------------
 
 def test_combine_opens_new_tab(win, tmp_path):
     a, b = str(tmp_path / "a.pdf"), str(tmp_path / "b.pdf")

@@ -1,4 +1,4 @@
-"""Custom Markups List columns (Bluebeam-style), saved inside the PDF.
+"""Custom Markups List columns, saved inside the PDF.
 
 A column is text, a number, a choice from a list, or a formula. Formulas
 use the markup's measurement (Value, Length, Area, Count, Volume...) and

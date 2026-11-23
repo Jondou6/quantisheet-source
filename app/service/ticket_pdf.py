@@ -4,7 +4,7 @@ in a phone PDF app with no signal, read back into the work order.
 - Each ticket carries its own id (QS-xxxxxxxx) printed on the page, in a
   read-only field and in the PDF's keywords, so a ticket is matched to
   its work order even when the phone app drops the fields.
-- Read back from the fields when they are there (Adobe Acrobat Reader
+- Read back from the fields when they are there (PDF readers
   keeps them). A built-in viewer may flatten the form on save: then each
   value is read from the page text inside that field's own box, and
   every box that can't be read (check boxes, empty boxes) is listed for

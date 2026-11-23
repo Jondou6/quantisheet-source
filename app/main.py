@@ -523,9 +523,9 @@ def _stamp_company(pm, name=None, logo=None):
             tw = QFontMetricsF(f).horizontalAdvance(text)
             r = QRectF(w * 0.065, h * 0.437, tw + w * 0.025, h * 0.049)
             p.setPen(Qt.NoPen)
-            p.setBrush(QColor("#e3f3ea"))
+            p.setBrush(QColor("#fbeae9"))
             p.drawRoundedRect(r, r.height() / 2, r.height() / 2)
-            p.setPen(QColor("#1f7a4c"))
+            p.setPen(QColor("#a91d1d"))
             p.drawText(r, Qt.AlignCenter, text)
     finally:
         p.end()

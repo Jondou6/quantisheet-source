@@ -364,7 +364,7 @@ class _Curve(QWidget):
         series = [("cum_planned", "Planned", QColor("#2563eb"), Qt.SolidLine),
                   ("cum_forecast", "Actual + forecast", QColor("#d32f2f"),
                    Qt.SolidLine),
-                  ("cum_billed", "Billed", QColor("#2e7d32"), Qt.DashLine)]
+                  ("cum_billed", "Billed", QColor("#232b2b"), Qt.DashLine)]
         for key, _name, col, style in series:
             p.setPen(QPen(col, 2.2, style))
             prev = QPointF(L, B)

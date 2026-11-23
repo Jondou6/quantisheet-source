@@ -1,4 +1,4 @@
-"""Dialogs for the Acrobat-style tools."""
+"""Dialogs for the PDF tools."""
 from PySide6.QtWidgets import (
     QCheckBox, QComboBox, QDialog, QDialogButtonBox, QFormLayout, QGridLayout,
     QLabel, QLineEdit, QSpinBox, QVBoxLayout

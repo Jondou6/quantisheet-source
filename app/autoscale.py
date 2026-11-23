@@ -103,7 +103,7 @@ def _sparse(page):
 
 # an engineering scale as OCR leaves it: SCALE: 1"=20', SCALE 1 = 20,
 # 1 20' HORIZ. (the quote marks and = are often lost or misread)
-_CIVIL = re.compile(r"SCALE\W{0,6}1\W{0,4}=?\W{0,4}(\d{1,3}0)\b"
+_CIVIL = re.compile(r"SCALE\W{0,6}1\W{0,4}=?\W{0,4}(5|\d{1,3}0)\b"
                     r"(?=\W{0,4}(?:'|FT|FEET|HORIZ|\W|$))", re.I)
 CIVIL_FEET = (5, 10, 20, 30, 40, 50, 60, 80, 100, 200, 300, 400, 500)
 
@@ -266,9 +266,152 @@ def _snap(ppu, unit="ft"):
     return best
 
 
+ZOOM_DPI = 400
+
+
+def _ocr_clip_text(page, clip, dpi=ZOOM_DPI, psm=11):
+    """One small area of a sheet OCR'd closely, as the sheet is shown,
+    read in lines. `clip` is in the page's text coordinates. psm 6 reads
+    the area as one block (Nov 23: it keeps SCALE: 1" = 5' together where
+    the sparse-text reading, psm 11, lost the "= 5'")."""
+    import os
+    import tempfile
+    import fitz
+    from . import acrobat, ocr as ocr_mod
+    exe = ocr_mod.find_tesseract()
+    if not exe:
+        return ""
+    # the OCR layer's words sit where the sheet shows them; the sheet's
+    # own text on a turned page is in its unturned frame - try both
+    tries = [fitz.Rect(clip) & page.rect]
+    if page.rotation:
+        tries.append((fitz.Rect(clip) * page.rotation_matrix) & page.rect)
+    zoom = dpi / 72.0
+    out = []
+    for shown in tries:
+        if shown.is_empty:
+            continue
+        pix = page.get_pixmap(matrix=fitz.Matrix(zoom, zoom), clip=shown,
+                              colorspace=fitz.csGRAY, alpha=False,
+                              annots=False)
+        fd, png = tempfile.mkstemp(suffix=".png", prefix="qs_scale_")
+        os.close(fd)
+        try:
+            pix.save(png)
+            words = acrobat._tess_tile(exe, png, "eng",
+                                       acrobat.tessdata_dir(), psm=psm)
+        except Exception as e:                            # noqa: BLE001
+            log.info("close-up OCR skipped: %s", e)
+            continue
+        finally:
+            try:
+                os.remove(png)
+            except OSError:
+                pass
+        out.append(_lines_text([w for w in words if w[5] >= 40]))
+        if re.search(r"GRAPHIC|SCALE", out[-1], re.I):
+            break
+    return "\n".join(out)
+
+
+def _lines_text(words):
+    """[(x0, y0, x1, y1, text, conf)] -> text in lines, top to bottom."""
+    words = sorted(words, key=lambda w: ((w[1] + w[3]) / 2, w[0]))
+    lines, cur, cy, ch = [], [], None, 0
+    for w in words:
+        y, h = (w[1] + w[3]) / 2, max(1, w[3] - w[1])
+        if cy is not None and abs(y - cy) > 0.6 * max(h, ch):
+            lines.append(cur)
+            cur = []
+        if not cur:
+            cy, ch = y, h
+        cur.append(w)
+    if cur:
+        lines.append(cur)
+    return "\n".join(" ".join(w[4] for w in sorted(ln, key=lambda w: w[0]))
+                     for ln in lines)
+
+
+def zoom_scale(page, words=None, ocr=None):
+    """Nov 23 (a civil sheet whose SCALE: 1" = 5' and graphic scale labels
+    were too small for the whole-sheet OCR): read the area around each
+    SCALE / GRAPHIC SCALE word again, close up. (label, ppu, unit) or
+    None. `ocr(page, clip) -> text` for tests."""
+    import fitz
+    if words is None:
+        words = page.get_text("words")
+    ocr = ocr or _ocr_clip_text
+    # only where a graphic scale is drawn (a detail sheet's many SCALE
+    # words aren't worth a close look each)
+    if not any(str(w[4]).upper().startswith("GRAPHIC") for w in words):
+        return None
+    words = [w for w in words if str(w[4]).upper().startswith("GRAPHIC")]
+    boxes = []
+    for w in words:
+        t = str(w[4]).upper()
+        if not (t.startswith("SCALE") or t.startswith("GRAPHIC")):
+            continue
+        h = max(4.0, w[3] - w[1])
+        b = fitz.Rect(w[0] - 12 * h, w[1] - 6 * h, w[2] + 24 * h,
+                      w[3] + 6 * h)
+        for i, o in enumerate(boxes):
+            if b.intersects(o):
+                boxes[i] = o | b
+                break
+        else:
+            boxes.append(b)
+    if ocr is _ocr_clip_text:
+        tries = [lambda b: _ocr_clip_text(page, b, ZOOM_DPI, psm=6),
+                 lambda b: _ocr_clip_text(page, b, ZOOM_DPI),
+                 lambda b: _ocr_clip_text(page, b, 600),
+                 lambda b: _ocr_clip_text(page, b, 600, psm=6)]
+    else:
+        tries = [lambda b: ocr(page, b), lambda b: ocr(page, b, 600)]
+    arch, part = [], []       # architectural scales read close up
+    for b in boxes[:6]:
+        for read in tries:
+            text = read(b) or ""
+            full = [f[:3] for f in takeoff._find(text)
+                    if f[3] and f[2] == "ft" and "'-0" in f[0]
+                    and takeoff.is_standard(f[1], f[2])]
+            arch += full
+            if not full:
+                # 'SCALE: 1/2" =' with the 1'-0" lost backs up a full read
+                part += _ZOOM_PART.findall(text.translate(takeoff._QUOTES))
+            # close up, a scale needs its "=" ('SCALE: 1" 10' with the
+            # "= 5'" lost is not 1" = 10'), and the graphic labels, when
+            # read, must agree with it
+            m = _ZOOM_CIVIL.search(text)
+            civ = (f'1" = {m.group(1)}\'', 72.0 / int(m.group(1)), "ft") \
+                if m and int(m.group(1)) in CIVIL_FEET else None
+            gl = graphic_labels(text.split("GRAPHIC")[0]
+                                if "GRAPHIC" in text.upper() else text)
+            if civ and gl and abs(gl[1] - civ[1]) > 1e-9:
+                break                 # they disagree: no scale from here
+            if civ or gl:
+                return civ or gl
+    # Nov 23 (D01.10: 1/2" = 1'-0" over a bar labelled 0 2 4 in feet): an
+    # architectural scale needs two readings of it and none of another
+    # (or one, and its inches again where the rest was lost)
+    labels = {a[0] for a in arch}
+    if len(labels) == 1:
+        inch = arch[0][0].split('"')[0]
+        if all(p == inch for p in part) and \
+                len(arch) + (len(part) if "/" in inch else 0) >= 2:
+            return arch[0]
+    return None
+
+
+_ZOOM_PART = re.compile(r"SCALE\W{0,3}(\d{1,2}/\d{1,2})\s*\"\s*=?\s*$", re.M)
+
+
+_ZOOM_CIVIL = re.compile(r"SCALE\W{0,4}1\W{0,3}=\W{0,3}(5|\d{1,3}0)\b",
+                         re.I)
+
+
 def detect(doc, pages=None, use_ocr=True, progress=None):
     """One row per page: {page, label, ppu, unit, source ('text', 'ocr',
-    'dimensions' or ''), existing (ppu already set or None), dims {ppu, n,
+    'civil', 'graphic', 'close-up', 'dimensions' or ''), existing (ppu already set or None), dims {ppu, n,
     agree}, status ('ok', 'check', 'none'), note}."""
     from . import sheets
     have = annotate.read_scales(doc)
@@ -321,6 +464,10 @@ def detect(doc, pages=None, use_ocr=True, progress=None):
                 found = [c for c in map(graphic_labels, near_graphic) if c]
                 if found:
                     sc, src = min(found, key=lambda c: -c[1]), "graphic"
+        if sc is None and has_text and use_ocr:
+            civ = zoom_scale(page)
+            if civ:
+                sc, src = civ, "close-up"
         if sc is None and info.get("odd"):
             note = f"odd scale written: {info['odd'][0]} - pick it if right"
         nts = sc is None and bool(NTS.search(text))
@@ -371,6 +518,11 @@ def detect(doc, pages=None, use_ocr=True, progress=None):
                 row["note"] = ("read from the graphic scale's labels (first "
                                "division taken as 1\") - check it against "
                                "the bar or a known dimension")
+            elif src == "close-up" and not agree:
+                row["status"] = "check"
+                row["note"] = ("read close up beside the graphic scale (OCR)"
+                               " - check it against the bar or a known "
+                               "dimension")
             elif src == "ocr" and not agree:
                 row["status"] = "check"
                 row["note"] = ("read by OCR - spot-check it (OCR can misread "

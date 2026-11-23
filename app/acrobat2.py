@@ -1,4 +1,4 @@
-"""More Acrobat-style tools: Create PDF (Office, text, HTML, images),
+"""More PDF tools: Create PDF (Office, text, HTML, images),
 split / replace / duplicate pages, visual compare, PowerPoint & HTML
 export, sanitize & properties, and batch processing (Action Wizard)."""
 import html as html_mod

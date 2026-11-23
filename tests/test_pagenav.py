@@ -1,4 +1,4 @@
-"""Acrobat-style page bar and pages drawn ahead for instant page turns."""
+"""The page bar and pages drawn ahead for instant page turns."""
 import os
 
 import fitz

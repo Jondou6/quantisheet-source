@@ -1,4 +1,4 @@
-"""Accessibility check (Document > Accessibility Check), Acrobat-style.
+"""Accessibility check (Document > Accessibility Check).
 
 Checks what can be judged from the file and fixes what can be fixed
 safely - including tagging the structure (autotag.py); says plainly what

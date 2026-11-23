@@ -1,4 +1,4 @@
-"""Heavy civil estimating (HeavyBid-style): crews and production rates.
+"""Heavy civil estimating: crews and production rates.
 
 You estimate an activity ("8 in sewer, 6-10 ft deep") by the crew that
 builds it and how fast: crew hours = quantity / production rate, and the

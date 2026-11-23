@@ -12,7 +12,7 @@ from PySide6.QtWidgets import (QComboBox, QDialog, QDialogButtonBox,
 
 from . import fillsign as F, settings
 
-BG = {F.READY: "#cdf0cd", F.UNSURE: "#fff1bd", F.NEVER: "#ffcdcd",
+BG = {F.READY: "#eef1f1", F.UNSURE: "#fff1bd", F.NEVER: "#ffcdcd",
       F.SIGN: "#c8e6ff", F.BLANK: "#eeeeee", F.HAS: "#eeeeee"}
 C_TICK, C_FIELD, C_VALUE, C_SRC, C_STATUS, C_PAGE = range(6)
 OURS = "Our company"

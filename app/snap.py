@@ -1,4 +1,4 @@
-"""Snap to content, like Bluebeam: while drawing or measuring, the cursor
+"""Snap to content: while drawing or measuring, the cursor
 jumps to line ends, corners, intersections, midpoints and onto lines in the
 drawing (and to the points of existing markups).
 

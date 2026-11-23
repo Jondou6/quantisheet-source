@@ -1,4 +1,4 @@
-__version__ = "1.1.25"
+__version__ = "1.1.29"
 
 
 # Money rounds half up everywhere, the way an estimator rounds by hand:
