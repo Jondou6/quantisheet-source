@@ -1,0 +1,5 @@
+QuantiSheet 1.1.33
+- Send with QuantiLink is also in the export windows: Export My Estimate (as PDF or Excel) and Bid Summary (Excel) send the export to your office's QuantiLink and show a share link to copy into an email.
+- Send with QuantiLink: a wrong office key now says so plainly, and the temporary copies made for sending are removed afterwards. Tested against a real QuantiLink server.
+- Auto Scale: fewer false 'check' warnings on detail sheets - a view's own scale note (SCALE: 1/2" = 1'-0") is no longer read as a dimension, and one repeated note is no longer taken as a measured dimension.
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.33 - the full source of this build. Help > About shows the same link.

@@ -150,7 +150,8 @@ def test_folders_upload_and_share_link(server, no_policy):
 
 
 def test_errors_are_plain_messages(server, no_policy):
-    with pytest.raises(ql.QuantiLinkError, match="Bad key"):
+    with pytest.raises(ql.QuantiLinkError,
+                       match="didn't accept the office key"):
         ql.Client(server.url, "qlt_wrong").spaces()
     server.fail["P/RFIs/big.pdf"] = (507, "Storage is full (made-up).")
     with pytest.raises(ql.QuantiLinkError, match="Storage is full"):
@@ -181,6 +182,9 @@ def test_send_records_and_attachments(server, no_policy, tmp_path):
     space, path, body = list(server.files.values())[0]
     assert space == "s2" and path.startswith("Example Clinic/RFIs/RFI ")
     assert body.startswith(b"%PDF")
+    ql.cleanup(items)
+    assert not os.path.exists(items[0][0])           # the printed PDF
+    assert os.path.exists(items[1][0])               # the project's file
     text = ql.links_text(res, 3)
     assert res[0]["link"] in text and "3 days" in text
     assert "held" not in text
@@ -279,3 +283,57 @@ def test_connection_window_lists_folders_it_can_send_to(qapp, server,
                         lambda **kw: saved.update(kw))
     d.save()
     assert saved["key"] == KEY and saved["space"]["id"] in ("s1", "s2")
+
+
+def test_export_windows_send_a_saved_export(qapp, server, no_policy,
+                                            tmp_path, monkeypatch):
+    """Jon, Nov 24: Send with QuantiLink in the estimate and bid summary
+    export windows - the export is saved to a temp folder, sent, and its
+    link shown; the temp copy is removed."""
+    from app import quantilink_ui
+    monkeypatch.setattr(ql, "connection", lambda: {
+        "url": server.url, "key": KEY, "space": {"id": "s2", "name":
+                                                  "Estimating"},
+        "days": 7, "it": False})
+    seen = {}
+
+    def save(folder):
+        p = os.path.join(folder, "Estimate - Example Clinic.pdf")
+        with open(p, "wb") as f:
+            f.write(b"%PDF-1.4 made-up estimate")
+        seen["path"] = p
+        return p
+    res = quantilink_ui.send_saved_file(None, save, "Estimates",
+                                        "Example Clinic", show=False)
+    assert res["link"].startswith(server.url + "/s/")
+    space, path, body = list(server.files.values())[-1]
+    assert path == "Example Clinic/Estimates/Estimate - Example Clinic.pdf"
+    assert body == b"%PDF-1.4 made-up estimate"
+    assert not os.path.exists(seen["path"])          # temp copy removed
+    assert quantilink_ui.send_saved_file(None, lambda d: None, "Estimates",
+                                         "X", show=False) is None
+    # the estimate export window has the button, with PDF and Excel
+    from app.estimate_ui import ExportEstimateDialog
+    d = ExportEstimateDialog(None)
+    assert d.ql_btn is not None and d.ql_btn.menu() is not None
+    assert [a.text() for a in d.ql_btn.menu().actions()] == ["PDF", "Excel"]
+    assert not d.ql_btn.isEnabled()                  # no drawing open
+    d.close()
+    import inspect
+    from app import costlayer_ui
+    src = inspect.getsource(costlayer_ui.SummaryDialog)
+    assert "Send with QuantiLink" in src and '"Bid Summaries"' in src
+
+
+def test_no_export_button_when_it_turned_quantilink_off(qapp, monkeypatch):
+    monkeypatch.setattr(policy, "_from_registry",
+                        lambda: {"DisableQuantiLink": 1})
+    policy.reload()
+    try:
+        from app.estimate_ui import ExportEstimateDialog
+        d = ExportEstimateDialog(None)
+        assert d.ql_btn is None
+        d.close()
+    finally:
+        monkeypatch.setattr(policy, "_from_registry", lambda: {})
+        policy.reload()

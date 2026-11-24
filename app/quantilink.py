@@ -169,6 +169,8 @@ class Client:
             data = {}
         if status >= 400 or (isinstance(data, dict) and data.get("error")):
             msg = data.get("error") if isinstance(data, dict) else None
+            if status == 401:                    # "Not signed in" etc.
+                msg = None
             if not isinstance(msg, str) or not msg.strip():
                 msg = _STATUS.get(status, f"QuantiLink answered with an "
                                           f"error ({status}).")
@@ -230,6 +232,18 @@ def remote_path(project, kind, name):
     """<Project>/<RFIs>/<file> on QuantiLink."""
     return "/".join((clean_part(project), clean_part(KINDS.get(kind, kind)),
                      clean_part(name, 120)))
+
+
+def send_file(client, space, project, folder, path, days=DAYS,
+              name=None):
+    """One saved file (an estimate or bid summary export) to
+    <project>/<folder>/<name> and its share link."""
+    name = clean_part(name or os.path.basename(path), 120)
+    with open(path, "rb") as f:
+        data = f.read()
+    got = client.upload(space, "/".join((clean_part(project),
+                                         clean_part(folder), name)), data)
+    return {"name": name, "link": client.share(got["id"], days)}
 
 
 def record_label(kind, rec):
@@ -297,6 +311,21 @@ def send(client, space, project, kind, items, days=DAYS, progress=None):
     if progress:
         progress(n, n, "")
     return out
+
+
+def cleanup(items):
+    """Remove the record PDFs gather() printed to temp folders (never the
+    project's own attachments)."""
+    import shutil
+    import tempfile
+    tmp = os.path.realpath(tempfile.gettempdir())
+    for path, _name in items:
+        if not path:
+            continue
+        d = os.path.dirname(os.path.realpath(path))
+        if os.path.basename(d).startswith("quantisheet-") and \
+                os.path.dirname(d) == tmp:
+            shutil.rmtree(d, ignore_errors=True)
 
 
 def links_text(results, days=DAYS):

@@ -83,10 +83,30 @@ def _segments(page):
     return segs
 
 
+def _in_scale_note(words, i):
+    """True when words[i] is the 1'-0" of a scale note (SCALE: 1/2" =
+    1'-0"), not a dimension: an "=" or SCALE just before it on its line
+    (Nov 24: a test set's A-401 has twelve views, each with its scale
+    note, and their twelve 1'-0" said 377 pt/ft)."""
+    w = words[i]
+    if len(w) < 7:
+        return False
+    for j in range(i - 1, max(-1, i - 5), -1):
+        p = words[j]
+        if len(p) < 7 or (p[5], p[6]) != (w[5], w[6]):
+            break
+        t = str(p[4]).upper()
+        if t.endswith("=") or "SCALE" in t:
+            return True
+    return False
+
+
 def _dimension_words(words):
     """(feet, cx, cy) of every dimension string (24'-0") on the page."""
     out = []
-    for w in words:
+    for i, w in enumerate(words):
+        if _in_scale_note(words, i):
+            continue
         got = takeoff.parse_length(w[4])
         if not got or got[1] != "ft" or got[0] < MIN_DIM_FT:
             continue
@@ -204,7 +224,7 @@ def dimension_scale(page, words=None):
     if words is None:
         words = page.get_text("words")
     dims = _dimension_words(words)
-    vals = []
+    vals, feet = [], []
     if dims:
         segs = _segments(page)
         # horizontal lines by height, vertical lines by x; keep each line's
@@ -241,19 +261,26 @@ def dimension_scale(page, words=None):
                                       (a[1] - b[1]) ** 2) ** 0.5)
             if best and best[2]:
                 vals.append(best[2] / ft)
+                feet.append(ft)
     if len(vals) < 2:
         return {"ppu": None, "n": len(vals), "values": vals}
     # densest cluster (dimension strings pick up stray lines; the real
     # scale is the value most of them agree on)
     best = []
     for v in vals:
-        close = [x for x in vals if abs(x / v - 1) <= AGREE_TOL]
+        close = [i for i, x in enumerate(vals) if abs(x / v - 1) <= AGREE_TOL]
         if len(close) > len(best):
             best = close
     need = 2 if len(vals) <= 3 else max(3, int(0.2 * len(vals)))
     if len(best) < need:
         return {"ppu": None, "n": len(best), "values": vals}
-    return {"ppu": statistics.median(best), "n": len(best), "values": vals}
+    # Nov 24 (a test set's A-201: four 1'-0" notes beside one long line
+    # said 377 pt/ft): a small cluster where every string is the same
+    # length is one repeated note, not a measured plan - not evidence
+    if len(best) < 5 and len({round(feet[i], 3) for i in best}) < 2:
+        return {"ppu": None, "n": len(best), "values": vals}
+    return {"ppu": statistics.median(vals[i] for i in best),
+            "n": len(best), "values": vals}
 
 
 def _snap(ppu, unit="ft"):

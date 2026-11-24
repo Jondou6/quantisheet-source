@@ -267,6 +267,13 @@ class SummaryDialog(QDialog):
         bb = QDialogButtonBox()
         self.export_btn = bb.addButton("Export…", QDialogButtonBox.ActionRole)
         self.export_btn.clicked.connect(lambda: self.export())
+        # Send with QuantiLink (Jon, Nov 24: in the export windows)
+        from . import policy
+        self.ql_btn = None
+        if policy.allowed("quantilink"):
+            self.ql_btn = bb.addButton("Send with QuantiLink…",
+                                       QDialogButtonBox.ActionRole)
+            self.ql_btn.clicked.connect(lambda: self.send_quantilink())
         save = bb.addButton("Save to Job", QDialogButtonBox.AcceptRole)
         save.clicked.connect(self.save)
         bb.addButton(QDialogButtonBox.Close).clicked.connect(self.reject)
@@ -348,6 +355,21 @@ class SummaryDialog(QDialog):
             if not path:
                 return None
         return cost_rollup.export(path, r)
+
+
+    def _save_to(self, folder):
+        """The bid summary saved into `folder` as Excel (for QuantiLink)."""
+        path = os.path.join(folder, report_file_name(
+            "Bid Summary", os.path.splitext(os.path.basename(
+                getattr(self.doc, "name", "") or ""))[0], ext=".xlsx"))
+        return self.export(path)
+
+    def send_quantilink(self, show=True, opener=None):
+        from . import quantilink_ui
+        return quantilink_ui.send_saved_file(
+            self, self._save_to, "Bid Summaries",
+            quantilink_ui.project_name(self.mw, self.doc), show=show,
+            opener=opener)
 
 
 def summary_dialog(mw, show=True):

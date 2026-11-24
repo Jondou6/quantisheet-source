@@ -587,6 +587,15 @@ class ExportEstimateDialog(QDialog):
             b.clicked.connect(lambda _c=False, f=fn: f())
             b.setEnabled(doc is not None)
             btns.addWidget(b)
+        # Send with QuantiLink (Jon, Nov 24: in the export windows)
+        from . import quantilink_ui
+        self.ql_btn = quantilink_ui.add_send_button(
+            btns, self, [("PDF", lambda d: self._save_to(d, ".pdf")),
+                         ("Excel", lambda d: self._save_to(d, ".xlsx"))],
+            "Estimates", lambda: quantilink_ui.project_name(
+                self.parent(), self.doc))
+        if self.ql_btn is not None:
+            self.ql_btn.setEnabled(doc is not None)
         btns.addStretch()
         close = QPushButton("Close")
         close.clicked.connect(self.accept)
@@ -739,6 +748,16 @@ class ExportEstimateDialog(QDialog):
                                 f"{e}")
             return None
         return path
+
+    def _save_to(self, folder, ext):
+        """The export saved into `folder` (for Send with QuantiLink)."""
+        from .reportname import report_file_name
+        base = os.path.splitext(os.path.basename(getattr(self.doc, "name",
+                                                         "") or ""))[0]
+        path = os.path.join(folder, report_file_name("Estimate", base,
+                                                     ext=ext))
+        fn = {".pdf": "save_pdf", ".xlsx": "save_xlsx"}[ext]
+        return self._save(fn, path)
 
     def save_pdf(self, path=None):
         if self.doc is None:

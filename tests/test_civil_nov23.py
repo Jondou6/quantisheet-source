@@ -137,3 +137,59 @@ def test_civil_scale_of_five_feet():
     from app import autoscale as asc
     assert asc.civil_scale("SCALE: 1\" = 5'")[0] == "1\" = 5'"
     assert asc.civil_scale("SCALE: 1/2\" = 1'-0\"") is None
+
+
+def test_repeated_same_note_is_not_dimension_evidence():
+    """Nov 24 (a test set's A-201): four 1'-0" notes beside one long line
+    each said 377 pt/ft against a written 1/4" = 1'-0" - one repeated note,
+    not measured dimensions, so no 'check' from them."""
+    import fitz
+    from app import autoscale
+    d = fitz.open()
+    pg = d.new_page(width=1728, height=1152)
+    pg.insert_text((1350, 1080), "A-201  ELEVATIONS", fontsize=14)
+    pg.insert_text((1350, 1110), 'SCALE: 1/4" = 1\'-0"', fontsize=14)
+    for y in (200, 400, 600, 800):
+        pg.draw_line((100, y), (477, y), width=0.5)
+        pg.insert_text((270, y - 4), "1'-0\"", fontsize=9)
+    r = autoscale.detect(d)[0]
+    assert r["ppu"] == 18.0 and r["dims"]["ppu"] is None
+    assert r["status"] == "ok"
+    # different lengths that agree are still evidence
+    r2 = autoscale.dimension_scale(_two_dims_page())
+    assert r2["ppu"] and abs(r2["ppu"] - 18.0) < 0.5
+
+
+def _two_dims_page():
+    import fitz
+    d = fitz.open()
+    pg = d.new_page(width=1728, height=1152)
+    for i, ft in enumerate((24, 12, 30)):
+        y = 200 + i * 150
+        pg.draw_line((100, y), (100 + ft * 18.0, y), width=0.5)
+        pg.insert_text((100 + ft * 9 - 15, y - 4), f"{ft}'-0\"", fontsize=9)
+    return pg
+
+
+def test_scale_note_feet_are_not_dimensions():
+    """Nov 24 (a test set's A-401): the 1'-0" of each view's SCALE: 1/2" =
+    1'-0" note was read as a dimension string."""
+    import fitz
+    from app import autoscale
+    d = fitz.open()
+    pg = d.new_page(width=1728, height=1152)
+    pg.insert_text((1350, 1080), "A-401  DETAILS", fontsize=14)
+    for i, y in enumerate((200, 450, 700, 950)):
+        pg.draw_line((100, y + 20), (600, y + 20), width=0.5)
+        pg.insert_text((100, y), f"DETAIL {i + 1}   SCALE: 1/2\" = 1'-0\"",
+                       fontsize=9)
+    for i, ft in enumerate((2, 3, 4)):
+        y = 250 + i * 150
+        pg.draw_line((900, y), (900 + ft * 36.0, y), width=0.5)
+        pg.insert_text((900 + ft * 18 - 12, y - 4), f"{ft}'-0\"", fontsize=9)
+    words = pg.get_text("words")
+    feet = sorted(f for f, _x, _y in autoscale._dimension_words(words))
+    assert feet == [2.0, 3.0, 4.0]
+    r = autoscale.detect(d)[0]
+    assert r["ppu"] == 36.0 and r["dims"]["agree"] is not False
+    assert r["status"] == "ok"

@@ -275,11 +275,12 @@ class SendDialog(QDialog):
 
         def work():
             try:
-                state["done"] = ql.send(client, c["space"]["id"],
-                                        self.store.name, kind, items, days,
-                                        progress)
+                done = ql.send(client, c["space"]["id"], self.store.name,
+                               kind, items, days, progress)
             except Exception as e:                        # noqa: BLE001
-                state["done"] = [{"name": "", "error": str(e)}]
+                done = [{"name": "", "error": str(e)}]
+            ql.cleanup(items)
+            state["done"] = done
         self.send_btn.setEnabled(False)
         self.status.setText(f"Sending {len(items)} file(s)…")
         if wait:
@@ -324,6 +325,119 @@ class SendDialog(QDialog):
         if text:
             QGuiApplication.clipboard().setText(text)
             self.status.setText("Links copied.")
+
+
+def project_name(win, doc=None):
+    """The job's name when the drawing is in a Project Center job, else
+    the drawing's file name."""
+    import os
+    try:
+        st = win._job_store() if win is not None and \
+            hasattr(win, "_job_store") else None
+    except Exception:                                     # noqa: BLE001
+        st = None
+    if st is not None:
+        return st.name
+    name = os.path.basename(getattr(doc, "name", "") or "") if doc else ""
+    return os.path.splitext(name)[0] or "QuantiSheet"
+
+
+class LinkDialog(QDialog):
+    """The share link for one sent file, with Copy."""
+
+    def __init__(self, parent, result, days):
+        super().__init__(parent)
+        self.setWindowTitle("Sent with QuantiLink")
+        self.resize(560, 200)
+        v = QVBoxLayout(self)
+        self.text = ql.links_text([result], days) if result.get("link") \
+            else f"Not sent: {result.get('error')}"
+        lab = QLabel(("Sent. Paste this into your email:" if
+                      result.get("link") else "Couldn't send the file."))
+        v.addWidget(lab)
+        box = QPlainTextEdit(self.text)
+        box.setReadOnly(True)
+        v.addWidget(box)
+        bb = QDialogButtonBox()
+        if result.get("link"):
+            cp = bb.addButton("Copy Link", QDialogButtonBox.ActionRole)
+            cp.clicked.connect(lambda: QGuiApplication.clipboard().setText(
+                self.text))
+        bb.addButton(QDialogButtonBox.Close).clicked.connect(self.reject)
+        v.addWidget(bb)
+
+
+def send_saved_file(parent, save, folder, project, show=True, opener=None,
+                    days=None):
+    """Export windows (Jon, Nov 24: 'Export windows'): save(path) writes the
+    export to a temp file, which goes to <project>/<folder> on QuantiLink;
+    the link is shown with Copy. Returns the result dict, or None when
+    nothing was sent (QuantiLink off, not set up, nothing saved)."""
+    import os
+    import shutil
+    import tempfile
+    from . import policy
+    if not policy.allowed("quantilink"):
+        return None
+    c = ql.connection()
+    if not (c["url"] and c["key"] and c["space"].get("id")):
+        if not show:
+            return None
+        d = ConnectionDialog(parent, opener=opener)
+        if not d.exec():
+            return None
+        c = ql.connection()
+        if not (c["url"] and c["key"] and c["space"].get("id")):
+            return None
+    days = days or c["days"]
+    tmp = tempfile.mkdtemp(prefix="quantisheet-")
+    try:
+        path = save(tmp)
+        if not path or not os.path.isfile(path):
+            return None
+        try:
+            QGuiApplication.setOverrideCursor(Qt.WaitCursor)
+            client = ql.Client(c["url"], c["key"], opener=opener)
+            res = ql.send_file(client, c["space"]["id"], project, folder,
+                               path, days)
+        except Exception as e:                            # noqa: BLE001
+            res = {"name": os.path.basename(path), "error": str(e)}
+        finally:
+            QGuiApplication.restoreOverrideCursor()
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+    if show:
+        LinkDialog(parent, res, days).exec()
+    return res
+
+
+def add_send_button(layout, parent, choices, folder, project_fn,
+                    before=None):
+    """A 'Send with QuantiLink' button in an export window's button row
+    (hidden when IT turned QuantiLink off). choices: [(label, save)] -
+    one choice sends at once, several open a small menu (PDF / Excel)."""
+    from PySide6.QtWidgets import QMenu
+    from . import policy
+    if not policy.allowed("quantilink"):
+        return None
+    b = QPushButton("Send with QuantiLink…")
+    b.setToolTip("Save this export and send it to your office's QuantiLink "
+                 "server, with a share link back for an email")
+
+    def go(save):
+        return send_saved_file(parent, save, folder, project_fn())
+    if len(choices) == 1:
+        b.clicked.connect(lambda: go(choices[0][1]))
+    else:
+        m = QMenu(b)
+        for label, save in choices:
+            m.addAction(label, lambda s=save: go(s))
+        b.setMenu(m)
+    if before is None:
+        layout.addWidget(b)
+    else:
+        layout.insertWidget(before, b)
+    return b
 
 
 def open_send(win, store=None, show=True, opener=None):
