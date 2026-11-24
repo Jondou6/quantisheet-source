@@ -304,28 +304,32 @@ def test_start_cards_never_cut_off_their_text(qapp):
     page.close()
 
 
-def test_splash_shows_only_this_computers_company(qapp, tmp_path,
-                                                  monkeypatch):
-    """Nov 3 (Jon): the shipped splash has no company on it; the company
-    saved on this computer (proposal company details) is drawn on it."""
+def test_splash_shows_no_company(qapp, tmp_path, monkeypatch):
+    """Nov 24 (Jon): the company saved for proposals is not drawn on the
+    splash any more - the splash is the same picture for everyone."""
     from PySide6.QtGui import QColor, QImage, QPixmap
     from app import main, settings
-    pm = QPixmap(1200, 700)
-    pm.fill(QColor("white"))
-    monkeypatch.setattr(settings, "get", lambda k, d=None: {} if k ==
-                        "company" else d)
-    assert main.splash_company() == ("", "")
-    before = pm.toImage().copy()
-    main._stamp_company(pm)
-    assert pm.toImage() == before                    # nothing drawn
     logo = str(tmp_path / "logo.png")
     img = QImage(200, 80, QImage.Format_RGB32)
     img.fill(QColor(20, 90, 40))
     img.save(logo)
     monkeypatch.setattr(settings, "get", lambda k, d=None: {
         "name": "Test Builders", "logo": logo} if k == "company" else d)
-    assert main.splash_company() == ("Test Builders", logo)
-    main._stamp_company(pm)
-    out = pm.toImage()
-    assert out.pixelColor(100, 90).green() < 150     # the logo
-    assert out.pixelColor(80, 320) != QColor("white")  # the "by" label
+    assert not hasattr(main, "_stamp_company")
+    shown = []
+
+    class FakeSplash:
+        def __init__(self, pm):
+            shown.append(pm.toImage())
+
+        def show(self):
+            pass
+    monkeypatch.setattr(main, "QSplashScreen", FakeSplash)
+    main._show_splash(qapp)
+    path = main.os.path.join(main.os.path.dirname(main.os.path.dirname(
+        main.os.path.abspath(main.__file__))), "splash.png")
+    if shown and main.os.path.isfile(path):
+        ref = QPixmap(path).toImage()
+        # where the logo and the "by <company>" label used to go: untouched
+        for x, y in ((100, 90), (80, 320), (150, 120)):
+            assert shown[0].pixelColor(x, y) == ref.pixelColor(x, y)

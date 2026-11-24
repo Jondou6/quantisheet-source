@@ -281,7 +281,7 @@ def _invite_html(project, pkg, due, link, sender):
                'invited to bid on this project. Will you be bidding?</p>'
                '<table width="100%" cellpadding="0" cellspacing="0" align="center" '
                'style="max-width:390px"><tr>'
-               + _btn(_intent(link, "yes"), "Yes", "#bd2322", 120)
+               + _btn(_intent(link, "yes"), "Yes", "#28a745", 120)
                + _btn(_intent(link, "no"), "No", "#d93a2b", 120)
                + _btn(_intent(link, "unsure"), "Unsure", "#F4C430", 120,
                       "#1f1f1f")

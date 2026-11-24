@@ -154,6 +154,9 @@ Users can't change these inside the program. `LicenseKey`, `AcceptAgreement` and
 | `DisableDocuSign` | on/off | No DocuSign requests (QuantiSheet's own signing still works). |
 | `DisableDropbox` | on/off | No Dropbox open and save (File > Open from Dropbox, Save to Dropbox). |
 | `DropboxAppKey` | text | The App key of the company's Dropbox app, so users only sign in (see "Dropbox" below). Not a secret; the App secret is never needed. |
+| `DisableQuantiLink` | on/off | No Send with QuantiLink (Home tab). |
+| `QuantiLinkURL` | text | The office's QuantiLink server, e.g. `https://files.example.com` (https required). |
+| `QuantiLinkKey` | text | The office's shared QuantiLink access key (`qlt_...`). With `QuantiLinkURL` set too, users can't change the connection. Left out of support bundles. |
 | `DisableAI` | on/off | Local AI features off. |
 | `DisableUpdateCheck` | on/off | No daily update check: the team copy's check for a newer version, and the Microsoft Store copy's reminder when the Store has an update waiting (the Store does the install). |
 | `DisablePackageStatus` | on/off | No live package status (Package Tracker > Check Status). |
@@ -164,7 +167,7 @@ Every setting is read from the same registry keys, so Group Policy works the sam
 
 | Setting | Setup copy (team / tester) | Microsoft Store copy |
 |---|---|---|
-| `LicenseKey`, `SkipEmailSignIn`, `PriceDatabasePath`, `RelayURL`, `RelayToken`, `DisableAI`, `AIHost`, `OfflineMode`, `DisableAerial`, `DisableWeather`, `DisableRateLookup`, `DisableDocuSign`, `DisableDropbox`, `DropboxAppKey`, `DisablePackageStatus`, `LogDirectory` | Yes | Yes |
+| `LicenseKey`, `SkipEmailSignIn`, `PriceDatabasePath`, `RelayURL`, `RelayToken`, `DisableAI`, `AIHost`, `OfflineMode`, `DisableAerial`, `DisableWeather`, `DisableRateLookup`, `DisableDocuSign`, `DisableDropbox`, `DropboxAppKey`, `DisableQuantiLink`, `QuantiLinkURL`, `QuantiLinkKey`, `DisablePackageStatus`, `LogDirectory` | Yes | Yes |
 | `DisableUpdateCheck` | Turns off the signed daily check | Turns off the Store-update reminder |
 | Right-click actions in File Explorer | Setup option "Add QuantiSheet actions to the right-click menu" | PDFs only: Open in QuantiSheet, Reduce size. Convert to PDF and Combine PDFs (folders) need the setup copy |
 | "QuantiSheet" printer | Setup option | Switch on "QuantiSheet Printer" in Settings > Apps > Startup |
@@ -184,6 +187,7 @@ Opening, marking up, measuring, estimating and printing drawings never use the i
 | Labor-rate downloads | `api.bls.gov`, `data.bls.gov` | `DisableRateLookup` |
 | DocuSign signature requests | `*.docusign.net` (your account's base URL) | `DisableDocuSign` |
 | Dropbox open and save | `www.dropbox.com`, `api.dropboxapi.com`, `content.dropboxapi.com` | `DisableDropbox` |
+| Send with QuantiLink (only when a user clicks Send) | the office's own QuantiLink server (`QuantiLinkURL`), https | `DisableQuantiLink` |
 | Local AI | `localhost:11434` (or `AIHost`) – stays on your network | `DisableAI` |
 | Live package status (Package Tracker > Check Status, only with that carrier's keys; only the tracking number is sent) | `onlinetools.ups.com`, `apis.fedex.com`, `apis.usps.com`, `api-eu.dhl.com` | `DisablePackageStatus` |
 | Update check (team copy only; once a day and Help > Check for Updates Now) | `pub-1121abaa7290424187564108985e68a0.r2.dev` (the team update host, Cloudflare R2; set in `app/updatecheck.py` `UPDATE_BASE`) | `DisableUpdateCheck` |

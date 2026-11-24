@@ -41,7 +41,7 @@ class AccessibilityDialog(QDialog):
         for r, x in enumerate(self.results):
             ok = QTableWidgetItem("Passed" if x["ok"] else
                                   ("Can fix" if x["fix"] else "Needs you"))
-            theme.tint(ok, "#fbeae9" if x["ok"] else
+            theme.tint(ok, "#d9f5e3" if x["ok"] else
                        "#fff1c2" if x["fix"] else "#ffd9d9")
             for c, it in enumerate((QTableWidgetItem(x["name"]), ok,
                                     QTableWidgetItem(x["detail"]))):

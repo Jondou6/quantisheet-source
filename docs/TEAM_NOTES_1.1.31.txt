@@ -1,0 +1,4 @@
+QuantiSheet 1.1.31
+- Back to the original look: buttons, ribbon tiles, links and highlights are teal-green again, and done, won, ready and OK are green again (the red look from 1.1.30 is gone).
+- The start-up splash screen no longer shows a company name or logo. Your company details stay in Settings for proposals.
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.31 - the full source of this build. Help > About shows the same link.

@@ -139,7 +139,7 @@ def _secrets():
     name looks secret. Literal values, longest first."""
     from . import policy, settings
     vals = set()
-    for k in ("LicenseKey", "RelayToken"):
+    for k in ("LicenseKey", "RelayToken", "QuantiLinkKey"):
         v = _try(lambda k=k: policy.get(k))
         if isinstance(v, str) and len(v) >= 6:
             vals.add(v)

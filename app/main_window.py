@@ -1932,6 +1932,8 @@ class MainWindow(QMainWindow):
         for d in self.findChildren(QDockWidget):
             a = d.toggleViewAction()
             self._cmd.setdefault(clean(a.text()).lower(), a)
+        for a in self._ribbon_only_actions():
+            self._cmd.setdefault(clean(a.text()).lower(), a)
         for key, a in self._cmd.items():
             name = self.ICON_OF.get(key)
             if name and a.icon().isNull():
@@ -1941,6 +1943,23 @@ class MainWindow(QMainWindow):
                 if not (isinstance(data, str) and icons.has(data)):
                     a.setProperty("qs_icon", name)
         return self._cmd
+
+    def _ribbon_only_actions(self):
+        """Commands that are on the ribbon only, with no menu entry (Jon
+        places each one): Send with QuantiLink on the Home tab (Nov 23).
+        None of them when IT turned the feature off."""
+        if getattr(self, "_ribbon_only", None) is None:
+            from . import policy
+            self._ribbon_only = []
+            if policy.allowed("quantilink"):
+                a = QAction("Send with QuantiLink…", self)
+                a.setToolTip("Send with QuantiLink: a job's RFIs, "
+                             "submittals, daily logs or meeting minutes "
+                             "to the office's QuantiLink server, with "
+                             "share links back for an email")
+                a.triggered.connect(lambda: self.send_quantilink())
+                self._ribbon_only.append(a)
+        return self._ribbon_only
 
     def command(self, text):
         """The QAction for a menu command, by its name."""
@@ -2006,6 +2025,13 @@ class MainWindow(QMainWindow):
             claims.setIconText("ClaimIT")
             t_, g_ = quickaccess.fold("Module", "ClaimIT")
             self.ribbon.page(t_).group(g_).large(claims, "ClaimIT")
+        qlink = self.command("Send with QuantiLink")
+        if qlink is not None:           # not when IT turned it off
+            qlink.setIcon(icons.icon("link"))
+            qlink.setProperty("qs_icon", "link")
+            qlink.setIconText("QuantiLink")
+            t_, g_ = quickaccess.fold("Home", "File")
+            self.ribbon.page(t_).group(g_).large(qlink, "QuantiLink")
         ms = self.command("Master Schedule (Sub Updates)")
         if ms is not None:              # the Master Schedule module is on
             ms.setIcon(icons.icon("calendar"))
@@ -5040,6 +5066,13 @@ class MainWindow(QMainWindow):
                 self, title, "Which project? Pick one or open its folder:",
                 "New Project…")
         return None
+
+    def send_quantilink(self, store=None, show=True, opener=None):
+        """Home > Send with QuantiLink (quantilink_ui.py): the job of the
+        open drawing, or pick one."""
+        from . import quantilink_ui
+        store = store if store is not None else self._job_store()
+        return quantilink_ui.open_send(self, store, show=show, opener=opener)
 
     def ask_project(self, store=None, show=True):
         """Ask the Project: a question answered from the open PDF and the

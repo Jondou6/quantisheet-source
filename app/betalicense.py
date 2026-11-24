@@ -476,8 +476,7 @@ def LicenseDialog(parent=None):
                 good = False
             else:
                 good, _, msg = check(k)
-                from . import theme
-                color = theme.good_hex() if good else "#c62828"
+                color = "#2e7d32" if good else "#c62828"
                 self.status.setText(f"<span style='color:{color}'>{msg}"
                                     "</span>")
             self.ok.setEnabled(good)

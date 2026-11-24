@@ -124,7 +124,7 @@ def test_html_matches_preconsuite_style_layout():
     pos = [h.index(x) for x in order]
     assert pos == sorted(pos)
     assert "May 20, 2026 2:00 PM" in h
-    for c in ("#bd2322", "#d93a2b", "#F4C430", "#0b5cad"):
+    for c in ("#28a745", "#d93a2b", "#F4C430", "#0b5cad"):
         assert c in h
     import re
     visible = re.sub(r'(href|src)="[^"]*"', "", h)

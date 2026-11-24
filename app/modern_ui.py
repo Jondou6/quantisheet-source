@@ -901,6 +901,14 @@ class AllToolsPane(QWidget):
                                          key=lambda a: clean(a.text()))}
             order.append("Panels")
         cats = {name: groups for name, _icon, groups in out}
+        # ribbon-only commands (no menu entry): Send with QuantiLink
+        extra = [a for a in (getattr(lay.win, "_ribbon_only", None) or [])
+                 if id(a) not in seen and clean(a.text())]
+        seen.update(id(a) for a in extra)
+        if extra and "Home" in cats:
+            cats["Home"].append(("Share", extra))
+        elif extra:
+            out.append(("Share", "link", [("", extra)]))
         for top in order:
             groups = [(sub or "More", acts) for sub, acts in rest[top].items()]
             home = MERGE.get(top)

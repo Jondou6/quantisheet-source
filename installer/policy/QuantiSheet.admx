@@ -123,6 +123,26 @@
         <text id="DropboxAppKey" valueName="DropboxAppKey" required="true" />
       </elements>
     </policy>
+    <policy name="DisableQuantiLink" class="Both" displayName="$(string.DisableQuantiLink)" explainText="$(string.DisableQuantiLink_Help)" key="Software\Policies\QuantiSheet" valueName="DisableQuantiLink">
+      <parentCategory ref="Internet" />
+      <supportedOn ref="SUPPORTED_QuantiSheet" />
+      <enabledValue><decimal value="1" /></enabledValue>
+      <disabledValue><decimal value="0" /></disabledValue>
+    </policy>
+    <policy name="QuantiLinkURL" class="Both" displayName="$(string.QuantiLinkURL)" explainText="$(string.QuantiLinkURL_Help)" presentation="$(presentation.QuantiLinkURL)" key="Software\Policies\QuantiSheet">
+      <parentCategory ref="Internet" />
+      <supportedOn ref="SUPPORTED_QuantiSheet" />
+      <elements>
+        <text id="QuantiLinkURL" valueName="QuantiLinkURL" required="true" />
+      </elements>
+    </policy>
+    <policy name="QuantiLinkKey" class="Both" displayName="$(string.QuantiLinkKey)" explainText="$(string.QuantiLinkKey_Help)" presentation="$(presentation.QuantiLinkKey)" key="Software\Policies\QuantiSheet">
+      <parentCategory ref="Internet" />
+      <supportedOn ref="SUPPORTED_QuantiSheet" />
+      <elements>
+        <text id="QuantiLinkKey" valueName="QuantiLinkKey" required="true" />
+      </elements>
+    </policy>
     <policy name="DisableAI" class="Both" displayName="$(string.DisableAI)" explainText="$(string.DisableAI_Help)" key="Software\Policies\QuantiSheet" valueName="DisableAI">
       <parentCategory ref="Internet" />
       <supportedOn ref="SUPPORTED_QuantiSheet" />

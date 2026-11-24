@@ -58,6 +58,12 @@ SETTINGS = {
     "DropboxAppKey": (str, "The Dropbox App key for every user (from the "
                            "company's Dropbox app; no App secret is "
                            "needed)"),
+    "DisableQuantiLink": (bool, "No Send with QuantiLink (the office's "
+                                "QuantiLink file-sharing server)"),
+    "QuantiLinkURL": (str, "The office's QuantiLink server address for "
+                           "every user, e.g. https://files.example.com"),
+    "QuantiLinkKey": (str, "The office's shared QuantiLink access key "
+                           "(qlt_...) for every user"),
     "LogDirectory": (str, "Write log files here instead of each user's "
                           "profile"),
 }
@@ -98,6 +104,10 @@ NETWORK = {
     "docusign": ("DisableDocuSign", ["*.docusign.net"]),
     "dropbox": ("DisableDropbox", ["www.dropbox.com", "api.dropboxapi.com",
                                    "content.dropboxapi.com"]),
+    # Send with QuantiLink: only the office's own server, only when
+    # someone clicks Send (quantilink.py)
+    "quantilink": ("DisableQuantiLink", ["the QuantiLink server "
+                                         "(QuantiLinkURL)"]),
     "ai": ("DisableAI", ["localhost:11434 (or AIHost)"]),
     # Package Tracker > Check Status (packages_live.HOSTS), only with a
     # carrier's keys and only when someone clicks it
@@ -329,7 +339,7 @@ def masked():
     """For the diagnostics report: the key's middle is hidden."""
     out = {}
     for k, v in all_set().items():
-        if k in ("LicenseKey", "RelayToken") and v:
+        if k in ("LicenseKey", "RelayToken", "QuantiLinkKey") and v:
             out[k] = "(set)"          # nothing of it (Venice review S5)
         else:
             out[k] = v

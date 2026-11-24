@@ -1,0 +1,3 @@
+QuantiSheet 1.1.32
+- Send with QuantiLink (Home tab): send a job's RFIs, submittals, daily logs or meeting minutes, with their attachments if you like, to your office's QuantiLink file-sharing server, and get share links back to paste into an email. Set up once with the office's server and shared key (Connection...), or your IT department sets them for everyone. Sending again adds a new version; nothing is replaced.
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.32 - the full source of this build. Help > About shows the same link.

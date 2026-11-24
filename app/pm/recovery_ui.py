@@ -423,11 +423,10 @@ class RecoveryDialog(QDialog):
             self.result.setText("Add steps, Suggest Steps, or ask the AI "
                                 "Helper.")
         elif ev["forecast"]:
-            from .. import theme
             self.result.setText(
                 f"With this plan: completion <b>{ev['forecast']:%b %d, %Y}"
                 f"</b> - {ev['recovered']} workday(s) recovered - " +
-                (f"<b style='color:{theme.good_hex()}'>meets the target</b>"
+                ("<b style='color:#1e8449'>meets the target</b>"
                  if ev["on_time"] else
                  f"<b style='color:#c0392b'>still {ev['behind']} "
                  "workday(s) late</b>") +

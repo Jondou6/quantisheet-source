@@ -20,7 +20,7 @@ COLS = [("project", "Project"), ("gc", "GC"), ("trade", "Trade"),
         ("rfi_due", "Questions due"), ("estimator", "Estimator"),
         ("status", "Status"), ("amount", "Our bid"), ("_go", "Go / no-go"),
         ("_same", "Same project?")]
-STATUS_BG = {"Won": "#fbeae9", "Lost": "#ffcdcd", "Declined": "#e6e6e6",
+STATUS_BG = {"Won": "#cdf0cd", "Lost": "#ffcdcd", "Declined": "#e6e6e6",
              "Submitted": "#c8e6ff", "Accepted": "#fff1bd"}
 EDIT = [("project", "Project *"), ("gc", "GC (who invited us)"),
         ("trade", "Trade / scope"), ("address", "Address"),

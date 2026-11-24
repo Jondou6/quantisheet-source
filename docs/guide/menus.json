@@ -2862,6 +2862,11 @@
      "tip": "Print"
     },
     {
+     "label": "QuantiLink",
+     "action": "Send with QuantiLink…",
+     "tip": "Send with QuantiLink: a job's RFIs, submittals, daily logs or meeting minutes to the office's QuantiLink server, with share links back for an email"
+    },
+    {
      "label": "Generate Set",
      "action": "Generate Set…",
      "tip": "Generate Set"

@@ -477,8 +477,7 @@ def _stamp_version(pm):
 
 def splash_company():
     """(name, logo path or "") of the company saved on this computer for
-    proposals - shown on the splash. Nobody else's company is built into
-    the program (Jon, Nov 3: only his copy shows his company)."""
+    proposals. Not drawn on the splash any more (Jon, Nov 24)."""
     try:
         from . import settings
         c = settings.get("company") or {}
@@ -489,47 +488,6 @@ def splash_company():
     if logo and not os.path.isfile(logo):
         logo = ""
     return name, logo
-
-
-def _stamp_company(pm, name=None, logo=None):
-    """The company's logo above the name and a "by <company>" label under
-    it, in the spaces the splash leaves for them. Nothing when no company
-    is saved. Placed as shares of the picture, like the version."""
-    from PySide6.QtCore import QRectF, Qt
-    from PySide6.QtGui import QColor, QFont, QFontMetricsF, QImage, \
-        QPainter
-    if name is None:
-        name, logo = splash_company()
-    if not name and not logo:
-        return pm
-    w, h = pm.width(), pm.height()
-    p = QPainter(pm)
-    try:
-        p.setRenderHint(QPainter.Antialiasing, True)
-        p.setRenderHint(QPainter.SmoothPixmapTransform, True)
-        if logo:
-            img = QImage(logo)
-            if not img.isNull():
-                box = QRectF(w * 0.06, h * 0.091, w * 0.30, h * 0.137)
-                s = min(box.width() / img.width(), box.height() / img.height())
-                p.drawImage(QRectF(box.x(), box.y(), img.width() * s,
-                                   img.height() * s), img)
-        if name:
-            f = QFont("Segoe UI")
-            f.setPixelSize(max(10, round(h * 0.0243)))
-            f.setWeight(QFont.DemiBold)
-            p.setFont(f)
-            text = f"by {name}"
-            tw = QFontMetricsF(f).horizontalAdvance(text)
-            r = QRectF(w * 0.065, h * 0.437, tw + w * 0.025, h * 0.049)
-            p.setPen(Qt.NoPen)
-            p.setBrush(QColor("#fbeae9"))
-            p.drawRoundedRect(r, r.height() / 2, r.height() / 2)
-            p.setPen(QColor("#a91d1d"))
-            p.drawText(r, Qt.AlignCenter, text)
-    finally:
-        p.end()
-    return pm
 
 
 def _show_splash(app):
@@ -547,10 +505,8 @@ def _show_splash(app):
         _stamp_version(pm)
     except Exception:
         logging.getLogger(__name__).debug("ignored error", exc_info=True)
-    try:
-        _stamp_company(pm)
-    except Exception:
-        logging.getLogger(__name__).debug("ignored error", exc_info=True)
+    # no company name or logo on the splash (Jon, Nov 24); the company
+    # details stay in Settings for proposals
     splash = QSplashScreen(pm)
     splash.show()
     app.processEvents()

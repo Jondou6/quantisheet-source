@@ -41,6 +41,12 @@
       <string id="DisableUpdateCheck_Help">Turns off the once-a-day update check. The team copy downloads one small signed file from the team update host (see IT_DEPLOYMENT.md), sends no user data, and installs an update only when the user clicks Update now. The Microsoft Store copy asks the Microsoft Store on this PC whether an update is waiting and shows a reminder; the Store does the download and install. Help &gt; Check for Updates Now still works when the user picks it.</string>
       <string id="DisablePackageStatus">No live package status from the carriers</string>
       <string id="DisablePackageStatus_Help">Turns off Package Tracker &gt; Check Status, which sends only a tracking number to the carrier it belongs to (UPS, FedEx, USPS or DHL) when the user clicks it and has that carrier's keys. Track (opening the carrier's page) still works. OfflineMode turns this off too.</string>
+      <string id="DisableQuantiLink">No Send with QuantiLink (the office's QuantiLink server)</string>
+      <string id="DisableQuantiLink_Help">Turns off Home &gt; Send with QuantiLink, which uploads Project Center files (RFIs, submittals, daily logs, meeting minutes) to the office's own QuantiLink server and makes share links, only when a user clicks Send. OfflineMode turns this off too.</string>
+      <string id="QuantiLinkURL">The office's QuantiLink server address for every user</string>
+      <string id="QuantiLinkURL_Help">The address of the office's QuantiLink server, for example https://files.example.com (https is required). Set it together with QuantiLinkKey and users can't change the connection.</string>
+      <string id="QuantiLinkKey">The office's shared QuantiLink access key for every user</string>
+      <string id="QuantiLinkKey_Help">The shared access key (qlt_...) made in QuantiLink under Account settings &gt; Desktop sync. It is sent only to the QuantiLink server, never in a web address, and is left out of support bundles.</string>
       <string id="DropboxAppKey">The Dropbox App key for every user (from the company's Dropbox app; no App secret is needed)</string>
       <string id="DropboxAppKey_Help">The App key of the company's Dropbox app (dropbox.com/developers/apps, Scoped access, Full Dropbox, permissions files.metadata.read, files.content.read and files.content.write, redirect URI http://127.0.0.1:53917/). Users then only sign in. The App secret is not needed and must not be entered anywhere.</string>
       <string id="LogDirectory">Write log files here instead of each user's profile</string>
@@ -61,6 +67,12 @@
       </presentation>
       <presentation id="AIHost">
         <textBox refId="AIHost"><label>AIHost:</label></textBox>
+      </presentation>
+      <presentation id="QuantiLinkURL">
+        <textBox refId="QuantiLinkURL"><label>QuantiLinkURL:</label></textBox>
+      </presentation>
+      <presentation id="QuantiLinkKey">
+        <textBox refId="QuantiLinkKey"><label>QuantiLinkKey:</label></textBox>
       </presentation>
       <presentation id="DropboxAppKey">
         <textBox refId="DropboxAppKey"><label>DropboxAppKey:</label></textBox>

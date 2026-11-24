@@ -50,7 +50,7 @@ def test_whats_new_111():
         assert w in s
     assert "Adobe" not in s and "Bluebeam" not in s
     from app import __version__
-    assert __version__ == "1.1.30"
+    assert __version__ == "1.1.32"
 
 
 def test_whats_new_112():
@@ -513,3 +513,27 @@ def test_whats_new_1130():
     assert "since 1.1.25" in notes and len(notes) < 4000
     for bad in ("Dillon", "AECOM", "Harbor", "HMB", "Metro"):
         assert bad not in notes
+
+
+def test_whats_new_1131():
+    p = os.path.join(os.path.dirname(helpcenter.__file__), "data",
+                     "whats_new.json")
+    s = json.load(open(p, encoding="utf-8"))["1.1.31"]
+    for w in ("original look", "teal-green", "splash"):
+        assert w in s
+    for bad in ("Repro", "Adobe", "Acrobat", "Bluebeam", "Planswift", "HMB",
+                "PlanHub", "Calcs.com", "Dillon", "AECOM", "Harbor", "Metro",
+                "Consensus"):
+        assert bad not in s
+
+
+def test_whats_new_1132():
+    p = os.path.join(os.path.dirname(helpcenter.__file__), "data",
+                     "whats_new.json")
+    s = json.load(open(p, encoding="utf-8"))["1.1.32"]
+    for w in ("Send with QuantiLink", "share links", "shared key"):
+        assert w in s
+    for bad in ("Repro", "Adobe", "Acrobat", "Bluebeam", "Planswift", "HMB",
+                "PlanHub", "Calcs.com", "Dillon", "AECOM", "Harbor", "Metro",
+                "Consensus"):
+        assert bad not in s

@@ -12,9 +12,8 @@ from PySide6.QtWidgets import (QCheckBox, QDialog, QDoubleSpinBox,
 
 from . import coverage, prebid, settings
 
-COLORS = {"green": QColor(189, 35, 34), "amber": QColor(230, 160, 20),
-          # not started is gray, not red: red now means reviewed (Nov 23)
-          "red": QColor(130, 136, 146)}
+COLORS = {"green": QColor(46, 160, 67), "amber": QColor(230, 160, 20),
+          "red": QColor(210, 50, 50)}
 THUMB = 170
 
 
@@ -26,7 +25,7 @@ def _thumb(page, rects, color, title_frac):
                  QImage.Format_RGB888).copy()
     p = QPainter(img)
     p.setPen(Qt.NoPen)
-    shade = QColor(189, 35, 34, 80)
+    shade = QColor(46, 160, 67, 110)
     for r in rects:
         p.fillRect(int(r.x0 * z) - 1, int(r.y0 * z) - 1,
                    max(3, int(r.width * z) + 2),
@@ -54,11 +53,10 @@ class CoverageDialog(QDialog):
         self.summary = QLabel()
         self.summary.setWordWrap(True)
         lay.addWidget(self.summary)
-        from . import theme
-        key = QLabel(f"<span style='color:{theme.good_hex()}'>■</span> reviewed &nbsp; "
+        key = QLabel("<span style='color:#2ea043'>■</span> reviewed &nbsp; "
                      "<span style='color:#e6a014'>■</span> taken off, not "
                      "reviewed or not checked &nbsp; "
-                     "<span style='color:#828892'>■</span> nothing yet. "
+                     "<span style='color:#d23232'>■</span> nothing yet. "
                      "Shaded = taken off. Double-click a sheet to go to it.")
         lay.addWidget(key)
         self.grid = QListWidget()
