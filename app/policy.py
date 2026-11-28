@@ -58,6 +58,9 @@ SETTINGS = {
     "DisableErrorReports": (bool, "No automatic error reports (team copy; "
                                   "Help > Send Error Reports "
                                   "Automatically)"),
+    "DisableBrowserAddon": (bool, "No PDFs from the Open in QuantiSheet "
+                                  "browser add-on (its direct line and "
+                                  "its links)"),
     "DropboxAppKey": (str, "The Dropbox App key for every user (from the "
                            "company's Dropbox app; no App secret is "
                            "needed)"),

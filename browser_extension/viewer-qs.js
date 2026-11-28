@@ -16,6 +16,10 @@
     o.set("isEvalSupported", false);
     o.set("externalLinkTarget", 2);     // links in a PDF open a new tab
     o.set("disableHistory", true);
+    const icon = document.createElement("link");   // the tab's own icon
+    icon.rel = "icon";
+    icon.href = "../../icons/icon32.png";
+    document.head.appendChild(icon);
     const app = window.PDFViewerApplication;
     app.initializedPromise.then(() => {
       addButton(app);
@@ -40,6 +44,9 @@
       app.setTitleUsingUrl(rec.name, "");
     } else if (src && canFetch(src)) {
       origin = { name: pdfName(src, ""), url: src };
+      // a website that won't send the PDF a second time: say so, with a
+      // way back to the browser's own viewer
+      app.eventBus.on("documenterror", () => usual(src));
       await app.open({ url: src, withCredentials: true });
     }
   }
@@ -52,6 +59,27 @@
   function olderThan(version, patch) {
     const p = String(version).split(".").map(Number);
     return p[0] === 1 && p[1] === 1 && p[2] < patch;
+  }
+
+  function usual(src) {
+    if (!noteEl || document.getElementById("qsUsual")) return;
+    noteEl.hidden = false;
+    noteEl.textContent = "The website didn't send this PDF to the " +
+      "add-on's viewer. ";
+    const link = document.createElement("a");
+    link.id = "qsUsual";
+    link.href = src;
+    link.textContent = "Open it the usual way";
+    link.style.cssText = "color:#9fe3da;font-weight:600";
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      // tell the add-on to leave this one alone, then go
+      chrome.runtime.sendMessage({ type: "qs-usual", url: src }, () => {
+        void chrome.runtime.lastError;
+        location.href = src;
+      });
+    });
+    noteEl.appendChild(link);
   }
 
   let noteEl = null;
@@ -98,6 +126,10 @@
       const data = await app.pdfDocument.saveDocument();
       line = new Line();
       const hello = await line.ask({ type: "hello" });
+      if (hello && hello.off) {
+        say(OFF_BY_IT);
+        return;
+      }
       if (!hello || !hello.ok) {
         // no direct line (the Store copy of QuantiSheet): the browser
         // saves the PDF and the saved file is handed over
@@ -128,9 +160,14 @@
         r = await line.ask(marks ? { type: "end", marks } : { type: "end" });
       }
       const newer = marks && hello.version && olderThan(hello.version, 39);
+      const noCuts = marks && hello.version &&
+        marks.marks.some((m) => m.type === "cutout") &&
+        olderThan(hello.version, 41);
       say(!(r && r.ok) ? "QuantiSheet didn't take the PDF. Try again."
         : newer ? "Sent, but the takeoff needs QuantiSheet 1.1.39 or " +
           "newer: this one only got the PDF."
+          : noCuts ? "Sent, but cut-outs need QuantiSheet 1.1.41 or " +
+            "newer: this one took the rest and left the cut-outs out."
           : marks ? "Sent with " + takeoffCount() + " takeoff " +
             "measurement(s). QuantiSheet is working out the quantities."
             : "Sent. It is opening in QuantiSheet.");

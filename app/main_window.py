@@ -3835,7 +3835,7 @@ class MainWindow(MenusMixin, AiCommandsMixin, ExchangeMixin, QMainWindow):
         """PDF attachments being dragged out of a mail program (Nov 27)."""
         try:
             from . import outlookdrop
-            return outlookdrop.pdf_names(mime)
+            return outlookdrop.wanted(mime)
         except Exception:                                 # noqa: BLE001
             return []
 
@@ -3867,13 +3867,19 @@ class MainWindow(MenusMixin, AiCommandsMixin, ExchangeMixin, QMainWindow):
         for p in paths:
             self.open_path(p)
         if wait:
+            whole = list(wait) == [outlookdrop.WHOLE]
             self._flash("Getting the PDF from Outlook...", 4000)
 
             def fetch(names=list(wait)):
                 got = outlookdrop.later(names)
                 for p in got:
                     self.open_path(p)
-                if not got:
+                if not got and whole:
+                    self._flash(
+                        "No PDF came across from that email. Open the "
+                        "email and drag the PDF itself onto QuantiSheet.",
+                        12000)
+                elif not got:
                     self._flash(
                         "That attachment didn't come across. Save it from "
                         "the email (right-click > Save As), then open it "
@@ -4061,7 +4067,7 @@ class MainWindow(MenusMixin, AiCommandsMixin, ExchangeMixin, QMainWindow):
                          left)
                 text = (f"{added} takeoff measurement"
                         f"{'' if added == 1 else 's'} from the browser "
-                        "viewer added (Ctrl+Z takes them back).")
+                        "viewer added (Ctrl+Z undoes them).")
                 if left:
                     text += (f" {left} left out: set the scale on that "
                              "page and measure again.")

@@ -93,6 +93,51 @@ def free_path(folder_, name):
     return path
 
 
+_PART = re.compile(r"^\.\d+-.+\.pdf\.part$", re.I)
+_NOTE = ".pdf.qsweb.json"               # app/webmarks.py SUFFIX on a PDF
+STALE = 24 * 3600
+
+
+def tidy(where, now=None):
+    """Clear out what an interrupted hand-off left in the folder, once it
+    is a day old: a half-sent file (.<number>-<name>.pdf.part) and the
+    takeoff notes of a PDF that is no longer there. Only those two kinds
+    of file, both made by this program; never a PDF. Returns how many."""
+    import time
+    now = time.time() if now is None else now
+    gone = 0
+    try:
+        names = os.listdir(where)
+    except OSError:
+        return 0
+    for n in names:
+        path = os.path.join(where, n)
+        low = n.lower()
+        if _PART.match(n):
+            pass
+        elif low.endswith(_NOTE) and \
+                not os.path.exists(path[:-len(".qsweb.json")]):
+            pass
+        else:
+            continue
+        try:
+            if os.path.isfile(path) and \
+                    now - os.path.getmtime(path) > STALE:
+                os.remove(path)
+                gone += 1
+        except OSError:
+            pass
+    return gone
+
+
+def _off():
+    try:
+        from . import policy
+        return policy.on("DisableBrowserAddon")
+    except Exception:                                     # noqa: BLE001
+        return False
+
+
 class Receiver:
     """One PDF arriving in pieces."""
 
@@ -120,6 +165,11 @@ class Receiver:
 
     def handle(self, msg):
         kind = msg.get("type") if isinstance(msg, dict) else None
+        if _off():
+            # IT turned the add-on's line off (policy DisableBrowserAddon)
+            self._drop()
+            return {"ok": False, "off": True,
+                    "error": "turned off by your IT department"}
         if kind == "hello":
             from . import __version__
             return {"ok": True, "version": __version__}
@@ -127,6 +177,7 @@ class Receiver:
             self._drop()
             where = self.where or folder()
             os.makedirs(where, exist_ok=True)
+            tidy(where)
             self.name = safe_name(msg.get("name"))
             self.part = os.path.join(
                 where, f".{os.getpid()}-{self.name}.part")

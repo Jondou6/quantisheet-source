@@ -48,6 +48,12 @@ def path_from(link):
 def files(argv):
     """The PDFs named by quantisheet:// links among the arguments."""
     out = []
+    try:                    # IT may turn the add-on's links off
+        from . import policy
+        if policy.on("DisableBrowserAddon"):
+            return out
+    except Exception:                                     # noqa: BLE001
+        pass
     for a in argv[1:]:
         if isinstance(a, str) and a.lower().startswith(SCHEME + ":"):
             p = path_from(a)

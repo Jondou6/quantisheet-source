@@ -161,6 +161,7 @@ Users can't change these inside the program. `LicenseKey`, `AcceptAgreement` and
 | `DisableUpdateCheck` | on/off | No daily update check: the team copy's check for a newer version, and the Microsoft Store copy's reminder when the Store has an update waiting (the Store does the install). |
 | `DisablePackageStatus` | on/off | No live package status (Package Tracker > Check Status). |
 | `DisableErrorReports` | on/off | Team copy only: removes Help > Send Error Reports Automatically (off unless a tester turns it on). |
+| `DisableBrowserAddon` | on/off | QuantiSheet takes no PDFs from the Open in QuantiSheet browser add-on (its direct line and its `quantisheet://` links). Nothing leaves the computer either way. |
 
 ### Which settings work in which copy
 
@@ -171,6 +172,7 @@ Every setting is read from the same registry keys, so Group Policy works the sam
 | `LicenseKey`, `SkipEmailSignIn`, `PriceDatabasePath`, `RelayURL`, `RelayToken`, `DisableAI`, `AIHost`, `OfflineMode`, `DisableAerial`, `DisableWeather`, `DisableRateLookup`, `DisableDocuSign`, `DisableDropbox`, `DropboxAppKey`, `DisableQuantiLink`, `QuantiLinkURL`, `QuantiLinkKey`, `DisablePackageStatus`, `LogDirectory` | Yes | Yes |
 | `DisableUpdateCheck` | Turns off the signed daily check | Turns off the Store-update reminder |
 | `DisableErrorReports` | Removes Help > Send Error Reports Automatically | Not in the Store copy |
+| `DisableBrowserAddon` | Turns off the add-on's direct line and its links | Turns off its links (the Store copy has no direct line) |
 | Right-click actions in File Explorer | Setup option "Add QuantiSheet actions to the right-click menu" | PDFs only: Open in QuantiSheet, Reduce size. Convert to PDF and Combine PDFs (folders) need the setup copy |
 | "QuantiSheet" printer | Setup option | Switch on "QuantiSheet Printer" in Settings > Apps > Startup |
 

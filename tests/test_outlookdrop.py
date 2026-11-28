@@ -140,6 +140,46 @@ def test_what_outlook_saves_must_be_a_pdf_and_trouble_is_not_an_error(
     assert od.later(["x.pdf"], str(tmp_path), gone) == []
 
 
+def test_the_running_outlook_is_joined_and_never_started():
+    """Nov 28: Windows lists a running Outlook for other programs only
+    some of the time. When it isn't listed but is running, it is asked
+    for by name (that joins the running one); when it isn't running,
+    nothing is started."""
+    class Client:
+        def __init__(self, listed):
+            self.listed, self.calls = listed, []
+
+        def GetActiveObject(self, name):              # noqa: N802
+            self.calls.append("listed?")
+            if not self.listed:
+                raise OSError("not listed")
+            return "the running Outlook"
+
+        def Dispatch(self, name):                     # noqa: N802
+            self.calls.append("by name")
+            return "the running Outlook, joined"
+    c = Client(True)
+    assert od._running_outlook(c, lambda: True) == "the running Outlook"
+    assert c.calls == ["listed?"]
+    c = Client(False)
+    assert od._running_outlook(c, lambda: True) == \
+        "the running Outlook, joined"
+    c = Client(False)
+    with pytest.raises(OSError):
+        od._running_outlook(c, lambda: False)
+    assert c.calls == ["listed?"]                 # never started
+
+    class R:
+        stdout = '"OUTLOOK.EXE","4321","Console","1","250,000 K"\n'
+    assert od._outlook_is_running(lambda *a, **k: R())
+    R.stdout = "INFO: No tasks are running which match the criteria.\n"
+    assert not od._outlook_is_running(lambda *a, **k: R())
+
+    def boom(*a, **k):
+        raise OSError("no tasklist")
+    assert not od._outlook_is_running(boom)
+
+
 def test_the_window_takes_a_mail_drag(tmp_path, monkeypatch):
     pytest.importorskip("PySide6.QtWidgets")
     import fitz
@@ -183,3 +223,61 @@ def test_the_window_takes_a_mail_drag(tmp_path, monkeypatch):
                 v.dirty = False
         w.close()
         app.processEvents()
+
+
+def test_a_whole_email_dragged_brings_its_pdfs(tmp_path):
+    """Nov 28: an email dragged from the message list, not its attachment."""
+    m = Mime(["Made-up addendum notice.msg"])
+    assert od.pdf_names(m) == [] and od.wanted(m) == [od.WHOLE]
+    assert od.save(m, str(tmp_path)) == ([], [od.WHOLE])
+    mail1 = type("I", (), {"Attachments": Coll(
+        [Att("Addendum 3.pdf"), Att("image001.png", b"\x89PNG"),
+         Att("fake.pdf", b"MZ")])})()
+    meeting = type("I", (), {})()                # nothing attached to it
+    mail2 = type("I", (), {"Attachments": Coll([Att("A-201.PDF")])})()
+    win = type("W", (), {"Selection": Coll([mail1, meeting, mail2])})()
+    got = od.later([od.WHOLE], str(tmp_path), _outlook(win))
+    assert [os.path.basename(p) for p in got] == ["Addendum 3.pdf",
+                                                  "A-201.pdf"]
+    assert "fake.pdf" not in os.listdir(tmp_path)
+    assert "image001.png" not in os.listdir(tmp_path)
+    # an email open in its own window
+    one = Window(item_atts=[Att("Bid form.pdf"), Att("Notes.docx", b"PK")])
+    got = od.later([od.WHOLE], str(tmp_path), _outlook(one))
+    assert [os.path.basename(p) for p in got] == ["Bid form.pdf"]
+    # an email with no PDF, and Outlook not there: nothing, no error
+    none = Window(item_atts=[Att("Notes.docx", b"PK")])
+    assert od.later([od.WHOLE], str(tmp_path), _outlook(none)) == []
+
+    def gone():
+        raise OSError("no Outlook")
+    assert od.later([od.WHOLE], str(tmp_path), gone) == []
+    # a PDF dragged along with an email: the PDF by name, as before
+    both = Mime(["Note.msg", "A-101.pdf"])
+    assert od.wanted(both) == ["A-101.pdf"]
+    # anything else is still not taken
+    assert od.wanted(Mime(["Bid form.docx"])) == []
+
+
+def test_no_more_than_ten_emails_from_one_drag(tmp_path):
+    mails = [type("I", (), {"Attachments": Coll([Att(f"P{i}.pdf")])})()
+             for i in range(14)]
+    win = type("W", (), {"Selection": Coll(mails)})()
+    got = od.later([od.WHOLE], str(tmp_path), _outlook(win))
+    assert len(got) == od.MAX_MAILS
+
+
+def test_the_log_reader_leaves_file_names_out():
+    import importlib.util
+    here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    spec = importlib.util.spec_from_file_location(
+        "diag_maillog", os.path.join(here, "tools", "diag_maillog.py"))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    text = ("10:00 INFO app.outlookdrop: mail drop: 1 PDF came with the "
+            "drag itself\n10:01 INFO x: something else\n"
+            "10:02 INFO app.outlookdrop: mail drag not opened (Made-up "
+            "Job A-101.pdf); it carried: FileGroupDescriptorW\n")
+    got = mod.lines(text)
+    assert len(got) == 2 and "Made-up" not in got[1]
+    assert "it carried: FileGroupDescriptorW" in got[1]

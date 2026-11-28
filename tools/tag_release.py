@@ -67,11 +67,12 @@ def gh(*args):
     return json.loads(p.stdout or "null")
 
 
-def releases(pages=5):
-    """{version: commit sha} from main, newest commit per version."""
+def releases(pages=5, branch="main"):
+    """{version: commit sha} from `branch`, newest commit per version."""
     out = {}
     for page in range(1, pages + 1):
-        rows = gh(f"repos/{REPO}/commits?sha=main&per_page=100&page={page}")
+        rows = gh(f"repos/{REPO}/commits?sha={branch}&per_page=100"
+                  f"&page={page}")
         if not rows:
             break
         for c in rows:
@@ -98,9 +99,15 @@ def missing(rel, have):
 
 
 def main(argv):
-    rel, have = releases(), tags()
+    # --branch NAME: a release whose snapshot is on its own branch (the
+    # public main is only moved on Jon's word)
+    branch = argv[argv.index("--branch") + 1] if "--branch" in argv \
+        and argv.index("--branch") + 1 < len(argv) else "main"
+    if not re.fullmatch(r"[A-Za-z0-9._/-]{1,80}", branch):
+        raise SystemExit("bad branch name")
+    rel, have = releases(branch=branch), tags()
     todo = missing(rel, have)
-    print(len(rel), "releases on main,", len(have), "tags,",
+    print(len(rel), "releases on", branch + ",", len(have), "tags,",
           len(todo), "missing:", " ".join(todo) or "none")
     if "--create" not in argv:
         if todo:

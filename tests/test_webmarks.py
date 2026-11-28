@@ -203,3 +203,72 @@ def test_opening_the_pdf_brings_the_browsers_takeoff_in(win, tmp_path):
     assert v.dirty                              # the user chooses to save
     win.undo()                                  # one step takes it back
     assert annotate.takeoff_items(v.doc) == []
+
+
+def test_a_page_stored_sideways_measures_the_same():
+    """Nov 28: tried in a test browser on a page with /Rotate 90 - a line
+    drawn left to right on screen arrives as a line up the PDF page, and
+    the scale by two points gave back the length typed in."""
+    doc = fitz.open()
+    doc.new_page(width=612, height=792).set_rotation(90)
+    assert doc[0].rect.width == 792              # shown sideways
+    data = _data({"page": 0, "type": "length", "group": "Run",
+                  "pts": [[369, 695], [369, 719]]},
+                 scales=[{"page": 0, "ppu": 2.4, "unit": "ft",
+                          "name": "10 ft by two points", "all": False}])
+    marks, skipped = webmarks.build(doc, data)
+    assert skipped == 0
+    line = marks[1][2]
+    assert line["measure"]["value"] == 10.0
+    # the marks' own coordinates are the page before it is turned
+    assert line["pts"] == [[369.0, 97.0], [369.0, 73.0]]
+    assert annotate.apply_op(doc, annotate.new_op("add_line", 0, **line))
+    # and on screen the line lies inside the sideways page
+    page = doc[0]                    # kept: its annotations need it
+    a = next(page.annots())
+    shown = (a.rect * page.rotation_matrix).normalize()
+    assert page.rect.contains(shown)
+    assert shown.width > shown.height            # left to right on screen
+
+
+CUT = {"page": 0, "type": "cutout", "group": "",
+       "pts": [[100, 430], [136, 430], [136, 466], [100, 466]]}   # 2 x 2 ft
+
+
+def test_a_cut_out_is_taken_off_the_area_it_was_drawn_in(win, tmp_path):
+    """Nov 28: a cut-out drawn in the browser comes off its area the way
+    QuantiSheet's own Cutout tool does it: 100 sq ft less a 2 ft square."""
+    pdf = tmp_path / "A-102 Made-up Plan.pdf"
+    doc = _doc()
+    doc.save(str(pdf))
+    doc.close()
+    stray = dict(CUT, pts=[[400, 100], [436, 100], [436, 136], [400, 136]])
+    webmarks.write(str(pdf), _data(AREA, CUT, stray))
+    assert win.open_path(str(pdf))
+    v = win._view
+    items = annotate.takeoff_items(v.doc)
+    assert [(it["type"], it["group"], it["value"]) for it in items] == [
+        ("area", "Slab", 96.0)]                  # net of the cut-out
+    cuts = [it for it in annotate.takeoff_items(v.doc, include_cutouts=True)
+            if it["type"] == annotate.CUTOUT]
+    assert [c["value"] for c in cuts] == [4.0]   # the stray one was left out
+    win.undo()                                   # the cut-out
+    assert annotate.takeoff_items(v.doc)[0]["value"] == 100.0
+    win.undo()                                   # then the area
+    assert annotate.takeoff_items(v.doc) == []
+
+
+def test_cut_outs_wait_for_their_areas():
+    doc = _doc()
+    marks, skipped = webmarks.build(doc, _data(AREA, CUT))
+    assert [k for _p, k, _pl in marks] == ["set_scale", "add_polygon"]
+    assert skipped == 0
+    # before the area is in the document there is nothing to take it off
+    assert webmarks.cutouts(doc, _data(AREA, CUT)) == ([], 1)
+    for pno, kind, payload in marks:
+        annotate.apply_op(doc, annotate.new_op(kind, pno, **payload))
+    more, left = webmarks.cutouts(doc, _data(AREA, CUT))
+    assert left == 0 and len(more) == 1
+    m = more[0][2]["measure"]
+    assert (m["type"], m["value"], m["group"]) == ("cutout", 4.0, "Slab")
+    assert m["parent"] and more[0][2]["label"].startswith("Cutout -4.00")

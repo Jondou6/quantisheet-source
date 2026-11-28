@@ -57,6 +57,10 @@ async function pageToPdf(tabId, url, title) {
   }
   let line = new Line();
   const hello = await line.ask({ type: "hello" });
+  if (hello && hello.off) {
+    line.close();
+    return { ok: false, why: OFF_BY_IT };
+  }
   const held = !hello || !hello.ok;
   if (held) {
     // no direct line (the Store copy of QuantiSheet): keep the PDF and

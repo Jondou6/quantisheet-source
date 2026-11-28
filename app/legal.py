@@ -272,7 +272,8 @@ of the document (not the document) to get a signed time.</li>
 <li><b>Email</b> goes out through your own Outlook account.</li>
 <li><b>A PDF dragged from an Outlook message</b> onto QuantiSheet is saved
 on this computer (Downloads\\QuantiSheet) and opened. Only the PDF
-attachments you drag are read; nothing else in the message is.</li>
+attachments you drag (or, when you drag a whole email, the PDFs attached to
+it) are read; nothing else in the message is.</li>
 <li><b>Weather</b> for daily logs and <b>BLS price indexes</b> are fetched
 from public services; only the location or index asked for is sent. A new
 Owner Report fetches the weather and forecast (Open-Meteo) by itself when

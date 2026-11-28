@@ -1,0 +1,3 @@
+QuantiSheet 1.1.44
+- Housekeeping in Downloads\QuantiSheet: if sending a PDF from the browser was cut short, the half-sent file it left behind is cleared out once it is a day old, along with the takeoff notes of a PDF that is no longer there. Your PDFs are never touched.
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.44 - the full source of this build. Help > About shows the same link.

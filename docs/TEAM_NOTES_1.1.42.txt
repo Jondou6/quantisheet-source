@@ -1,0 +1,4 @@
+QuantiSheet 1.1.42
+- Dragging a PDF out of an Outlook message: QuantiSheet now finds the running Outlook more reliably when the PDF has to be fetched from it. It never starts Outlook.
+- Takeoff that comes from the browser add-on's viewer (not released yet): each named item (Walls, Doors) keeps one colour, the same one it had in the browser.
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.42 - the full source of this build. Help > About shows the same link.

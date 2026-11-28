@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- QuantiSheet Outlook proof (test only). __HOST__ is filled in by
+     tools/outlook_proof.py with the https address the page is served
+     from. Never submitted anywhere. -->
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+           xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides/1.0"
+           xsi:type="MailApp">
+  <Id>6f0d2c1e-4b7a-4f0e-9a53-2d1b8c7e4a10</Id>
+  <Version>1.0.0.0</Version>
+  <ProviderName>QuantiSheet</ProviderName>
+  <DefaultLocale>en-US</DefaultLocale>
+  <DisplayName DefaultValue="QuantiSheet proof (test only)"/>
+  <Description DefaultValue="A test: can an add-in read a PDF attachment and reach QuantiSheet on this computer. Not the real add-in."/>
+  <IconUrl DefaultValue="__HOST__/icon-64.png"/>
+  <HighResolutionIconUrl DefaultValue="__HOST__/icon-128.png"/>
+  <SupportUrl DefaultValue="https://quantisheet.com"/>
+  <AppDomains>
+    <AppDomain>__HOST__</AppDomain>
+  </AppDomains>
+  <Hosts>
+    <Host Name="Mailbox"/>
+  </Hosts>
+  <Requirements>
+    <Sets>
+      <Set Name="Mailbox" MinVersion="1.8"/>
+    </Sets>
+  </Requirements>
+  <FormSettings>
+    <Form xsi:type="ItemRead">
+      <DesktopSettings>
+        <SourceLocation DefaultValue="__HOST__/proof.html"/>
+        <RequestedHeight>250</RequestedHeight>
+      </DesktopSettings>
+    </Form>
+  </FormSettings>
+  <Permissions>ReadItem</Permissions>
+  <Rule xsi:type="RuleCollection" Mode="Or">
+    <Rule xsi:type="ItemIs" ItemType="Message" FormType="Read"/>
+  </Rule>
+  <DisableEntityHighlighting>false</DisableEntityHighlighting>
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides" xsi:type="VersionOverridesV1_0">
+    <Requirements>
+      <bt:Sets DefaultMinVersion="1.8">
+        <bt:Set Name="Mailbox"/>
+      </bt:Sets>
+    </Requirements>
+    <Hosts>
+      <Host xsi:type="MailHost">
+        <DesktopFormFactor>
+          <ExtensionPoint xsi:type="MessageReadCommandSurface">
+            <OfficeTab id="TabDefault">
+              <Group id="qsProofGroup">
+                <Label resid="groupLabel"/>
+                <Control xsi:type="Button" id="qsProofButton">
+                  <Label resid="buttonLabel"/>
+                  <Supertip>
+                    <Title resid="buttonLabel"/>
+                    <Description resid="buttonTip"/>
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="icon16"/>
+                    <bt:Image size="32" resid="icon32"/>
+                    <bt:Image size="80" resid="icon80"/>
+                  </Icon>
+                  <Action xsi:type="ShowTaskpane">
+                    <SourceLocation resid="paneUrl"/>
+                  </Action>
+                </Control>
+              </Group>
+            </OfficeTab>
+          </ExtensionPoint>
+        </DesktopFormFactor>
+      </Host>
+    </Hosts>
+    <Resources>
+      <bt:Images>
+        <bt:Image id="icon16" DefaultValue="__HOST__/icon-16.png"/>
+        <bt:Image id="icon32" DefaultValue="__HOST__/icon-32.png"/>
+        <bt:Image id="icon80" DefaultValue="__HOST__/icon-128.png"/>
+      </bt:Images>
+      <bt:Urls>
+        <bt:Url id="paneUrl" DefaultValue="__HOST__/proof.html"/>
+      </bt:Urls>
+      <bt:ShortStrings>
+        <bt:String id="groupLabel" DefaultValue="QuantiSheet"/>
+        <bt:String id="buttonLabel" DefaultValue="QuantiSheet proof"/>
+      </bt:ShortStrings>
+      <bt:LongStrings>
+        <bt:String id="buttonTip" DefaultValue="Test only: checks that an add-in can read a PDF attachment and reach QuantiSheet on this computer."/>
+      </bt:LongStrings>
+    </Resources>
+  </VersionOverrides>
+</OfficeApp>

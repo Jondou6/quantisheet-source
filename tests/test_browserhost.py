@@ -145,3 +145,69 @@ def test_setup_registers_the_line_for_the_add_on_only():
         assert (f'Software\\{browser}\\NativeMessagingHosts\\'
                 'com.quantisheet.open"') in iss
     assert 'Source: "browser-host.json"; DestDir: "{app}"' in iss
+
+
+def test_it_can_turn_the_add_ons_line_and_links_off(tmp_path, monkeypatch):
+    """Nov 28: policy DisableBrowserAddon. The line says so (the add-on
+    then tells the user, and does not try another way), and the add-on's
+    quantisheet:// links open nothing."""
+    from app import policy, weblink
+    assert "DisableBrowserAddon" in policy.SETTINGS if hasattr(
+        policy, "SETTINGS") else True
+    monkeypatch.setattr(policy, "on",
+                        lambda name: name == "DisableBrowserAddon")
+    got, opened = _send(
+        tmp_path, {"type": "hello"}, {"type": "begin", "name": "p.pdf"},
+        {"type": "data", "b64": base64.b64encode(PDF).decode()},
+        {"type": "end"})
+    assert all(g == {"ok": False, "off": True,
+                     "error": "turned off by your IT department"}
+               for g in got) and len(got) == 4
+    assert os.listdir(tmp_path) == [] and not opened
+    real = tmp_path / "plan.pdf"
+    real.write_bytes(PDF)
+    from urllib.parse import quote
+    link = "quantisheet://open?path=" + quote(str(real), safe="")
+    assert weblink.files(["QuantiSheet.exe", link]) == []
+    monkeypatch.setattr(policy, "on", lambda name: False)
+    assert weblink.files(["QuantiSheet.exe", link]) == [str(real)]
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    ext = os.path.join(root, "browser_extension")
+    assert "hello.off" in open(os.path.join(ext, "direct.js")).read()
+    assert "if (r.off) {" in open(os.path.join(ext, "sw.js")).read()
+
+
+def test_what_an_interrupted_hand_off_left_is_cleared_after_a_day(tmp_path):
+    """Nov 28: a half-sent file and the takeoff notes of a PDF that is
+    gone. Only those; never a PDF, never anything newer than a day."""
+    import time
+    from app import browserhost as bh, webmarks
+    assert bh._NOTE == ".pdf" + webmarks.SUFFIX
+    old = time.time() - 3 * 24 * 3600
+
+    def make(name, aged=True):
+        p = tmp_path / name
+        p.write_bytes(b"x")
+        if aged:
+            os.utime(p, (old, old))
+        return p
+
+    part = make(".4321-Made-up Plan.pdf.part")
+    new_part = make(".4322-Made-up Plan.pdf.part", aged=False)
+    orphan = make("Gone Plan.pdf.qsweb.json")
+    new_orphan = make("Gone Plan (2).pdf.qsweb.json", aged=False)
+    kept_pdf = make("Kept Plan.pdf")
+    kept_note = make("Kept Plan.pdf.qsweb.json")
+    other = make("notes.txt")
+    lookalike = make("my.part")
+    assert bh.tidy(str(tmp_path)) == 2
+    assert not part.exists() and not orphan.exists()
+    for p in (new_part, new_orphan, kept_pdf, kept_note, other, lookalike):
+        assert p.exists()
+    assert bh.tidy(str(tmp_path / "not there")) == 0
+    # it runs when the next PDF starts to arrive
+    part2 = make(".9-Old.pdf.part")
+    rx = bh.Receiver(where=str(tmp_path), opener=lambda p: None)
+    assert rx.handle({"type": "begin", "name": "New.pdf"})["ok"]
+    assert not part2.exists()
+    rx.handle({"type": "abort"})

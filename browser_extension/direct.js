@@ -163,6 +163,10 @@ async function direct(url, title, tabId, own) {
   if (!chrome.runtime.connectNative) return { ok: false, noApp: true };
   const line = new Line();
   const hello = await line.ask({ type: "hello" });
+  if (hello && hello.off) {
+    line.close();
+    return { ok: false, off: true };
+  }
   if (!hello || !hello.ok) {
     line.close();
     return { ok: false, noApp: true };

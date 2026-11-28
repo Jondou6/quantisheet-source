@@ -57,6 +57,24 @@ clicks and the scale with the PDF (`"marks"` on the direct line's `end`),
 `app/webmarks.py` builds QuantiSheet's own takeoff markups from them when
 the PDF opens, with the program's own arithmetic, as one step Undo takes
 back. `viewer.html` now has three script lines above `viewer.mjs`.
+The panel is a column down the right side (the page area gives it the
+room, so the drawing is never covered). The two-point scale takes feet
+and inches (`10' 6"`). When a page's own words state exactly one scale
+(`SCALE: 1/4" = 1'-0"`) the panel offers it with a Use it button; it is
+never applied by itself. Erase removes the one measurement clicked. A PDF
+opened by its web address keeps its takeoff in the browser until it is
+cleared; one opened with View here keeps it for a day, as long as the
+add-on keeps that PDF. A named item (Walls, Doors) has one colour, the
+same in the viewer and in QuantiSheet (1.1.42 or newer).
+Clicks snap to the ends of the lines the page itself draws (read from
+PDF.js's record of the page, `getOperatorList`) and to the corners of
+measurements already made; a tick-box turns that off. Holding Shift
+squares the line up to level, plumb or 45 degrees.
+Cut-out takes an opening off the area it is drawn in (QuantiSheet 1.1.41
+or newer does the same on opening, with its own Cutout rules; an older
+one ignores cut-outs). One drawn outside every area is shown as "won't be
+taken off" and QuantiSheet leaves it out.
+Move drags a corner of a finished measurement; Erase removes one.
 
 The add-on's id is fixed by `key` in manifest.json; setup's
 `browser-host.json` lists the ids that may use the direct line. A store
@@ -91,3 +109,7 @@ Developer mode > Load unpacked > this folder.
 Not published. Publishing needs Jon's go, a Chrome Web Store developer
 account (one-time fee) and, for Edge, the Microsoft Edge program in
 Partner Center (no fee). The same folder is the package for both.
+
+Trying it in a real browser: `node tools/addon_test/run.js` (see the top
+of that file). The claims in tests/test_browser_extension.py that say
+"tried in a test browser" were made with it.

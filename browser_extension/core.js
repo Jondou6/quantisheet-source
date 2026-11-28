@@ -165,6 +165,9 @@ class Line {
   }
 }
 
+const OFF_BY_IT = "Your IT department has turned off opening PDFs from " +
+  "the browser in QuantiSheet.";
+
 // ---- a PDF kept inside the add-on for its viewer page ------------------
 // (the browser's own storage for this add-on; nothing leaves the computer)
 const STASH_DB = "qs-view";

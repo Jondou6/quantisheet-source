@@ -272,16 +272,19 @@ def run(url):
                     "!document.getElementById(i).disabled)})"))
                 if TAKEOFF:
                     # the made-up clicks of tests/test_webmarks.py: at
-                    # 1/4 inch to the foot, 10 ft, 100 sq ft, 2 counts
-                    v.js("sessionStorage.setItem('qs-takeoff:' + "
-                         "location.search, JSON.stringify({scales: {}, "
+                    # 1/4 inch to the foot, 10 ft, 100 sq ft less a 4 sq ft
+                    # cut-out, 2 counts
+                    v.js("localStorage.setItem('qs-takeoff:' + "
+                         "location.search, JSON.stringify({at: Date.now(), scales: {}, "
                          "everyPage: {ppu: 18, unit: 'ft', name: '1/4 in'},"
                          " marks: [{page: 0, type: 'length', group: 'Walls',"
                          " pts: [[72, 700], [252, 700]]}, {page: 0, type: "
                          "'area', group: 'Slab', pts: [[72, 400], [252, 400],"
                          " [252, 580], [72, 580]]}, {page: 0, type: 'count',"
                          " group: 'Doors', pts: [[300, 300]]}, {page: 0, "
-                         "type: 'count', group: 'Doors', pts: [[330, 300]]}"
+                         "type: 'count', group: 'Doors', pts: [[330, 300]]},"
+                         " {page: 0, type: 'cutout', group: '', pts: "
+                         "[[100, 430], [136, 430], [136, 466], [100, 466]]}"
                          "]})); location.reload(); 1")
                     time.sleep(6)
                     v = WS(vt["webSocketDebuggerUrl"])

@@ -131,6 +131,10 @@ function send(url, title, tabId, opt) {
     // first choice: straight into QuantiSheet, no download at all
     return direct(url, title, tabId, own).then((r) => {
       if (r.ok) return { ok: true, direct: true };
+      if (r.off) {
+        say(OFF_BY_IT, tabId);
+        return { ok: false, why: OFF_BY_IT };
+      }
       return download(url, title, tabId, place, own);
     });
   }
@@ -322,6 +326,19 @@ function saveHeld(url, name, tabId) {
 }
 
 chrome.runtime.onMessage.addListener((msg, sender, reply) => {
+  // the viewer couldn't load a PDF: leave that address to the browser's
+  // own viewer in that tab for the next while
+  if (msg && msg.type === "qs-usual" && sender.tab &&
+      sender.id === chrome.runtime.id &&
+      String(sender.url || "").startsWith(VIEWER_URL)) {
+    recent.set(sender.tab.id, [String(msg.url || ""), Date.now()]);
+    reply({ ok: true });
+    return false;
+  }
+  return false;
+});
+
+chrome.runtime.onMessage.addListener((msg, sender, reply) => {
   // from the add-on's own viewer page only, and only a PDF it holds
   if (!msg || msg.type !== "qs-save" || !sender.tab ||
       sender.id !== chrome.runtime.id ||
@@ -454,6 +471,9 @@ function onPdfShown(details) {
         return;
       }
       recent.set(details.tabId, [details.url, Date.now()]);
+      if (o.viewer && details.method && details.method !== "GET") {
+        return;         // a PDF made by a form: asking again won't give it
+      }
       if (o.viewer) {
         chrome.tabs.update(details.tabId, {
           url: VIEWER_URL + "?src=" + encodeURIComponent(details.url)

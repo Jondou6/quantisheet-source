@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QuantiSheet proof (test only)</title>
+<script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+<style>
+  body { font: 14px/1.45 "Segoe UI", Arial, sans-serif; margin: 14px;
+         color: #1d2424; }
+  h1 { font-size: 16px; margin: 0 0 8px; }
+  button { padding: 8px 14px; border: 0; border-radius: 5px;
+           background: #0e6a60; color: #fff; font-weight: 600;
+           cursor: pointer; }
+  ol { padding-left: 18px; }
+  li { margin: 6px 0; }
+  .ok { color: #0e6a60; font-weight: 600; }
+  .no { color: #b8312b; font-weight: 600; }
+  pre { white-space: pre-wrap; background: #f3f6f5; padding: 8px;
+        border-radius: 5px; font-size: 12px; }
+</style>
+</head>
+<body>
+<h1>QuantiSheet proof (test only)</h1>
+<p>This checks two things, on this email only: can an add-in read a PDF
+attachment, and can it reach a program on this computer. Nothing is sent
+anywhere else.</p>
+<button id="run">Run the test</button>
+<ol id="steps"></ol>
+<p>Copy what is below back to Claude:</p>
+<pre id="report">(not run yet)</pre>
+<script src="proof.js"></script>
+</body>
+</html>

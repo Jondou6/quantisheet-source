@@ -292,9 +292,15 @@ def test_module_does_not_download():
 
 
 def test_free_disk_matches_the_drive(tmp_path):
+    before = shutil.disk_usage(tmp_path).free
     got = models.free_disk(tmp_path)
     usage = shutil.disk_usage(tmp_path)
-    assert got.free_bytes == usage.free
+    # the other test processes write to the same drive while this runs
+    # (Nov 25: it failed now and then in the full run, never alone), so
+    # the figure only has to lie between the readings either side of it
+    low, high = sorted((before, usage.free))
+    slack = 64 * 1024 * 1024
+    assert low - slack <= got.free_bytes <= high + slack
     assert got.total_bytes == usage.total
     assert os.path.samefile(got.path, tmp_path)
 

@@ -1,0 +1,3 @@
+QuantiSheet 1.1.43
+- A whole email dragged from Outlook's message list onto QuantiSheet now works: every PDF attached to it is saved in Downloads\QuantiSheet and opened. Up to ten emails at once. Before, only the attachment itself could be dragged.
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.43 - the full source of this build. Help > About shows the same link.

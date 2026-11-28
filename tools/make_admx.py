@@ -19,7 +19,8 @@ GROUPS = [("Licensing", "Licensing and sign-in",
           ("Internet", "Internet and AI features",
            ["OfflineMode", "DisableAerial", "DisableWeather",
             "DisableRateLookup", "DisableDocuSign", "DisableDropbox",
-            "DisablePackageStatus", "DisableErrorReports", "DropboxAppKey",
+            "DisablePackageStatus", "DisableErrorReports",
+            "DisableBrowserAddon", "DropboxAppKey",
             "DisableQuantiLink",
             "QuantiLinkURL", "QuantiLinkKey", "DisableAI",
             "DisableUpdateCheck"])]
@@ -82,6 +83,13 @@ EXPLAIN = {
     "FedEx, USPS or DHL) when the user clicks it and has that carrier's "
     "keys. Track (opening the carrier's page) still works. OfflineMode "
     "turns this off too.",
+    "DisableBrowserAddon": "Stops QuantiSheet taking PDFs from the Open in "
+    "QuantiSheet browser add-on: the add-on's direct line (the browser "
+    "starts QuantiSheet to hand it the PDF the user is looking at) and the "
+    "quantisheet:// links it opens. Nothing leaves the computer either way; "
+    "this is for sites that do not allow browser add-ons to pass files to "
+    "programs. Opening PDFs from File > Open, File Explorer and by dragging "
+    "is not affected.",
     "DisableErrorReports": "Team copy only: removes Help > Send Error "
     "Reports Automatically, which a tester can turn on to send a short "
     "report (what happened, the QuantiSheet and Windows versions, where in "

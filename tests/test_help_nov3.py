@@ -50,7 +50,7 @@ def test_whats_new_111():
         assert w in s
     assert "Adobe" not in s and "Bluebeam" not in s
     from app import __version__
-    assert __version__ == "1.1.40"
+    assert __version__ == "1.1.44"
 
 
 def test_whats_new_112():
@@ -630,6 +630,54 @@ def test_whats_new_1140():
                      "whats_new.json")
     s = json.load(open(p, encoding="utf-8"))["1.1.40"]
     for w in ("Outlook", "drag", "v1.1.40"):
+        assert w in s
+    for bad in ("Repro", "Adobe", "Acrobat", "Bluebeam", "Planswift", "HMB",
+                "PlanHub", "Calcs.com", "Dillon", "AECOM", "Harbor", "Metro",
+                "Consensus", "Chrome", "Edge", "Brave"):
+        assert bad not in s
+
+
+def test_whats_new_1141():
+    p = os.path.join(os.path.dirname(helpcenter.__file__), "data",
+                     "whats_new.json")
+    s = json.load(open(p, encoding="utf-8"))["1.1.41"]
+    for w in ("browser add-on", "Cut-outs", "v1.1.41"):
+        assert w in s
+    for bad in ("Repro", "Adobe", "Acrobat", "Bluebeam", "Planswift", "HMB",
+                "PlanHub", "Calcs.com", "Dillon", "AECOM", "Harbor", "Metro",
+                "Consensus", "Chrome", "Edge", "Brave"):
+        assert bad not in s
+
+
+def test_whats_new_1142():
+    p = os.path.join(os.path.dirname(helpcenter.__file__), "data",
+                     "whats_new.json")
+    s = json.load(open(p, encoding="utf-8"))["1.1.42"]
+    for w in ("Outlook", "colour", "v1.1.42"):
+        assert w in s
+    for bad in ("Repro", "Adobe", "Acrobat", "Bluebeam", "Planswift", "HMB",
+                "PlanHub", "Calcs.com", "Dillon", "AECOM", "Harbor", "Metro",
+                "Consensus", "Chrome", "Edge", "Brave"):
+        assert bad not in s
+
+
+def test_whats_new_1143():
+    p = os.path.join(os.path.dirname(helpcenter.__file__), "data",
+                     "whats_new.json")
+    s = json.load(open(p, encoding="utf-8"))["1.1.43"]
+    for w in ("whole email", "Outlook", "v1.1.43"):
+        assert w in s
+    for bad in ("Repro", "Adobe", "Acrobat", "Bluebeam", "Planswift", "HMB",
+                "PlanHub", "Calcs.com", "Dillon", "AECOM", "Harbor", "Metro",
+                "Consensus", "Chrome", "Edge", "Brave"):
+        assert bad not in s
+
+
+def test_whats_new_1144():
+    p = os.path.join(os.path.dirname(helpcenter.__file__), "data",
+                     "whats_new.json")
+    s = json.load(open(p, encoding="utf-8"))["1.1.44"]
+    for w in ("half-sent", "never touched", "v1.1.44"):
         assert w in s
     for bad in ("Repro", "Adobe", "Acrobat", "Bluebeam", "Planswift", "HMB",
                 "PlanHub", "Calcs.com", "Dillon", "AECOM", "Harbor", "Metro",

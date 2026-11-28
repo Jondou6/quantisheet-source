@@ -416,3 +416,222 @@ console.log(JSON.stringify({ totals: t.totals(), quarter,
     assert out["first"] == {"page": 0, "type": "length", "group": "Walls",
                             "pts": [[72, 700], [252, 700]]}
     assert sorted(out["keys"]) == ["group", "page", "pts", "type"]
+
+
+@pytest.mark.skipif(not shutil.which("node"), reason="needs Node.js")
+def test_erase_removes_the_measurement_clicked_and_only_that_one():
+    """Nov 28: the viewer's takeoff had Undo and Clear only. Erase takes
+    out the one measurement under the click (tried in a test browser:
+    the middle one of three counts)."""
+    js = r"""
+const t = require(process.argv[1]);
+const m = [
+  { page: 0, type: 'length', pts: [[0, 0], [100, 0]] },
+  { page: 0, type: 'area', pts: [[0, 50], [100, 50], [100, 150], [0, 150]] },
+  { page: 0, type: 'count', pts: [[300, 300]] },
+  { page: 1, type: 'count', pts: [[50, 2]] }];
+console.log(JSON.stringify([
+  t.markAt(m, 0, [50, 3], 5),      // on the line
+  t.markAt(m, 0, [50, 20], 5),     // between the line and the area
+  t.markAt(m, 0, [50, 100], 5),    // inside the area
+  t.markAt(m, 0, [304, 303], 5),   // on the count
+  t.markAt(m, 0, [400, 400], 5),   // empty paper
+  t.markAt(m, 1, [50, 3], 5)]));   // another page's own count
+"""
+    r = subprocess.run(["node", "-e", js, os.path.join(EXT, "takeoff.js")],
+                       capture_output=True, text=True, timeout=60)
+    assert r.returncode == 0, r.stderr
+    assert json.loads(r.stdout) == [0, -1, 1, 2, -1, 3]
+    assert "data-tool='erase'" in _read("takeoff.js")
+
+
+@pytest.mark.skipif(not shutil.which("node"), reason="needs Node.js")
+def test_lengths_typed_as_on_drawings_and_the_scale_a_page_states():
+    """Nov 28: the two-point scale takes feet and inches, and the viewer
+    offers the scale a page's own words state - only when the page states
+    exactly one, and never by itself."""
+    js = r"""
+const t = require(process.argv[1]);
+const len = ['20', '12.5 m', "10'", "10' 6\"", "10'-6 1/2\"", '54"',
+             '4ft 6in', 'abc', '', '10 6'].map((x) => t.parseLength(x));
+const sc = ['SCALE: 1/4" = 1\'-0"', 'PLAN SCALE 1/8"=1\'-0" see 3/A-501',
+            'scale 1 1/2" = 1\'-0"', 'SCALE: 1" = 20\'',
+            '1/4" = 1\'-0" and 1/8" = 1\'-0"', 'NOT TO SCALE',
+            'A2 1/4" = 1\'-0"', 'SHEET 11/4" = 1\'-0"', '1" = 2\'-6"',
+            'room is 12\'-6" wide'].map((x) => t.scaleInText(x));
+console.log(JSON.stringify({ len, sc }));
+"""
+    r = subprocess.run(["node", "-e", js, os.path.join(EXT, "takeoff.js")],
+                       capture_output=True, text=True, timeout=60)
+    assert r.returncode == 0, r.stderr
+    out = json.loads(r.stdout)
+    assert out["len"] == [
+        {"value": 20, "unit": None}, {"value": 12.5, "unit": "m"},
+        {"value": 10, "unit": "ft"}, {"value": 10.5, "unit": "ft"},
+        {"value": 10 + 6.5 / 12, "unit": "ft"}, {"value": 54, "unit": "in"},
+        {"value": 4.5, "unit": "ft"}, None, None, None]
+    got = [(x and [x["name"], x["ppu"]]) for x in out["sc"]]
+    assert got == [
+        ['1/4" = 1\'-0"', 18], ['1/8" = 1\'-0"', 9],
+        ['1 1/2" = 1\'-0"', 108], ["1\" = 20'", 3.6],
+        None,                      # two scales on the page: not guessed
+        None, ['1/4" = 1\'-0"', 18],   # a sheet number's tail is not "2 1/4"
+        None,                      # "11/4" is not a scale
+        None, None]
+    t = _read("takeoff.js")
+    assert "This page says " in t and ">Use it</button>" in t
+    # the takeoff column has its own room: the drawing is not covered
+    assert 'area.style.right = show ? DOCK + "px" : "";' in t
+
+
+@pytest.mark.skipif(not shutil.which("node"), reason="needs Node.js")
+def test_clicks_snap_to_the_ends_of_the_lines_the_page_draws():
+    """Nov 28: a click near the end of a drawn line lands on it exactly
+    (and Shift squares a line up), so what QuantiSheet works out is from
+    the drawing's own geometry, not from where the mouse happened to be.
+    Tried in a test browser on a made-up line drawing with a scaled
+    group: clicks 2 points off landed exactly on the ends."""
+    js = r"""
+const t = require(process.argv[1]);
+const OPS = { save: 10, restore: 11, transform: 12, moveTo: 13, lineTo: 14,
+  curveTo: 15, curveTo2: 16, curveTo3: 17, closePath: 18, rectangle: 19,
+  paintFormXObjectBegin: 74, paintFormXObjectEnd: 75, constructPath: 91 };
+// a group drawn at twice size and moved (100, 100): a line and a box;
+// then, back outside the group, a line and a curve; then a form
+const ops = [10, 12, 91, 91, 11, 91, 74, 91, 75, 91];
+const args = [null, [2, 0, 0, 2, 100, 100], [[13, 14], [0, 0, 50, 0]],
+  [[19], [10, 10, 30, 20]], null,
+  [[13, 14, 15, 18], [72, 72, 300, 72, 1, 1, 2, 2, 400, 90]],
+  [[1, 0, 0, 1, 500, 500], [0, 0, 1, 1]], [[13, 14], [0, 0, 5, 5]], null,
+  [[13], [7, 7]]];
+const ends = t.lineEnds(ops, args, OPS);
+const g = t.gridOf(ends);
+const r2 = (p) => p && p.map((n) => Math.round(n * 100) / 100);
+console.log(JSON.stringify({ ends,
+  near: [t.nearest(g, [101, 98], 9), t.nearest(g, [150, 150], 9),
+         t.nearest(g, [181, 161], 9), t.nearest(g, [506, 504], 9)],
+  square: [r2(t.square([0, 0], [100, 4])), r2(t.square([0, 0], [3, -80])),
+           r2(t.square([10, 10], [60, 58]))] }));
+"""
+    r = subprocess.run(["node", "-e", js, os.path.join(EXT, "takeoff.js")],
+                       capture_output=True, text=True, timeout=60)
+    assert r.returncode == 0, r.stderr
+    out = json.loads(r.stdout)
+    assert out["ends"] == [
+        [100, 100], [200, 100],                          # the scaled line
+        [120, 120], [180, 120], [180, 160], [120, 160],  # the scaled box
+        [72, 72], [300, 72], [400, 90],          # outside the group again
+        [500, 500], [505, 505],                          # inside the form
+        [7, 7]]                                          # and out of it
+    assert out["near"] == [[100, 100], None, [180, 160], [505, 505]]
+    assert out["square"] == [[100.08, 0], [0, -80.06], [59.01, 59.01]]
+    t = _read("takeoff.js")
+    assert "id='qsSnap' checked" in t            # on, with a box to turn off
+    assert "if (on && !on.checked) return p;" in t
+
+
+@pytest.mark.skipif(not shutil.which("node"), reason="needs Node.js")
+def test_a_cut_out_previews_net_of_its_area_like_quantisheet():
+    """Nov 28: Cut-out in the viewer. Same made-up clicks as
+    tests/test_webmarks.py: 100 sq ft less a 2 ft square is 96, and a
+    cut-out outside every area is shown as one that won't be taken off."""
+    js = r"""
+const t = require(process.argv[1]);
+t.state.everyPage = { ppu: 18, unit: 'ft', name: 'quarter inch' };
+t.state.marks = [
+  { page: 0, type: 'area', group: 'Slab',
+    pts: [[72, 400], [252, 400], [252, 580], [72, 580]] },
+  { page: 0, type: 'cutout', group: '',
+    pts: [[100, 430], [136, 430], [136, 466], [100, 466]] },
+  { page: 0, type: 'cutout', group: '',
+    pts: [[400, 100], [436, 100], [436, 136], [400, 136]] }];
+console.log(JSON.stringify({ totals: t.totals(),
+  sent: t.data().marks.map((m) => m.type) }));
+"""
+    r = subprocess.run(["node", "-e", js, os.path.join(EXT, "takeoff.js")],
+                       capture_output=True, text=True, timeout=60)
+    assert r.returncode == 0, r.stderr
+    out = json.loads(r.stdout)
+    assert out["totals"] == [
+        {"type": "area", "group": "Slab", "unit": "sq ft", "value": 96,
+         "n": 1},
+        {"type": "cutout", "group": "", "unit": "not inside an area",
+         "value": 4, "n": 1}]
+    assert out["sent"] == ["area", "cutout", "cutout"]   # clicks, as ever
+    assert "data-tool='cutout'" in _read("takeoff.js")
+
+
+@pytest.mark.skipif(not shutil.which("node"), reason="needs Node.js")
+def test_move_finds_the_corner_under_the_mouse():
+    """Nov 28: Move drags a corner of a finished measurement (tried in a
+    test browser: an area's corner pulled out 2 ft and put back)."""
+    js = r"""
+const t = require(process.argv[1]);
+const m = [{ page: 0, pts: [[0, 0], [100, 0]] },
+           { page: 0, pts: [[50, 50], [98, 3]] },
+           { page: 1, pts: [[100, 1]] }];
+console.log(JSON.stringify([t.cornerAt(m, 0, [99, 1], 9),
+  t.cornerAt(m, 0, [60, 60], 9), t.cornerAt(m, 1, [99, 1], 9)]));
+"""
+    r = subprocess.run(["node", "-e", js, os.path.join(EXT, "takeoff.js")],
+                       capture_output=True, text=True, timeout=60)
+    assert r.returncode == 0, r.stderr
+    assert json.loads(r.stdout) == [{"mark": 0, "corner": 1}, None,
+                                    {"mark": 2, "corner": 0}]
+    assert "data-tool='move'" in _read("takeoff.js")
+    # an older QuantiSheet is told apart, not left to drop things silently
+    assert "cut-outs need QuantiSheet 1.1.41" in _read("viewer-qs.js")
+
+
+def test_the_viewer_uses_quantisheets_takeoff_keys():
+    """Nov 28: Shift+L, Shift+A and Shift+C pick the tools, as they do in
+    QuantiSheet - only while the takeoff column is open, and never while
+    typing a name (tried in a test browser)."""
+    t = _read("takeoff.js")
+    assert '{ L: "length", A: "area", C: "count" }[e.key]' in t
+    assert "!typing && !panel.hidden" in t
+    assert 'e.key === "Enter" && !typing' in t
+
+
+@pytest.mark.skipif(not shutil.which("node"), reason="needs Node.js")
+def test_a_named_item_has_the_same_colour_in_the_browser_and_the_program():
+    """Nov 28: Walls are one colour and Doors another, in the viewer and
+    then in QuantiSheet, so what was clicked out is recognisable."""
+    pytest.importorskip("fitz")
+    from app import webmarks
+    js = r"""
+const t = require(process.argv[1]);
+console.log(JSON.stringify({ palette: t.PALETTE,
+  walls: t.colorFor({ type: 'length', group: 'Walls' }),
+  doors: t.colorFor({ type: 'count', group: 'Doors' }),
+  none: t.colorFor({ type: 'area', group: '' }) }));
+"""
+    r = subprocess.run(["node", "-e", js, os.path.join(EXT, "takeoff.js")],
+                       capture_output=True, text=True, timeout=60)
+    assert r.returncode == 0, r.stderr
+    out = json.loads(r.stdout)
+    assert out["palette"] == webmarks.PALETTE
+
+    def css(c):
+        return "rgb(" + ",".join(str(int(v * 255 + 0.5)) for v in c) + ")"
+    assert out["walls"] == css(webmarks.color_for("length", "Walls"))
+    assert out["doors"] == css(webmarks.color_for("count", "Doors"))
+    assert out["walls"] != out["doors"]
+    assert webmarks.color_for("area", "") == webmarks.COLORS["area"]
+    assert out["none"] == "#1a73d9"
+
+
+def test_the_viewer_has_a_way_back_when_a_site_wont_send_the_pdf_again():
+    """Nov 28: with "use this viewer for every PDF" on, a website that
+    refuses the add-on's own request left an error and no PDF. The viewer
+    now says so with a link to the browser's own viewer, and the add-on
+    leaves that address alone (tried in a test browser against a made-up
+    site that answers 403 to anything but the tab itself)."""
+    v = _read("viewer-qs.js")
+    assert 'app.eventBus.on("documenterror", () => usual(src));' in v
+    assert "Open it the usual way" in v and 'type: "qs-usual"' in v
+    sw = _read("sw.js")
+    assert 'msg.type === "qs-usual"' in sw
+    assert "recent.set(sender.tab.id, [String(msg.url" in sw
+    # the hand-off test counts tabs.update calls: still only the viewer's
+    assert sw.count("chrome.tabs.update(") == 2

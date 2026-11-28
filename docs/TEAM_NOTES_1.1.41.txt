@@ -1,0 +1,4 @@
+QuantiSheet 1.1.41
+- Cut-outs drawn in the Open in QuantiSheet browser add-on's viewer (not released yet) come into QuantiSheet too: each is taken off the area it was drawn in, the same way the Cutout tool does it. One drawn outside every area is left out and you are told how many.
+- For IT: a new setting, DisableBrowserAddon, stops QuantiSheet taking PDFs from the browser add-on (its direct line and its links). See the IT deployment guide.
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.41 - the full source of this build. Help > About shows the same link.

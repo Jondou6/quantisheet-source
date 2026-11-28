@@ -41,6 +41,18 @@ MAX_POINTS = 2000
 UNITS = tuple(takeoff.UNITS)
 COLORS = {"length": [0.85, 0.1, 0.1], "area": [0.1, 0.45, 0.85],
           "count": [0.9, 0.5, 0.0]}
+# A named item keeps one colour, the same one the browser showed it in
+# (browser_extension/takeoff.js PALETTE; tests compare the two lists).
+PALETTE = [[0.85, 0.1, 0.1], [0.1, 0.45, 0.85], [0.1, 0.6, 0.3],
+           [0.9, 0.5, 0.0], [0.55, 0.25, 0.75], [0.0, 0.6, 0.65],
+           [0.8, 0.2, 0.55], [0.45, 0.35, 0.15]]
+
+
+def color_for(kind, group):
+    """The colour of a measurement: by its name, else by its kind."""
+    if not group:
+        return list(COLORS[kind])
+    return list(PALETTE[sum(ord(c) for c in group) % len(PALETTE)])
 
 
 def sidecar(path):
@@ -66,10 +78,10 @@ def clean(data):
                               "all": s.get("all") is True})
     for m in (data.get("marks") or [])[:MAX_MARKS]:
         if not isinstance(m, dict) or \
-                m.get("type") not in ("length", "area", "count"):
+                m.get("type") not in ("length", "area", "count", "cutout"):
             continue
         pts = _points(m.get("pts"))
-        need = {"length": 2, "area": 3, "count": 1}[m["type"]]
+        need = {"length": 2, "area": 3, "count": 1, "cutout": 3}[m["type"]]
         if not _is_page(m.get("page")) or pts is None or len(pts) < need:
             continue
         if m["type"] == "count":
@@ -136,6 +148,8 @@ def build(doc, data):
             scales[p] = {"ppu": s["ppu"], "unit": s["unit"]}
     counts = {}                         # (page, group) -> how many so far
     for m in data["marks"]:
+        if m["type"] == "cutout":       # after the areas are in: cutouts()
+            continue
         pno = m["page"]
         if pno >= n_pages:
             skipped += 1
@@ -155,7 +169,7 @@ def build(doc, data):
             counts[key] += 1
             marks.append((pno, "add_count", {
                 "pt": [ppts[0].x, ppts[0].y], "n": counts[key],
-                "color": COLORS["count"],
+                "color": color_for("count", group),
                 "measure": {"type": "count", "value": 1, "unit": "ea",
                             "group": group, "method": METHOD}}))
             continue
@@ -180,13 +194,91 @@ def build(doc, data):
         label = measure_extra.label_text(m["type"], value, unit_text, group,
                                          {}, takeoff.fmt)
         payload = {"pts": [[q.x, q.y] for q in ppts],
-                   "color": COLORS[m["type"]], "label": label,
+                   "color": color_for(m["type"], group), "label": label,
                    "measure": {"type": m["type"], "value": round(value, 4),
                                "unit": unit_text, "group": group,
                                "method": METHOD}}
         if kind == "add_polygon":
-            payload["fill"] = COLORS["area"]
+            payload["fill"] = color_for("area", group)
         marks.append((pno, kind, payload))
+    return marks, skipped
+
+
+def _point_in(pt, verts):
+    hit = False
+    n = len(verts)
+    for i in range(n):
+        a, b = verts[i], verts[(i + 1) % n]
+        if (a.y > pt.y) != (b.y > pt.y) and \
+                pt.x < (b.x - a.x) * (pt.y - a.y) / (b.y - a.y) + a.x:
+            hit = not hit
+    return hit
+
+
+def _area_at(page, pt):
+    """The smallest area measurement on `page` containing `pt`:
+    (annotation, group, unit) or None (as the Cutout tool finds it)."""
+    import fitz
+    best = None
+    for a in annotate.iter_annots(page):
+        subj = (a.info or {}).get("subject", "")
+        if not subj.startswith(annotate.TAKEOFF + ":area:") or \
+                a.type[0] != fitz.PDF_ANNOT_POLYGON:
+            continue
+        verts = [fitz.Point(v) for v in (a.vertices or [])]
+        if len(verts) < 3 or not _point_in(pt, verts):
+            continue
+        size = takeoff.polygon_area(verts)
+        if best is None or size < best[0]:
+            parts = subj.split(":", 5) + [""] * 6
+            best = (size, a, parts[4], parts[3])
+    return best[1:] if best else None
+
+
+def cutouts(doc, data):
+    """(marks, skipped) for the browser's cut-outs. Call it once the
+    areas are in the document: a cut-out is taken off the area it was
+    drawn in, the way QuantiSheet's own Cutout tool does it. One drawn
+    outside every area, or where there is no scale, is left out."""
+    import fitz
+    from .dmoney import c2 as _c2
+    data = clean(data)
+    if data is None:
+        return [], 0
+    marks, skipped = [], 0
+    own = {}
+    for s in data["scales"]:
+        for p in (range(doc.page_count) if s["all"] else [s["page"]]):
+            own[p] = {"ppu": s["ppu"], "unit": s["unit"]}
+    for m in data["marks"]:
+        if m["type"] != "cutout":
+            continue
+        pno = m["page"]
+        if pno >= doc.page_count:
+            skipped += 1
+            continue
+        page = doc[pno]
+        mat = page.transformation_matrix
+        ppts = [fitz.Point(x, y) * mat for x, y in m["pts"]]
+        sc = own.get(pno) or annotate.scale_at(
+            doc, pno, [(q.x, q.y) for q in ppts])
+        cx = sum(q.x for q in ppts) / len(ppts)
+        cy = sum(q.y for q in ppts) / len(ppts)
+        hit = _area_at(page, fitz.Point(cx, cy)) if sc else None
+        tag = annotate.tag_of(hit[0]) if hit else None
+        value = takeoff.polygon_area(ppts) / sc["ppu"] ** 2 if sc else 0
+        if not tag or not value > 0:
+            skipped += 1
+            continue
+        parent, group, unit = hit
+        color = list(parent.colors.get("stroke") or COLORS["area"])
+        marks.append((pno, "add_polygon", {
+            "pts": [[q.x, q.y] for q in ppts], "color": color,
+            "fill": [1, 1, 1], "dashes": True, "width": 1.2,
+            "label": f"Cutout -{_c2(value):,.2f} {unit}",
+            "measure": {"type": annotate.CUTOUT, "value": round(value, 4),
+                        "unit": unit, "group": group, "parent": tag,
+                        "method": METHOD}}))
     return marks, skipped
 
 
@@ -215,13 +307,19 @@ def take(view, path):
         return None
     marks, skipped = build(view.doc, data)
     added = 0
-    if marks:
-        hint, view.method_hint = view.method_hint, None
-        try:
+    hint, view.method_hint = view.method_hint, None
+    try:
+        if marks:
             view.apply_marks(marks)
-        finally:
-            view.method_hint = hint
-        added = sum(1 for _p, k, _pl in marks if k != "set_scale")
+            added = sum(1 for _p, k, _pl in marks if k != "set_scale")
+        # cut-outs go in second: each is taken off an area now in place
+        more, left = cutouts(view.doc, data)
+        skipped += left
+        if more:
+            view.apply_marks(more)
+            added += len(more)
+    finally:
+        view.method_hint = hint
     _remove(side)
     return added, skipped
 

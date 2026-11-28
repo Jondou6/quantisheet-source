@@ -2,8 +2,8 @@
   "manifest_version": 3,
   "name": "Open in QuantiSheet",
   "short_name": "QuantiSheet",
-  "version": "1.5.0",
-  "description": "Send the plan PDF you are looking at straight into QuantiSheet on this computer.",
+  "version": "1.9.1",
+  "description": "Open a web PDF in QuantiSheet, make a web page a PDF, or view, mark up and measure a PDF in the browser.",
   "minimum_chrome_version": "110",
   "icons": {
     "16": "icons/icon16.png",
