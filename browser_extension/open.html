@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Open in QuantiSheet</title>
+<style>
+  body { font: 15px/1.5 "Segoe UI", Arial, sans-serif; margin: 0;
+         background: #f4f7f6; color: #1d2424; }
+  .card { max-width: 520px; margin: 12vh auto 0; background: #fff;
+          border-radius: 10px; padding: 28px 30px 26px;
+          box-shadow: 0 2px 14px rgba(0,0,0,.12); }
+  h1 { font-size: 20px; margin: 0 0 6px; }
+  #file { font-weight: 600; word-break: break-word; margin: 0 0 18px; }
+  a.btn { display: inline-block; padding: 11px 20px; border-radius: 6px;
+          background: #0e6a60; color: #fff; font-weight: 600;
+          text-decoration: none; }
+  a.btn:hover { background: #0b5a51; }
+  p { margin: 14px 0 0; color: #4a5757; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #141918; color: #e7eeec; }
+    .card { background: #1b2221; } p { color: #a9b8b5; }
+    a.btn { background: #1f746b; }
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Opening in QuantiSheet</h1>
+  <div id="file">&nbsp;</div>
+  <a class="btn" id="go" href="#">Open in QuantiSheet</a>
+  <p id="note">If your browser asks, choose Open QuantiSheet. You can
+  tick "Always allow" so it doesn't ask again.</p>
+  <p>If nothing happens, click the button. It needs QuantiSheet 1.1.38 or
+  newer on this computer. You can close this tab afterwards.</p>
+</div>
+<script src="core.js"></script>
+<script src="open.js"></script>
+</body>
+</html>

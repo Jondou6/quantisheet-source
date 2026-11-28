@@ -1,0 +1,3 @@
+QuantiSheet 1.1.37
+- Fixed: a PDF handed over by the Open in QuantiSheet browser add-on (not released yet) now opens. In 1.1.36 QuantiSheet started and closed again without opening it.
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.37 - the full source of this build. Help > About shows the same link.

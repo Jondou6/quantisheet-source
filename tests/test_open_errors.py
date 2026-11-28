@@ -340,3 +340,35 @@ def test_attachments_saved_safely(win, tmp_path):
     assert win.attachments(pick="tool.exe", save_to=str(tmp_path / "t")) \
         is None
     assert not os.path.exists(tmp_path / "t")
+
+
+def test_practice_job_start_over_with_the_plan_open(win):
+    """Nov 25: Start Over wrote a fresh plan over the one open in the
+    window; Windows refused ("Permission denied") and it stopped."""
+    from app import practice_job as pj
+    dlg = win.practice_job(show=False)
+    dlg.next_step()
+    win._view.dirty = False
+    before = win.tabs.count()
+    dlg.start_over()                         # must not raise
+    assert win.tabs.count() == before        # closed, written, opened again
+    assert os.path.normcase(win._path) == os.path.normcase(pj.plan_path())
+    assert dlg.current["id"] == "open" and dlg.next_btn.isEnabled()
+    dlg.close()
+
+
+def test_practice_job_start_over_when_the_plan_cannot_be_written(
+        win, monkeypatch):
+    from app import practice_job as pj
+    dlg = win.practice_job(show=False)
+    win._view.dirty = False
+    real = pj.prepare
+
+    def prepare(root=None, refresh=False):
+        if refresh:
+            raise PermissionError("made-up: file in use")
+        return real(root, refresh)
+    monkeypatch.setattr(pj, "prepare", prepare)
+    dlg.start_over()                         # keeps the plan as it is
+    assert os.path.normcase(win._path) == os.path.normcase(pj.plan_path())
+    dlg.close()

@@ -93,6 +93,22 @@ a = Analysis(
     noarchive=False,
 )
 
+# Nov 25 (smaller installer): parts nothing in QuantiSheet uses - OpenCV's
+# video reader (FFmpeg, 29 MB; drawings are read with imread/imdecode
+# only), Pillow's AVIF photo plugin (7.5 MB; Pillow skips the format when
+# it's missing) and Qt's translations of its own dialogs (6.7 MB; the
+# program is in English)
+DROP = ("opencv_videoio_ffmpeg", "_avif.", "translations" + os.sep)
+
+
+def _keep(entry):
+    name = entry[0].replace("/", os.sep).lower()
+    return not any(d in name for d in DROP)
+
+
+a.binaries = [b for b in a.binaries if _keep(b)]
+a.datas = [d for d in a.datas if _keep(d)]
+
 pyz = PYZ(a.pure)
 
 exe = EXE(

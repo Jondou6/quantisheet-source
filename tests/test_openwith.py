@@ -57,6 +57,25 @@ def _verb(r):
         r.get("tasks", "").lower() == "shellverbs"
 
 
+def _weblink(r):
+    """The quantisheet:// link type (Nov 25, the browser add-on): its own
+    key, written by the standalone setup only."""
+    return r.get("subkey", "").lower().startswith(CLASSES + "quantisheet")\
+        and not r.get("subkey", "").lower().startswith(
+            CLASSES + "quantisheet.")
+
+
+def test_link_type_is_the_standalone_setups_own_key():
+    mine = [r for r in iss_registry("quantisheet.iss") if _weblink(r)]
+    assert len(mine) == 4
+    assert all(r["subkey"].lower() == CLASSES + "quantisheet" or
+               r["subkey"].lower().startswith(CLASSES + "quantisheet\\")
+               for r in mine)
+    assert sum("uninsdeletekey" in r.get("flags", "") for r in mine) == 1
+    assert not [r for r in iss_registry("quantisheet_server.iss")
+                if _weblink(r)]
+
+
 def test_right_click_actions_only_remove_their_own_keys():
     verbs = [r for r in iss_registry("quantisheet.iss") if _verb(r)]
     assert verbs
@@ -74,7 +93,8 @@ def iss_openwith(name):
     type)."""
     regs = [r for r in iss_registry(name)
             if r.get("subkey", "").lower().startswith(CLASSES)
-            and not _cleanup(r) and not _toolset(r) and not _verb(r)]
+            and not _cleanup(r) and not _toolset(r) and not _verb(r)
+            and not _weblink(r)]
     progs = {r["valuename"] for r in regs
              if r["subkey"].lower() == LIST}
     return progs, regs

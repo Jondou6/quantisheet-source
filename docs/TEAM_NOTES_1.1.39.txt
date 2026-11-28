@@ -1,0 +1,3 @@
+QuantiSheet 1.1.39
+- Takeoff started in the Open in QuantiSheet browser add-on (not released yet) comes into QuantiSheet: lengths, areas and counts clicked out in the add-on's viewer arrive as QuantiSheet's own takeoff markups when the PDF opens. QuantiSheet works out the quantities itself from where you clicked and the scale you set. Ctrl+Z takes them all back in one step.
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.39 - the full source of this build. Help > About shows the same link.

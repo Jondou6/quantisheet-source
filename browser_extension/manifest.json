@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "Open in QuantiSheet",
+  "short_name": "QuantiSheet",
+  "version": "1.5.0",
+  "description": "Send the plan PDF you are looking at straight into QuantiSheet on this computer.",
+  "minimum_chrome_version": "110",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "Open in QuantiSheet",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png"
+    }
+  },
+  "background": {
+    "service_worker": "sw.js"
+  },
+  "permissions": [
+    "activeTab",
+    "contextMenus",
+    "downloads",
+    "nativeMessaging",
+    "scripting",
+    "storage"
+  ],
+  "optional_permissions": [
+    "webRequest",
+    "debugger"
+  ],
+  "optional_host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr16tsB+DXCpQVImHwkb22luYqhhHgNMBgwBDVqHiWq9dj13d8oIW3xP00kooZFVQoYeaJZGvIo+5tnPYA5jDjPATVL4wlV6Vet+ISHjZsGUA/LGtO12S9m8rMSzVMnlyAkxXDXRG1+ZfRjCn6eRRnIP9uDXivwqOBWMyd3I6q9TqwBhmkF32KsH9Nf3TGq6ZTqmpB01V6lcXyYSOY5CbOc2A50QWQPYHPihGEo6WZV4xqhJ250w8ATPgwjU3xerR/EOxC4wPJ4XXuxHSqxok9RGygOwI9ec6/v9RXV+rrnFWonmkBKzbtTrGf9zZj6ENlZBytgeJywXy1onbB5yTAQIDAQAB",
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  }
+}

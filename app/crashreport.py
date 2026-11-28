@@ -133,7 +133,12 @@ def write(kind, body):
             with open(path, "w", encoding="utf-8") as f:
                 f.write(_clean(text) + "\n")
             _prune(d)
-            return path
+        try:               # Nov 25: sent only if the tester turned it on
+            from . import errorreports
+            errorreports.maybe_send(path)
+        except Exception:                                 # noqa: BLE001
+            pass
+        return path
     except Exception:                                     # noqa: BLE001
         return None
 

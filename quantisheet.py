@@ -34,12 +34,27 @@ def _convert_old_files():
         pass
 
 
+def _is_link(args):
+    """One quantisheet:// link (the browser add-on): the desktop app
+    opens it. Nov 25: it went to the command-line tools, which stopped
+    with "unknown command", so nothing opened."""
+    return len(args) == 1 and args[0].lower().startswith("quantisheet:")
+
+
+def _is_browser(args):
+    """A browser started us for its add-on (app/browserhost.py)."""
+    return any(a.lower().startswith("chrome-extension://") for a in args)
+
+
 def main():
     multiprocessing.freeze_support()
+    if _is_browser(sys.argv[1:]):
+        from app import browserhost
+        return browserhost.main()
     _convert_old_files()
     args = [a for a in sys.argv[1:] if a != "--new-window"]   # File > New
     gui = not args or (len(args) == 1 and args[0].lower().endswith(".pdf")
-                       and os.path.exists(args[0]))
+                       and os.path.exists(args[0])) or _is_link(args)
     if gui:
         from app.main import run
         return run(sys.argv)

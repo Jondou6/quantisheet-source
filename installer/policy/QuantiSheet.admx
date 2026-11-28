@@ -116,6 +116,12 @@
       <enabledValue><decimal value="1" /></enabledValue>
       <disabledValue><decimal value="0" /></disabledValue>
     </policy>
+    <policy name="DisableErrorReports" class="Both" displayName="$(string.DisableErrorReports)" explainText="$(string.DisableErrorReports_Help)" key="Software\Policies\QuantiSheet" valueName="DisableErrorReports">
+      <parentCategory ref="Internet" />
+      <supportedOn ref="SUPPORTED_QuantiSheet" />
+      <enabledValue><decimal value="1" /></enabledValue>
+      <disabledValue><decimal value="0" /></disabledValue>
+    </policy>
     <policy name="DropboxAppKey" class="Both" displayName="$(string.DropboxAppKey)" explainText="$(string.DropboxAppKey_Help)" presentation="$(presentation.DropboxAppKey)" key="Software\Policies\QuantiSheet">
       <parentCategory ref="Internet" />
       <supportedOn ref="SUPPORTED_QuantiSheet" />

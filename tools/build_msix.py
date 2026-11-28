@@ -141,6 +141,11 @@ MANIFEST = """<?xml version="1.0" encoding="utf-8"?>
             </uap:SupportedFileTypes>
           </uap:FileTypeAssociation>
         </uap:Extension>
+        <uap:Extension Category="windows.protocol">
+          <uap:Protocol Name="quantisheet">
+            <uap:DisplayName>QuantiSheet</uap:DisplayName>
+          </uap:Protocol>
+        </uap:Extension>
       </Extensions>
     </Application>
   </Applications>

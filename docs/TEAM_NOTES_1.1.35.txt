@@ -1,0 +1,5 @@
+QuantiSheet 1.1.35
+- Auto Scale: a sheet whose details all say SCALE: NONE is now reported as not to scale (don't measure from it) instead of 'set it by hand', and a section's scale note is read even when its foot mark prints badly.
+- Send with QuantiLink now tells your office's QuantiLink who pressed Send (the name on your markups), so files sent with the shared office key show their sender.
+- Team copy: Help > Send Error Reports Automatically. It is off until you turn it on. When on, after an error QuantiSheet sends a short report - what happened, the QuantiSheet and Windows versions and where in the program the error was. It never sends drawings, job files, file or folder names, prices, email addresses or the log. Your IT department can remove it (DisableErrorReports).
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.35 - the full source of this build. Help > About shows the same link.

@@ -1,0 +1,9 @@
+{
+  "name": "com.quantisheet.open",
+  "description": "Open in QuantiSheet: receives a PDF from the browser add-on and opens it",
+  "path": "QuantiSheet.exe",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://klfflmcmedeghfecpbdmfajjhdbhigap/"
+  ]
+}

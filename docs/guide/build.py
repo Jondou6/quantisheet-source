@@ -56,6 +56,7 @@ thead { display: table-header-group; }
 .toc h1 { margin-bottom: 8px; }
 .toc .row { display: flex; justify-content: space-between; align-items: baseline;
             border-bottom: 1px dotted #d6c2c0; padding: 7px 0 5px; }
+.toc a.row { color: inherit; text-decoration: none; }
 .toc .row.top { font-size: 11.4pt; padding: 9px 0 6px; }
 .toc .row.sub { font-size: 9.8pt; padding-left: 22px; }
 .toc .row .n { color: #b8312b; font-weight: bold; }
@@ -181,8 +182,10 @@ def page_html(body, toc, pages):
     for lvl, title, hid in toc:
         num = pages.get(hid, 88)
         cls = "top" if lvl == 1 else "sub"
-        rows.append(f'<div class="row {cls}"><span>{inline(title)}</span>'
-                    f'<span class="n">{num}</span></div>')
+        # each row is a link to its topic (Jon, Nov 25); link_contents()
+        # points it at the page once the cover is added
+        rows.append(f'<a class="row {cls}" href="#{hid}"><span>'
+                    f'{inline(title)}</span><span class="n">{num}</span></a>')
     return ("<!doctype html><html><head><meta charset='utf-8'><title>QuantiSheet "
             f"Features and How-To Guide (Version {V})</title><style>{CSS}</style>"
             "</head><body><img class='wm' src='" + _logo_uri() + "'>"
@@ -217,6 +220,35 @@ def heading_pages(pdf_path, toc):
         else:
             print("NOT IN OUTLINE:", t)
     return pages
+
+
+def link_contents(w, pages):
+    """Point every contents row's link at its topic's page. Chromium
+    writes the links to named places (the heading ids), which are lost
+    when the cover is put in front; each becomes a jump to the page.
+    Returns how many links were set."""
+    from pypdf.generic import ArrayObject, NameObject
+    n = 0
+    for page in w.pages:
+        for ref in page.get("/Annots") or []:
+            a = ref.get_object()
+            if a.get("/Subtype") != "/Link":
+                continue
+            dest = a.get("/Dest")
+            act = a.get("/A")
+            if dest is None and act is not None and \
+                    act.get_object().get("/S") == "/GoTo":
+                dest = act.get_object().get("/D")
+            name = str(dest).lstrip("/") if isinstance(dest, str) else None
+            if name not in pages:
+                continue
+            target = w.pages[pages[name] - 1]
+            a[NameObject("/Dest")] = ArrayObject(
+                [target.indirect_reference, NameObject("/Fit")])
+            if "/A" in a:
+                del a["/A"]
+            n += 1
+    return n
 
 
 # ------------------------------------------------- the command reference
@@ -323,6 +355,7 @@ def main():
     b = pypdf.PdfReader(os.path.join(HERE, "body.pdf"))
     for p in b.pages[1:]:
         w.add_page(p)
+    linked = link_contents(w, pages)
     # bookmarks
     parent = None
     w.add_outline_item("Contents", 1)
@@ -339,7 +372,7 @@ def main():
     w.page_mode = "/UseOutlines"
     with open(OUT, "wb") as f:
         w.write(f)
-    print("pages", len(w.pages), pages)
+    print("pages", len(w.pages), "contents links", linked, pages)
 
 
 if __name__ == "__main__":

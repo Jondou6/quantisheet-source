@@ -1,0 +1,5 @@
+QuantiSheet 1.1.34
+- Faster OCR: Make Searchable, AI Takeoff and Auto Scale read scanned and civil sheets about twice as fast - every core but one reads at once, each sheet is drawn once, and the next sheet is made ready while the last is read. The results are the same.
+- Auto Scale reads all the sheets of a set that need OCR in one go, so a civil set's scales come up sooner.
+- A smaller program: parts nothing in QuantiSheet uses (a video reader, an unused photo format and Qt's translations of its own dialogs) are left out.
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.34 - the full source of this build. Help > About shows the same link.

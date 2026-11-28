@@ -337,3 +337,27 @@ def test_no_export_button_when_it_turned_quantilink_off(qapp, monkeypatch):
     finally:
         monkeypatch.setattr(policy, "_from_registry", lambda: {})
         policy.reload()
+
+
+def test_uploads_say_who_sent_them(no_policy, monkeypatch):
+    """Nov 25: with one shared office key, QuantiLink records who pressed
+    Send - the person's markup name, plain letters only."""
+    from app import settings
+    seen = []
+
+    class R:
+        status = 200
+
+        def read(self):
+            return b'{"result": []}'
+
+    def opener(req, timeout=0):
+        seen.append(dict(req.header_items()))
+        return R()
+    monkeypatch.setattr(settings, "author", lambda: "Pat Example\u00e9<b>")
+    ql.Client("http://127.0.0.1:8080", KEY, opener=opener).spaces()
+    assert seen[0]["X-quantilink-sent-by"] == "Pat Exampleb"
+    assert seen[0]["X-quantilink-source"] == "QuantiSheet"
+    monkeypatch.setattr(settings, "author", lambda: "")
+    ql.Client("http://127.0.0.1:8080", KEY, opener=opener).spaces()
+    assert "X-quantilink-sent-by" not in seen[1]

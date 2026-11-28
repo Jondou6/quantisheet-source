@@ -33,16 +33,19 @@ MIN_DIM_FT = 1.0
 NTS = re.compile(r"\b(N\.?T\.?S\.?|NOT\s+TO\s+SCALE)\b", re.I)
 
 
-def _ocr_text(page):
+def _ocr_text(page, words=None):
     """OCR'd page text as lines (top to bottom, left to right, as the
-    sheet is shown - Nov 19: rotated sheets were read sideways), or ''."""
+    sheet is shown - Nov 19: rotated sheets were read sideways), or ''.
+    `words`: the page's [(Rect, text)] already OCR'd (Nov 25: read for
+    the whole set at once)."""
     from . import acrobat
-    try:
-        words = [{"rect": r, "text": t}
-                 for r, t in acrobat.ocr_page_words(page)]
-    except Exception as e:                    # no tesseract, timeout...
-        log.info("autoscale OCR skipped: %s", e)
-        return ""
+    if words is None:
+        try:
+            words = acrobat.ocr_page_words(page)
+        except Exception as e:                # no tesseract, timeout...
+            log.info("autoscale OCR skipped: %s", e)
+            return ""
+    words = [{"rect": r, "text": t} for r, t in words]
     words.sort(key=lambda w: ((w["rect"].y0 + w["rect"].y1) / 2, w["rect"].x0))
     lines, cur, cy, ch = [], [], None, 0
     for w in words:
@@ -126,6 +129,36 @@ def _sparse(page):
 _CIVIL = re.compile(r"SCALE\W{0,6}1\W{0,4}=?\W{0,4}(5|\d{1,3}0)\b"
                     r"(?=\W{0,4}(?:'|FT|FEET|HORIZ|\W|$))", re.I)
 CIVIL_FEET = (5, 10, 20, 30, 40, 50, 60, 80, 100, 200, 300, 400, 500)
+
+
+_SCALE_WORD = re.compile(r"\bSCALE\b", re.I)
+# NONE, NTS, or a NONE the OCR cut short ("SCALE: N"): a real scale
+# starts with a digit
+_AFTER_NONE = re.compile(r"\s*:?\s*NONE\b|\s*:\s*N[A-Z]{0,2}\b", re.I)
+_AFTER_SKIP = re.compile(r"\s*:?\s*AS\s+(SHOWN|NOTED)\b", re.I)
+_BEFORE_SKIP = re.compile(r"NOT\s+TO\s+$", re.I)
+
+
+def scale_none(text):
+    """How many views say SCALE: NONE, when every scale note on the sheet
+    says so (0 if any note could be a real scale: a bare 'SCALE:' whose
+    value wasn't read, or a graphic scale). The title block's SHEET SCALE:
+    AS SHOWN and NOT TO SCALE don't count either way. The words may be on
+    separate lines of the sheet's text (SCALE: / NONE)."""
+    flat = " ".join(text.split())
+    n = 0
+    for m in _SCALE_WORD.finditer(flat):
+        after = flat[m.end():m.end() + 16]
+        if _AFTER_SKIP.match(after) or \
+                _BEFORE_SKIP.search(flat[max(0, m.start() - 12):m.start()]):
+            continue
+        before = flat[max(0, m.start() - 9):m.start()].upper()
+        if _AFTER_NONE.match(after):
+            n += 1
+        elif after.lstrip().startswith(":") or before.endswith("GRAPHIC "):
+            return 0             # a scale note that isn't NONE
+        # else the word in a sentence ("Do not scale this document")
+    return n
 
 
 def civil_scale(text):
@@ -403,6 +436,16 @@ def zoom_scale(page, words=None, ocr=None):
                     and takeoff.is_standard(f[1], f[2])]
             arch += full
             if not full:
+                # Nov 25 (a section sheet: SCALE: 1/2" = 17-0", the 1'-0"
+                # misread): the inches and an "= 1?-0" are a full reading
+                m = _ZOOM_NEAR.search(text.translate(takeoff._QUOTES))
+                if m:
+                    near = [f[:3] for f in takeoff._find(
+                        f'{m.group(1)}" = 1\'-0"')
+                        if f[2] == "ft" and takeoff.is_standard(f[1], f[2])]
+                    arch += near[:1]
+                    full = near[:1]
+            if not full:
                 # 'SCALE: 1/2" =' with the 1'-0" lost backs up a full read
                 part += _ZOOM_PART.findall(text.translate(takeoff._QUOTES))
             # close up, a scale needs its "=" ('SCALE: 1" 10' with the
@@ -429,6 +472,10 @@ def zoom_scale(page, words=None, ocr=None):
     return None
 
 
+_ZOOM_NEAR = re.compile(r"SCALE\W{0,3}(\d{1,2}/\d{1,2})\s*\"\s*=\s*1\S{0,2}"
+                        r"\s?-\s?0")
+
+
 _ZOOM_PART = re.compile(r"SCALE\W{0,3}(\d{1,2}/\d{1,2})\s*\"\s*=?\s*$", re.M)
 
 
@@ -444,9 +491,11 @@ def detect(doc, pages=None, use_ocr=True, progress=None):
     have = annotate.read_scales(doc)
     pages = list(pages if pages is not None else range(doc.page_count))
     rows = []
-    for k, pno in enumerate(pages):
-        if progress and progress(k, len(pages)) is False:
-            break
+    # Nov 25: each sheet's text first, then every sheet that needs OCR is
+    # read at once (one pool, the next sheet drawn while the last is
+    # read), then the scales
+    pre = {}
+    for pno in pages:
         page = doc[pno]
         # the sheet's text is read once and shared: it used to be pulled
         # out four times per sheet (57 % of Auto Scale's time)
@@ -457,14 +506,30 @@ def detect(doc, pages=None, use_ocr=True, progress=None):
             tp = None
         info = sheets.scan(doc, [pno], numbers=False,
                            textpages={pno: tp} if tp is not None else None)[0]
-        sc, src, note = info["scale"], "text" if info["scale"] else "", ""
         text = page.get_text(textpage=tp)
         has_text = bool(text.strip())
-        if sc is None and use_ocr and (not has_text or _sparse(page)):
-            # a scan - or (Nov 19) a sheet whose scales are drawn as
-            # outlines, not typed (a civil set: only its title block has
-            # text)
-            otext = _ocr_text(page)
+        # a scan - or (Nov 19) a sheet whose scales are drawn as outlines,
+        # not typed (a civil set: only its title block has text)
+        need = info["scale"] is None and use_ocr and \
+            (not has_text or _sparse(page))
+        # the page object is kept: its text page belongs to it
+        pre[pno] = (page, tp, info, text, has_text, need)
+    ocr_words = {}
+    need = [p for p in pages if pre[p][5]]
+    if need:
+        from . import acrobat
+        try:
+            ocr_words = acrobat.ocr_pages_words(doc, need)
+        except Exception as e:                # no tesseract, timeout...
+            log.info("autoscale OCR skipped: %s", e)
+            ocr_words = {p: [] for p in need}
+    for k, pno in enumerate(pages):
+        if progress and progress(k, len(pages)) is False:
+            break
+        page, tp, info, text, has_text, needs_ocr = pre[pno]
+        sc, src, note = info["scale"], "text" if info["scale"] else "", ""
+        if needs_ocr:
+            otext = _ocr_text(page, ocr_words.get(pno, []))
             main = takeoff.main_scale(otext)
             if main and takeoff.is_standard(main[1], main[2]):
                 sc, src = main, "ocr"
@@ -497,11 +562,18 @@ def detect(doc, pages=None, use_ocr=True, progress=None):
                 sc, src = civ, "close-up"
         if sc is None and info.get("odd"):
             note = f"odd scale written: {info['odd'][0]} - pick it if right"
-        nts = sc is None and bool(NTS.search(text))
+        none_n = scale_none(text) if sc is None else 0
+        nts = sc is None and (bool(NTS.search(text)) or none_n > 0)
         dims = dimension_scale(page, page.get_text("words", textpage=tp)) \
             if has_text and not nts else {"ppu": None, "n": 0}
         if nts:
             note = "sheet says NTS (not to scale) - don't measure from it"
+            if none_n:
+                # Nov 25 (a civil set's detail sheets): it said "no scale
+                # found - set it by hand", which is the wrong advice
+                note = (f"{none_n} detail{'s' if none_n > 1 else ''} on "
+                        f"this sheet say{'' if none_n > 1 else 's'} SCALE: "
+                        "NONE (not to scale) - don't measure from it")
         agree = None
         if sc and dims["ppu"] and sc[2] == "ft":
             agree = abs(dims["ppu"] / sc[1] - 1) <= AGREE_TOL

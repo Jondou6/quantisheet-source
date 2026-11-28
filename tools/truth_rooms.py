@@ -83,6 +83,7 @@ def run(name="hmb", sheet=None, dump=False, pic=()):
             r.get("name") or "") or ""), []).append(r)
     tr = truth(name)
     errs, ok = [], 0
+    result = {}
     print(f"{'room':34s} {'truth':>8s} {'traced':>8s} {'err':>7s} "
           f"{'tol':>4s}  conf  flags")
     for t_ in sorted(tr, key=lambda x: x["no"]):
@@ -90,12 +91,15 @@ def run(name="hmb", sheet=None, dump=False, pic=()):
         if not got:
             print(f"{t_['name'][:34]:34s} {t_['sf']:8.1f} {'MISSED':>8s}")
             errs.append(100.0)
+            result[t_["no"]] = {"sf": None, "err": None, "ok": False}
             continue
         r = got[0]
         sf = r.get("net_sf") or r.get("sqft")
         e = 100 * (sf - t_["sf"]) / t_["sf"]
         errs.append(abs(e))
         ok += abs(e) <= t_["tol"]
+        result[t_["no"]] = {"sf": round(sf, 1), "err": round(e, 1),
+                            "ok": abs(e) <= t_["tol"]}
         print(f"{t_['name'][:34]:34s} {t_['sf']:8.1f} {sf:8.1f} {e:+6.1f}% "
               f"{t_['tol']:4.0f}  {r.get('trace_confidence') or 0:4.2f}  "
               f"{'; '.join(r.get('flags') or [])[:70]}")
@@ -178,6 +182,7 @@ def run(name="hmb", sheet=None, dump=False, pic=()):
           f" vs truth {sum(t_['sf'] for t_ in tr):.1f}")
     doc.close()
     shutil.rmtree(tmp, ignore_errors=True)
+    return {"ok": ok, "n": n, "rooms": result}
 
 
 if __name__ == "__main__":

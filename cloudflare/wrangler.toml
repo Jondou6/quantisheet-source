@@ -1,0 +1,11 @@
+# The error-report receiver (see README.md). Deploy from this folder:
+#   npx wrangler deploy
+name = "quantisheet-error-reports"
+main = "error-reports-worker.js"
+compatibility_date = "2026-01-01"
+workers_dev = false
+routes = [{ pattern = "reports.quantisheet.com", custom_domain = true }]
+
+[[r2_buckets]]
+binding = "REPORTS"
+bucket_name = "quantisheet-error-reports"

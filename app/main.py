@@ -100,6 +100,7 @@ def run(argv=None):
     if os.environ.get("QUANTISHEET_SMOKE"):
         _private_settings()        # the build check never touches yours
     _setup_logging()
+    _mark("logging")
     if not os.environ.get("QUANTISHEET_SMOKE"):
         try:            # the shared copy: open this person's own one (Nov 3)
             from . import owncopy
@@ -109,8 +110,10 @@ def run(argv=None):
                 return 0
         except Exception:                                 # noqa: BLE001
             logging.getLogger(__name__).debug("ignored", exc_info=True)
+    _mark("shared-copy check")
     from . import oldnames         # files saved under the old name
     oldnames.install()             # convert as they open (once each)
+    _mark("old names")
     try:                                     # which build (0.12.30 N4)
         import fitz
         from PySide6 import __version__ as qt_v
@@ -122,7 +125,9 @@ def run(argv=None):
             getattr(fitz, "VersionBind", "?"), qt_v)
     except Exception:                                     # noqa: BLE001
         logging.getLogger("quantisheet").info("QuantiSheet starting")
+    _mark("PDF engine")
     app = QApplication(argv)
+    _mark("Qt started")
     try:                                    # Venice #18: screen-reader names
         from . import a11y
         a11y.install(app)
@@ -144,8 +149,14 @@ def run(argv=None):
             QMessageBox.warning(None, "Reduce Size",
                                 f"{os.path.basename(verb[1])}: {e}")
         return 0
+    _mark("screen-reader names")
     files = [a for a in argv[1:] if a.lower().endswith((".pdf", ".qstools"))
              and os.path.exists(a)]
+    try:                    # quantisheet://open links (the browser add-on)
+        from . import weblink
+        files += [f for f in weblink.files(argv) if f not in files]
+    except Exception:                                     # noqa: BLE001
+        logging.getLogger(__name__).debug("ignored", exc_info=True)
     new_window = "--new-window" in argv
     if not os.environ.get("QUANTISHEET_SMOKE") and not verb and \
             not new_window:
@@ -163,11 +174,14 @@ def run(argv=None):
                 return 0
         except Exception:
             logging.getLogger(__name__).debug("ignored error", exc_info=True)
+    _mark("already-running check")
     app.setApplicationName("QuantiSheet")
     _set_icon(app)
+    _mark("icon")
     from . import filedialogs
     filedialogs.install()
     from . import betalicense
+    _mark("file dialogs")
     # the splash goes up first thing - unless a license prompt is coming,
     # which it must never cover
     splash = None if betalicense.required() else _show_splash(app)

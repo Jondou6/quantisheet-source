@@ -60,6 +60,7 @@ Name: "ai"; Description: "Install local AI - Ollama and its model, about 2 GB (A
 [Files]
 Source: "{#SourceDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "*DEEP_DIVE*,*DEEP-DIVE*,FOR_CLAUDE_*,*XACTIMATE*,*SAGESURE*,*EAGLEVIEW*,*.esx,*_BRIEF.md,*_BRIEF.pdf"
 Source: "..\tools\install_deps.ps1"; DestDir: "{app}\extras"; Flags: ignoreversion
+Source: "browser-host.json"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{autoprograms}\QuantiSheet"; Filename: "{app}\QuantiSheet.exe"; IconFilename: "{app}\QuantiSheet.exe"; Comment: "QuantiSheet"; AppUserModelID: "QuantiSheet.App"
@@ -70,6 +71,16 @@ Name: "{autodesktop}\QuantiSheet"; Filename: "{app}\QuantiSheet.exe"; IconFilena
 ; ProgID QuantiSheet.pdf is this setup's own: the server setup and the MSI
 ; use QuantiSheet.Server.pdf, so uninstalling one leaves the other's entry.
 ; FriendlyAppName is the name the Open-with list shows
+; quantisheet://open?path=... links from the browser add-on "Open in QuantiSheet" (app/weblink.py): only ever a PDF already on this computer
+Root: HKA; Subkey: "Software\Classes\quantisheet"; ValueType: string; ValueName: ""; ValueData: "URL:QuantiSheet"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\Classes\quantisheet"; ValueType: string; ValueName: "URL Protocol"; ValueData: ""
+Root: HKA; Subkey: "Software\Classes\quantisheet\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\QuantiSheet.exe,0"
+Root: HKA; Subkey: "Software\Classes\quantisheet\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\QuantiSheet.exe"" ""%1"""
+; the browser add-on's direct line (app/browserhost.py): each browser looks up com.quantisheet.open here and may start QuantiSheet.exe for the add-ons listed in browser-host.json only
+Root: HKA; Subkey: "Software\Google\Chrome\NativeMessagingHosts\com.quantisheet.open"; ValueType: string; ValueName: ""; ValueData: "{app}\browser-host.json"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\BraveSoftware\Brave-Browser\NativeMessagingHosts\com.quantisheet.open"; ValueType: string; ValueName: ""; ValueData: "{app}\browser-host.json"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\Microsoft\Edge\NativeMessagingHosts\com.quantisheet.open"; ValueType: string; ValueName: ""; ValueData: "{app}\browser-host.json"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\Chromium\NativeMessagingHosts\com.quantisheet.open"; ValueType: string; ValueName: ""; ValueData: "{app}\browser-host.json"; Flags: uninsdeletekey
 Root: HKA; Subkey: "Software\Classes\QuantiSheet.pdf"; ValueType: string; ValueName: ""; ValueData: "PDF Document (QuantiSheet)"; Flags: uninsdeletekey; Tasks: openwith
 Root: HKA; Subkey: "Software\Classes\QuantiSheet.pdf\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\QuantiSheet.exe,0"; Tasks: openwith
 Root: HKA; Subkey: "Software\Classes\QuantiSheet.pdf\shell\open"; ValueType: string; ValueName: "FriendlyAppName"; ValueData: "QuantiSheet"; Tasks: openwith

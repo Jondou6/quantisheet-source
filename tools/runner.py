@@ -4,7 +4,10 @@ Watches the .run folder inside QuantiSheet for request files and runs them:
   tests            -> the test suite (same as run-tests.bat)
   tool NAME ARGS   -> python tools/NAME.py ARGS   (only scripts in tools/)
 Each request <id>.req produces <id>.out (output) when finished.
-Stops by itself after 10 hours, or when a file named STOP appears in .run.
+Every 24 hours it starts a fresh copy of itself and exits, so it keeps
+running (and picks up a newer runner.py) without anyone restarting it; a
+file named RESTART in .run does that at once. It stops only when a file
+named STOP appears in .run.
 """
 import os
 import shlex
@@ -124,16 +127,50 @@ def _stop_old():
                                              0))
 
 
+HOURS = 24
+
+
+def _restart():
+    """Start a fresh runner, detached, then let this one end. runner.alive
+    is removed first so the new one's _stop_old leaves this (exiting)
+    process and itself alone."""
+    try:
+        os.remove(os.path.join(RUN, "runner.alive"))
+    except OSError:
+        pass
+    flags = 0
+    for f in ("CREATE_NO_WINDOW", "DETACHED_PROCESS",
+              "CREATE_NEW_PROCESS_GROUP"):
+        flags |= getattr(subprocess, f, 0)
+    exe = sys.executable
+    if sys.platform.startswith("win"):
+        w = os.path.join(os.path.dirname(exe), "pythonw.exe")
+        exe = w if os.path.exists(w) else exe
+    return subprocess.Popen([exe, os.path.abspath(__file__)], cwd=ROOT,
+                            stdin=subprocess.DEVNULL,
+                            stdout=subprocess.DEVNULL,
+                            stderr=subprocess.DEVNULL, creationflags=flags,
+                            close_fds=True)
+
+
 def main():
     os.makedirs(RUN, exist_ok=True)
     _stop_old()
     stop = os.path.join(RUN, "STOP")
     if os.path.exists(stop):
         os.remove(stop)
-    end = time.time() + 24 * 3600
+    end = time.time() + HOURS * 3600
+    again = os.path.join(RUN, "RESTART")
     with open(os.path.join(RUN, "runner.alive"), "w") as f:
         f.write(str(os.getpid()))
-    while time.time() < end and not os.path.exists(stop):
+    while not os.path.exists(stop):
+        if time.time() >= end or os.path.exists(again):
+            try:
+                os.remove(again)
+            except OSError:
+                pass
+            _restart()
+            return
         for name in sorted(os.listdir(RUN)):
             if not name.endswith(".req"):
                 continue
@@ -160,4 +197,6 @@ def main():
 
 
 if __name__ == "__main__":
+    if sys.argv[1:2] == ["--after"]:        # tools/runner_restart.py
+        time.sleep(float(sys.argv[2]))
     main()

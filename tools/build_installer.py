@@ -41,11 +41,15 @@ STATUS = os.path.join(ROOT, ".run", "build_installer.status")
 NOWIN = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 
 
+_LOG_LOCK = __import__("threading").Lock()
+
+
 def log(*a):
     msg = " ".join(str(x) for x in a)
-    print(msg, flush=True)
-    with open(LOG, "a", encoding="utf-8") as f:
-        f.write(time.strftime("%H:%M:%S ") + msg + "\n")
+    with _LOG_LOCK:                 # setups are compiled side by side
+        print(msg, flush=True)
+        with open(LOG, "a", encoding="utf-8") as f:
+            f.write(time.strftime("%H:%M:%S ") + msg + "\n")
 
 
 def status(s):
@@ -58,8 +62,9 @@ def sh(cmd, timeout=1800, env=None, check=True):
     p = subprocess.run(cmd, capture_output=True, text=True, errors="replace",
                        timeout=timeout, env=env, creationflags=NOWIN)
     out = (p.stdout or "") + (p.stderr or "")
-    with open(LOG, "a", encoding="utf-8") as f:
-        f.write(out[-20000:] + "\n")
+    with _LOG_LOCK:
+        with open(LOG, "a", encoding="utf-8") as f:
+            f.write(out[-20000:] + "\n")
     if check and p.returncode != 0:
         raise RuntimeError(f"failed (exit {p.returncode}): {cmd[:3]}\n"
                            + out[-3000:])
@@ -496,6 +501,10 @@ def run(skip_program=False, program_only=False):
         os.makedirs(RELEASE, exist_ok=True)
         pub = legal._pub().get("name") or "QuantiSheet"
         made = []
+        # Nov 25: the four setups (tester and public, program and server)
+        # are compiled side by side, and the two MSIs beside them - one
+        # after another they took 18 of the build's 26 minutes
+        setups = []
         for src, out_dir, edition in ((app_dir, RELEASE, "tester"),
                                       (public_copy(app_dir), GITHUB,
                                        "public")):
@@ -507,24 +516,38 @@ def run(skip_program=False, program_only=False):
                     base = base.replace("QuantiSheet-Beta", "QuantiSheet-"
                                         "Public-Beta")
                 base += f"-{__version__}"
-                sh([iscc, "/Q", f"/DAppVersion={__version__}",
-                    f"/DAppPublisher={pub}", f"/DSourceDir={src}",
-                    f"/DOutputDir={out_dir}", f"/DOutputBase={base}",
-                    os.path.join(ROOT, "installer", iss)], timeout=3600)
-                made.append(os.path.join(out_dir, base + ".exe"))
+                setups.append(([iscc, "/Q", f"/DAppVersion={__version__}",
+                                f"/DAppPublisher={pub}", f"/DSourceDir={src}",
+                                f"/DOutputDir={out_dir}",
+                                f"/DOutputBase={base}",
+                                os.path.join(ROOT, "installer", iss)],
+                               os.path.join(out_dir, base + ".exe")))
         # the MSI packages for IT (0.12.24): the same programs
         sys.path.insert(0, os.path.join(ROOT, "tools"))
         import make_msi
-        for src, out_dir, base in (
-                (app_dir, RELEASE, "QuantiSheet-Beta"),
-                (app_dir + "-public", GITHUB, "QuantiSheet-Public-Beta")):
-            msi = os.path.join(out_dir, f"{base}-{__version__}.msi")
-            make_msi.build(src, msi, __version__, pub)
-            info = make_msi.check(msi)
-            if info["version"] != make_msi.msi_version(__version__) or \
-                    info["files"] < 100:
-                raise RuntimeError(f"the MSI looks wrong: {info}")
-            made.append(msi)
+
+        def msis():
+            out = []
+            for src, out_dir, base in (
+                    (app_dir, RELEASE, "QuantiSheet-Beta"),
+                    (app_dir + "-public", GITHUB, "QuantiSheet-Public-Beta")):
+                msi = os.path.join(out_dir, f"{base}-{__version__}.msi")
+                make_msi.build(src, msi, __version__, pub)
+                info = make_msi.check(msi)
+                if info["version"] != make_msi.msi_version(__version__) or \
+                        info["files"] < 100:
+                    raise RuntimeError(f"the MSI looks wrong: {info}")
+                out.append(msi)
+            return out
+        from concurrent.futures import ThreadPoolExecutor
+        par = max(1, min(len(setups), (os.cpu_count() or 2) // 2))
+        with ThreadPoolExecutor(par + 1) as ex:
+            jobs = [ex.submit(sh, cmd, 3600) for cmd, _out in setups]
+            msi_job = ex.submit(msis)
+            for j in jobs:
+                j.result()              # a failed compile fails the build
+            made += [out for _cmd, out in setups]
+            made += msi_job.result()
         # ClaimIT: its own program and its own setup (0.12.29). A ClaimIT
         # failure is logged, never fails QuantiSheet's build.
         claims = build_claims(iscc, dist, work, pub, skip_program)
@@ -559,6 +582,23 @@ def run(skip_program=False, program_only=False):
                  "NOT made - " + (r.stdout + r.stderr)[-300:]))
         except Exception as e:                            # noqa: BLE001
             log("   Store package not made:", e)
+        # Nov 25: the takeoff accuracy check on the real test plan sets
+        # (on this PC only), so a change that breaks rooms or scales is
+        # seen before a release. It never fails the build: its line says
+        # REGRESSION.
+        try:
+            r = subprocess.run([sys.executable, os.path.join(
+                ROOT, "tools", "accuracy_gate.py")], capture_output=True,
+                text=True, timeout=2400, cwd=ROOT,
+                env=dict(os.environ, QT_QPA_PLATFORM="offscreen"))
+            for ln in (r.stdout or "").splitlines():
+                if ln.startswith(("accuracy:", "  REGRESSION")):
+                    log("   " + ln.strip())
+            if r.returncode not in (0, 1):
+                log("   accuracy check didn't run:",
+                    (r.stdout + r.stderr)[-300:])
+        except Exception as e:                            # noqa: BLE001
+            log("   accuracy check didn't run:", e)
         status("done " + setup)
     except Exception as e:
         log("BUILD FAILED:", e)

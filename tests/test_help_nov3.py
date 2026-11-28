@@ -50,7 +50,7 @@ def test_whats_new_111():
         assert w in s
     assert "Adobe" not in s and "Bluebeam" not in s
     from app import __version__
-    assert __version__ == "1.1.33"
+    assert __version__ == "1.1.40"
 
 
 def test_whats_new_112():
@@ -548,4 +548,90 @@ def test_whats_new_1133():
         assert w in s
     for bad in ("Repro", "Adobe", "Acrobat", "Bluebeam", "Planswift", "HMB",
                 "PlanHub", "Calcs.com", "Dillon", "AECOM", "Harbor", "Metro"):
+        assert bad not in s
+
+
+def test_whats_new_1134():
+    p = os.path.join(os.path.dirname(helpcenter.__file__), "data",
+                     "whats_new.json")
+    s = json.load(open(p, encoding="utf-8"))["1.1.34"]
+    for w in ("Faster OCR", "Auto Scale", "smaller program", "v1.1.34"):
+        assert w in s
+    for bad in ("Repro", "Adobe", "Acrobat", "Bluebeam", "Planswift", "HMB",
+                "PlanHub", "Calcs.com", "Dillon", "AECOM", "Harbor", "Metro",
+                "Consensus"):
+        assert bad not in s
+
+
+def test_whats_new_1135():
+    p = os.path.join(os.path.dirname(helpcenter.__file__), "data",
+                     "whats_new.json")
+    s = json.load(open(p, encoding="utf-8"))["1.1.35"]
+    for w in ("SCALE: NONE", "who pressed Send",
+              "Send Error Reports Automatically", "v1.1.35"):
+        assert w in s
+    for bad in ("Repro", "Adobe", "Acrobat", "Bluebeam", "Planswift", "HMB",
+                "PlanHub", "Calcs.com", "Dillon", "AECOM", "Harbor", "Metro",
+                "Consensus"):
+        assert bad not in s
+
+
+def test_whats_new_1136():
+    p = os.path.join(os.path.dirname(helpcenter.__file__), "data",
+                     "whats_new.json")
+    s = json.load(open(p, encoding="utf-8"))["1.1.36"]
+    for w in ("Terms of Service (version 1.1)", "clickable",
+              "browser add-on", "v1.1.36"):
+        assert w in s
+    for bad in ("Repro", "Adobe", "Acrobat", "Bluebeam", "Planswift", "HMB",
+                "PlanHub", "Calcs.com", "Dillon", "AECOM", "Harbor", "Metro",
+                "Consensus", "Chrome", "Edge"):
+        assert bad not in s
+
+
+def test_whats_new_1137():
+    p = os.path.join(os.path.dirname(helpcenter.__file__), "data",
+                     "whats_new.json")
+    s = json.load(open(p, encoding="utf-8"))["1.1.37"]
+    for w in ("browser add-on", "v1.1.37"):
+        assert w in s
+    for bad in ("Repro", "Adobe", "Acrobat", "Bluebeam", "Planswift", "HMB",
+                "PlanHub", "Calcs.com", "Dillon", "AECOM", "Harbor", "Metro",
+                "Consensus", "Chrome", "Edge", "Brave"):
+        assert bad not in s
+
+
+def test_whats_new_1138():
+    p = os.path.join(os.path.dirname(helpcenter.__file__), "data",
+                     "whats_new.json")
+    s = json.load(open(p, encoding="utf-8"))["1.1.38"]
+    for w in ("browser add-on", "v1.1.38"):
+        assert w in s
+    for bad in ("Repro", "Adobe", "Acrobat", "Bluebeam", "Planswift", "HMB",
+                "PlanHub", "Calcs.com", "Dillon", "AECOM", "Harbor", "Metro",
+                "Consensus", "Chrome", "Edge", "Brave"):
+        assert bad not in s
+
+
+def test_whats_new_1139():
+    p = os.path.join(os.path.dirname(helpcenter.__file__), "data",
+                     "whats_new.json")
+    s = json.load(open(p, encoding="utf-8"))["1.1.39"]
+    for w in ("browser add-on", "Ctrl+Z", "v1.1.39"):
+        assert w in s
+    for bad in ("Repro", "Adobe", "Acrobat", "Bluebeam", "Planswift", "HMB",
+                "PlanHub", "Calcs.com", "Dillon", "AECOM", "Harbor", "Metro",
+                "Consensus", "Chrome", "Edge", "Brave"):
+        assert bad not in s
+
+
+def test_whats_new_1140():
+    p = os.path.join(os.path.dirname(helpcenter.__file__), "data",
+                     "whats_new.json")
+    s = json.load(open(p, encoding="utf-8"))["1.1.40"]
+    for w in ("Outlook", "drag", "v1.1.40"):
+        assert w in s
+    for bad in ("Repro", "Adobe", "Acrobat", "Bluebeam", "Planswift", "HMB",
+                "PlanHub", "Calcs.com", "Dillon", "AECOM", "Harbor", "Metro",
+                "Consensus", "Chrome", "Edge", "Brave"):
         assert bad not in s

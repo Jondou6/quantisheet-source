@@ -1,0 +1,16 @@
+QuantiSheet 1.1.40 (everything new since 1.1.33)
+- Plans that arrive by email: drag a PDF attachment out of an Outlook message and drop it on the QuantiSheet window. It is saved in Downloads\QuantiSheet and opens. Several PDFs can be dragged at once. Only PDFs are taken; nothing else in the message is read.
+- Takeoff started in the Open in QuantiSheet browser add-on (not released yet) comes into QuantiSheet: lengths, areas and counts clicked out in the add-on's viewer arrive as QuantiSheet's own takeoff markups when the PDF opens. QuantiSheet works out the quantities itself from where you clicked and the scale you set. Ctrl+Z takes them all back in one step.
+- The Open in QuantiSheet browser add-on (not released yet) now hands a PDF straight to QuantiSheet, with no download and no Save As window in the browser. The PDF is saved in Downloads\QuantiSheet and opens.
+- Fixed: a PDF handed over by the Open in QuantiSheet browser add-on (not released yet) now opens. In 1.1.36 QuantiSheet started and closed again without opening it.
+- Terms of Service (version 1.1) and the Privacy page are brought up to date with what QuantiSheet does now: your rights to the published source code, automatic tools and cost data, Back Office and ClaimIT, the services QuantiSheet can connect to, Send with QuantiLink, error reports, and a clearer limit of liability. Help > Terms of Service and Help > Privacy.
+- The Features and How-To Guide's contents page is clickable: click a topic to jump straight to its page (Help > Features & How-To Guide).
+- Ready for the Open in QuantiSheet browser add-on (not released yet): QuantiSheet can be handed a PDF that a browser has just saved on this computer. It only ever opens a PDF already on your computer.
+- Help > About shows the support address.
+- Auto Scale: a sheet whose details all say SCALE: NONE is now reported as not to scale (don't measure from it) instead of 'set it by hand', and a section's scale note is read even when its foot mark prints badly.
+- Send with QuantiLink now tells your office's QuantiLink who pressed Send (the name on your markups), so files sent with the shared office key show their sender.
+- Team copy: Help > Send Error Reports Automatically. It is off until you turn it on. When on, after an error QuantiSheet sends a short report - what happened, the QuantiSheet and Windows versions and where in the program the error was. It never sends drawings, job files, file or folder names, prices, email addresses or the log. Your IT department can remove it (DisableErrorReports).
+- Faster OCR: Make Searchable, AI Takeoff and Auto Scale read scanned and civil sheets about twice as fast - every core but one reads at once, each sheet is drawn once, and the next sheet is made ready while the last is read. The results are the same.
+- Auto Scale reads all the sheets of a set that need OCR in one go, so a civil set's scales come up sooner.
+- A smaller program: parts nothing in QuantiSheet uses (a video reader, an unused photo format and Qt's translations of its own dialogs) are left out.
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.40 - the full source of this build. Help > About shows the same link.

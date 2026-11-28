@@ -193,3 +193,47 @@ def test_scale_note_feet_are_not_dimensions():
     r = autoscale.detect(d)[0]
     assert r["ppu"] == 36.0 and r["dims"]["agree"] is not False
     assert r["status"] == "ok"
+
+
+def test_scale_none_details_are_not_to_scale():
+    """Nov 25: a detail sheet whose every view says SCALE: NONE is not to
+    scale - say so, instead of 'set it by hand'."""
+    import fitz
+    from app import autoscale
+    assert autoscale.scale_none(
+        "SHEET SCALE: AS SHOWN\nSCALE: NONE\nVALVE BOX\nSCALE:NONE") == 2
+    assert autoscale.scale_none("SCALE: NONE\nSCALE:\n") == 0   # one unread
+    assert autoscale.scale_none("SCALE: NONE\nGRAPHIC SCALE") == 0
+    assert autoscale.scale_none("NO NOTES HERE") == 0
+    assert autoscale.scale_none(
+        "Do not scale this document. SCALE: NONE DETAIL") == 1
+    assert autoscale.scale_none("SCALE:\nNONE\nNOT TO\nSCALE") == 1
+    d = fitz.open()
+    p = d.new_page(width=2448, height=1584)
+    p.insert_text((300, 2200 / 2), "SHEET SCALE: AS SHOWN", fontsize=8)
+    for i, y in enumerate((400, 800, 1200)):
+        p.insert_text((200 + 300 * i, y), "SCALE: NONE", fontsize=9)
+        p.insert_text((200 + 300 * i, y - 14), f"DETAIL {i + 1}", fontsize=9)
+    r = autoscale.detect(d, use_ocr=False)[0]
+    assert r["status"] == "none" and r["ppu"] is None
+    assert "3 details" in r["note"] and "SCALE: NONE" in r["note"]
+    assert "by hand" not in r["note"]
+
+
+def test_close_up_misread_foot_mark_still_reads(monkeypatch):
+    """Nov 25 (a section sheet): SCALE: 1/2" = 17-0" is 1/2" = 1'-0" with
+    the foot mark misread; with its inches read again it is enough, alone
+    it is not."""
+    from app import autoscale as asc
+    words = [(495, 740, 540, 748, "GRAPHIC", 0, 0, 1)]
+    near = "SECTION C)\nSCALE: 1/2” = 17-0”\n0 2 4\nGRAPHIC SCALE"
+    part = "SECTION\nSCALE: 1/2” =\n0 2 4\nGRAPHIC SCALE"
+    reads = iter([near, part])
+    got = asc.zoom_scale(None, words, ocr=lambda p, c, d=0: next(reads))
+    assert got[0] == "1/2\" = 1'-0\"" and abs(got[1] - 36.0) < 1e-9
+    reads = iter([near] + ["GRAPHIC SCALE"] * 9)
+    assert asc.zoom_scale(None, words, ocr=lambda p, c, d=0:
+                          next(reads)) is None
+    assert asc.scale_none("SCALE: N RIP_ DETAIL SCALE: NONE") == 2
+    assert asc.scale_none("SCALE: NTS") == 1
+    assert asc.scale_none("SCALE: NORTH ARROW") == 0

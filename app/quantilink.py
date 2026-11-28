@@ -125,6 +125,19 @@ _STATUS = {
 }
 
 
+def sender_name():
+    """Who is sending, for QuantiLink's records: the name QuantiSheet puts
+    on this person's markups (Settings), in plain letters (a web header
+    can't carry others)."""
+    try:
+        from . import settings
+        name = (settings.author() or "").strip()
+    except Exception:                                     # noqa: BLE001
+        return ""
+    name = "".join(ch for ch in name if " " <= ch <= "~" and ch not in "<>")
+    return name[:120].strip()
+
+
 class Client:
     """One QuantiLink server with the office key. opener: tests pass a
     function (request, timeout) -> response."""
@@ -146,6 +159,12 @@ class Client:
         req.add_header("Authorization", "Bearer " + self.key)
         req.add_header("Content-Type", ctype)
         req.add_header("Accept", "application/json")
+        # Nov 25: with one shared office key, QuantiLink shows who pressed
+        # Send (on the file's version and in its audit log)
+        who = sender_name()
+        if who:
+            req.add_header("X-QuantiLink-Sent-By", who)
+            req.add_header("X-QuantiLink-Source", "QuantiSheet")
         endpoint = path.rsplit("/", 1)[-1]
         try:
             r = self._open(req, timeout=self.timeout)

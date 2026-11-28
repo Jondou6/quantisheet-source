@@ -46,6 +46,12 @@ snapshot has no history.
        git tag -a <ref> -m "QuantiSheet <ref> corresponding source"
        git push origin <ref>
 
+   Or, on the PC with the GitHub CLI signed in (`gh auth login`), tag
+   every release that has no tag yet in one go:
+
+       python tools/tag_release.py            (lists what is missing)
+       python tools/tag_release.py --create
+
 A later release is the same export, then one new commit on a checkout of
 quantisheet-source (keep that clone's `.git`, replace the other files
 with the new snapshot). The public history is only these snapshot commits.

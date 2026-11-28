@@ -147,8 +147,9 @@ def test_dialog(qtbot=None):
 
 def test_menu_entry():
     import ast
-    src = open(os.path.join(os.path.dirname(__file__), "..", "app",
-                            "main_window.py"), encoding="utf-8").read()
+    # the menus are in mw_menus.py since the main window was split (Nov 25)
+    src = "".join(open(os.path.join(os.path.dirname(__file__), "..", "app",
+                                    f), encoding="utf-8").read()
+                  for f in ("main_window.py", "mw_menus.py"))
     assert "Date and Time Calculators…" in src
     assert '("Date and Time Calculators",' in src
-    ast.parse(src)

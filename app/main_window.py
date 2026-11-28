@@ -371,7 +371,13 @@ def repaired_notice(path):
             "Protect & Repair > Check / Repair PDF… to check it and save a repaired copy.")
 
 
-class MainWindow(QMainWindow):
+# the window's methods, by part (Nov 25)
+from .mw_menus import MenusMixin            # noqa: E402
+from .mw_ai import AiCommandsMixin          # noqa: E402
+from .mw_exchange import ExchangeMixin      # noqa: E402
+
+
+class MainWindow(MenusMixin, AiCommandsMixin, ExchangeMixin, QMainWindow):
     def setWindowTitle(self, title):
         """Beta copies carry who they're licensed to in the title bar."""
         if not hasattr(self, "_beta_label"):
@@ -686,831 +692,6 @@ class MainWindow(QMainWindow):
         if needs_doc:
             self._doc_actions.append(a)
         return a
-
-    def _build_menus(self):
-        mb = self.menuBar()
-        f = mb.addMenu("&File")
-        self._file_menu = f
-        # One column that fits a laptop screen (Chief's user test, Nov 6:
-        # 40-odd top-level rows spilled into two columns). Related commands
-        # sit in submenus; every command keeps its name and shortcut.
-        self._act(f, "Open…", QKeySequence.Open, self.open_file, False)
-        self._act(f, "New Window", None, lambda: self.new_window(), False)
-        self.recent_menu = f.addMenu("Open Recent")
-        self.recent_menu.aboutToShow.connect(self._fill_recent)
-        self._act(f, "Open Bid Download (.zip) as a Job…", None,
-                  lambda: self.open_bid_zip(), False)
-        self._act(f, "Open Project Folder…", None, self._choose_project, False)
-        self._act(f, "Close Tab", QKeySequence.Close,
-                  lambda: self.close_tab(self.tabs.currentIndex()))
-        f.addSeparator()
-        self._act(f, "Save", QKeySequence.Save, self.save_file)
-        self._act(f, "Save As…", QKeySequence.SaveAs, self.save_as)
-        self.autosave_action = self._act(f, "AutoSave", None,
-                                         lambda: self.toggle_autosave(),
-                                         False)
-        self.autosave_action.setCheckable(True)
-        self._act(f, "Recover Unsaved Files…", None,
-                  lambda: self.recover_unsaved(ask_if_none=True), False)
-        cs = f.addMenu("Copies && Cloud")
-        self._act(cs, "Work on a Local Copy", None,
-                  lambda: self.work_on_local_copy())
-        self._act(cs, "Copy Back to the Original", None,
-                  lambda: self.copy_back_original())
-        # Open from / Save to Dropbox (hidden when IT turns Dropbox off)
-        from . import dropbox_ui
-        dropbox_ui.add_actions(self, cs)
-        self._act(cs, "Version History…", None, self.show_versions)
-        f.addSeparator()
-        new = f.addMenu("Create")
-        self._act(new, "New From Form Library…", "Ctrl+Shift+N",
-                  lambda: self.new_from_form(), False)
-        self._act(new, "Generate Set…", None, lambda: self.generate_set(),
-                  False)
-        self._act(new, "Create PDF From File…", None, self.create_pdf, False)
-        self._act(new, "Combine Files…", None, self.combine_files, False)
-        imp = f.addMenu("Import")
-        self._act(imp, "Import AutoCAD DXF…", None, lambda: self.import_dxf(),
-                  False)
-        self._act(imp, "Import Markups (PDF or XFDF)…", None,
-                  self.import_markups)
-        exp = f.addMenu("Export To")
-        self._act(exp, "Word Document (.docx)…", None,
-                  lambda: self.export_as("docx"))
-        self._act(exp, "Excel Workbook (.xlsx)…", None,
-                  lambda: self.export_as("xlsx"))
-        self._act(exp, "PowerPoint (.pptx)…", None,
-                  lambda: self.export_as("pptx"))
-        self._act(exp, "Web Page (.html)…", None,
-                  lambda: self.export_as("html"))
-        self._act(exp, "Text (.txt)…", None, lambda: self.export_as("txt"))
-        self._act(exp, "AutoCAD DXF (this page)…", None,
-                  lambda: self.export_dxf())
-        self._act(exp, "Google Earth (KML, aerial page markups)…", None,
-                  lambda: self.export_geo("kml"))
-        self._act(exp, "GIS (GeoJSON, aerial page markups)…", None,
-                  lambda: self.export_geo("geojson"))
-        self._act(exp, "PDF/A (archival)…", None, lambda: self.export_pdfa())
-        self._act(exp, "External Issue (strip pricing)…", None,
-                  lambda: self.export_external())
-        self._act(exp, "Images (PNG)…", None, lambda: self.export_as("png"))
-        self._act(exp, "Images (JPEG)…", None, lambda: self.export_as("jpg"))
-        exp.addSeparator()
-        self._act(exp, "Export Markups (XFDF)…", None, self.export_xfdf)
-        cmp_ = f.addMenu("Compare")
-        self._act(cmp_, "Compare…", "Ctrl+Alt+C", lambda: self.compare())
-        self._act(cmp_, "Compare Text With…", None, self.compare_with)
-        self._act(cmp_, "Compare Revisions (Overlay)…", "Ctrl+Alt+O",
-                  self.compare_revisions)
-        self._act(cmp_, "Quick Compare (Same Sheets)…", None,
-                  self.compare_visual)
-        prot = f.addMenu("Protect && Repair")
-        self._act(prot, "Password Protect…", None, self.protect)
-        self._act(prot, "Remove Security…", None, self.unprotect)
-        self._act(prot, "Remove Hidden Information…", None, self.sanitize)
-        prot.addSeparator()
-        self._act(prot, "Reduce File Size…", None, self.reduce_size)
-        self._act(prot, "Check / Repair PDF…", None, self.check_repair)
-        sig = f.addMenu("Sign")
-        self._act(sig, "Sign…", None, self.sign)
-        self._act(sig, "Verify Signatures…", None, self.verify)
-        self._act(sig, "Signing Timestamp Server…", None,
-                  lambda: self.timestamp_server(), False)
-        f.addSeparator()
-        self._act(f, "Print…", QKeySequence.Print, self.print_doc)
-        self._act(f, "Print Preview…", None, self.print_preview)
-        self._act(f, "Document Properties…", "Ctrl+D", self.doc_properties)
-        self._act(f, "Attachments…", None, lambda: self.attachments())
-        f.addSeparator()
-        self._act(f, "Exit", QKeySequence.Quit, self.close, False)
-
-        e = mb.addMenu("&Edit")
-        self._undo_act = self._act(e, "Undo", QKeySequence.Undo, self.undo)
-        self._redo_act = self._act(e, "Redo", QKeySequence.Redo, self.redo)
-        # both redo keys on every platform, and Ctrl+Shift+Z never falls
-        # through to Undo (Chief's estimator test, Nov 7)
-        self._undo_act.setShortcuts([QKeySequence("Ctrl+Z")])
-        self._redo_act.setShortcuts([QKeySequence("Ctrl+Y"),
-                                     QKeySequence("Ctrl+Shift+Z")])
-        e.addSeparator()
-        self._act(e, "Copy Text", QKeySequence.Copy, self.copy_text)
-        self._act(e, "Copy as Table (for Excel)", "Ctrl+Shift+C",
-                  self.copy_table)
-        self._act(e, "Select All Text on Page", QKeySequence.SelectAll,
-                  self.select_all_text)
-        self._act(e, "Copy All Text on This Page", None,
-                  lambda: self.copy_text(page=True))
-        self._act(e, "Paste", QKeySequence.Paste, lambda: self.paste())
-        self._act(e, "Paste Image", None,
-                  lambda: self._view and self._view.paste_image())
-        self._act(e, "Delete Selected Markup", QKeySequence.Delete,
-                  lambda: self._view and self._view.delete_selected())
-        self._act(e, "Add Selected Markup to Tool Chest…", None,
-                  self.add_selected_to_chest)
-        e.addSeparator()
-        self._act(e, "Find…", QKeySequence.Find, self.find)
-        e.addSeparator()
-        self._act(e, "Author Name…", None, self.set_author, False)
-        e.addSeparator()
-
-        v = mb.addMenu("&View")
-        for d in (self.thumb_dock, self.takeoff_dock, self.bm_dock,
-                  self.docs_dock, self.chest_dock, self.props_dock,
-                  self.markups_dock, self.asm_dock, self.est_dock,
-                  self.qty_dock):
-            v.addAction(d.toggleViewAction())
-        a = self._act(v, "Bottom Panels (Markups, Estimate…)", "F9",
-                      lambda: self.toggle_bottom_panels(), False)
-        a.setCheckable(True)
-        self.bottom_act = a
-        v.addSeparator()
-        self._act(v, "Next Page", "PgDown",
-                  lambda: self._view and self._view.next_page())
-        self._act(v, "Previous Page", "PgUp",
-                  lambda: self._view and self._view.prev_page())
-        self._act(v, "Go to Page…", "Ctrl+G", self.go_to_page)
-        self._act(v, "First Page", "Ctrl+Home",
-                  lambda: self.page_nav.first())
-        self._act(v, "Last Page", "Ctrl+End", lambda: self.page_nav.last())
-        v.addSeparator()
-        self._act(v, "Zoom In", QKeySequence.ZoomIn, lambda: self._zoom(1.25))
-        self._act(v, "Zoom Out", QKeySequence.ZoomOut, lambda: self._zoom(0.8))
-        self._act(v, "Fit Width", "Ctrl+2", self.fit_width)
-        self._act(v, "Fit Page", "Ctrl+0", self.fit_page)
-        self._act(v, "Previous View", "Alt+Left", self.previous_view)
-        self._act(v, "Actual Size", "Ctrl+1", lambda: self._view and
-                  self._view.set_zoom(QApplication.primaryScreen()
-                                      .logicalDotsPerInch() / 72))
-        v.addSeparator()
-        self.snap_action = QAction("Snap to Content", self, checkable=True)
-        self.snap_action.setShortcut("Shift+F9")
-        self.snap_action.setToolTip("Snap drawing and measuring to line "
-                                    "ends, corners and intersections (Shift+F9)")
-        self.snap_action.setChecked(settings.get("snap", True) is not False)
-        self.snap_action.toggled.connect(self.set_snap)
-        v.addAction(self.snap_action)
-        self.thin_action = QAction("Enhance Thin Lines", self)
-        self.thin_action.setCheckable(True)
-        self.thin_action.setToolTip("Draw hairlines at least one screen "
-                                    "pixel wide, so drawings stay crisp "
-                                    "when zoomed out")
-        self.thin_action.setChecked(settings.get("thin_lines", True)
-                                    is not False)
-        self.thin_action.toggled.connect(self.set_thin_lines)
-        v.addAction(self.thin_action)
-        v.addSeparator()
-        tm = v.addMenu("Theme")
-        tg = QActionGroup(self)
-        from . import theme as _theme
-        self._theme_actions = []          # Python-owned (Grok N5): an action
-        for key, label in (("system", "Follow Windows"), ("dark", "Dark"),
-                           ("light", "Light")):     # made by addAction(text)
-            ta = QAction(label, self)              # could lose its wrapper
-            tm.addAction(ta)
-            self._theme_actions.append(ta)
-            ta.setCheckable(True)
-            ta.setChecked(_theme.mode() == key)
-            ta.triggered.connect(lambda _c=False, k=key: self.set_theme(k))
-            tg.addAction(ta)
-        self._act(v, "Command Search…", "Ctrl+K",
-                  lambda: self.command_search(), False)
-        self._act(v, "Show Ribbon", "Ctrl+F1",
-                  lambda: self.active_ribbon().set_collapsed(
-                      not self.active_ribbon().collapsed), False)
-        # Takeoff Studio pieces (Chief's v24 / v26)
-        v.addSeparator()
-        from . import snap_indicator as _si
-        sm = v.addMenu("Snap Modes")
-        self._snap_mode_actions = {}
-        on = _si.load_modes()
-        for m in _si.ORDER:
-            ma = sm.addAction(m)
-            ma.setCheckable(True)
-            ma.setChecked(m in on)
-            ma.toggled.connect(lambda _c=False: self._set_snap_modes())
-            self._snap_mode_actions[m] = ma
-        self._field_action = self._act(v, "Field Mode", "Ctrl+5",
-                                       lambda: self.toggle_field_mode(),
-                                       False)
-        self._field_action.setCheckable(True)
-        dm = v.addMenu("Density")
-        dg = QActionGroup(self)
-        from . import field_mode as _fm
-        cur = settings.get("density", "comfortable")
-        for name in _fm.DENSITY:
-            da = QAction(name.title(), self)      # Python-owned, as above
-            dm.addAction(da)
-            da.setCheckable(True)
-            da.setChecked(name == cur)
-            da.triggered.connect(lambda _c=False, n=name:
-                                 self.set_density(n))
-            dg.addAction(da)
-        self._view_menu_bar = v
-        # Color Takeoff By (Nov 4 takeoff list #6)
-        cm = v.addMenu("Color Takeoff By")
-        cg = QActionGroup(self)
-        for label, mode in (("Off", None), ("Item", "item"),
-                            ("Status", "status"),
-                            ("Priced / Not Priced", "priced")):
-            ca = QAction(label, self)
-            ca.setCheckable(True)
-            ca.setChecked(mode is None)
-            ca.triggered.connect(lambda _c=False, m=mode: self.color_by(m))
-            cg.addAction(ca)
-            cm.addAction(ca)
-        # ribbon tabs (Nov 4, fewer clicks): quickaccess.py
-        tm = v.addMenu("Ribbon Tabs")
-        for label, key, default in (
-                ("Show All Tabs", "show_all_tabs", False),
-                ("Tabs Follow the Open File", "tabs_follow_file", True),
-                ("Classic Tabs (all 14, next start)", "classic_tabs", False)):
-            ta = QAction(label, self)
-            ta.setCheckable(True)
-            ta.setChecked(bool(settings.get(key, default)))
-            ta.triggered.connect(lambda c=False, k=key: self._tab_option(k, c))
-            tm.addAction(ta)
-        tm.addSeparator()
-        self._act(tm, "Choose My Role (Estimator, PM, Service, Office)…", None,
-                  lambda: self._choose_role(), False)
-        dbl = QAction("Double-Click Edits PDF Text", self)
-        dbl.setCheckable(True)
-        dbl.setChecked(bool(settings.get("dblclick_edits_text", True)))
-        dbl.triggered.connect(lambda c=False: settings.set(
-            "dblclick_edits_text", bool(c)))
-        v.addAction(dbl)
-
-        menus = {"Markup": mb.addMenu("&Markup"), "Edit": e, "View": v}
-        menus["Fill & Sign"] = mb.addMenu("F&ill && Sign")
-        menus["Takeoff"] = mb.addMenu("&Takeoff")
-        for menu, label, tool, key, _tb in TOOL_MENU:
-            m = menus[menu]
-            if label is None:
-                m.addSeparator()
-                continue
-            a = self._act(m, label, key,
-                          lambda checked=False, t=tool: self.set_tool(t))
-            a.setCheckable(True)
-            a.setData(tool)
-            a.setIcon(icons.icon(tool))
-            a.setToolTip(f"{label} ({key})" if key else label)
-            self._tools.addAction(a)
-            self._tool_actions[tool] = a
-        self._tool_actions[None].setChecked(True)
-        mk = menus["Markup"]
-        mk.addSeparator()
-        self._act(mk, "Markup Color…", None, self.pick_color)
-        self._act(mk, "Default Style", None, self.reset_color)
-        self._act(mk, "Refresh Legends", None, self.refresh_legends)
-        lsm = mk.addMenu("Legend Style")
-        self._legend_style_group = QActionGroup(self)
-        for key, text in (("takeoff", "Takeoff (quantities only)"),
-                          ("classic", "Classic (counts + 2 decimals)")):
-            a = lsm.addAction(text)
-            a.setCheckable(True)
-            a.setChecked(settings.get("legend_style", "takeoff") == key)
-            a.triggered.connect(
-                lambda checked=False, k=key: settings.set("legend_style", k))
-            self._legend_style_group.addAction(a)
-        mk.addSeparator()
-        self._act(mk, "Line Styles…", None, self.line_styles, False)
-        self._act(mk, "Hatch Patterns…", None, self.hatch_patterns, False)
-        self._act(mk, "Layers…", None, self.layers)
-
-        fsm = menus["Fill & Sign"]
-        fsm.addSeparator()
-        self._act(fsm, "Fill From the Job and Sign…", None,
-                  lambda: self.fill_from_job_and_sign(), False)
-        self._act(fsm, "Change Signature…", None,
-                  lambda: self._redraw_signature("signature"), False)
-        self._act(fsm, "Change Initials…", None,
-                  lambda: self._redraw_signature("initials"), False)
-
-        t = menus["Takeoff"]
-        self._act(t, "Count From a Picture…", None,
-                  lambda: self.count_from_picture())
-        t.addSeparator()
-        presets = t.addMenu("Scale Presets")
-        for family, items in takeoff.PRESETS.items():
-            sub = presets.addMenu(family)
-            for name, (ppu, unit) in items:
-                a = self._act(sub, name, None,
-                              lambda _=False, n=name, p=ppu, u=unit:
-                              self.apply_scale_preset(n, p, u))
-        self._act(t, "Auto Scale (Read Sheets)…", None,
-                  lambda: self.sheet_setup(scales=True, bookmarks=False))
-        self._act(t, "Auto Scale (Check Against Dimensions)…", None,
-                  lambda: self._boost("autoscale"))
-        self._act(t, "Auto Takeoff (Review)…", "Ctrl+Alt+R",
-                  lambda: self._boost("autotakeoff_review"))
-        self._act(t, "Show Scale", None, self.show_scale)
-        sl = t.addMenu("Show Side Lengths")
-        self._side_group = QActionGroup(self)
-        for key, text in (("off", "Off"), ("selected", "Selected Markup"),
-                          ("all", "All Measurements on the Page")):
-            act = sl.addAction(text)
-            act.setCheckable(True)
-            act.setChecked(settings.get("side_lengths", "off") == key)
-            act.triggered.connect(
-                lambda checked=False, k=key: self.set_side_lengths(k))
-            self._side_group.addAction(act)
-        from . import measure_extra as _mx
-        cm = t.addMenu("Captions")
-        self._caption_group = QActionGroup(self)
-        for key, text in _mx.CAPTIONS.items():
-            act = cm.addAction(text)
-            act.setCheckable(True)
-            act.setChecked(_mx.caption_mode() == key)
-            act.triggered.connect(
-                lambda checked=False, k=key: self.set_captions(k))
-            self._caption_group.addAction(act)
-        self._act(t, "Viewports on This Page…", None, self.manage_viewports)
-        t.addSeparator()
-        self._act(t, "Takeoff Standard…", None, self.takeoff_standard)
-        t.addSeparator()
-        self._act(t, "Count by Label…", None, self.auto_count_label)
-        from . import takeoff_assist_ui as _tau
-        self._act(t, "Count Several Symbols…", None,
-                  lambda: _tau.count_several(self))
-        self._act(t, "Try the Count Library…", None,
-                  self.try_count_library)
-        self._act(t, "Item Names Learned…", None, self.item_names_learned,
-                  False)
-        self._act(t, "Auto Takeoff Rooms on This Sheet…", "Ctrl+Shift+R",
-                  self.auto_takeoff_rooms)
-        a = self._act(t, "Rooms: Use Tag Area When the Trace Differs",
-                      None, lambda: self.toggle_room_tag_area(), False)
-        a.setCheckable(True)
-        a.setChecked(bool(settings.get("rooms_use_tag_area", True)))
-        self.room_tag_act = a
-        self._act(t, "Auto Takeoff Walls && Doors on This Sheet…",
-                  "Ctrl+Shift+W", self.auto_walls)
-        self._act(t, "Walls by Role…", None,
-                  lambda: _tau.walls_by_role(self))
-        self._act(t, "Change Wall Role of Selection…", None,
-                  lambda: _tau.change_wall_role(self))
-        a = self._act(t, "Trace Outline: Follow Drawn Lines", None,
-                      lambda: None, False)
-        a.setCheckable(True)
-        a.setChecked(_tau.trace_follow())
-        a.toggled.connect(_tau.set_trace_follow)
-        self.trace_follow_act = a
-        self._act(t, "Trade Takeoff (Pipe, Duct, Devices, Roof, Rebar, "
-                  "Earthwork)…", "Ctrl+Alt+T", self.trade_takeoff)
-        self._act(t, "Check Takeoff…", "Ctrl+Alt+K", self.check_takeoff)
-        self.roof_act = self._act(t, "Roof Plan Takeoff…", None,
-                                  self.roof_takeoff)
-        on = bool(settings.get("roof_takeoff", False))
-        self.roof_act.setVisible(on)
-        a = t.addAction("Show Roof Plan Tools")
-        a.setCheckable(True)
-        a.setChecked(on)
-        a.toggled.connect(self._show_roof_tools)
-        # Nov 23 (Jon): quantities from a 3D (IFC) model - its own 3D Model
-        # tab after AI, and here in the Takeoff menu
-        self._act(t, "3D Model Quantities (IFC)…", None,
-                  lambda: self.model_quantities(), False)
-        t.addSeparator()
-        self._act(t, "Assembly Library…", "Ctrl+Shift+L",
-                  self.assemblies.open_library)
-        a = self._act(t, "Take Off Into Assembly…", None,
-                      lambda: self.take_into_assembly())
-        a.setStatusTip("Pick a CSI division and an assembly; the matching "
-                       "tool starts and what you trace is priced by it")
-        t.addAction(self.asm_dock.toggleViewAction())
-        self._act(t, "Labor Rates && Crews…", None, self.labor_settings)
-        self._act(t, "Cost Books…", None, self.cost_books)
-        self._act(t, "Add From Cost Book…", None,
-                  lambda: self.add_from_cost_book())
-        self._act(t, "Quick $/SF Estimate…", None,
-                  lambda: self.quick_sf_estimate(), False)
-        self._act(t, "Model Estimate…", None,
-                  lambda: self.model_estimate(), False)
-        self._act(t, "Concrete Calculator…", None,
-                  lambda: self.calculators(0), False)
-        self._act(t, "Brick and Block Calculator…", None,
-                  lambda: self.calculators(1), False)
-        self._act(t, "Roofing Calculator…", None,
-                  lambda: self.calculators(2), False)
-        self._act(t, "Rebar Calculator…", None,
-                  lambda: self.calculators(3), False)
-        self._act(t, "Beam and Header Calculator…", None,
-                  lambda: self.calculators(4), False)
-        self._act(t, "Column and Post Calculator…", None,
-                  lambda: self.calculators(5), False)
-        self._act(t, "Footing Size Calculator…", None,
-                  lambda: self.calculators(6), False)
-        self._act(t, "Metal Stud Framing Calculator…", None,
-                  lambda: self.calculators(7), False)
-        self._act(t, "Structural Steel Calculator…", None,
-                  lambda: self.calculators(8), False)
-        self._act(t, "Earthwork Calculator…", None,
-                  lambda: self.calculators(9), False)
-        self._act(t, "Aggregate and Asphalt Calculator…", None,
-                  lambda: self.calculators(10), False)
-        self._act(t, "Drywall Calculator…", None,
-                  lambda: self.calculators(11), False)
-        self._act(t, "Paint Calculator…", None,
-                  lambda: self.calculators(12), False)
-        self._act(t, "Date and Time Calculators…", None,
-                  lambda: self.date_calculators(), False)
-        self._act(t, "Bid Tabs…", None, self.bid_tabs, False)
-        self._act(t, "Bid Leveling…", None, self.bid_leveling, False)
-        a = self._act(t, "Scope Sheets…", None, lambda: self.scope_sheets(),
-                      False)
-        a.setStatusTip("Compare sub bids for one trade at a time on your "
-                       "Scope Sheet: budget, bidders, checklist, scope "
-                       "lines, math check, award")
-        a.setWhatsThis(a.statusTip())
-        self._act(t, "Price Database…", None, self.price_database, False)
-        self._act(t, "Location Factors…", None, self.location_factors, False)
-        self._act(t, "Import Your Own Price List…", None,
-                  self.import_price_list, False)
-        self._act(t, "Export Assembly Estimate (Excel)…", None,
-                  lambda: self.assemblies._export_dialog())
-        self._act(t, "Bid Build-up…", None, lambda: self.bid_buildup(),
-                  False)
-        self._act(t, "Pre-bid Checklist…", None,
-                  lambda: self.prebid_checklist())
-        self._act(t, "Leveling Board…", None, lambda: self.leveling_board())
-        self._act(t, "Bid Form Autopilot…", None, lambda: self.bid_form_autopilot())
-        self._act(t, "Bid Form Workbook…", None, lambda: self.bid_form_workbook())
-        self._act(t, "Builder's Risk Quote Request…", None,
-                  lambda: self.builders_risk())
-        self._act(t, "Placeholders && Allowances…", None,
-                  lambda: self.placeholders())
-        self._act(t, "Escalation to Buy Date…", None,
-                  lambda: self.escalation())
-        self._act(t, "Bid Gate Settings…", None, lambda: self.bid_gate_settings(),
-                  False)
-        from . import coverage_ui
-        self._act(t, "Carry Takeoff Forward to a Revised Set…", None,
-                  lambda: self.carry_forward())
-        self._act(t, "Typical Sheet (Count This Sheet N Times)…", None,
-                  lambda: self.page_multiplier())
-        self._act(t, "Wood Sheathing Helper…", None,
-                  lambda: self.sheathing_helper())
-        self._act(t, "Buy Quantities (Sheets, Boxes, Rolls)…", None,
-                  lambda: self.buy_quantities())
-        self._act(t, "Coverage Map and Second Check…", None,
-                  lambda: coverage_ui.show(self))
-        self._act(t, "Revision Changes (Old → New)…", None,
-                  lambda: self._boost("revdelta"))
-        self._act(t, "Job Cost Feedback (Bid vs Actual)…", None,
-                  lambda: self.job_cost_feedback(), False)
-        self._act(t, "Estimating Dashboard…", None,
-                  lambda: self.estimating_dashboard(), False)
-        self._act(t, "Bid Board…", None, lambda: self.bid_board(), False)
-        a = self._act(t, "Show Unpriced Markups", None,
-                      lambda: self.toggle_unpriced())
-        a.setCheckable(True)
-        self.unpriced_act = a
-        self._act(t, "Create Proposal…", "Ctrl+Shift+B",
-                  lambda: self.create_proposal())
-        self._act(t, "Export Bid Package…", None,
-                  lambda: self.export_bid_package())
-        t.addSeparator()
-        t.addAction(self.est_dock.toggleViewAction())
-        self._act(t, "Price These…", None, lambda: self.price_these())
-        self._act(t, "Award: Budget && Commitments in the Job…", None,
-                  lambda: self.award_estimate())
-        self._act(t, "Export Estimate (CSV)…", None,
-                  lambda: self.estimate._export_dialog())
-        self._act(t, "Export My Estimate…", None,
-                  lambda: self.export_my_estimate())
-        self._act(t, "Export Quantities (CSV)…", None, self.export_quantities)
-        self._act(t, "Export to Sage 300 Job Cost (CSV)…", None,
-                  self.export_sage)
-        self._act(t, "Link Quantities to Excel…", None, self.link_excel)
-        from .estimating import ui as estimating_tools      # r36 features
-        estimating_tools.add_menu(self, t)
-
-        p = mb.addMenu("&Pages")
-        self._act(p, "Rotate Right", "Ctrl+Shift+=",
-                  lambda: self._page_action("rotate_right", self._sel_pages()))
-        self._act(p, "Rotate Left", "Ctrl+Shift+-",
-                  lambda: self._page_action("rotate_left", self._sel_pages()))
-        self._act(p, "Rotate All Pages Right", None,
-                  lambda: self._page_action("rotate_right",
-                                            list(range(self._doc().page_count))))
-        p.addSeparator()
-        self._act(p, "Insert Blank Page", None,
-                  lambda: self._page_action("insert_blank", self._sel_pages()))
-        self._act(p, "Insert Pages From PDF…", None,
-                  lambda: self._page_action("insert_pdf", self._sel_pages()))
-        self._act(p, "Duplicate Page", None, self.duplicate_page)
-        self._act(p, "Replace Pages…", None, self.replace_pages)
-        self._act(p, "Organize Pages…", "Ctrl+Shift+G", self.organize_pages)
-        self._act(p, "Split Document…", None, self.split_doc)
-        self._act(p, "Booklet / N-up…", None, self.booklet_nup)
-        self._act(p, "Extract Pages…", None,
-                  lambda: self._page_action("extract", self._sel_pages(True)))
-        self._act(p, "Delete Pages…", None,
-                  lambda: self._page_action("delete", self._sel_pages(True)))
-        p.addSeparator()
-        self._act(p, "Header && Footer…", None, self.header_footer)
-        self._act(p, "Auto Bookmark Sheets…", None,
-                  lambda: self.sheet_setup(scales=False, bookmarks=True))
-        self._act(p, "Link Sheet References", None, self.batch_link)
-        self._act(p, "Remove Sheet Links", None,
-                  lambda: self.batch_link(remove=True))
-        self._act(p, "Page Numbers…", None,
-                  lambda: self.header_footer(page_numbers=True))
-        self._act(p, "Crop Pages", None, lambda: self.set_tool("crop"))
-        self._act(p, "Bates Numbering…", None, self.bates)
-        self._act(p, "Watermark…", None, self.watermark)
-
-        dm = mb.addMenu("&Document")
-        self._act(dm, "Make Searchable (OCR)…", None, self.make_searchable)
-        self._act(dm, "Check Scan Quality…", None, self.scan_quality)
-        self._act(dm, "Preflight / PDF/X…", None,
-                  lambda: self.preflight())
-        self._act(dm, "Request Signatures…", None,
-                  lambda: self.request_signatures())
-        self._act(dm, "Signature Requests…", None,
-                  lambda: self.signature_requests(), False)
-        self._act(dm, "Accessibility Check…", None,
-                  lambda: self.accessibility_check())
-        self._act(dm, "Spec Book Sections…", None,
-                  lambda: self.spec_sections())
-        self._act(dm, "Search && Redact…", None, self.search_redact)
-        dm.addSeparator()
-        self._act(dm, "Prepare Form (detect fields)", None, self.prepare_form)
-        self._act(dm, "Clear Form", None, self.clear_form)
-        self._act(dm, "Fill Form From Job", None, lambda: self.fill_form())
-        dm.addSeparator()
-        self._act(dm, "Flatten Markups && Fields…", None, self.flatten)
-        self._act(dm, "Auto Bookmark (Link Details)…", None,
-                  lambda: self._boost("autobookmark"))
-
-        tl = mb.addMenu("&Tools")
-        self._act(tl, "Action Wizard (Batch Process)…", None, self.batch,
-                  False)
-        self._act(tl, "Macros…", None, self.open_macros)
-        self._act(tl, "Package Tracker…", None, self.package_tracker, False)
-        self._act(tl, "Back Up My QuantiSheet Data…", None,
-                  lambda: self.backup_data(), False)
-        self._act(tl, "Restore QuantiSheet Data From a Backup…", None,
-                  lambda: self.restore_data(), False)
-        self._act(tl, "Time Log…", None, lambda: self.time_log(), False)
-        tl.addSeparator()
-        self._act(tl, "Start Relay (host on this computer)…", None,
-                  self.start_relay, False)
-        self._act(tl, "Live Collaboration…", None, self.open_collab)
-
-        # Nov 20 (Jon): its own menu, after Tools
-        pam = mb.addMenu("Project &Analysis")
-        self._act(pam, "Project Analysis…", None,
-                  lambda: self.project_analysis())
-        self._act(pam, "Find Bid Terms…", None, lambda: self.bid_terms())
-        self._act(pam, "Manufacturers in Specs…", None,
-                  lambda: self.spec_manufacturers())
-        self._act(pam, "Bid Submittal Checklist…", None,
-                  lambda: self.bid_submittal())
-
-        r = mb.addMenu("&Review")
-        self._act(r, "Revision Log…", None, lambda: self.revision_log())
-        self._act(r, "Tags vs Schedule Check…", None,
-                  lambda: self.tag_check())
-        self._act(r, "Measurement Audit…", None,
-                  lambda: self.measurement_audit())
-        r.addSeparator()
-        self._act(r, "Auto-Markup by Rules", None, self.auto_markup)
-        self._act(r, "Edit Auto-Markup Rules…", None, self.edit_rules)
-        r.addSeparator()
-        self._act(r, "AI Takeoff (Whole Set)…", "Ctrl+Shift+A",
-                  lambda: self.ai_takeoff())
-        z = r.addMenu("AI Takeoff Zones")
-        self._act(z, "Draw a Zone: Only Here", None,
-                  lambda: self._view and self._view.set_tool("zone_include"))
-        self._act(z, "Draw a Zone: Leave Out", None,
-                  lambda: self._view and self._view.set_tool("zone_exclude"))
-        self._act(z, "Clear Zones on This Page", None,
-                  lambda: self._view and self._view.clear_zones())
-        self._act(r, "Build Schedule From Plans…", None,
-                  lambda: self.ai_schedule(), False)
-        self._act(r, "Voice Commands", "Ctrl+Shift+V",
-                  lambda: self.voice_commands())
-        self._act(r, "AI: Summarize…", None, self.ai_summary)
-        # Nov 23 (Jon): project assistants, also on the AI tab
-        self._act(r, "Ask the Project…", None, lambda: self.ask_project(),
-                  False)
-        self._act(r, "Draft Daily Log From Notes…", None,
-                  lambda: self.daily_draft(), False)
-        self._act(r, "Check Submittal Against Spec…", None,
-                  lambda: self.submittal_check(), False)
-        self._act(r, "AI: Redline…", None, self.ai_redline)
-        self._act(r, "AI: Spec-Check…", None, self.ai_spec_check)
-        self._act(r, "Spec Book Risk Scanner…", None,
-                  lambda: self.spec_risk(), False)
-        self._act(r, "AI: Translate Markups…", None, self.translate_markups)
-        self._act(r, "AI: Find RFIs && Questions…", None, self.ai_find_rfis)
-        self._act(r, "Local AI Models…", None, lambda: self.ai_models(),
-                  False)
-        r.addSeparator()
-        r.addAction(self.rfi_dock.toggleViewAction())
-        self._act(r, "New RFI…", None, lambda: self.new_rfi("RFI"))
-        self._act(r, "New Submittal…", None,
-                  lambda: self.new_rfi("Submittal"))
-        self._act(r, "Submittal Review Stamp", None,
-                  lambda: self.set_tool("review_stamp"))
-
-        pj = mb.addMenu("&Project")
-        self._act(pj, "Project Center…", "Ctrl+Shift+P",
-                  lambda: self.project_center(), False)
-        self._act(pj, "Company Directory…", None,
-                  lambda: self.company_directory(), False)
-        self._act(pj, "Bid Invites Send As…", None,
-                  lambda: self.bid_invite_sender(), False)
-        self._act(pj, "Scheduler (Gantt)…", "Ctrl+Shift+J",
-                  lambda: self.scheduler(), False)
-        self._act(pj, "New Schedule…", None,
-                  lambda: self.scheduler(new=True), False)
-        self._act(pj, "Weekly Owner Report…", None,
-                  lambda: self.weekly_owner_report(), False)
-        self._act(pj, "Date and Time Calculators…", None,
-                  lambda: self.date_calculators(), False)
-        pj.addSeparator()
-        self._act(pj, "New Set From Files…", None,
-                  lambda: self._sets_do("new_set"), False)
-        self._act(pj, "Open Set…", None, lambda: self._sets_do("open_set"),
-                  False)
-        self._act(pj, "Batch Slip Sheet…", None,
-                  lambda: self.batch_slip_sheet(), False)
-        self._act(pj, "Watch Plan Folder…", None,
-                  lambda: self.watch_plan_folder())
-        self._act(pj, "Check Plan Folder Now", None,
-                  lambda: self.check_plan_folder(quiet=False))
-        self._act(pj, "Search Takeoff Across Jobs…", None,
-                  lambda: self.measurement_audit(1), False)
-        pj.addSeparator()
-        self._act(pj, "Drawing Register…", None,
-                  lambda: self.doc_control(0))
-        self._act(pj, "Transmittals…", None, lambda: self.doc_control(1))
-        self._act(pj, "New Transmittal…", None,
-                  lambda: self.doc_control(1).new_transmittal())
-        self._act(pj, "Addenda…", None, lambda: self.doc_control(2))
-        pj.addSeparator()
-        self._act(pj, "Punch List…", "Ctrl+Shift+U", lambda: self.quality(0))
-        self._act(pj, "New Punch Item…", None,
-                  lambda: self.quality(0).new_punch())
-        self._act(pj, "Three-Phase Inspections…", None,
-                  lambda: self.quality(1))
-        pj.addSeparator()
-        self._act(pj, "Code Check…", None, self.code_check)
-        self._act(pj, "Project Risk Flags…", None,
-                  lambda: self.risk_flags(), False)
-        pj.addSeparator()
-        self._act(pj, "Submittal Log…", None, self.submittal_log, False)
-
-        # Module: add-on reference tools (ADA first; ClaimIt to come).
-        # No drawing needed: the Standards and the counts checker work alone
-        md = mb.addMenu("&Module")
-        self._module_menu = md
-        self._act(md, "ADA Standards PDF…", None, self.ada_pdf, False)
-        self._act(md, "ADA Standards (2010)…", None, lambda: self.ada(0),
-                  False)
-        self._act(md, "ADA Checker…", None, lambda: self.ada(1), False)
-        md.addSeparator()
-        self._act(md, "Climate Zone by County…", None,
-                  lambda: self.energy_code(0), False)
-        self._act(md, "Code Library…", None, lambda: self.energy_code(1),
-                  False)
-        self._act(md, "Read the Energy Code Online…", None,
-                  lambda: self.energy_code(2), False)
-        from . import claims_hook        # optional separate program
-        if claims_hook.launcher() is not None:
-            md.addSeparator()
-            self._act(md, "ClaimIT (Insurance Claim Estimate)…", None,
-                      self.open_claims_module, False)   # no PDF needed
-        from . import backoffice_hook    # optional Back Office program
-        backoffice_hook.add_menu_item(self, md)
-        from . import master_hook        # Master Schedule (sub updates)
-        master_hook.add_menu_item(self, md)
-
-        bl = mb.addMenu("&Billing")
-        self._act(bl, "Contract && Billing…", "Ctrl+Shift+M",
-                  lambda: self.billing())
-        self._act(bl, "Schedule of Values…", None,
-                  lambda: self.billing("Schedule of Values"))
-        self._act(bl, "Change Order From Selected Markup…", None,
-                  self.change_from_markup)
-        self._act(bl, "Change Order From Revision…", None,
-                  lambda: self.change_from_revision())
-        self._act(bl, "Change Orders…", None,
-                  lambda: self.billing("Change Orders"))
-        self._act(bl, "Pay Applications…", None,
-                  lambda: self.billing("Pay Applications"))
-        self._act(bl, "Lien Waivers…", None,
-                  lambda: self.billing("Lien Waivers"))
-
-        cv = mb.addMenu("&Civil")
-        self._act(cv, "Civil Takeoff (Trades)…", None,
-                  lambda: self.trade_takeoff())
-        self._act(cv, "Work Notes Takeoff…", None,
-                  lambda: self.work_notes_takeoff())
-        self._act(cv, "Haul Calculator…", None, lambda: self.civil(6),
-                  False)
-        self._act(cv, "Export to CivilBid (Excel)…", None,
-                  lambda: self.export_heavybid())
-        from . import costlayer_ui
-        costlayer_ui.add_menu(self, cv)
-        from . import aerial_ui
-        aerial_ui.add_menu(self, cv)
-        from . import production_ui
-        production_ui.add_menu(self, cv)
-        cv.addSeparator()
-        self._act(cv, "Crew Estimate (Activities)…", None,
-                  lambda: self.civil(0))
-        self._act(cv, "Estimate From Takeoff (All Groups)", None,
-                  lambda: self.civil(0).add_all_groups())
-        self._act(cv, "Add From Activity Library…", None,
-                  lambda: self.civil(0).add_from_library())
-        self._act(cv, "Start From Master Estimate…", None,
-                  lambda: self.civil(0).start_from_master())
-        self._act(cv, "Crews…", None, lambda: self.civil(1), False)
-        self._act(cv, "Equipment Rates…", None, lambda: self.civil(2), False)
-        self._act(cv, "Labor Burden && Wages…", None, lambda: self.civil(3),
-                  False)
-        self._act(cv, "Import Prevailing Wages (Davis-Bacon)…", None,
-                  lambda: self.civil(3).import_wages())
-        cv.addSeparator()
-        self._act(cv, "Material && Sub Quotes…", None, lambda: self.civil(9))
-        self._act(cv, "Crew Schedule…", None, lambda: self.civil(10))
-        self._act(cv, "Resources (Hours by Class && Equipment)…", None,
-                  lambda: self.civil(11))
-        self._act(cv, "Export Cash Flow…", None,
-                  lambda: self.civil(10).export_cashflow())
-        cv.addSeparator()
-        self._act(cv, "Owner Bid Schedule…", None, lambda: self.civil(4))
-        self._act(cv, "Import Owner Bid Schedule…", None,
-                  lambda: self.civil(4).import_pay())
-        self._act(cv, "Export Priced Bid Schedule…", None,
-                  lambda: self.civil(4).export_pay())
-        self._act(cv, "Indirects…", None, lambda: self.civil(5))
-        self._act(cv, "Bid Versions…", None, lambda: self.civil(7))
-        self._act(cv, "Save Bid Version…", None,
-                  lambda: self.civil(7).save_version())
-        cv.addSeparator()
-        self._act(cv, "Time Cards…", None, lambda: self.project_center(),
-                  False)
-        self._act(cv, "Production History…", None, lambda: self.civil(8),
-                  False)
-        self._act(cv, "Cost to Complete (Forecast)…", None,
-                  lambda: self.civil(12))
-        self._act(cv, "Civil Job Cost (Bid vs Actual)…", None,
-                  lambda: self.job_cost_feedback(), False)
-
-        h = mb.addMenu("&Help")
-        self._help_menu = h
-        self._act(h, "Help Center && Tutorials…", "F1", self.help_center,
-                  False)
-        self._act(h, "Features && How-To Guide (PDF)", None,
-                  lambda: self.open_guide(), False)
-        self._act(h, "Video Tutorials", None,
-                  lambda: self.video_tutorials(), False)
-        self._act(h, "Welcome Tour", None, self.welcome_tour, False)
-        self._act(h, "Open Practice Drawings", None, self.open_practice,
-                  False)
-        self._act(h, "Practice Job (10 Minutes)…", None,
-                  lambda: self.practice_job(), False)
-        self._act(h, "Keyboard Shortcuts", None, self.shortcuts, False)
-        self._act(h, "Customize Shortcuts…", None,
-                  lambda: self.customize_shortcuts(), False)
-        self._act(h, "Report an Issue…", None, self.report_issue, False)
-        self._act(h, "Support Bundle for IT…", None, self.support_bundle,
-                  False)
-        self._act(h, "Recent Problems (Log)…", None,
-                  lambda: self.recent_problems(), False)
-        from . import betalicense as _bl
-        store = _bl.is_store()      # the Store copy: no printer, no key
-        if not store:
-            self._act(h, "Add the QuantiSheet Printer…", None,
-                      self.add_printer, False)
-        h.addSeparator()
-        self._act(h, "Terms of Service", None,
-                  lambda: self.about("Terms of Service"), False)
-        self._act(h, "Privacy", None, lambda: self.about("Privacy"), False)
-        self._act(h, "Third-Party Licenses", None,
-                  lambda: self.about("Third-Party Licenses"), False)
-        if not store:
-            self._act(h, "Enter License Key…", None, self.enter_license,
-                      False)
-        h.addSeparator()
-        self._act(h, "About QuantiSheet", None, self.about, False)
-        # team copy only: Help > Check for Updates (never the Store copy)
-        try:
-            from . import updatecheck_ui
-            updatecheck_ui.install(self, h)
-        except Exception:                                 # noqa: BLE001
-            logging.getLogger(__name__).debug("update check not wired",
-                                              exc_info=True)
-        exit_a = next((a for a in self._file_menu.actions()
-                       if a.text().replace("&", "") == "Exit"), None)
-        if exit_a is not None:
-            self._file_menu.insertMenu(exit_a, h)
-            self._file_menu.insertSeparator(exit_a)
-        else:
-            self._file_menu.addMenu(h)
 
     # ---- ribbon -----------------------------------------------------------------
     # (tab, group, [items]); an item is "Command text" (a large button), a
@@ -1944,136 +1125,10 @@ class MainWindow(QMainWindow):
                     a.setProperty("qs_icon", name)
         return self._cmd
 
-    def _ribbon_only_actions(self):
-        """Commands that are on the ribbon only, with no menu entry (Jon
-        places each one): Send with QuantiLink on the Home tab (Nov 23).
-        None of them when IT turned the feature off."""
-        if getattr(self, "_ribbon_only", None) is None:
-            from . import policy
-            self._ribbon_only = []
-            if policy.allowed("quantilink"):
-                a = QAction("Send with QuantiLink…", self)
-                a.setToolTip("Send with QuantiLink: a job's RFIs, "
-                             "submittals, daily logs or meeting minutes "
-                             "to the office's QuantiLink server, with "
-                             "share links back for an email")
-                a.triggered.connect(lambda: self.send_quantilink())
-                self._ribbon_only.append(a)
-        return self._ribbon_only
-
     def command(self, text):
         """The QAction for a menu command, by its name."""
         return self._cmd.get(text.replace("…", "").rstrip(". ").strip()
                              .lower())
-
-    def _build_toolbar(self):
-        """The ribbon (replaces the old toolbars), Ctrl+K command search
-        and the theme."""
-        from . import theme
-        from .ribbon import Ribbon, clean
-        self._index_actions()
-        # menus stay as the source of every command; their shortcuts need
-        # the actions on the window once the menu bar is hidden
-        for a in self._cmd.values():
-            if a not in self.actions():
-                self.addAction(a)
-        self.menuBar().hide()
-        self.ribbon = Ribbon(self)
-        self.ribbon.app_button.setMenu(self._file_menu)
-        self.ribbon.help_button.setMenu(self._help_menu)
-        self.ribbon.search_requested.connect(self.command_search)
-        self.ribbon.theme_picked.connect(self.set_theme)
-        missing = []
-        from . import quickaccess
-        for tab, title, items in self.RIBBON:
-            tab, title = quickaccess.fold(tab, title)  # fewer tabs (Nov 4)
-            g = self.ribbon.page(tab).group(title)
-            for it in items:
-                if it == "@scale":
-                    self._build_scale_box(g)
-                    continue
-                if isinstance(it, list):
-                    acts = [self.command(t) for t in it]
-                    missing += [t for t, a in zip(it, acts) if a is None]
-                    acts = [a for a in acts if a is not None]
-                    for a in acts:
-                        if a.icon().isNull():
-                            tool = a.data() if isinstance(a.data(), str) \
-                                else None
-                            if tool and icons.has(tool):
-                                a.setIcon(icons.icon(tool))
-                    if acts:
-                        g.small(acts)
-                    continue
-                text, label, icon = it if isinstance(it, tuple) else \
-                    (it, None, None)
-                a = self.command(text)
-                if a is None:
-                    missing.append(text)
-                    continue
-                if icon:
-                    a.setIcon(icons.icon(icon))
-                    a.setProperty("qs_icon", icon)
-                if label:
-                    a.setIconText(label)
-                g.large(a, label)
-        self._place_roof_tile()
-        claims = self.command("ClaimIT (Insurance Claim Estimate)")
-        if claims is not None:          # only when ClaimIT is installed
-            claims.setIcon(icons.icon("dollar"))
-            claims.setProperty("qs_icon", "dollar")
-            claims.setIconText("ClaimIT")
-            t_, g_ = quickaccess.fold("Module", "ClaimIT")
-            self.ribbon.page(t_).group(g_).large(claims, "ClaimIT")
-        qlink = self.command("Send with QuantiLink")
-        if qlink is not None:           # not when IT turned it off
-            qlink.setIcon(icons.icon("link"))
-            qlink.setProperty("qs_icon", "link")
-            qlink.setIconText("QuantiLink")
-            t_, g_ = quickaccess.fold("Home", "File")
-            self.ribbon.page(t_).group(g_).large(qlink, "QuantiLink")
-        ms = self.command("Master Schedule (Sub Updates)")
-        if ms is not None:              # the Master Schedule module is on
-            ms.setIcon(icons.icon("calendar"))
-            ms.setProperty("qs_icon", "calendar")
-            ms.setIconText("Master Schedule")
-            t_, g_ = quickaccess.fold("Module", "Schedule")
-            self.ribbon.page(t_).group(g_).large(ms, "Master Schedule")
-        up = self.command("Check for Updates Now")
-        if up is not None:          # team / Store copy only (review Part F)
-            up.setProperty("keywords", "update updater upgrade new version "
-                           "download install latest")
-            up.setProperty("qs_icon", "sync")
-            if up.icon().isNull():
-                up.setIcon(icons.icon("sync"))
-            self.ribbon.page("Help").group("About").large(up, "Updates")
-        if missing:
-            log.warning("ribbon: no command named %s", ", ".join(missing))
-        self._ribbon_missing = missing
-        holder = QToolBar("Ribbon")
-        holder.setObjectName("ribbon_bar")
-        holder.setMovable(False)
-        holder.setFloatable(False)
-        holder.toggleViewAction().setVisible(False)
-        holder.setContextMenuPolicy(Qt.PreventContextMenu)
-        holder.setStyleSheet("QToolBar { padding: 0; margin: 0; }")
-        holder.addWidget(self.ribbon)
-        self.addToolBar(Qt.TopToolBarArea, holder)
-        self._ribbon_bar = holder
-        # always open on the Home tab (Jon, 0.13.11), not the last one used
-        self._fill_ai_tab()
-        self._fill_approved_tiles()
-        if "Home" in self.ribbon.pages:
-            self.ribbon.show_page("Home")
-        self.ribbon.set_collapsed(bool(settings.get("ribbon_collapsed")))
-        self.ribbon.page_changed.connect(
-            lambda _n: self._sync_tool_chest(force=True, tab_change=True))
-        self._chest_mode = None
-        self._sync_tool_chest()
-        theme.hub.changed.connect(self._retheme)
-        QTimer.singleShot(0, self._tidy_dock_tabs)
-        # load the modules the first edit needs while the user looks around
-        QTimer.singleShot(1500, self._preload)
 
     def _preload(self):
         try:
@@ -2341,139 +1396,6 @@ class MainWindow(QMainWindow):
         rf.changed.connect(sync)
         sync()
         return b
-
-    def _fill_approved_tiles(self):
-        """Menu windows approved onto the ribbon (stage 1 placement)."""
-        from PySide6.QtWidgets import QMenu, QToolButton
-        from .ribbon import clean
-        missing = []
-        missing += self._ribbon_put("Home", "File", (
-            ("Generate Set", "Generate Set", "layers"),
-            ("Print Preview", "Print Preview", "print"),
-            ("Save As", "Save As", "save"),
-            ("Recover Unsaved Files", "Recover", "history"),
-        ))
-        missing += self._ribbon_put("Document", "Forms", (
-            ("New From Form Library", "Form Library", "form"),
-        ))
-        missing += self._ribbon_put("Project", "Sets", (
-            ("Open Bid Download (.zip) as a Job", "Bid Download", "package"),
-        ))
-        missing += self._ribbon_put("Document", "Protect", (
-            ("Check / Repair PDF", "Check / Repair", "shield"),
-        ))
-        missing += self._ribbon_put("Document", "Content", (
-            ("Attachments", "Attachments", "attach"),
-            ("Check Scan Quality", "Scan Quality", "audit"),
-            ("Auto Bookmark (Link Details)", "Link Details", "bookmark"),
-        ))
-        missing += self._ribbon_put("Takeoff", "Plan Set", (
-            ("Takeoff Standard", "Standard", "checklist"),
-            ("Coverage Map and Second Check", "Coverage", "overlay"),
-        ))
-        missing += self._ribbon_put("Estimate", "Pricing", (
-            ("Model Estimate", "Model", "estimate"),
-            ("Location Factors", "Location", "flag"),
-            ("Import Your Own Price List", "Price List", "import"),
-            ("Planning Cost Model", "Cost Model", "budget"),
-            ("Estimate Templates", "Templates", "book"),
-            ("Supplier Price List Import", "Supplier Prices", "import"),
-            ("Match Rates & Price a Workbook", "Match Rates", "dollar"),
-            ("Crew Hours by Pay Item", "Crew Hours", "crew"),
-        ))
-        missing += self._ribbon_put("Estimate", "Assemblies", (
-            ("Assembly Rules & Wall-Type Assemblies", "Wall Assemblies",
-             "walls"),
-        ))
-        missing += self._ribbon_put("Estimate", "Bidding", (
-            ("Bid Gate Settings", "Bid Gate", "lock"),
-            ("Award: Budget & Commitments in the Job", "Award", "gavel"),
-            ("Estimate Error Check", "Error Check", "checklist"),
-            ("Bid-Day Quote Comparison", "Bid Day", "compare"),
-            ("Estimate vs Actual", "Vs Actual", "trend"),
-            ("Job Cost Feedback (Bid vs Actual)", "Job Cost", "budget"),
-        ))
-        missing += self._ribbon_put("Estimate", "Output", (
-            ("Material Order List", "Materials", "list"),
-            ("Estimating Dashboard", "Dashboard", "panels"),
-            ("Bid Board", "Bid Board", "list"),
-            ("Export to Sage 300 Job Cost (CSV)", "Sage 300", "export"),
-        ))
-        missing += self._ribbon_put("Estimate", "Civil Estimate", (
-            ("Assembly Library (CivilBid codes)", "CivilBid Library",
-             "assembly"),
-            ("Bind Takeoff Group to Assembly", "Bind Group", "link"),
-            ("Insert Assembly Line", "Insert Line", "add_line"),
-            ("Bid Summary (Coded Assemblies)", "Coded Summary", "bidtabs"),
-            ("Revision Change Report", "Code Changes", "compare"),
-        ))
-        missing += self._ribbon_put("Estimate", "Civil Field", (
-            ("Production by Depth", "By Depth", "measure_volume"),
-        ))
-        missing += self._ribbon_put("Pages", "Pages", (
-            ("Booklet / N-up", "Booklet", "panels"),
-            ("Rotate All Pages Right", "Rotate All", "rotate"),
-            ("Remove Sheet Links", "Unlink Sheets", "link"),
-        ))
-        missing += self._ribbon_put("Help", "Learn", (
-            ("Practice Job (10 Minutes)", "Practice Job", "home"),
-        ))
-        missing += self._ribbon_put("Tools", "Settings", (
-            ("Customize Shortcuts", "Shortcuts", "keyboard"),
-            ("Back Up My QuantiSheet Data", "Back Up", "save"),
-            ("Restore QuantiSheet Data From a Backup", "Restore", "history"),
-            ("Time Log", "Time Log", "calendar"),
-        ))
-        missing += self._ribbon_put("Help", "About", (
-            ("Support Bundle for IT", "Support Bundle", "package"),
-            ("Recent Problems (Log)", "Problems", "history"),
-            ("Add the QuantiSheet Printer", "Printer", "print"),
-            ("Enter License Key", "License", "lock"),
-        ))
-        missing += self._ribbon_put("Project", "Manage", (
-            ("Bid Invites Send As", "Bid Invites", "mail"),
-        ))
-        missing += self._ribbon_put("Project", "Schedule", (
-            ("New Schedule", "New Schedule", "gantt"),
-        ))
-        missing += self._ribbon_put("Billing", "Changes", (
-            ("Change Order From Revision", "From Revision", "change_order"),
-        ))
-        # one Dropbox tile, one Export tile (the menus already exist)
-        g = self.ribbon.page("Home").group("File")
-        box = getattr(self, "_dropbox_actions", None) or {}
-        if box:
-            m = QMenu(g)
-            for a in box.values():
-                m.addAction(a)
-            first = next(iter(box.values()))
-            first.setProperty("qs_icon", "cloud")
-            if first.icon().isNull():
-                first.setIcon(icons.icon("cloud"))
-            b = g.large(first, "Dropbox", menu=m)
-            b.setPopupMode(QToolButton.InstantPopup)
-            shown = any(a.isVisible() for a in box.values())
-            b.setVisible(shown)
-        exp_menu = None
-        for a in self._file_menu.actions():
-            if a.menu() is not None and clean(a.text()).lower() == "export to":
-                exp_menu = a.menu()
-                break
-        if exp_menu is not None:
-            first = next((a for a in exp_menu.actions()
-                          if not a.isSeparator() and a.text()), None)
-            if first is not None:
-                first.setProperty("qs_icon", "export")
-                if first.icon().isNull():
-                    first.setIcon(icons.icon("export"))
-                b = g.large(first, "Export", menu=exp_menu)
-                b.setPopupMode(QToolButton.InstantPopup)
-        missing += self._fill_pdf_tab(exp_menu)
-        self._approved_missing = missing
-        if missing:
-            log.warning("ribbon placement: no command named %s",
-                        ", ".join(missing))
-        return missing
 
     # ---- scale presets on the Takeoff ribbon ---------------------------------------
     def _build_scale_box(self, group):
@@ -3645,95 +2567,6 @@ class MainWindow(QMainWindow):
                         "in a changed area is flagged Revised.", 15000)
         return dlg
 
-    def tag_check(self, pattern=None, show=True):
-        """Review > Tags vs Schedule: door / window / fixture tags on the
-        plans against their schedule (takeoff list #14)."""
-        from PySide6.QtWidgets import (QDialog, QDialogButtonBox, QHBoxLayout,
-                                       QLabel, QLineEdit, QPushButton,
-                                       QTableWidget, QTableWidgetItem,
-                                       QVBoxLayout)
-        from . import tagcheck
-        v = self._view
-        if v is None:
-            return None
-        dlg = QDialog(self)
-        dlg.setWindowTitle("Tags vs Schedule")
-        dlg.resize(760, 480)
-        lay = QVBoxLayout(dlg)
-        row = QHBoxLayout()
-        row.addWidget(QLabel("Tags:"))
-        pat = QLineEdit(pattern or settings.get("tagcheck_pattern") or "D-#")
-        pat.setToolTip("* any letters, ? one letter, # a number: D-#, 1##, "
-                       "W*, P-#")
-        go = QPushButton("Check")
-        row.addWidget(pat, 1)
-        row.addWidget(go)
-        lay.addLayout(row)
-        note = QLabel("")
-        note.setWordWrap(True)
-        lay.addWidget(note)
-        table = QTableWidget(0, 4)
-        table.setHorizontalHeaderLabels(["Tag", "Check", "Times drawn",
-                                         "Sheets"])
-        lay.addWidget(table, 1)
-        bb = QDialogButtonBox(QDialogButtonBox.Close)
-        csv_b = bb.addButton("Save CSV…", QDialogButtonBox.ActionRole)
-        rfi_b = bb.addButton("Make an RFI", QDialogButtonBox.ActionRole)
-        bb.rejected.connect(dlg.reject)
-        lay.addWidget(bb)
-        state = {"rep": None}
-
-        def run():
-            p = pat.text().strip()
-            if not p:
-                return None
-            settings.set("tagcheck_pattern", p)
-            QApplication.setOverrideCursor(Qt.WaitCursor)
-            try:
-                rep = tagcheck.check(v.doc, p)
-            finally:
-                QApplication.restoreOverrideCursor()
-            state["rep"] = rep
-            rows = tagcheck.rows(rep)
-            table.setRowCount(len(rows))
-            for r, vals in enumerate(rows):
-                for c, val in enumerate(vals):
-                    table.setItem(r, c, QTableWidgetItem(str(val)))
-            note.setText(f"{len(rep['both'])} OK, {len(rep['plan_only'])} on "
-                         f"the plans only, {len(rep['schedule_only'])} in "
-                         "the schedule only.")
-            return rep
-
-        def save_csv():
-            if not state["rep"]:
-                return
-            path, _ = QFileDialog.getSaveFileName(
-                dlg, "Save CSV", os.path.splitext(self._path or "tags")[0] +
-                " tag check.csv", "CSV (*.csv)")
-            if path:
-                tagcheck.export_csv(state["rep"], path)
-
-        def make_rfi():
-            text = tagcheck.rfi_text(state["rep"] or {}) if state["rep"] \
-                else ""
-            if not text:
-                note.setText("Nothing to ask: every tag matches.")
-                return
-            self.rfi_dock.show()
-            self.rfis.new("RFI", {"title": f"Tags {state['rep']['pattern']} "
-                                  "vs schedule", "question": text,
-                                  "page": v.page})
-        go.clicked.connect(run)
-        csv_b.clicked.connect(save_csv)
-        rfi_b.clicked.connect(make_rfi)
-        dlg.run = run
-        dlg.table = table
-        if pattern:
-            run()
-        if show:
-            dlg.show()
-        return dlg
-
     def color_by(self, mode):
         v = self._view
         if v is None:
@@ -3755,82 +2588,6 @@ class MainWindow(QMainWindow):
             if dlg.added:
                 self._doc_edited()
                 self.estimate.refresh()
-        return dlg
-
-    def buy_quantities(self, show=True):
-        """Takeoff > Buy Quantities: per item, the size of one and the
-        waste; the totals then show what to order."""
-        from PySide6.QtWidgets import (QDialog, QDialogButtonBox,
-                                       QTableWidget, QTableWidgetItem,
-                                       QVBoxLayout)
-        from . import buyqty
-        v = self._view
-        if v is None:
-            return None
-        totals = {}
-        for it in annotate.totals_items(v.doc):
-            if it["group"] and it["type"] != "cutout":
-                k = (it["group"], it["unit"])
-                totals[k] = totals.get(k, 0) + it["value"]
-        rs = buyqty.rules(v.doc)
-        dlg = QDialog(self)
-        dlg.setWindowTitle("Buy Quantities")
-        dlg.resize(720, 420)
-        lay = QVBoxLayout(dlg)
-        t = QTableWidget(len(totals), 6)
-        t.setHorizontalHeaderLabels(["Item", "Total", "Size of one",
-                                     "Buy unit", "Waste %", "Buy"])
-        keys = sorted(totals)
-        for r, (g, u) in enumerate(keys):
-            rule = rs.get(g, {})
-            for c, val in enumerate((g, f"{_c2(totals[(g, u)]):,.2f} {u}",
-                                     f"{rule.get('per', '') or ''}",
-                                     rule.get("unit", ""),
-                                     f"{rule.get('waste', '') or ''}", "")):
-                it = QTableWidgetItem(str(val))
-                if c in (0, 1, 5):
-                    it.setFlags(it.flags() & ~Qt.ItemIsEditable)
-                t.setItem(r, c, it)
-
-        def recalc():
-            for r, (g, u) in enumerate(keys):
-                try:
-                    per = float(t.item(r, 2).text() or 0)
-                    waste = float(t.item(r, 4).text() or 0)
-                except ValueError:
-                    t.item(r, 5).setText("?")
-                    continue
-                n = buyqty.buy(totals[(g, u)], {"per": per, "waste": waste}) \
-                    if per > 0 else None
-                t.blockSignals(True)
-                t.item(r, 5).setText("" if n is None else
-                                     f"{n:,} {t.item(r, 3).text() or 'each'}")
-                t.blockSignals(False)
-        t.itemChanged.connect(lambda _i: recalc())
-        recalc()
-        lay.addWidget(t)
-        bb = QDialogButtonBox(QDialogButtonBox.Save | QDialogButtonBox.Cancel)
-        lay.addWidget(bb)
-
-        def save():
-            for r, (g, u) in enumerate(keys):
-                try:
-                    per = float(t.item(r, 2).text() or 0)
-                    waste = float(t.item(r, 4).text() or 0)
-                    buyqty.set_rule(v.doc, g, per, t.item(r, 3).text(),
-                                    waste)
-                except ValueError as e:
-                    QMessageBox.warning(dlg, "Buy Quantities", f"{g}: {e}")
-                    return
-            v.mark_dirty()
-            self._refresh_panels()
-            dlg.accept()
-        bb.accepted.connect(save)
-        bb.rejected.connect(dlg.reject)
-        dlg.table = t
-        dlg.save = save
-        if show:
-            dlg.show()
         return dlg
 
     def page_multiplier(self, n=None):
@@ -4285,12 +3042,6 @@ class MainWindow(QMainWindow):
         return scan_check_ui.open_dialog(self, show=show,
                                          languages=languages)
 
-    def ai_models(self, show=True, fetch=None):
-        """Review > Local AI Models: what the local AI has installed and
-        the model size that fits this PC. Never downloads."""
-        from .ai import models_ui
-        return models_ui.open_dialog(self, show=show, fetch=fetch)
-
     def billing(self, tab=None):
         """The Contract & Billing window for this document (non-modal)."""
         from .billing_ui import BillingDialog
@@ -4527,14 +3278,6 @@ class MainWindow(QMainWindow):
         dlg.exec()
         return dlg
 
-    def import_price_list(self):
-        """Estimate > Import Your Own Price List (local-only cost book)."""
-        from .priceimport_ui import ImportPriceListDialog
-        dlg = ImportPriceListDialog(self)
-        self._price_import_dlg = dlg
-        dlg.exec()
-        return dlg
-
     def cost_books(self):
         from PySide6.QtWidgets import QDialog
         from .estimating_ui import CostBookDialog
@@ -4621,11 +3364,6 @@ class MainWindow(QMainWindow):
                 self._flash(f"Priced {n} line(s)")
         return dlg
 
-    def export_my_estimate(self, show=True):
-        """Totals by CSI division and cost type; Save to PDF, Excel or
-        CSV."""
-        return self.estimate.export_my_estimate(show)
-
     def model_estimate(self, show=True):
         """A building priced from its type, SF and options: from your job
         history and from a Generate Set plan's quantities, side by side;
@@ -4710,185 +3448,6 @@ class MainWindow(QMainWindow):
             v.remove_viewport(vps[names.index(pick)]["name"])
             v.update()
 
-    def import_markups(self, path=None, layer=None):
-        v = self._view
-        if not v:
-            return 0
-        if path is None:
-            path, _ = QFileDialog.getOpenFileName(
-                self, "Import Markups From", "",
-                "PDF or XFDF (*.pdf *.xfdf);;PDF (*.pdf);;XFDF (*.xfdf)")
-            if not path:
-                return 0
-        if path.lower().endswith((".xfdf", ".xml")):
-            from . import xfdf
-            try:
-                marks = xfdf.import_marks(v.doc, path, layer)
-            except Exception as ex:
-                QMessageBox.warning(self, "Import Markups",
-                                    f"Couldn't read that XFDF file:\n{ex}")
-                return 0
-        else:
-            try:
-                src = fitz.open(path)
-            except Exception as ex:
-                QMessageBox.warning(self, "Import Markups", str(ex))
-                return 0
-            try:
-                marks = annotate.import_ops(v.doc, src, layer)
-            finally:
-                src.close()
-        if not marks:
-            QMessageBox.information(self, "Import Markups",
-                                    "That PDF has no markups to import.")
-            return 0
-        n = v.apply_marks(marks)
-        self._flash(f"Imported {n} markup(s) from {os.path.basename(path)}")
-        return n
-
-    def export_xfdf(self, path=None):
-        """Markups to XFDF, for other PDF programs."""
-        from . import xfdf
-        v = self._view
-        if not v:
-            return 0
-        if path is None:
-            base = os.path.splitext(self._path or "markups")[0]
-            path, _ = QFileDialog.getSaveFileName(
-                self, "Export Markups", base + ".xfdf", "XFDF (*.xfdf)")
-            if not path:
-                return 0
-        n = xfdf.export(v.doc, path)
-        self._flash(f"Exported {n} markup(s) to {os.path.basename(path)}")
-        return n
-
-    def translate_markups(self, language=None, texts_fn=None):
-        """Translate markup comments with the local AI model."""
-        v = self._view
-        if not v:
-            return 0
-        if language is None:
-            language, ok = QInputDialog.getItem(
-                self, "Translate Markups", "Translate comments into:",
-                ["Spanish", "English", "French", "Portuguese", "German",
-                 "Chinese (Simplified)", "Vietnamese", "Korean", "Polish"],
-                0, True)
-            if not ok or not language.strip():
-                return 0
-        jobs = []
-        for it in annotate.markup_items(v.doc):
-            text = (it.get("comment") or "").strip()
-            if not text or it["type"] in ("Legend",):
-                continue
-            if it["subject"] and it.get("mtype"):
-                continue                       # measurement labels: numbers
-            key = "text" if it["type"] in ("Text Box", "Callout",
-                                            "FreeText") else "note"
-            jobs.append((it["page"], it["ref"], key, text))
-        if not jobs:
-            QMessageBox.information(self, "Translate Markups",
-                                    "No markup comments to translate.")
-            return 0
-        from . import bg
-        from .ai import review
-
-        def apply(out):
-            if getattr(v, "doc", None) is None or v.doc.is_closed:
-                return 0                       # the tab closed meanwhile
-            marks = [(pg, "set_annot", {**ref, key: new})
-                     for (pg, ref, key, old), new in zip(jobs, out)
-                     if new != old]
-            n = v.apply_marks(marks) if marks else 0
-            same = len(jobs) - len(marks)
-            msg = f"Translated {n} markup comment(s) into {language}"
-            if same:
-                # said, not hidden (Chief's round 7, Nov 9: 1 of 3 came
-                # back translated and it still read as all done)
-                msg = (f"Translated {n} of {len(jobs)} markup comment(s) "
-                       f"into {language} - {same} came back unchanged "
-                       "(already in that language, or the AI skipped "
-                       "them)")
-            self._flash(msg)
-            return n
-        if texts_fn is not None:               # given directly: run here
-            try:
-                return apply(texts_fn([j[3] for j in jobs]))
-            except Exception as ex:            # noqa: BLE001
-                QMessageBox.warning(self, "Translate Markups", str(ex))
-                return 0
-        # the local model can take minutes: off the window's thread, with a
-        # box that can be hidden or cancelled (Chief's re-test, Nov 7: the
-        # program froze for 6 minutes and Windows said Not Responding)
-        from PySide6.QtWidgets import QProgressDialog
-        texts = [j[3] for j in jobs]
-        busy = QProgressDialog(
-            f"Translating {len(texts)} markup comment(s) into {language} "
-            "with the local AI - this can take a few minutes. You can keep "
-            "working; Cancel throws the result away.", "Cancel", 0, 0, self)
-        busy.setWindowTitle("Translate Markups")
-        busy.setMinimumDuration(0)
-        busy.setAutoClose(False)
-        busy.setAutoReset(False)
-        busy.setModal(False)
-        state = {"cancelled": False, "over": False, "late": False}
-        token = review.Cancel()
-        # the longest it may wait: the AI part limit for each batch of 25
-        limit = self._ai_limit() * max(1, -(-len(texts) // 25))
-
-        def cancel():
-            # closing the box when the work is done emits canceled too;
-            # only a Cancel while it runs counts (Chief's round 4, Nov 7:
-            # every finished translation was thrown away as "cancelled").
-            # The request itself is ended too (round 7)
-            if not state["over"]:
-                state["cancelled"] = True
-                token.cancel_soon()
-        busy.canceled.connect(cancel)
-        busy.show()
-        self._translate_busy = busy
-
-        def too_long():
-            if not state["over"]:
-                state["late"] = True
-                cancel()
-        watch = QTimer(busy)
-        watch.setSingleShot(True)
-        watch.timeout.connect(too_long)
-        watch.start(int(limit * 1000))
-
-        def finish():
-            cancelled = state["cancelled"]
-            state["over"] = True
-            watch.stop()
-            busy.close()
-            return cancelled
-
-        def stopped():
-            if state["late"]:
-                QMessageBox.warning(
-                    self, "Translate Markups",
-                    "The local AI didn't answer in "
-                    f"{self._minutes(limit)}, so the translation was "
-                    "stopped. Nothing changed.")
-            else:
-                self._flash("Translate Markups cancelled - nothing changed")
-
-        def done(out):
-            if finish():
-                stopped()
-                return
-            apply(out)
-
-        def failed(msg):
-            if finish():
-                stopped()
-            else:
-                QMessageBox.warning(self, "Translate Markups", str(msg))
-        bg.run(lambda: review.run_cancellable(
-            token, review.translate_texts, texts, language), done, failed,
-            self)
-        return busy
-
     @staticmethod
     def _ai_limit():
         from .ai import dialogs
@@ -4901,66 +3460,6 @@ class MainWindow(QMainWindow):
             return f"{seconds:.0f} seconds"
         m = round(seconds / 60)
         return f"{m} minute" + ("" if m == 1 else "s")
-
-    def link_excel(self, path=None):
-        from . import qlink
-        v, tab = self._view, self._tab
-        if not v:
-            return None
-        doc_path = tab.path if tab else None
-        if not doc_path:
-            QMessageBox.information(self, "Quantity Link",
-                                    "Save the PDF first, then link it.")
-            return None
-        cur = qlink.link_for(doc_path)
-        if path is None:
-            if cur:
-                # this job's workbook is remembered (Nov 4): open it,
-                # update it, or unlink
-                box = QMessageBox(self)
-                box.setWindowTitle("Quantity Link")
-                box.setText(f"This job's quantities go to:\n{cur}")
-                b_open = box.addButton("Open Workbook",
-                                       QMessageBox.AcceptRole)
-                b_upd = box.addButton("Update Now", QMessageBox.ActionRole)
-                b_un = box.addButton("Unlink", QMessageBox.DestructiveRole)
-                box.addButton(QMessageBox.Cancel)
-                box.setDefaultButton(b_open)
-                box.exec()
-                hit = box.clickedButton()
-                if hit is b_un:
-                    qlink.set_link(doc_path, None)
-                    self._flash("Excel link removed")
-                    return None
-                if hit not in (b_open, b_upd):
-                    return None
-                path = cur
-                if hit is b_open:
-                    msg = qlink.update(v.doc, path)
-                    if msg:
-                        self._flash(msg)
-                    self._open_file_external(path)
-                    return path
-            else:
-                base = os.path.splitext(doc_path)[0] + " quantities.xlsx"
-                path, _ = QFileDialog.getSaveFileName(
-                    self, "Link Quantities to Excel", base,
-                    "Excel (*.xlsx)")
-                if not path:
-                    return None
-        new = cur != path
-        qlink.set_link(doc_path, path)
-        msg = qlink.update(v.doc, path)
-        if msg:
-            self._flash(msg)
-        else:
-            self._flash(f"Quantities linked to {os.path.basename(path)}; "
-                        "it updates whenever the takeoff changes")
-            if new and os.path.isfile(path) and QMessageBox.question(
-                    self, "Quantity Link", "Open the workbook now?") == \
-                    QMessageBox.Yes:
-                self._open_file_external(path)
-        return path
 
     def watch_plan_folder(self, folder=None):
         """Project > Watch Plan Folder (Nov 19): the folder this job's plan
@@ -5168,78 +3667,6 @@ class MainWindow(QMainWindow):
             dlg.show()
         return dlg
 
-    def export_bid_package(self, folder=None, ask=None):
-        """Estimate > Export Bid Package: the proposal, the estimate
-        summary (PDF and Excel), the estimate detail, the takeoff sheets
-        and - after AI Takeoff - the estimate workbook, in one folder and
-        one zip, with a contents list of what still needs a look (Nov 17).
-        `folder` and `ask` are for tests. Returns bidpackage.make's
-        result or None."""
-        from . import bidpackage, proposal
-        v = self._view
-        if not v:
-            return None
-        if folder is None:
-            # Nov 19: the bid-submittal checklist first
-            from .bidsubmittal_ui import SubmittalDialog
-            sub = SubmittalDialog(v.doc, self)
-            ok = sub.exec()
-            self._doc_edited()
-            if not ok:
-                return None
-            start = os.path.dirname(self._path or "") or os.path.expanduser(
-                "~")
-            folder = QFileDialog.getExistingDirectory(
-                self, "Export Bid Package To", start)
-            if not folder:
-                return None
-        ai = getattr(self, "_ai_dlg", None)
-        res = rows = None
-        try:
-            if ai is not None and ai.view is v and ai.result:
-                res, rows = ai.result, getattr(ai, "rows", None)
-        except RuntimeError:                   # the dialog was closed
-            res = rows = None
-        QApplication.setOverrideCursor(Qt.WaitCursor)
-        try:
-            out = bidpackage.make(v.doc, folder, comp=proposal.company(),
-                                  ai_rows=rows, ai_result=res)
-        except Exception as ex:                           # noqa: BLE001
-            log.exception("bid package")
-            QMessageBox.warning(self, "Bid Package",
-                                f"Could not make the bid package:\n{ex}")
-            return None
-        finally:
-            QApplication.restoreOverrideCursor()
-        names = [os.path.basename(p) for _k, p in out["files"]]
-        text = (f"{len(names)} file(s) in {os.path.basename(out['folder'])}"
-                f", and {os.path.basename(out['zip'])} to send.")
-        if out["skipped"]:
-            text += "\n\nNot included:\n" + "\n".join(
-                f"- {bidpackage._label(k)}: {why}" for k, why in out["skipped"])
-        if out["checks"]:
-            text += "\n\nBefore you send it:\n" + "\n".join(
-                f"- {c}" for c in out["checks"])
-        if ask is None:
-            ask = (lambda t: QMessageBox.question(
-                self, "Bid Package", t) == QMessageBox.Yes)
-        # Nov 17: the Bid Board opportunity it is for can be marked sent
-        opp = bidpackage.board_match(bidpackage.project_of(v.doc))
-        out["board"] = None
-        if opp is not None and ask(
-                text + "\n\nMark \"" + (opp.get("project") or "") + "\" for "
-                + (opp.get("gc") or "the GC") + " as Submitted on the Bid "
-                "Board?"):
-            try:
-                out["board"] = bidpackage.mark_submitted(opp, out)
-                self._flash("Marked Submitted on the Bid Board")
-            except Exception:                             # noqa: BLE001
-                log.warning("bid board", exc_info=True)
-            text = "The bid package is ready."
-        if ask(text + "\n\nOpen the folder?"):
-            self._open_file_external(out["folder"])
-        return out
-
     def video_tutorials(self, open_url=None):
         """Help > Video Tutorials: QuantiSheet's YouTube channel in the
         browser (Nov 17). Returns the address."""
@@ -5403,21 +3830,64 @@ class MainWindow(QMainWindow):
         return [u.toLocalFile() for u in mime.urls() if u.isLocalFile() and
                 u.toLocalFile().lower().endswith(".pdf")]
 
+    @staticmethod
+    def _mail_pdfs(mime):
+        """PDF attachments being dragged out of a mail program (Nov 27)."""
+        try:
+            from . import outlookdrop
+            return outlookdrop.pdf_names(mime)
+        except Exception:                                 # noqa: BLE001
+            return []
+
     def dragEnterEvent(self, ev):
-        if self._dropped_pdfs(ev.mimeData()):
+        m = ev.mimeData()
+        if self._dropped_pdfs(m) or self._mail_pdfs(m):
             ev.acceptProposedAction()
         else:
             ev.ignore()
 
     def dragMoveEvent(self, ev):
-        if self._dropped_pdfs(ev.mimeData()):
+        m = ev.mimeData()
+        if self._dropped_pdfs(m) or self._mail_pdfs(m):
             ev.acceptProposedAction()
         else:
             ev.ignore()
 
+    def _drop_from_mail(self, mime):
+        """Attachments dragged from Outlook: save the PDFs in
+        Downloads\\QuantiSheet and open them. Those Outlook has to be
+        asked for are fetched just after the drop (it can't answer while
+        its own drag is still going)."""
+        from . import outlookdrop
+        try:
+            paths, wait = outlookdrop.save(mime)
+        except Exception:                                 # noqa: BLE001
+            log.warning("mail drop", exc_info=True)
+            return False
+        for p in paths:
+            self.open_path(p)
+        if wait:
+            self._flash("Getting the PDF from Outlook...", 4000)
+
+            def fetch(names=list(wait)):
+                got = outlookdrop.later(names)
+                for p in got:
+                    self.open_path(p)
+                if not got:
+                    self._flash(
+                        "That attachment didn't come across. Save it from "
+                        "the email (right-click > Save As), then open it "
+                        "here.", 12000)
+            QTimer.singleShot(250, fetch)
+        return bool(paths or wait)
+
     def dropEvent(self, ev):
         paths = self._dropped_pdfs(ev.mimeData())
         if not paths:
+            if self._mail_pdfs(ev.mimeData()) and \
+                    self._drop_from_mail(ev.mimeData()):
+                ev.acceptProposedAction()
+                return
             ev.ignore()
             return
         ev.acceptProposedAction()
@@ -5582,6 +4052,22 @@ class MainWindow(QMainWindow):
                 quickaccess.labels_on_open(view, path)
             except Exception:                             # noqa: BLE001
                 log.debug("sheet names on open", exc_info=True)
+        try:          # takeoff clicked out in the browser add-on's viewer
+            from . import webmarks
+            got = webmarks.take(view, path)
+            if got:
+                added, left = got
+                log.info("browser takeoff: %d added, %d left out", added,
+                         left)
+                text = (f"{added} takeoff measurement"
+                        f"{'' if added == 1 else 's'} from the browser "
+                        "viewer added (Ctrl+Z takes them back).")
+                if left:
+                    text += (f" {left} left out: set the scale on that "
+                             "page and measure again.")
+                QTimer.singleShot(0, lambda t=text: self._flash(t, 15000))
+        except Exception:                                 # noqa: BLE001
+            log.warning("browser takeoff marks not added", exc_info=True)
         if getattr(doc, "is_repaired", False):
             # a non-blocking notice: the file opens as usual
             note = repaired_notice(path)
@@ -6264,67 +4750,6 @@ class MainWindow(QMainWindow):
             dlg.show()
         return dlg
 
-    def export_external(self, path=None, ask=True):
-        """Save a copy for subs, owners and other outsiders with the
-        estimate, prices, margins and audit trail left out."""
-        from . import acrobat2, jobdata
-        if not self._view:
-            return None
-        if path is None:
-            base = os.path.splitext(self._path or getattr(
-                self._tab, "suggest", "") or "document.pdf")[0]
-            path, _ = QFileDialog.getSaveFileName(
-                self, "External Issue (strip pricing)",
-                base + " - external.pdf", "PDF (*.pdf)")
-            if not path:
-                return None
-        if self._path and os.path.abspath(path) == \
-                os.path.abspath(self._path):
-            QMessageBox.warning(self, "External Issue",
-                                "Pick a new file name; this copy must not "
-                                "replace your working file.")
-            return None
-        from . import safeio
-        prot = getattr(self._view, "protection", None)
-        try:
-            try:
-                removed = acrobat2.external_issue(
-                    self._view.doc, path, prot.open_pw if prot else None)
-            except safeio.UnprotectedCopyError as e:
-                if not confirm_unprotected_copy(self, "External Issue",
-                                                str(e)):
-                    return None
-                removed = acrobat2.external_issue(
-                    self._view.doc, path, allow_unprotected=True)
-        except Exception as ex:
-            QMessageBox.warning(self, "External Issue",
-                                f"Could not save:\n{ex}")
-            return None
-        what = ", ".join(l for _, l in jobdata.describe(self._view.doc)) \
-            or "none"
-        msg = (f"Saved {os.path.basename(path)} without job data "
-               f"({what}) or hidden information.")
-        if ask:
-            QMessageBox.information(self, "External Issue", msg)
-        self._flash(msg)
-        return path, removed
-
-    def export_pdfa(self, path=None):
-        from .accessibility_ui import export_pdfa
-        from . import jobdata
-        v = self._view
-        if v is not None and path is None and jobdata.describe(v.doc):
-            # an archival copy can't carry attachments (review QS-003)
-            if QMessageBox.question(
-                    self, "PDF/A",
-                    "The archival (PDF/A) copy won't include QuantiSheet's "
-                    "job data (" + ", ".join(lab for _n, lab in
-                                            jobdata.describe(v.doc)) +
-                    "). This file keeps it - keep working in this one.\n\n"
-                    "Make the archival copy?") != QMessageBox.Yes:
-                return None
-        return export_pdfa(self, path)
-
     def civil(self, tab=0, show=True):
         """Civil tab: crew-and-production estimate, libraries, bid
         schedule, indirects, haul, versions and field production."""
@@ -6343,85 +4768,6 @@ class MainWindow(QMainWindow):
              ("OSHA Type A - 3/4:1 slopes over 5 ft", "A"),
              ("OSHA Type B - 1:1 slopes over 5 ft", "B"),
              ("OSHA Type C - 1.5:1 slopes over 5 ft", "C")]
-
-    def export_heavybid(self, folder=None, soil=None, result=None,
-                        ask=True):
-        """Civil > Export to HeavyBid (Excel): biditems, activities and
-        resources from the civil takeoff (pipe by depth band, structures,
-        trench excavation / bedding / backfill / haul), one single-sheet
-        workbook each, in HeavyBid's import order (Chief's v22)."""
-        from . import civil_export, civiltakeoff, heavy
-        v = self._view
-        if v is None:
-            return None
-        if result is None:
-            scales = {p: (sc["ppu"], sc.get("unit", "ft"))
-                      for p, sc in annotate.read_scales(v.doc).items()}
-            if not scales:
-                # instant: reading every title block first took minutes on
-                # a 300-sheet set only to find no sheet had a scale
-                QMessageBox.information(
-                    self, "Export to CivilBid",
-                    "No sheet in this set has a scale yet. Set the scale on "
-                    "the utility plans (Takeoff > Auto Scale) and try "
-                    "again.")
-                return None
-            if ask:
-                return self._heavybid_in_background(v, None, scales,
-                                                    folder, soil)
-            pages = self._heavybid_pages(v.doc, scales)
-            if not pages:
-                QMessageBox.information(
-                    self, "Export to CivilBid",
-                    "No civil plan sheet with a scale was found. Set the "
-                    "scale on the utility plans (Takeoff > Auto Scale) and "
-                    "try again.")
-                return None
-            result = civiltakeoff.takeoff(v.doc, pages, scales)
-        if not result.get("pipes") and not result.get("structures"):
-            QMessageBox.information(self, "Export to CivilBid",
-                                    "The civil takeoff found no pipe or "
-                                    "structures to export.")
-            return None
-        if soil is None:
-            names = [n for n, _ in self.SOILS]
-            pick, ok = QInputDialog.getItem(
-                self, "Export to CivilBid", "Trench walls:", names, 0, False)
-            if not ok:
-                return None
-            soil = dict(self.SOILS)[pick]
-        if folder is None:
-            start = os.path.dirname(self._path) if self._path else \
-                os.path.expanduser("~")
-            folder = QFileDialog.getExistingDirectory(
-                self, "Folder for the CivilBid files", start)
-            if not folder:
-                return None
-        try:
-            out = civil_export.heavybid_export(folder, result, soil)
-        except ValueError as e:
-            if ask and QMessageBox.question(
-                    self, "Export to CivilBid",
-                    f"{e}\n\nSome codes don't line up (an activity with no "
-                    "biditem, or a resource with no activity). Export "
-                    "anyway?") != QMessageBox.Yes:
-                return None
-            out = civil_export.heavybid_export(folder, result, soil,
-                                               force=True)
-        files = [os.path.basename(out[k]) for k in
-                 ("biditems", "activities", "resources") if out.get(k)]
-        if ask:
-            QMessageBox.information(
-                self, "Export to CivilBid",
-                f"Wrote {', '.join(files)} to {folder}.\n\nIn HeavyBid "
-                "(Menu > Exchange > Excel, Import):\n"
-                "1. Back up the estimate first, and try a scratch estimate "
-                "before a live one.\n"
-                "2. Import biditems, then activities, then resources.\n"
-                "3. Tick \"First row contains column titles\" and map the "
-                "columns once in your Master Estimate so new estimates "
-                "keep it.")
-        return out
 
     @staticmethod
     def _heavybid_pages(doc, scales):
@@ -6662,64 +5008,6 @@ class MainWindow(QMainWindow):
             out.close()
         self._flash(f"Saved {os.path.basename(path)}")
         return path
-
-    def print_to(self, printer, pages=None):
-        """Print `pages` (0-based; default the printer's page range)."""
-        from PySide6.QtGui import QImage
-        from PySide6.QtPrintSupport import QPrinter
-        doc = self._view.doc
-        if pages is None:
-            first, last = printer.fromPage(), printer.toPage()
-            if first == 0:
-                first, last = 1, doc.page_count
-            pages = list(range(first - 1, last))
-        if printer.outputFormat() == QPrinter.PdfFormat and \
-                printer.outputFileName():
-            # Qt's own "print to file": write the pages, don't rasterize
-            return bool(self.save_pages_pdf(printer.outputFileName(),
-                                            pages=pages))
-        dpi = min(300, max(72, printer.resolution()))
-        painter = QPainter()
-        if not painter.begin(printer):
-            QMessageBox.warning(self, "Print", "Could not start printing.")
-            return False
-        total = len(pages)
-        prog = self._print_progress(total)
-        cancelled = False
-        try:
-            for n, i in enumerate(pages):
-                if prog is not None:
-                    prog.setLabelText(f"Printing page {n + 1} of {total}"
-                                      f"  (sheet {i + 1})")
-                    prog.setValue(n)
-                    QApplication.processEvents()
-                    if prog.wasCanceled():
-                        cancelled = True
-                        printer.abort()
-                        break
-                if n:
-                    printer.newPage()
-                pix = doc[i].get_pixmap(dpi=dpi, alpha=False)
-                img = QImage(pix.samples, pix.width, pix.height, pix.stride,
-                             QImage.Format_RGB888)
-                area = painter.viewport()
-                size = img.size().scaled(area.size(), Qt.KeepAspectRatio)
-                painter.setViewport(area.x(), area.y(), size.width(),
-                                    size.height())
-                painter.setWindow(img.rect())
-                painter.drawImage(0, 0, img)
-                painter.setViewport(area)
-        finally:
-            if painter.isActive():
-                painter.end()
-            if prog is not None:
-                prog.setValue(total)
-                prog.close()
-        if cancelled:
-            self._flash("Printing cancelled")
-            return False
-        self._flash(f"Sent {total} page(s) to the printer")
-        return True
 
     def _print_progress(self, total):
         """"Printing page 13 of 60" with Cancel, while pages go to the
@@ -7110,11 +5398,6 @@ class MainWindow(QMainWindow):
             f"1 inch on paper = {inch:,.3g} {sc['unit']}\n"
             f"({sc['ppu']:.3f} points per {sc['unit']})")
 
-    def export_quantities(self):
-        if self._view:
-            self.quantities.refresh()
-            self.quantities._export_dialog()
-
     def new_rfi(self, kind="RFI", from_selection=False):
         """A new log item; from the selected markup if asked."""
         v = self._view
@@ -7129,104 +5412,6 @@ class MainWindow(QMainWindow):
         self.rfi_dock.show()
         self.rfi_dock.raise_()
         return self.rfis.new(kind, fields)
-
-    def ai_find_rfis(self, spec_path=None, ask=None, wait=False,
-                     dialog=None):
-        """Find RFIs (v36). Drawings: rule checks over the whole set - pipe
-        runs, rims/inverts, slopes, callouts, spec sections, schedules,
-        open scope - run in the background and show in one panel as soon
-        as they're done; no language model is needed to find anything (the
-        panel can optionally reword a question with it). A spec book open
-        on its own still goes to _find_rfis_in_specs. `ask`, `wait` and
-        `dialog` are for tests."""
-        import time
-        from .ai import rfi_finder, rfi_rules
-        from . import bg
-        v = self._view
-        if not v:
-            return None
-        doc = v.doc
-        src = doc.name if (doc.name and os.path.isfile(doc.name) and
-                           not getattr(doc, "is_dirty", True)) else None
-        data = plans_now = None
-        if not src:
-            try:
-                data = doc.tobytes()          # quick; the text pass isn't
-            except Exception:
-                plans_now = rfi_finder.gather(doc)
-
-        def read_plans():
-            # its own copy of the document, so the worker never shares the
-            # viewer's (PyMuPDF documents are single-threaded)
-            if plans_now is not None:
-                return plans_now
-            with (fitz.open(src) if src else fitz.open("pdf", data)) as d:
-                return rfi_finder.gather(d)
-
-        def scan(spec, plans=None):
-            plans = plans if plans is not None else read_plans()
-            if rfi_finder.is_spec_book(plans):
-                return None, plans, ""
-            specs, note = None, ""
-            if spec:
-                try:
-                    with fitz.open(spec) as sd:
-                        specs = rfi_finder.gather(sd, "specs")
-                except Exception as ex:
-                    note = f"Couldn't read the specs: {ex}"
-            return rfi_rules.find(plans, specs), plans, note
-
-        if wait:
-            items, plans, note = scan(spec_path)
-            if items is None:
-                return self._find_rfis_in_specs(plans, ask, wait, dialog)
-            if dialog is None:
-                return items
-            dlg = dialog(items, note)
-            if not dlg.exec():
-                return []
-            return self.create_rfis(dlg.selected(), spec_path)
-        from .rfi_ui import RfiFindingsPanel
-        old = getattr(self, "_rfi_panel", None)
-        if old is not None:
-            try:
-                old.close()
-                old.deleteLater()
-            except RuntimeError:
-                pass
-
-        def goto(f):
-            if f.get("doc", "plans") != "plans" or f.get("page") is None:
-                return
-            pg, _r = rfi_finder.locate(self._view.doc, f)
-            if pg is not None:
-                self._view.go_to(pg)
-
-        cache = {}
-
-        def run(spec):
-            started = time.monotonic()
-
-            def done(res):
-                items, plans, note = res
-                cache["plans"] = plans
-                if items is None:                # a spec book is open
-                    panel.close()
-                    self._find_rfis_in_specs(plans, ask)
-                    return
-                panel.set_findings(items, (note + " " if note else "") +
-                                   rfi_rules.coverage_text(plans, len(items))
-                                   + f" ({time.monotonic() - started:.1f} s)")
-            bg.run(lambda: scan(spec, cache.get("plans")), done,
-                   lambda err: panel.set_findings([], f"Scan failed: {err}"),
-                   panel)
-        panel = RfiFindingsPanel(self, on_draft=self.create_rfis,
-                                 on_specs=run, on_goto=goto)
-        panel.spec_path = spec_path or None
-        self._rfi_panel = panel
-        panel.show()
-        run(spec_path)
-        return panel
 
     def _find_rfis_in_specs(self, specs, ask=None, wait=False, dialog=None):
         """Find RFIs with a spec book / project manual open: every page
@@ -7615,86 +5800,12 @@ class MainWindow(QMainWindow):
         self._dir_dlg = dlg
         return dlg
 
-    def ai_takeoff(self, show=True):
-        """AI Takeoff: the whole set taken off in one go."""
-        from .aitakeoff_ui import AITakeoffDialog
-        if not self._view or self._collab_blocked("AI Takeoff"):
-            return None
-        dlg = AITakeoffDialog(self)
-        if show:
-            dlg.show()
-            dlg.read()
-        self._ai_dlg = dlg
-        return dlg
-
     def voice_commands(self):
         """Turn listening for voice commands on or off."""
         if getattr(self, "voice", None) is None:
             from .voice_ui import VoiceControl
             self.voice = VoiceControl(self)
         return self.voice.toggle()
-
-    def export_sage(self, path=None, job=None):
-        """Coded assembly lines as a Sage 300 CRE Job Cost budget import
-        (Job, Extra, Cost Code, Category, Description, Units, UM, Amount).
-        Lines without a cost code or category are listed, not exported."""
-        from . import assembly_codes as ac, costlayer_ui, sage_export
-        if not self._view:
-            return None
-        lib = costlayer_ui.load_library(self, quiet=True) or {}
-        lines, unbound = ac.priced_lines(self._view.doc, lib)
-        from . import estimate_lines            # Estimate panel lines too
-        lines = list(lines) + estimate_lines.sage_lines(self._view.doc)
-        if job is None:
-            job, ok = QInputDialog.getText(self, "Sage 300 Job Cost",
-                                           "Sage job number:")
-            if not ok:
-                return None
-        rows, problems = sage_export.job_cost_rows(lines, job=job)
-        if not rows:
-            QMessageBox.information(
-                self, "Sage 300 Job Cost",
-                "Nothing to export: bind your takeoff to coded assemblies "
-                "first (Civil > CivilBid-Coded Assemblies)."
-                + (f"\n\n{len(unbound)} takeoff group(s) aren't bound yet."
-                   if unbound else ""))
-            return None
-        if not path:
-            pv = sage_export.preview(rows, problems)
-            if QMessageBox.question(
-                    self, "Export to Sage 300",
-                    f"{pv['lines']} budget line(s) for job "
-                    f"{', '.join(pv['jobs']) or '(none)'}, totalling "
-                    f"${_c2(pv['total']):,.2f}." +
-                    (f"\n{pv['left_out']} line(s) will be left out (no cost "
-                     "code or category)." if pv["left_out"] else "") +
-                    "\n\nWrite the import file?") != QMessageBox.Yes:
-                return None
-            path, _ = QFileDialog.getSaveFileName(
-                self, "Export to Sage 300", "sage-job-cost.csv",
-                "CSV (*.csv)")
-            if not path:
-                return None
-        sage_export.export_csv(path, rows)
-        # a file that backs the import out again, kept beside it
-        rev = os.path.splitext(path)[0] + " (reversal).csv"
-        try:
-            sage_export.export_csv(rev, sage_export.reversal(rows))
-        except OSError:
-            rev = ""
-        msg = f"{len(rows)} budget line(s) written to {os.path.basename(path)}."
-        if rev:
-            msg += (f"\n\nIf it goes to the wrong job, importing "
-                    f"{os.path.basename(rev)} backs it out.")
-        if problems or unbound:
-            skipped = [f"line {p['line']}: {p['description']} - {p['reason']}"
-                       for p in problems[:12]]
-            if unbound:
-                skipped.append(f"{len(unbound)} takeoff group(s) not bound "
-                               "to an assembly")
-            msg += "\n\nLeft out:\n" + "\n".join(skipped)
-        QMessageBox.information(self, "Sage 300 Job Cost", msg)
-        return path
 
     def calculators(self, tab=0, show=True):
         """Concrete (0), Brick & Block (1), Roofing (2), Rebar (3), Beam
@@ -8019,111 +6130,6 @@ class MainWindow(QMainWindow):
             from .rules_dialog import RulesDialog
             RulesDialog(self._view, self).exec()
 
-    def ai_summary(self):
-        if not self._view:
-            return
-        from .ai import review
-        from . import bg
-        text, info = review.doc_text_info(self._view.doc)
-        note = review.coverage_note(info)
-        in_set = review.set_sheets(self._view.doc)
-        # a busy box while the model works (Chief's estimator test, Nov 7:
-        # nothing showed for a minute, then the answer popped up)
-        from PySide6.QtWidgets import QProgressDialog
-        head = ("Asking the local AI for a summary - this can take a "
-                "minute.")
-        # while it waits nothing has been reviewed yet: "Reading", and the
-        # answer keeps "Reviewed" (hands-on pass, Nov 10)
-        reading = note.replace("Reviewed", "Reading", 1)
-        busy = QProgressDialog(head + "\n" + reading, "Stop", 0, 0, self)
-        busy.setWindowTitle("AI Summary")
-        busy.setMinimumDuration(0)
-        busy.setAutoClose(False)
-        busy.setAutoReset(False)
-        # Stop really ends the request, and one that never answers is
-        # stopped after the AI time limit (Chief's round 7, Nov 9: the
-        # button only hid the box and the request could run 15 minutes)
-        state = {"over": False, "stopped": False, "late": False}
-        token = review.Cancel()
-        limit = self._ai_limit()
-        started = time.monotonic()
-
-        def stop():
-            if not state["over"]:
-                state["stopped"] = True
-                token.cancel_soon()
-        busy.canceled.connect(stop)
-
-        def tick():
-            waited = time.monotonic() - started
-            if waited > limit and not state["over"]:
-                state["late"] = True
-                stop()
-                return
-            busy.setLabelText(f"{head} Waiting {waited:.0f} s.\n{reading}")
-        clock = QTimer(busy)
-        clock.setInterval(1000)
-        clock.timeout.connect(tick)
-        clock.start()
-        busy.show()
-        self._ai_busy = busy
-        self._ai_summary_tick = tick                    # for tests
-
-        def finish():
-            was = state["stopped"]
-            state["over"] = True
-            clock.stop()
-            try:
-                busy.close()
-            except RuntimeError:
-                pass
-            return was
-
-        def stopped():
-            if state["late"]:
-                QMessageBox.warning(
-                    self, "AI Summary",
-                    f"The local AI didn't answer in {self._minutes(limit)}"
-                    ", so the summary was stopped. Nothing was read.")
-            else:
-                self._flash("AI Summary stopped")
-
-        def done(text_out):
-            if finish():
-                stopped()
-            else:
-                QMessageBox.information(self, "AI Summary", text_out)
-
-        def failed(e):
-            if finish():
-                stopped()
-            else:
-                QMessageBox.warning(self, "AI", e)
-        bg.run(lambda: review.run_cancellable(
-            token, review.summarize_text, text, info["cut"], note, in_set),
-            done, failed, self)
-        return busy
-
-    def ai_redline(self):
-        if not self._view:
-            return
-        from .ai.dialogs import RedlineDialog
-        from .ai import review
-        dlg = RedlineDialog(self._view.doc, self)
-        if dlg.exec():
-            self._view.apply_marks(
-                review.redline_marks(self._view.doc, dlg.selected_edits()))
-
-    def ai_spec_check(self):
-        if not self._view:
-            return
-        from .ai.dialogs import SpecCheckDialog
-        from .ai import review
-        dlg = SpecCheckDialog(self._view.doc, self)
-        if dlg.exec() and dlg.findings:
-            self._view.apply_marks(
-                review.spec_marks(self._view.doc, dlg.findings))
-
     def open_macros(self):
         if self._view:
             from .macro_dialog import MacroDialog
@@ -8203,34 +6209,6 @@ class MainWindow(QMainWindow):
             dlg.show()
             dlg.raise_()
         return dlg
-
-    def export_geo(self, kind="kml", path=None):
-        """Markups on an aerial photo page to Google Earth / GIS, in their
-        real place on the map."""
-        from . import geoexport
-        v = self._view
-        if v is None:
-            return None
-        if geoexport.geo_of(v.doc, v.page) is None:
-            QMessageBox.information(
-                self, "Export", "Go to an aerial photo page first (Civil or "
-                "Takeoff > Aerial Photo Page). Only those pages know where "
-                "they are on the map.")
-            return None
-        ext = ".kml" if kind == "kml" else ".geojson"
-        if path is None:
-            base = os.path.splitext(self._path or "markups")[0]
-            path, _ = QFileDialog.getSaveFileName(
-                self, "Export Markups to " + ("Google Earth" if kind == "kml"
-                                              else "GIS"),
-                base + ext, ("KML (*.kml)" if kind == "kml"
-                             else "GeoJSON (*.geojson)"))
-            if not path:
-                return None
-        n = (geoexport.to_kml if kind == "kml" else geoexport.to_geojson)(
-            v.doc, v.page, path)
-        self._flash(f"Exported {n} markup(s) to {os.path.basename(path)}")
-        return n
 
     def support_bundle(self, path=None):
         """Help > Support Bundle: a zip for the help desk - versions,
@@ -8426,63 +6404,6 @@ class MainWindow(QMainWindow):
             dlg.show()
         return dlg
 
-    def add_printer(self, confirm=True):
-        """Help > Add the QuantiSheet Printer: adds "QuantiSheet" to Windows'
-        printers (print from any program and it opens here). Needs an
-        administrator - Windows asks. The server setup and the MSI add it
-        for every user already."""
-        import subprocess
-        import sys
-        if not sys.platform.startswith("win"):
-            return False
-        if confirm and QMessageBox.question(
-                self, "QuantiSheet Printer",
-                "Add a printer named \"QuantiSheet\" to Windows?\n\n"
-                "Print from any program to \"QuantiSheet\" and the pages "
-                "open here as a new PDF (a copy is kept in Documents\\"
-                "QuantiSheet\\Printed).\n\nWindows will ask for an "
-                "administrator's permission.") != QMessageBox.Yes:
-            return False
-        import ctypes
-        if getattr(sys, "frozen", False):
-            exe, args = sys.executable, "printer --install"
-            # never run as administrator a program any user can change
-            # (threat model T-006: a per-user install lives in the user's
-            # own folder - a swapped QuantiSheet.exe would get admin rights)
-            if user_writable(os.path.dirname(exe)):
-                QMessageBox.information(
-                    self, "QuantiSheet Printer",
-                    "This copy of QuantiSheet is installed just for you, in "
-                    "a folder you can change, so it can't be given "
-                    "administrator rights to add a printer.\n\nTo add the "
-                    "printer, install QuantiSheet for all users (run the "
-                    "setup as an administrator), or ask your IT person.")
-                return False
-        else:
-            root = os.path.dirname(os.path.dirname(os.path.abspath(
-                __file__)))
-            exe = sys.executable
-            args = f'"{os.path.join(root, "quantisheet.py")}" printer --install'
-        rc = ctypes.windll.shell32.ShellExecuteW(None, "runas", exe, args,
-                                                 None, 0)
-        if rc <= 32:                     # declined or failed
-            QMessageBox.information(self, "QuantiSheet Printer",
-                                    "The printer wasn't added (Windows "
-                                    "didn't get an administrator's OK).")
-            return False
-        # the helper that opens printed pages runs as you, from sign-in
-        try:
-            from . import printer_setup, printhelper
-            printer_setup._set_run("HKEY_CURRENT_USER",
-                                   printhelper.helper_command())
-            printhelper.ensure_running()
-        except Exception:                                 # noqa: BLE001
-            log.warning("print helper not turned on", exc_info=True)
-        self.statusBar().showMessage(
-            "Adding the QuantiSheet printer - it appears in Windows' "
-            "printers in a few seconds.", 10000)
-        return True
-
     def welcome_tour(self):
         """A guided walk around the window (different from the Help
         Center's step-by-step tutorials)."""
@@ -8572,58 +6493,6 @@ class MainWindow(QMainWindow):
         self._flash(f"Combined {len(paths)} files ({doc.page_count} pages). "
                     "Save to keep it.")
         return self.open_document(doc, "Combined.pdf")
-
-    def export_as(self, fmt):
-        from . import acrobat
-        if not self._view:
-            return None
-        doc = self._view.doc
-        if fmt in ("png", "jpg"):
-            folder = QFileDialog.getExistingDirectory(self, "Save Images To")
-            if not folder:
-                return None
-        else:
-            filt = {"docx": "Word (*.docx)", "xlsx": "Excel (*.xlsx)",
-                    "txt": "Text (*.txt)", "pptx": "PowerPoint (*.pptx)",
-                    "html": "Web page (*.html)"}[fmt]
-            path = self._ask_save("Export", "." + fmt, filt)
-            if not path:
-                return None
-        # every export runs on a worker thread now: Excel on a 4-sheet set
-        # held the window for 25 s (review 0.12.29, step 9)
-        if fmt != "txt":
-            return self._export_big(fmt, folder if fmt in ("png", "jpg")
-                                    else path)
-        QApplication.setOverrideCursor(Qt.WaitCursor)
-        try:
-            if fmt in ("png", "jpg"):
-                out = acrobat.export_images(doc, folder, fmt, dpi=150)
-                msg = f"Saved {len(out)} images"
-            elif fmt == "docx":
-                out = acrobat.export_word(doc, path)
-                msg = "Exported to Word (text and tables; layout simplified)"
-            elif fmt == "pptx":
-                from . import acrobat2
-                out = acrobat2.export_powerpoint(doc, path)
-                msg = "Exported to PowerPoint (one slide per page)"
-            elif fmt == "html":
-                from . import acrobat2
-                out = acrobat2.export_html(doc, path)
-                msg = "Exported web page"
-            elif fmt == "xlsx":
-                n = acrobat.export_excel(doc, path)
-                out = path
-                msg = f"Exported {n} sheet(s) to Excel"
-            else:
-                out = acrobat.export_text(doc, path)
-                msg = "Exported text"
-        except Exception as ex:
-            QApplication.restoreOverrideCursor()
-            QMessageBox.warning(self, "Export", f"Export failed:\n{ex}")
-            return None
-        QApplication.restoreOverrideCursor()
-        self._flash(msg)
-        return out
 
     def _export_big(self, fmt, target):
         """export_as for a big set: the same exports, on a worker thread."""
@@ -9071,102 +6940,6 @@ class MainWindow(QMainWindow):
             "company details come from Create Proposal).", 10000)
         return done
 
-    def import_dxf(self, path=None, out=None, what=None):
-        """A DXF drawing as PDF ready for takeoff: model space on one
-        sheet at a standard scale with its layers, or the paper space
-        sheets as plotted with each viewport's scale."""
-        from . import dxf
-        if path is None:
-            path, _ = QFileDialog.getOpenFileName(
-                self, "Import AutoCAD DXF", "", "AutoCAD DXF (*.dxf)")
-            if not path:
-                return None
-        if what is None:
-            try:
-                sheets = dxf.layouts(path)
-            except Exception as ex:
-                QMessageBox.warning(self, "Import DXF", str(ex))
-                return None
-            what = "model"
-            if sheets:
-                n_vp = sum(n for _, n in sheets)
-                choices = [f"Sheets as plotted ({len(sheets)} layout(s), "
-                           f"{n_vp} viewport(s), each with its scale)",
-                           "Model space (one sheet, with layers you can "
-                           "switch on and off)"]
-                pick, ok = QInputDialog.getItem(
-                    self, "Import AutoCAD DXF", "What to import:", choices,
-                    0, False)
-                if not ok:
-                    return None
-                what = "layouts" if pick == choices[0] else "model"
-        if out is None:
-            base = os.path.splitext(path)[0]
-            out = base + ".pdf"
-            if os.path.exists(out):
-                out = base + " (from DXF).pdf"
-            out, _ = QFileDialog.getSaveFileName(
-                self, "Save the Drawing as PDF", out, "PDF (*.pdf)")
-            if not out:
-                return None
-        QApplication.setOverrideCursor(Qt.WaitCursor)
-        try:
-            info = dxf.to_pdf(path, out, what=what)
-        except Exception as ex:
-            QApplication.restoreOverrideCursor()
-            QMessageBox.warning(self, "Import DXF", str(ex))
-            return None
-        QApplication.restoreOverrideCursor()
-        self.open_path(out)
-        if what == "layouts":
-            msg = (f"Imported {info['pages']} sheet(s) with "
-                   f"{info['viewports']} viewport(s) ({info['scale']}). "
-                   "Each viewport has its scale, so takeoff is exact.")
-            if info.get("layers_off"):
-                msg += (f" {info['layers_off']} layer(s) were off in the "
-                        "drawing and came in switched off.")
-        else:
-            msg = (f"Imported at {info['scale']} on {info['sheet']}, "
-                   f"{info['layers']} layer(s). The scale is set, so you "
-                   "can measure right away (layers: Markup > Layers).")
-            if info.get("layers_off"):
-                msg += (f" {info['layers_off']} layer(s) were off in the "
-                        "drawing and came in switched off.")
-        if info.get("turned_on"):
-            msg += (" Almost every layer was switched off in the file, so "
-                    "they all came in on (Markup > Layers to hide some).")
-        if info["skipped"]:
-            msg += f" {info['skipped']} item(s) couldn't be drawn."
-        self.statusBar().showMessage(msg, 15000)
-        return info
-
-    def export_dxf(self, path=None):
-        """This page's line work, text, markups and takeoff as a DXF."""
-        from . import annotate, dxf
-        v = self._view
-        if not v:
-            return None
-        if path is None:
-            path = self._ask_save("Export AutoCAD DXF",
-                                  f" - page {v.page + 1}.dxf",
-                                  "AutoCAD DXF (*.dxf)")
-            if not path:
-                return None
-        page = v.page
-        has_scale = bool(annotate.read_scales(v.doc).get(page))
-
-        def done(info):
-            # on the window thread once the worker has written the file
-            self._flash(
-                f"Exported {info['entities']} items to DXF in "
-                f"{'real ' + info['units'] if has_scale else 'paper inches (no scale set)'}.",
-                15000)
-        # off the window thread: one sheet held it for 14 s (review 0.12.29)
-        self._in_background("Export DXF", f"Exporting page {page + 1} to "
-                            "DXF...", lambda d: dxf.from_page(d, page, path),
-                            done)
-        return path
-
     def create_pdf(self):
         from . import acrobat2
         paths, _ = QFileDialog.getOpenFileNames(self, "Create PDF From", "",
@@ -9429,15 +7202,6 @@ class MainWindow(QMainWindow):
         if store is None:
             return None
         return owner_report_ui.open_report(store, self)
-
-    def ai_schedule(self, store=None, show=True):
-        """Review > Build Schedule From Plans: open (or start) the project's
-        schedule in the Scheduler and read this drawing set and its spec
-        book into a draft schedule."""
-        w = self.scheduler(store=store)
-        if w is None:
-            return None
-        return w.build_from_plans(plans=self._path, show=show)
 
     def project_center(self):
         """RFIs, submittals, punch, daily logs, meetings... for the job.

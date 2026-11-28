@@ -283,14 +283,20 @@ def test_ocr_tiles_are_cleaned_up_after_a_failure(tmp_path, monkeypatch):
         return p
     monkeypatch.setattr(tempfile, "mkdtemp", mk)
     calls = {"n": 0}
-    real_pix = fitz.Page.get_pixmap
+    monkeypatch.setattr(acrobat, "_tess_tile", lambda *a, **k: [])
 
-    def pix(self, *a, **k):
-        calls["n"] += 1
-        if calls["n"] == 3:
-            raise RuntimeError("example failure")
-        return real_pix(self, *a, **k)
-    monkeypatch.setattr(fitz.Page, "get_pixmap", pix)
+    def failing(real):
+        def pix(self, *a, **k):
+            calls["n"] += 1
+            if calls["n"] == 3:
+                raise RuntimeError("example failure")
+            return real(self, *a, **k)
+        return pix
+    # tiles are drawn from the page's display list since Nov 25
+    monkeypatch.setattr(fitz.Page, "get_pixmap",
+                        failing(fitz.Page.get_pixmap))
+    monkeypatch.setattr(fitz.DisplayList, "get_pixmap",
+                        failing(fitz.DisplayList.get_pixmap))
     d = fitz.open()
     d.new_page(width=3000, height=3000)
     with pytest.raises(RuntimeError):

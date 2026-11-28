@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Open in QuantiSheet</title>
+<style>
+  body { font: 13px/1.4 "Segoe UI", Arial, sans-serif; margin: 0;
+         width: 300px; color: #1d2424; background: #fff; }
+  .wrap { padding: 14px 16px 16px; }
+  h1 { font-size: 14px; margin: 0 0 6px; }
+  p { margin: 0 0 10px; color: #4a5757; }
+  #name { font-weight: 600; color: #1d2424; word-break: break-word; }
+  button { width: 100%; padding: 9px 12px; border: 0; border-radius: 6px;
+           background: #0e6a60; color: #fff; font: inherit; font-weight: 600;
+           cursor: pointer; }
+  button:hover { background: #0b5a51; }
+  button:disabled { background: #b9c4c2; cursor: default; }
+  button.second { margin-top: 8px; background: transparent; color: #0e6a60;
+                  border: 1px solid #0e6a60; font-weight: 500; }
+  button.second:hover { background: #e2f1ee; }
+  #opts { margin: 12px 0 0; padding-top: 10px; border-top: 1px solid #d9e0df; }
+  #opts label { display: block; margin: 4px 0; font-size: 12px; }
+  #note { margin: 10px 0 0; font-size: 12px; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1b2221; color: #e7eeec; }
+    p { color: #a9b8b5; } #name { color: #e7eeec; }
+    button { background: #1f746b; } button:hover { background: #26867b; }
+    button.second { color: #3dbba9; border-color: #3dbba9;
+                    background: transparent; }
+    button.second:hover { background: #173430; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Open in QuantiSheet <span id="ver" style="font-weight:400;color:#8a9694;font-size:11px"></span></h1>
+  <p id="name">&nbsp;</p>
+  <button id="go">Open in QuantiSheet</button>
+  <button id="view" class="second">View here</button>
+  <button id="next" class="second">Open my next PDF download instead</button>
+  <button id="page" class="second">Make this page a PDF</button>
+  <div id="opts">
+    <label><input type="checkbox" id="opt-button"> Show an Open in
+      QuantiSheet button on every PDF</label>
+    <label><input type="checkbox" id="opt-always"> Always open web PDFs
+      in QuantiSheet</label>
+    <label><input type="checkbox" id="opt-viewer"> Use this add-on's
+      viewer for every PDF in the browser (view and mark up here)</label>
+  </div>
+  <p id="note">Saves the PDF to Downloads\QuantiSheet on this computer and
+  opens it in QuantiSheet. Nothing is sent anywhere.</p>
+</div>
+<script src="core.js"></script>
+<script src="popup.js"></script>
+</body>
+</html>

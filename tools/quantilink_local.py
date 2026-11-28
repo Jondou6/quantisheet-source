@@ -98,6 +98,11 @@ def start(folder=None):
     os.makedirs(data, exist_ok=True)
     env = dict(os.environ, HOST="127.0.0.1", PORT="8080",
                QUANTILINK_DATA=data)
+    # backups into the Dropbox folder, as Start QuantiLink.bat does (Nov 25)
+    drop = os.path.join(os.path.expanduser("~"), "Dropbox")
+    if os.path.isdir(drop):
+        env["QUANTILINK_BACKUP_DIR"] = os.path.join(drop, "QuantiLink Backups")
+        print("backups to", env["QUANTILINK_BACKUP_DIR"])
     log = open(os.path.join(data, "server.log"), "ab")
     flags = getattr(subprocess, "CREATE_NO_WINDOW", 0) | \
         getattr(subprocess, "DETACHED_PROCESS", 0) | \
@@ -134,6 +139,11 @@ def stop():
 def status():
     h = health()
     print("running" if h else "not running", URL, _state().get("folder", ""))
+    bdir = os.path.join(os.path.expanduser("~"), "Dropbox", "QuantiLink Backups",
+                        "snapshots")
+    if os.path.isdir(bdir):
+        snaps = sorted(os.listdir(bdir))
+        print("Dropbox backups:", len(snaps), "newest", snaps[-1] if snaps else None)
 
 
 def _login_file():

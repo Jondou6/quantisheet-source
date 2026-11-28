@@ -1,0 +1,3 @@
+QuantiSheet 1.1.38
+- The Open in QuantiSheet browser add-on (not released yet) now hands a PDF straight to QuantiSheet, with no download and no Save As window in the browser. The PDF is saved in Downloads\QuantiSheet and opens.
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.38 - the full source of this build. Help > About shows the same link.

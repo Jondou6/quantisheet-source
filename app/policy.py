@@ -55,6 +55,9 @@ SETTINGS = {
     "DisablePackageStatus": (bool, "No live package status from the "
                                    "carriers (Package Tracker > Check "
                                    "Status)"),
+    "DisableErrorReports": (bool, "No automatic error reports (team copy; "
+                                  "Help > Send Error Reports "
+                                  "Automatically)"),
     "DropboxAppKey": (str, "The Dropbox App key for every user (from the "
                            "company's Dropbox app; no App secret is "
                            "needed)"),
@@ -117,6 +120,9 @@ NETWORK = {
     # team copy only (updatecheck.py; must equal its MANIFEST_HOSTS |
     # DOWNLOAD_HOSTS - tests/test_updatecheck.py)
     "update": ("DisableUpdateCheck", [_update_host()]),
+    # team copy only, and only when a tester turned it on
+    # (errorreports.py REPORT_HOST - tests/test_errorreports.py)
+    "errorreports": ("DisableErrorReports", ["reports.quantisheet.com"]),
 }
 
 _cache = None

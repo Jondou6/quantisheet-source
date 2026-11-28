@@ -96,20 +96,32 @@ def pages_needing_ocr(doc, sparse=False):
 
 def _new_words(page, words):
     """The OCR words the text layer doesn't already have (a word whose
-    middle falls in a typed word's box is dropped)."""
+    middle falls in a typed word's box is dropped). The typed words are
+    put in a grid first (Nov 25: checking every OCR word against every
+    typed word was 45 % of the OCR time on a civil set)."""
     try:
-        have = [fitz.Rect(w[:4]) + (-1, -1, 1, 1)
+        have = [(w[0] - 1, w[1] - 1, w[2] + 1, w[3] + 1)
                 for w in page.get_text("words")]
     except Exception:                                  # noqa: BLE001
         have = []
     if not have:
         return list(words)
+    cell = _GRID
+    grid = {}
+    for b in have:
+        for gx in range(int(b[0] // cell), int(b[2] // cell) + 1):
+            for gy in range(int(b[1] // cell), int(b[3] // cell) + 1):
+                grid.setdefault((gx, gy), []).append(b)
     out = []
     for r, text in words:
-        c = fitz.Point((r.x0 + r.x1) / 2, (r.y0 + r.y1) / 2)
-        if not any(h.contains(c) for h in have):
+        cx, cy = (r.x0 + r.x1) / 2, (r.y0 + r.y1) / 2
+        near = grid.get((int(cx // cell), int(cy // cell)), ())
+        if not any(b[0] <= cx < b[2] and b[1] <= cy < b[3] for b in near):
             out.append((r, text))
     return out
+
+
+_GRID = 36.0               # points: half an inch
 
 
 OCR_MIN_CONF = 60          # Tesseract word confidence (0-100) to keep
@@ -140,15 +152,18 @@ def is_photo(page):
         return False
 
 
-def _tess_tile(exe, png, language, tessdata, psm=11):
+def _tess_tile(exe, png, language, tessdata, psm=11, dpi=None):
     """[(x0, y0, x1, y1, text, conf)] in the tile's pixels. psm 11 finds
-    scattered text (a drawing); 6 reads one block (a small close-up)."""
+    scattered text (a drawing); 6 reads one block (a small close-up).
+    `dpi` is the picture's resolution for a .pgm, which has none of its
+    own (the same reading as the .png it replaced, Nov 25)."""
     import subprocess
     env = dict(os.environ, OMP_THREAD_LIMIT="1")
     if tessdata:
         env["TESSDATA_PREFIX"] = tessdata
+    extra = ["--dpi", str(int(dpi))] if dpi else []
     out = subprocess.run([exe, png, "stdout", "-l", language,
-                          "--psm", str(psm), "tsv"],
+                          "--psm", str(psm)] + extra + ["tsv"],
                          capture_output=True, timeout=600, env=env,
                          creationflags=getattr(subprocess,
                                                "CREATE_NO_WINDOW", 0))
@@ -180,12 +195,12 @@ def _plausible(text):
     return good / len(t) >= 0.6
 
 
-def ocr_page_words(page, dpi=None, language="eng", workers=None,
-                   min_conf=OCR_MIN_CONF):
-    """Words on an (unrotated) page, OCR'd in tiles on several cores:
-    [(Rect in page points, text)] with confidence >= min_conf."""
-    import tempfile
-    from concurrent.futures import ThreadPoolExecutor
+def _draw_tiles(page, ex, tmpdir, tag, dpi=None, language="eng"):
+    """Draw `page` (as it is shown) in tiles and hand each to tesseract on
+    the pool `ex` as soon as it is drawn, so drawing and reading overlap.
+    Returns the job for _read_tiles. Nov 25: the tiles come from one
+    display list (the page is read once, not once per tile) and are saved
+    as .pgm (no compression; the same reading as .png)."""
     exe = ocr_mod.find_tesseract()
     if not exe:
         raise ocr_mod.OCRUnavailable("Tesseract is not installed.")
@@ -195,38 +210,48 @@ def ocr_page_words(page, dpi=None, language="eng", workers=None,
     tile = TILE_PX / zoom                       # tile size in page points
     ov = TILE_OVERLAP / zoom
     R = page.rect
-    jobs = []
-    out = []
-    tmpdir = tempfile.mkdtemp(prefix="pdfs_ocr_")
-    # the tiles are drawn inside the try, so a failure part-way through
-    # never leaves pictures and the folder behind in TEMP (outside review
-    # via Chief, Nov 7 - M9)
+    m = fitz.Matrix(zoom, zoom)
     try:
-        y = R.y0
-        k = 0
-        while y < R.y1 - 1:
-            x = R.x0
-            while x < R.x1 - 1:
-                core = fitz.Rect(x, y, min(x + tile, R.x1),
-                                 min(y + tile, R.y1))
-                clip = fitz.Rect(core.x0 - ov, core.y0 - ov, core.x1 + ov,
-                                 core.y1 + ov) & R
-                pix = page.get_pixmap(matrix=fitz.Matrix(zoom, zoom),
-                                      clip=clip, colorspace=fitz.csGRAY,
-                                      alpha=False, annots=False)
-                png = os.path.join(tmpdir, f"t{k}.png")
-                pix.save(png)
-                del pix
-                jobs.append((png, clip, core))
-                k += 1
-                x += tile
-            y += tile
-        workers = workers or max(1, min(4, (os.cpu_count() or 2)))
-        with ThreadPoolExecutor(workers) as ex:
-            results = list(ex.map(lambda j: _tess_tile(exe, j[0], language,
-                                                       tess), jobs))
-        for (png, clip, core), words in zip(jobs, results):
-            for x0, y0, x1, y1, text, conf in words:
+        dl = page.get_displaylist(annots=False)
+
+        def draw(clip):
+            return dl.get_pixmap(matrix=m, clip=clip,
+                                 colorspace=fitz.csGRAY, alpha=False)
+    except Exception:                                  # noqa: BLE001
+        def draw(clip):
+            return page.get_pixmap(matrix=m, clip=clip,
+                                   colorspace=fitz.csGRAY, alpha=False,
+                                   annots=False)
+    tiles = []
+    y = R.y0
+    k = 0
+    while y < R.y1 - 1:
+        x = R.x0
+        while x < R.x1 - 1:
+            core = fitz.Rect(x, y, min(x + tile, R.x1), min(y + tile, R.y1))
+            clip = fitz.Rect(core.x0 - ov, core.y0 - ov, core.x1 + ov,
+                             core.y1 + ov) & R
+            pix = draw(clip)
+            res = pix.xres
+            img = os.path.join(tmpdir, f"{tag}_{k}.pgm")
+            pix.save(img)
+            del pix
+            tiles.append((ex.submit(_tess_tile, exe, img, language, tess,
+                                    11, res), clip, core, img))
+            k += 1
+            x += tile
+        y += tile
+    return {"tiles": tiles, "zoom": zoom}
+
+
+def _read_tiles(job, min_conf=None):
+    """The words of a _draw_tiles job: [(Rect in page points, text)]."""
+    min_conf = OCR_MIN_CONF if min_conf is None else min_conf
+    zoom = job["zoom"]
+    out = []
+    try:
+        for fut, clip, core, _img in job["tiles"]:
+            for x0, y0, x1, y1, text, conf in fut.result():
                 if conf < min_conf or not _plausible(text):
                     continue
                 r = fitz.Rect(clip.x0 + x0 / zoom, clip.y0 + y0 / zoom,
@@ -235,7 +260,77 @@ def ocr_page_words(page, dpi=None, language="eng", workers=None,
                 if core.contains(c):            # overlap: keep once
                     out.append((r, text))
     finally:
-        import shutil
+        for fut, _c, _k, img in job["tiles"]:
+            fut.cancel()
+        for fut, _c, _k, img in job["tiles"]:
+            if not fut.cancelled():
+                try:
+                    fut.exception()               # wait before removing
+                except Exception:                 # noqa: BLE001
+                    pass
+            try:
+                os.remove(img)
+            except OSError:
+                pass
+    return out
+
+
+def ocr_workers():
+    """Tesseract processes at once: every core but one, at most 8 (Nov 25:
+    it was 4 on an 8-core PC; each process uses one core)."""
+    return max(1, min(8, (os.cpu_count() or 2) - 1))
+
+
+def ocr_page_words(page, dpi=None, language="eng", workers=None,
+                   min_conf=OCR_MIN_CONF):
+    """Words on a page as it is shown, OCR'd in tiles on several cores:
+    [(Rect in page points, text)] with confidence >= min_conf."""
+    import shutil
+    import tempfile
+    from concurrent.futures import ThreadPoolExecutor
+    if not ocr_mod.find_tesseract():
+        raise ocr_mod.OCRUnavailable("Tesseract is not installed.")
+    # the tiles are drawn inside the try, so a failure part-way through
+    # never leaves pictures and the folder behind in TEMP (outside review
+    # via Chief, Nov 7 - M9)
+    tmpdir = tempfile.mkdtemp(prefix="pdfs_ocr_")
+    try:
+        with ThreadPoolExecutor(workers or ocr_workers()) as ex:
+            return _read_tiles(_draw_tiles(page, ex, tmpdir, "p", dpi,
+                                           language), min_conf)
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+
+def ocr_pages_words(doc, pages, dpi=None, language="eng",
+                    min_conf=OCR_MIN_CONF):
+    """{page number: ocr_page_words(...)} for several sheets, on one pool,
+    the next sheet drawn while the last is read (Nov 25: Auto Scale read
+    a civil set's sheets one at a time, cores idle at each sheet's end)."""
+    import shutil
+    import tempfile
+    from concurrent.futures import ThreadPoolExecutor
+    if not ocr_mod.find_tesseract():
+        raise ocr_mod.OCRUnavailable("Tesseract is not installed.")
+    out, pending = {}, []
+    tmpdir = tempfile.mkdtemp(prefix="pdfs_ocr_")
+    try:
+        with ThreadPoolExecutor(ocr_workers()) as ex:
+            try:
+                for i in pages:
+                    pending.append((i, _draw_tiles(doc[i], ex, tmpdir,
+                                                   f"{i}", dpi, language)))
+                    while len(pending) > 1:
+                        j, job = pending.pop(0)
+                        out[j] = _read_tiles(job, min_conf)
+                while pending:
+                    j, job = pending.pop(0)
+                    out[j] = _read_tiles(job, min_conf)
+            finally:
+                for _j, job in pending:
+                    for t in job["tiles"]:
+                        t[0].cancel()
+    finally:
         shutil.rmtree(tmpdir, ignore_errors=True)
     return out
 
@@ -257,37 +352,74 @@ def make_searchable(doc, pages=None, dpi=None, language="eng", progress=None,
             "from https://github.com/UB-Mannheim/tesseract/wiki (Windows) and "
             "restart QuantiSheet.")
     pages = pages_needing_ocr(doc) if pages is None else list(pages)
+    import shutil
+    import tempfile
+    from concurrent.futures import ThreadPoolExecutor
     done = 0
-    for n, i in enumerate(pages):
-        if progress and progress(n, len(pages)) is False:
-            break
+    pending = []
+    tmpdir = tempfile.mkdtemp(prefix="pdfs_ocr_")
+
+    def finish(i, side, flat, turned):
+        nonlocal done
         page = doc[i]
-        if is_photo(page):
-            if skipped is not None:
-                skipped.append(i)
-            continue
-        # Nov 19: the sheet is read as it is shown, rotation and all (it
-        # was turned back to 0 first, so a sheet rotated 270 was read
-        # sideways - fragments and junk); the words go back where they
-        # are shown, and on a sheet that has some text only what's new
-        side = sparse_text(page) if vertical is None else vertical
-        words = ocr_page_words(page, dpi, language)
-        add_words(page, _new_words(page, words))
+        add_words(page, _new_words(page, _read_tiles(flat)))
         if side:
-            # a civil sheet's profile callouts run up the page (STA 15+41
-            # NEW MANHOLE): read the sheet a quarter turn round too, and
-            # write those words the same way, so they read along their
-            # own line (Nov 19)
             rot = page.rotation
             try:
                 page.set_rotation((rot + 90) % 360)
-                more = [(r, t) for r, t in ocr_page_words(page, dpi,
-                                                          language)
+                more = [(r, t) for r, t in _read_tiles(turned)
                         if _WORDISH.search(t)]
                 add_words(page, _new_words(page, more))
             finally:
                 page.set_rotation(rot)
         done += 1
+    # Nov 25: one pool for the whole set, and the next sheet (or the
+    # quarter-turn reading) is drawn while tesseract still reads the last
+    # one, so no core waits at the end of each sheet
+    try:
+        with ThreadPoolExecutor(ocr_workers()) as ex:
+            try:
+                for n, i in enumerate(pages):
+                    if progress and progress(n, len(pages)) is False:
+                        break
+                    page = doc[i]
+                    if is_photo(page):
+                        if skipped is not None:
+                            skipped.append(i)
+                        continue
+                    # Nov 19: the sheet is read as it is shown, rotation
+                    # and all (it was turned back to 0 first, so a sheet
+                    # rotated 270 was read sideways - fragments and junk);
+                    # the words go back where they are shown, and on a
+                    # sheet that has some text only what's new
+                    side = sparse_text(page) if vertical is None else vertical
+                    flat = _draw_tiles(page, ex, tmpdir, f"{i}a", dpi,
+                                       language)
+                    turned = None
+                    if side:
+                        # a civil sheet's profile callouts run up the page
+                        # (STA 15+41 NEW MANHOLE): read the sheet a quarter
+                        # turn round too, and write those words the same
+                        # way, so they read along their own line (Nov 19)
+                        rot = page.rotation
+                        try:
+                            page.set_rotation((rot + 90) % 360)
+                            turned = _draw_tiles(page, ex, tmpdir, f"{i}b",
+                                                 dpi, language)
+                        finally:
+                            page.set_rotation(rot)
+                    pending.append((i, side, flat, turned))
+                    while len(pending) > 1:
+                        finish(*pending.pop(0))
+                while pending:
+                    finish(*pending.pop(0))
+            finally:
+                for _i, _s, flat, turned in pending:  # after a failure
+                    for job in (flat, turned):
+                        for t in (job or {}).get("tiles", []):
+                            t[0].cancel()
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
     return done
 
 

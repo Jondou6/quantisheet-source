@@ -31,6 +31,7 @@ def test_application_pdf_has_no_aia_wording(tmp_path):
 
 def test_menus_say_pay_applications_without_form_numbers():
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    for f in ("main_window.py", "simple_menu.py", "billing_ui.py"):
+    for f in ("main_window.py", "mw_menus.py", "mw_exchange.py",
+              "simple_menu.py", "billing_ui.py"):
         src = open(os.path.join(root, "app", f), encoding="utf-8").read()
         assert "(G702/G703)" not in src and "G702/G703 PDF" not in src

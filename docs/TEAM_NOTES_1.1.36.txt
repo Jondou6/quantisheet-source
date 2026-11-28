@@ -1,0 +1,6 @@
+QuantiSheet 1.1.36
+- Terms of Service (version 1.1) and the Privacy page are brought up to date with what QuantiSheet does now: your rights to the published source code, automatic tools and cost data, Back Office and ClaimIT, the services QuantiSheet can connect to, Send with QuantiLink, error reports, and a clearer limit of liability. Help > Terms of Service and Help > Privacy.
+- The Features and How-To Guide's contents page is clickable: click a topic to jump straight to its page (Help > Features & How-To Guide).
+- Ready for the Open in QuantiSheet browser add-on (not released yet): QuantiSheet can be handed a PDF that a browser has just saved on this computer. It only ever opens a PDF already on your computer.
+- Help > About shows the support address.
+- Source code (GNU AGPL-3.0): https://github.com/Jondou6/quantisheet-source/tree/v1.1.36 - the full source of this build. Help > About shows the same link.

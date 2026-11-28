@@ -19,14 +19,18 @@ GROUPS = [("Licensing", "Licensing and sign-in",
           ("Internet", "Internet and AI features",
            ["OfflineMode", "DisableAerial", "DisableWeather",
             "DisableRateLookup", "DisableDocuSign", "DisableDropbox",
-            "DropboxAppKey", "DisableAI", "DisableUpdateCheck"])]
+            "DisablePackageStatus", "DisableErrorReports", "DropboxAppKey",
+            "DisableQuantiLink",
+            "QuantiLinkURL", "QuantiLinkKey", "DisableAI",
+            "DisableUpdateCheck"])]
 EXPLAIN = {
-    "DisableUpdateCheck": "Team copy only: turns off the once-a-day check "
-    "for a newer team build (Help > Check for Updates). The check downloads "
-    "one small signed file from the team update host (see IT_DEPLOYMENT.md) "
-    "and sends no "
-    "user data; an update installs only when the user clicks Install now. "
-    "The Microsoft Store copy never checks - the Store updates it.",
+    "DisableUpdateCheck": "Turns off the once-a-day update check. The team "
+    "copy downloads one small signed file from the team update host (see "
+    "IT_DEPLOYMENT.md), sends no user data, and installs an update only when "
+    "the user clicks Update now. The Microsoft Store copy asks the Microsoft "
+    "Store on this PC whether an update is waiting and shows a reminder; the "
+    "Store does the download and install. Help > Check for Updates Now still "
+    "works when the user picks it.",
     "DisableDropbox": "Turns off File > Open from Dropbox and Save to "
     "Dropbox. These contact www.dropbox.com, api.dropboxapi.com and "
     "content.dropboxapi.com, only when a user runs them.",
@@ -73,12 +77,36 @@ EXPLAIN = {
     "of Labor Statistics.",
     "DisableDocuSign": "Turns off DocuSign signature requests. QuantiSheet's "
     "own signing still works.",
+    "DisablePackageStatus": "Turns off Package Tracker > Check Status, "
+    "which sends only a tracking number to the carrier it belongs to (UPS, "
+    "FedEx, USPS or DHL) when the user clicks it and has that carrier's "
+    "keys. Track (opening the carrier's page) still works. OfflineMode "
+    "turns this off too.",
+    "DisableErrorReports": "Team copy only: removes Help > Send Error "
+    "Reports Automatically, which a tester can turn on to send a short "
+    "report (what happened, the QuantiSheet and Windows versions, where in "
+    "the program the error was) to reports.quantisheet.com after an error. "
+    "It is off unless the tester turns it on; no drawings, job files, file "
+    "names, prices or logs are sent. OfflineMode turns this off too.",
+    "DisableQuantiLink": "Turns off Home > Send with QuantiLink, which "
+    "uploads Project Center files (RFIs, submittals, daily logs, meeting "
+    "minutes) to the office's own QuantiLink server and makes share links, "
+    "only when a user clicks Send. OfflineMode turns this off too.",
+    "QuantiLinkURL": "The address of the office's QuantiLink server, for "
+    "example https://files.example.com (https is required). Set it together "
+    "with QuantiLinkKey and users can't change the connection.",
+    "QuantiLinkKey": "The shared access key (qlt_...) made in QuantiLink "
+    "under Account settings > Desktop sync. It is sent only to the "
+    "QuantiLink server, never in a web address, and is left out of support "
+    "bundles.",
     "DisableAI": "Turns off the local AI features (AI Takeoff, AI review, "
     "brief reading, RFI finder).",
 }
 
 
-def main():
+def build():
+    """The two files' text, (admx, adml), from app/policy.py - the one
+    source (tests/test_it_policy checks the shipped files equal it)."""
     names = sum((g[2] for g in GROUPS), [])
     assert sorted(names) == sorted(S), set(S) ^ set(names)
     assert set(EXPLAIN) == set(S), set(S) ^ set(EXPLAIN)
@@ -157,12 +185,20 @@ def main():
                      '</textBox>', '      </presentation>']
     adml += ['    </presentationTable>', '  </resources>',
              '</policyDefinitionResources>', '']
+    return "\n".join(admx), "\n".join(adml)
+
+
+def paths():
     d = os.path.join(ROOT, "installer", "policy")
-    os.makedirs(os.path.join(d, "en-US"), exist_ok=True)
-    for path, lines in ((os.path.join(d, "QuantiSheet.admx"), admx),
-                        (os.path.join(d, "en-US", "QuantiSheet.adml"), adml)):
-        with open(path, "w", encoding="utf-8", newline="\r\n") as f:
-            f.write("\n".join(lines))
+    return (os.path.join(d, "QuantiSheet.admx"),
+            os.path.join(d, "en-US", "QuantiSheet.adml"))
+
+
+def main():
+    for path, text in zip(paths(), build()):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w", encoding="utf-8", newline="\n") as f:
+            f.write(text)
     print("written", len(S), "settings")
 
 

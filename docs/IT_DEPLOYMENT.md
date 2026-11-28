@@ -160,6 +160,7 @@ Users can't change these inside the program. `LicenseKey`, `AcceptAgreement` and
 | `DisableAI` | on/off | Local AI features off. |
 | `DisableUpdateCheck` | on/off | No daily update check: the team copy's check for a newer version, and the Microsoft Store copy's reminder when the Store has an update waiting (the Store does the install). |
 | `DisablePackageStatus` | on/off | No live package status (Package Tracker > Check Status). |
+| `DisableErrorReports` | on/off | Team copy only: removes Help > Send Error Reports Automatically (off unless a tester turns it on). |
 
 ### Which settings work in which copy
 
@@ -169,6 +170,7 @@ Every setting is read from the same registry keys, so Group Policy works the sam
 |---|---|---|
 | `LicenseKey`, `SkipEmailSignIn`, `PriceDatabasePath`, `RelayURL`, `RelayToken`, `DisableAI`, `AIHost`, `OfflineMode`, `DisableAerial`, `DisableWeather`, `DisableRateLookup`, `DisableDocuSign`, `DisableDropbox`, `DropboxAppKey`, `DisableQuantiLink`, `QuantiLinkURL`, `QuantiLinkKey`, `DisablePackageStatus`, `LogDirectory` | Yes | Yes |
 | `DisableUpdateCheck` | Turns off the signed daily check | Turns off the Store-update reminder |
+| `DisableErrorReports` | Removes Help > Send Error Reports Automatically | Not in the Store copy |
 | Right-click actions in File Explorer | Setup option "Add QuantiSheet actions to the right-click menu" | PDFs only: Open in QuantiSheet, Reduce size. Convert to PDF and Combine PDFs (folders) need the setup copy |
 | "QuantiSheet" printer | Setup option | Switch on "QuantiSheet Printer" in Settings > Apps > Startup |
 
@@ -191,6 +193,7 @@ Opening, marking up, measuring, estimating and printing drawings never use the i
 | Local AI | `localhost:11434` (or `AIHost`) – stays on your network | `DisableAI` |
 | Live package status (Package Tracker > Check Status, only with that carrier's keys; only the tracking number is sent) | `onlinetools.ups.com`, `apis.fedex.com`, `apis.usps.com`, `api-eu.dhl.com` | `DisablePackageStatus` |
 | Update check (team copy only; once a day and Help > Check for Updates Now) | `pub-1121abaa7290424187564108985e68a0.r2.dev` (the team update host, Cloudflare R2; set in `app/updatecheck.py` `UPDATE_BASE`) | `DisableUpdateCheck` |
+| Automatic error reports (team copy only, and only after a tester turns on Help > Send Error Reports Automatically; a short report with no drawings, job files, file names, prices or logs) | `reports.quantisheet.com` | `DisableErrorReports` |
 | Collaboration | your own relay (`RelayURL`), TCP 8765 and 8766 | don't set a relay |
 
 `OfflineMode` turns off every internet feature above.

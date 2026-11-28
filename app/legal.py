@@ -16,8 +16,10 @@ from PySide6.QtWidgets import (QDialog, QDialogButtonBox, QFileDialog,
 from . import __version__, settings
 
 PUBLISHER = {
-    "name": "QuantiSheet",                 # company that licenses the program
-    "contact": "",                        # support email shown in About
+    "name": "QuantiSheet",                 # the name on the installers
+    # who the Terms are with and who holds the copyright (Jon, Nov 25)
+    "legal_name": "Jon Dougherty, All State Services LLC",
+    "contact": "support@quantisheet.com",  # support email shown in About
     "website": "",
     "state": "",                          # governing-law state
 }
@@ -38,8 +40,8 @@ def source_line():
     return (f"<p>Source code (GNU AGPL): <a href='{url}'>{url}</a></p>")
 
 
-TERMS_VERSION = "1.0"
-TERMS_DATE = "October 15, 2026"
+TERMS_VERSION = "1.1"
+TERMS_DATE = "November 25, 2026"
 
 
 def _pub():
@@ -62,7 +64,7 @@ def _no_contact():
 
 def terms_html():
     p = _pub()
-    who = p["name"]
+    who = p.get("legal_name") or p["name"]
     law = (f"the laws of the State of {p['state']}" if p["state"] else
            "the laws of the state where the publisher has its principal "
            "place of business")
@@ -75,28 +77,49 @@ QuantiSheet for) and {who} ("we"). By installing or using QuantiSheet you accept
 them. If you don't accept them, don't use the program.</p>
 
 <h3>1. Your license</h3>
-<p>We grant you a non-exclusive, non-transferable license to install and
-use QuantiSheet for your own business, on the number of computers your
-license allows. You may not sell, rent, sublicense or redistribute the
-program, or remove its notices. Parts of QuantiSheet are open-source
-software under their own licenses (Help > Third-Party Licenses); nothing
-here limits your rights under those licenses.</p>
+<p>You may install and use QuantiSheet for your own business, on the
+number of computers your license allows. QuantiSheet's source code is
+published under the GNU Affero General Public License, version 3 (Help
+&gt; About shows where). You may use, copy, change and share that source
+code as that license allows, and nothing in these terms takes those
+rights away. Other parts of QuantiSheet are open-source software under
+their own licenses (Help &gt; Third-Party Licenses), and those licenses
+apply to them.</p>
+<p>What the open-source licenses do not give you: you may not sell, rent
+or share a license key; you may not use the QuantiSheet name or logo for
+a product of your own, or in a way that suggests we stand behind it; and
+you may not remove the notices in the program.</p>
 
 <h3>2. Your files and data</h3>
 <p>Your drawings, documents, takeoff, estimates and project records belong
 to you. QuantiSheet keeps them on your computer, in your files, and on any
-server you choose to connect it to. We do not receive them. See Privacy.</p>
+server or service you choose to send them to (for example your office's
+QuantiLink or relay server, Dropbox or DocuSign). We do not receive them.
+See Privacy for exactly what leaves your computer and when.</p>
 
 <h3>3. Quantities, estimates and automatic tools</h3>
 <p>QuantiSheet measures, counts, calculates and suggests - including with
-automatic and AI-assisted tools (auto takeoff, trade takeoff, symbol
-counts, AI review). <b>Results can be wrong.</b> Drawings may be
-inaccurate, out of scale or incomplete, and automatic tools can miss or
-misread items. You are responsible for checking every quantity, price,
-schedule, code check and document before you rely on it, bid it, sign it or
-send it. QuantiSheet is a tool for qualified professionals and does not
-replace their judgment, a licensed design professional, or the contract
-documents.</p>
+automatic and AI-assisted tools (Auto Scale, auto takeoff, trade takeoff,
+symbol counts, AI Takeoff, AI review, schedules built from the plans).
+<b>Results can be wrong.</b> Drawings may be inaccurate, out of scale or
+incomplete, and automatic tools can miss or misread items, including a
+sheet's scale. You are responsible for checking every quantity, scale,
+price, schedule, code check and document before you rely on it, bid it,
+sign it or send it. QuantiSheet is a tool for qualified professionals and
+does not replace their judgment, a licensed design professional, or the
+contract documents.</p>
+<p><b>Cost data.</b> Price lists, cost books, labor rates and price
+indexes that come with QuantiSheet or that it downloads are reference
+figures only. They may be out of date or wrong for your area. The prices
+in your bid are yours to set and check.</p>
+<p><b>Code and accessibility checks.</b> Checks against building,
+energy or accessibility rules are aids for finding things to look at.
+They are not a ruling that a design or a building complies, and they are
+not legal advice.</p>
+<p><b>Generated drawings.</b> Drawings QuantiSheet makes for you (for
+example Generate Set) are drafts for planning and pricing. They are not
+construction documents and are not prepared or sealed by a licensed
+design professional.</p>
 
 <h3>4. Signatures, records and compliance</h3>
 <p>Electronic signatures, certificates, pay applications, lien waivers,
@@ -104,34 +127,68 @@ compliance checks and other records you create are your responsibility to
 use correctly under the laws and contracts that apply to you. Email you
 send from QuantiSheet goes out through your own email account.</p>
 
-<h3>5. Acceptable use</h3>
+<h3>5. Back Office and ClaimIT</h3>
+<p>The optional Back Office program (job cost, billing, payroll,
+certified payroll, accounting exports and related records) and the
+optional ClaimIT program (insurance claim estimates) are tools for keeping
+and preparing your own records. They do not give accounting, tax, payroll,
+legal or insurance advice, and their figures can be wrong. You are
+responsible for your filings, your pay, your books and your claims, and
+for protecting the employee and financial information you enter. Have a
+qualified professional check them.</p>
+
+<h3>6. Services that are not ours</h3>
+<p>Some features use services run by others, only when you use them:
+Dropbox, DocuSign, parcel carriers, weather and government data
+services, a signature timestamp server if you set one, and the servers
+your own office runs (QuantiLink, the collaboration relay, an AI server).
+Those services have their own terms and privacy rules, can change or
+stop, and are not under our control. We are not responsible for them.</p>
+
+<h3>7. Acceptable use</h3>
 <p>Don't use QuantiSheet to break the law, infringe anyone's rights, or
-access documents you aren't allowed to. Don't reverse-engineer the program
-except as the law or an open-source license allows.</p>
+access documents you aren't allowed to.</p>
 
-<h3>6. Updates and support</h3>
-<p>We may provide updates and support as described in your purchase or
-subscription. We may change these terms for future versions; the version
-in Help shows which terms apply to the copy you have.</p>
+<h3>8. Test copies, license keys, updates and support</h3>
+<p>A test (beta) copy is given to you to try and may have more errors than
+a finished release; keep your own backups. A license key may have an end
+date. When it ends, QuantiSheet opens your files but stops saving until
+you enter a new key. A copy from the Microsoft Store is also covered by
+the Microsoft Store's terms, and the Store updates it.</p>
+<p>We may provide updates and support, but we don't promise to unless we
+have agreed that with you in writing. We may change these terms for
+future versions; the version in Help shows which terms apply to the copy
+you have.</p>
 
-<h3>7. No warranty</h3>
+<h3>9. Error reports and feedback</h3>
+<p>If you send us an issue report, an error report or a suggestion, we
+may use it to fix and improve QuantiSheet without owing you anything.
+Privacy says what a report contains. Automatic error reports are off
+unless you turn them on.</p>
+
+<h3>10. No warranty</h3>
 <p>QUANTISHEET IS PROVIDED "AS IS" AND "AS AVAILABLE", WITHOUT WARRANTIES OF
 ANY KIND, EXPRESS OR IMPLIED, INCLUDING MERCHANTABILITY, FITNESS FOR A
 PARTICULAR PURPOSE, ACCURACY AND NON-INFRINGEMENT, TO THE FULLEST EXTENT
 THE LAW ALLOWS.</p>
 
-<h3>8. Limitation of liability</h3>
+<h3>11. Limitation of liability</h3>
 <p>TO THE FULLEST EXTENT THE LAW ALLOWS, WE ARE NOT LIABLE FOR INDIRECT,
 INCIDENTAL, SPECIAL, CONSEQUENTIAL OR PUNITIVE DAMAGES, OR FOR LOST
 PROFITS, LOST BIDS, LOST DATA OR BUSINESS INTERRUPTION, ARISING FROM YOUR
 USE OF QUANTISHEET. OUR TOTAL LIABILITY IS LIMITED TO THE AMOUNT YOU PAID
-FOR QUANTISHEET IN THE TWELVE MONTHS BEFORE THE CLAIM.</p>
+FOR QUANTISHEET IN THE TWELVE MONTHS BEFORE THE CLAIM. IN NO EVENT SHALL
+TOTAL LIABILITY EXCEED THE GREATER OF FEES PAID IN THE PRIOR TWELVE MONTHS
+OR US $100, AND NOTHING IN THESE TERMS LIMITS LIABILITY THAT CANNOT BE
+EXCLUDED BY LAW.</p>
 
-<h3>9. Ending this agreement</h3>
-<p>You may stop using QuantiSheet at any time. Your license ends if you
-break these terms; then uninstall the program. Your files remain yours.</p>
+<h3>12. Ending this agreement</h3>
+<p>You may stop using QuantiSheet at any time. Your license under these
+terms ends if you break them; then uninstall the program. Your files
+remain yours, and your rights under the open-source licenses continue as
+those licenses say.</p>
 
-<h3>10. General</h3>
+<h3>13. General</h3>
 <p>These terms are governed by {law}. If part of them can't be enforced,
 the rest still applies. Questions: {contact}.</p>
 """
@@ -161,8 +218,11 @@ def privacy_html():
     contact = p["contact"] or _no_contact()
     return f"""
 <h2>Privacy</h2>
+<p style='color:#888'>Updated {TERMS_DATE}</p>
 <p><b>QuantiSheet does not send your documents or data to us.</b> It runs
-on your computer and stores your work in your own files and folders.</p>
+on your computer and stores your work in your own files and folders. We
+have no accounts for you to sign in to and we keep no copy of your
+work.</p>
 <h3>What stays on your computer</h3>
 <ul>
 <li>Your PDFs, markups, takeoff, estimates and job data (inside the PDFs
@@ -173,15 +233,46 @@ and in the folders you choose).</li>
 sent to an outside AI service. Your IT department can point QuantiSheet at
 an Ollama server on another computer (the AIHost setting); then the text
 the AI reads goes to that server.</li>
+<li><b>Your name on your work</b>: markups, measurements and records
+carry the name set in QuantiSheet (your Windows user name unless you
+change it). It is saved inside the PDFs and job files, so anyone you give
+those files to can see it.</li>
+<li><b>Time Log</b>: how long QuantiSheet is actively used on each job
+and sheet is kept on this computer (Tools &gt; Time Log). It is not sent
+anywhere.</li>
+<li><b>License key and sign-in</b>: a license key is checked on this
+computer, without contacting us. If a test copy asks for your work email
+the first time it starts, the address is checked on this computer and is
+not sent to us.</li>
+<li><b>Back Office and ClaimIT</b> (optional programs) keep their own
+records on this computer, in their own data folders. Back Office encrypts
+Social Security numbers, tax IDs and bank details, and its backups are
+encrypted.</li>
 </ul>
 <h3>What leaves your computer - only when you use it</h3>
 <ul>
 <li><b>Project sharing, live collaboration and signature requests</b> go
 through the server you or your company set up (the relay). Whoever runs
 that server holds that data.</li>
+<li><b>Send with QuantiLink</b>: the files you choose to send go to your
+office's own QuantiLink server, together with your name (so the office
+can see who sent them). Whoever runs that server holds those files. The
+share links it gives back open the files for anyone who has the link,
+until the link ends.</li>
+<li><b>Back Office self-service</b> (optional): if your office runs the
+Back Office self-service server, Publish and Pull send employee details
+to it and bring requests and time punches back, only when someone clicks
+them. Whoever runs that server holds that data.</li>
 <li><b>DocuSign</b>: documents you choose to send with DocuSign go to
 DocuSign under its own terms.</li>
+<li><b>Signature timestamps</b>: off unless a timestamp server has been
+set for QuantiSheet. When one is set, signing a PDF sends that server a
+fingerprint
+of the document (not the document) to get a signed time.</li>
 <li><b>Email</b> goes out through your own Outlook account.</li>
+<li><b>A PDF dragged from an Outlook message</b> onto QuantiSheet is saved
+on this computer (Downloads\\QuantiSheet) and opened. Only the PDF
+attachments you drag are read; nothing else in the message is.</li>
 <li><b>Weather</b> for daily logs and <b>BLS price indexes</b> are fetched
 from public services; only the location or index asked for is sent. A new
 Owner Report fetches the weather and forecast (Open-Meteo) by itself when
@@ -194,6 +285,9 @@ government services (USGS, Census, FEMA, U.S. Fish and Wildlife).</li>
 <li><b>Package status</b> (Package Tracker &gt; Check Status, only with a
 carrier's keys you entered) sends just the tracking number to that
 carrier (UPS, FedEx, USPS or DHL).</li>
+<li><b>Links that open your web browser</b> (videos, code references,
+carrier tracking pages, permit offices, the source code) take you to
+those websites, which have their own privacy rules.</li>
 <li><b>Report an Issue</b> writes an email in your own mail program with
 what you typed, a screenshot you can drop, facts about the open drawing
 (page count, sheet sizes, how many markups - never its content), and a
@@ -209,9 +303,10 @@ weekly copy in Documents\\QuantiSheet Backups) hold your settings,
 signing key, carrier keys and Back Office data. They stay where they are
 saved; keep them somewhere private.</p>
 {_updates_html()}
-<p>IT can turn off the weather, site lookups, price indexes, DocuSign and
-Dropbox for everyone (the OfflineMode setting){_updates_it()} and the AI
-features (DisableAI).</p>
+<p>IT can turn off the weather, site lookups, price indexes, DocuSign,
+Dropbox, Send with QuantiLink, package status and automatic error reports
+for everyone, each by its own setting or all at once (the OfflineMode
+setting){_updates_it()} and the AI features (DisableAI).</p>
 <h3>Deleting your data</h3>
 <p>Your drawings and job folders are yours and stay where you put them.
 QuantiSheet's own settings, recovery copies and price database are in
@@ -245,7 +340,14 @@ def _updates_html():
                 "server). An update downloads and installs only when you "
                 "click Update now; QuantiSheet then closes, updates and "
                 "opens again by itself. Turn it off "
-                "with Help &gt; Check for Updates Automatically.</p>")
+                "with Help &gt; Check for Updates Automatically.</p>"
+                "<p><b>Error reports (team copy)</b>: off unless you turn "
+                "on Help &gt; Send Error Reports Automatically. When on, "
+                "after an error QuantiSheet sends a short report: what "
+                "happened, the QuantiSheet and Windows versions, and where "
+                "in the program the error was. It never sends drawings, "
+                "job files, file or folder names, prices, email addresses "
+                "or the log.</p>")
     return ("<p><b>Updates</b>: this copy doesn't check for updates; ask "
             "the person or company who gave it to you.</p>")
 
@@ -274,7 +376,22 @@ THIRD_PARTY = [
     ("pyHanko", "MIT", "Digital signatures"),
     ("cryptography", "Apache 2.0 or BSD", "Certificates and encryption"),
     ("Pillow", "MIT-CMU (HPND)", "Images"),
+    ("pyHanko certvalidator and asn1crypto", "MIT",
+     "Checking signing certificates"),
     ("ezdxf", "MIT", "AutoCAD DXF import and export"),
+    ("openpyxl", "MIT", "Reading and writing Excel workbooks"),
+    ("python-pptx", "MIT", "Writing PowerPoint files"),
+    ("lxml (with libxml2 and libxslt)", "BSD 3-Clause; MIT",
+     "Reading and writing the XML inside Office files"),
+    ("Shapely (with GEOS)", "BSD 3-Clause; GEOS is GNU LGPL v2.1",
+     "Shapes and areas for takeoff and generated drawings"),
+    ("OpenBLAS (inside NumPy)", "BSD 3-Clause", "Fast number work"),
+    ("fontTools", "MIT", "Reading fonts for PDF text"),
+    ("aiohttp, multidict, yarl, frozenlist", "Apache 2.0",
+     "A web-request library that comes with another component"),
+    ("certifi", "Mozilla Public License 2.0",
+     "The list of trusted web certificates"),
+    ("tzdata", "Apache 2.0", "Time zones"),
     ("Modulor", "MIT", "Generate Set: walls, openings and rooms "
      "(the drawing kernel)"),
     ("manifold3d", "Apache 2.0", "Geometry used by Modulor"),
@@ -307,7 +424,10 @@ its own license; their full texts come with each package.</p>
 License</th><th align=left>Used for</th></tr>{rows}</table>
 <p style='color:#888'>Components under the GNU AGPL (MuPDF, Ghostscript)
 require the program's source to be offered to its users, unless a
-commercial license is obtained from Artifex.</p>
+commercial license is obtained from Artifex. QuantiSheet's source for
+this version is offered under the GNU AGPL v3; Help &gt; About shows
+where. Qt (LGPL) and GEOS (LGPL) are separate library files that you may
+replace with your own builds.</p>
 """
 
 
@@ -400,7 +520,7 @@ project control in one program.</p>
 <td>{html_escape(settings.DIR)}</td></tr>
 <tr><td style='padding:2px 16px 2px 0;color:#888'>Terms</td>
 <td>Version {TERMS_VERSION}, {TERMS_DATE}</td></tr></table>
-{source_line()}<p style='color:#888'>© 2026 {html_escape(p['name'])}. Built with
+{source_line()}<p style='color:#888'>© 2026 {html_escape(p.get('legal_name') or p['name'])}. Built with
 open-source software - see Third-Party Licenses.</p>
 """
 

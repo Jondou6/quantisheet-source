@@ -371,3 +371,20 @@ def test_support_bundle_scrubs_keys_tokens_users_and_shares(tmp_path,
                    "tok-123-very-private", "jsmithers", "fileserver"):
         assert secret not in everything, secret
     assert "[secret removed]" in everything and "[user]" in everything
+
+
+def test_policy_templates_match_their_generator():
+    """tools/make_admx.py is the one source of the ADMX/ADML (Nov 25
+    optimization list: they had drifted, QuantiLink and package status
+    were added by hand). Run it after adding a setting."""
+    import importlib.util
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    spec = importlib.util.spec_from_file_location(
+        "make_admx", os.path.join(root, "tools", "make_admx.py"))
+    mk = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mk)
+    for path, text in zip(mk.paths(), mk.build()):
+        with open(path, encoding="utf-8") as f:
+            shipped = f.read().replace("\r\n", "\n")
+        assert shipped == text, (os.path.basename(path) +
+                                 " is out of date: run tools/make_admx.py")

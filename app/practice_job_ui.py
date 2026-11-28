@@ -2,6 +2,9 @@
 #22/#23, Nov 4). The logic and the sandbox are practice_job.py (PR 9);
 this is the small step window that sits beside the plan. Each step says
 what to do; "Show Me" does it for you on the practice plan only."""
+import logging
+import os
+
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (QDialog, QHBoxLayout, QLabel, QPushButton,
                                QVBoxLayout)
@@ -114,9 +117,29 @@ class PracticeJobWindow(QDialog):
         self.fill()
         return self.current["id"]
 
+    def _close_plan(self):
+        """Close the practice plan's tab: Windows won't let a fresh plan
+        be written over a file that is open (Nov 25: Start Over stopped
+        with "Permission denied"). False when the user keeps it open."""
+        plan = os.path.normcase(os.path.abspath(pj.plan_path()))
+        tabs = getattr(self.win, "tabs", None)
+        for i in reversed(range(tabs.count() if tabs is not None else 0)):
+            path = getattr(tabs.widget(i), "path", None)
+            if path and os.path.normcase(os.path.abspath(path)) == plan:
+                if not self.win.close_tab(i):
+                    return False
+        return True
+
     def start_over(self):
+        if not self._close_plan():
+            return
+        try:
+            info = pj.prepare(refresh=True)
+        except Exception:                                 # noqa: BLE001
+            logging.getLogger(__name__).warning(
+                "practice plan not refreshed", exc_info=True)
+            info = pj.prepare()         # the plan as it is, markups and all
         pj.reset_progress()
-        info = pj.prepare(refresh=True)
         self.win.open_path(info["plan"])
         self.index = 0
         self.next_btn.setEnabled(True)
